@@ -1,0 +1,14 @@
+[
+    { "MASTER_DB_DNSNAME": "text:vmonk1-master.test.rightscale.com" , "MASTER_DB_DNSID": "text:5264480", "SLAVE_DB_DNSNAME": "text:vmonk1-slave.test.rightscale.com" , "SLAVE_DB_DNSID": "text:5264500" },
+    { "MASTER_DB_DNSNAME": "text:vmonk2-master.test.rightscale.com" , "MASTER_DB_DNSID": "text:5264481", "SLAVE_DB_DNSNAME": "text:vmonk2-slave.test.rightscale.com" , "SLAVE_DB_DNSID": "text:5264501" },
+    { "MASTER_DB_DNSNAME": "text:vmonk3-master.test.rightscale.com" , "MASTER_DB_DNSID": "text:5264482", "SLAVE_DB_DNSNAME": "text:vmonk3-slave.test.rightscale.com" , "SLAVE_DB_DNSID": "text:5264503" },
+    { "MASTER_DB_DNSNAME": "text:vmonk4-master.test.rightscale.com" , "MASTER_DB_DNSID": "text:5264483", "SLAVE_DB_DNSNAME": "text:vmonk4-slave.test.rightscale.com" , "SLAVE_DB_DNSID": "text:5264506" },
+    { "MASTER_DB_DNSNAME": "text:vmonk5-master.test.rightscale.com" , "MASTER_DB_DNSID": "text:5264484", "SLAVE_DB_DNSNAME": "text:vmonk5-slave.test.rightscale.com" , "SLAVE_DB_DNSID": "text:5264507" },
+    { "MASTER_DB_DNSNAME": "text:vmonk6-master.test.rightscale.com" , "MASTER_DB_DNSID": "text:5264485", "SLAVE_DB_DNSNAME": "text:vmonk6-slave.test.rightscale.com" , "SLAVE_DB_DNSID": "text:5264509" },
+    { "MASTER_DB_DNSNAME": "text:vmonk7-master.test.rightscale.com" , "MASTER_DB_DNSID": "text:5264487", "SLAVE_DB_DNSNAME": "text:vmonk7-slave.test.rightscale.com" , "SLAVE_DB_DNSID": "text:5264511" },
+    { "MASTER_DB_DNSNAME": "text:vmonk8-master.test.rightscale.com" , "MASTER_DB_DNSID": "text:5264489", "SLAVE_DB_DNSNAME": "text:vmonk8-slave.test.rightscale.com" , "SLAVE_DB_DNSID": "text:5264513" },
+    { "MASTER_DB_DNSNAME": "text:vmonk9-master.test.rightscale.com" , "MASTER_DB_DNSID": "text:5264499", "SLAVE_DB_DNSNAME": "text:vmonk9-slave.test.rightscale.com" , "SLAVE_DB_DNSID": "text:5264515" },
+    { "MASTER_DB_DNSNAME": "text:vmonk10-master.test.rightscale.com", "MASTER_DB_DNSID": "text:5264493", "SLAVE_DB_DNSNAME": "text:vmonk10-slave.test.rightscale.com", "SLAVE_DB_DNSID": "text:5264517" },
+    { "MASTER_DB_DNSNAME": "text:vmonk11-master.test.rightscale.com", "MASTER_DB_DNSID": "text:5264497", "SLAVE_DB_DNSNAME": "text:vmonk11-slave.test.rightscale.com", "SLAVE_DB_DNSID": "text:5264518" },
+    { "MASTER_DB_DNSNAME": "text:vmonk12-master.test.rightscale.com", "MASTER_DB_DNSID": "text:5264498", "SLAVE_DB_DNSNAME": "text:vmonk12-slave.test.rightscale.com", "SLAVE_DB_DNSID": "text:5264519" }
+]

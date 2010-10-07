@@ -1,0 +1,7 @@
+export PATH=$PATH:/home/ec2/bin
+export EC2_HOME=/home/ec2
+
+# Source global definitions
+if [ -f /etc/bashrc ]; then
+        . /etc/bashrc
+fi

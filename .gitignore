@@ -1,0 +1,6 @@
+.DS_Store
+.rake_test_cache
+*.swp
+*.log
+*.swo
+*.db

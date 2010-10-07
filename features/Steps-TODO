@@ -1,0 +1,31 @@
+FEs
+3233 a2enmod deflate needs to be added in the apache install script for Ubuntu FE's
+3248 Apache modules are not installed properly for Ubuntu images
+2700 haproxy plugin for collectd is not working
+3378 Apache doesn't properly serve static content, due to a bad Rewrite Condition
+3379 Add "LB get HA proxy config" to all Front End ST
+1401 entering "yes" for the OPT_PHP_ENABLE script breaks the install'
+3302 Ubuntu Apache access_log doesn't get rotated
+
+HAProxy
+3300 HAProxy Add scripts user sed -i.orig which causes duplicate plugins in processes.conf
+3225 Collectd plugin does not work with HAProxy 1.3
+3223 LB HA proxy install v5: Script bug with Ubuntu RightImages
+2700 haproxy plugin for collectd is not working
+3279 Better race condition code for haproxy connect/disconnect backend
+3312 Front End HAProxy templates do not rotate /var/log/httpd/haproxy.log
+3332 HAProxy templates should not have a default value for HEALTH_CHECK_URI
+3413 haproxy 1.3 won't start with no servers registered
+
+MySQL
+3381 MySQL logs not configured in logrotate.
+3399 MySQL 5.1 EBS v2 support for new size
+3175 Initialize slave from slave snapshot
+3303 MySQL shared default configuration files do not properly enable logging
+3324 MySQL keeps bin logs forever eventually consuming entire disk
+3391 MySQL binlogs are not properly rotated on CentOS
+3136 MySql Ubuntu - Logging not configured in my.cnf
+3012 verify low TTL for mysql/EBS server
+652 MySQL, collectd needs to be restart after promote to master
+
+

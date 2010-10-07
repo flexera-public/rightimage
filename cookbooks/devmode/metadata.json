@@ -1,0 +1,54 @@
+{
+  "recipes": {
+    "devmode::setup_cookbooks": "Used to setup Dropbox cookbook as instance cookbooks.",
+    "devmode::do_recipe_loop": "Reconverge the boot recipes <count> times.",
+    "devmode::do_recipe_loop_step": "Used by do_recipe_loop as a remote recipe."
+  },
+  "groupings": {
+
+  },
+  "long_description": "= DESCRIPTION:\n\nUsefull recipes for cookbook development on the RightScale platform.\n\n= REQUIREMENTS:\n\n= ATTRIBUTES: \n\n= USAGE:\n\n",
+  "recommendations": {
+
+  },
+  "dependencies": {
+
+  },
+  "maintainer": "RightScale, Inc.",
+  "suggestions": {
+
+  },
+  "description": "Installs\/Configures devmode",
+  "maintainer_email": "cary@rightscale.com",
+  "name": "devmode",
+  "conflicting": {
+
+  },
+  "providing": {
+
+  },
+  "platforms": {
+
+  },
+  "version": "0.1.0",
+  "attributes": {
+    "devmode\/converge_loop\/total": {
+      "calculated": false,
+      "default": "10",
+      "type": "string",
+      "choice": [
+
+      ],
+      "display_name": "Converge Loop Count",
+      "recipes": [
+        "devmode::do_converge_loop",
+        "devmode::do_converge_loop_step"
+      ],
+      "required": "optional"
+    }
+  },
+  "replacing": {
+
+  },
+  "license": "All rights reserved"
+}

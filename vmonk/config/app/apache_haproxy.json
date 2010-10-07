@@ -1,0 +1,31 @@
+{
+		"SYSLOG_SERVER":"env:RS_SYSLOG",
+		"PHP_MODULES_LIST":"ignore:$ignore",
+		"OPT_TARGET_BIND_ADDRESS":"ignore:$ignore",
+		"OPT_SVN_USERNAME":"cred:martin_svn_user",
+		"LB_BACKEND_NAME":"env:EC2_INSTANCE_ID",
+		"SERVER_UUID":"env:RS_INSTANCE_UUID",
+		"OPT_PHP_ENABLE":"text:yes",
+		"PRIVATE_SSH_KEY":"key:publish-test:1",
+		"OPT_TARGET_BIND_PORT":"ignore:$ignore",
+		"DB_HOST_NAME":"text:<%= ENV['EC2_PUBLIC_HOSTNAME'] %>",
+		"RAILS_ENV":"text:production",
+		"LB_BIND_PORT":"text:85",
+		"WEBSITE_DNS":"text:reg-rails.test.rightscale.com",
+		"OPT_SVN_PASSWORD":"cred:martin_svn_passwd",
+		"LB_BIND_ADDRESS":"text:127.0.0.1",
+		"RAILS_VERSION":"text:2.1.2",
+		"DBAPPLICATION_USER":"cred:DBAPPLICATION_USER",
+		"APPLICATION":"text:app_test",
+		"LB_HOSTNAME":"text:foo_overwritten",
+		"LB_APPLISTENER_NAME":"text:railsapp",
+		"OPT_VHOST_PORT":"ignore:$ignore",
+		"MAX_CONN_PER_SERVER":"text:100",
+		"MASTER_DB_DNSNAME":"text:<%= ENV['EC2_PUBLIC_HOSTNAME'] %>",
+		"HEALTH_CHECK_URI":"ignore:$ignore",
+		"SVN_APP_REPOSITORY":"text:https://wush.net/svn/rightscale/unified_test_app/rails",
+		"DB_SCHEMA_NAME":"text:app_test",
+		"DBAPPLICATION_PASSWORD":"cred:DBAPPLICATION_PASSWORD"
+		}
+
+

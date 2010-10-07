@@ -1,0 +1,8 @@
+export DEPLOYMENT="martin_foo"
+export FRONTEND_HREF="https://my.rightscale.com/api/acct/2901/server_templates/12583"
+export SSH_KEY_HREF="https://my.rightscale.com/api/acct/2901/ec2_ssh_keys/7053"
+export SECURITY_GROUP_HREF="https://my.rightscale.com/api/acct/2901/ec2_security_groups/6411"
+export PRIVATE_KEY_PATH="/root/.ssh/publish-test"
+export IMAGE_HREF="https://my.rightscale.com/api/acct/2901/ec2_images/91316755"
+export CLOUD_ID="1"
+export INSTANCE_TYPE="m1.small"

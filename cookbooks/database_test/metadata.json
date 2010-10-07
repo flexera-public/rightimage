@@ -1,0 +1,39 @@
+{
+  "recipes": {
+
+  },
+  "groupings": {
+
+  },
+  "long_description": "= DESCRIPTION:\n\n= REQUIREMENTS:\n\n= ATTRIBUTES: \n\n= USAGE:\n\n",
+  "recommendations": {
+
+  },
+  "dependencies": {
+
+  },
+  "maintainer": "RightScale, Inc.",
+  "suggestions": {
+
+  },
+  "description": "used as a test for the database provider",
+  "maintainer_email": "cary@rightscale.com",
+  "name": "database_test",
+  "conflicting": {
+
+  },
+  "providing": {
+
+  },
+  "platforms": {
+
+  },
+  "version": "0.1.0",
+  "attributes": {
+
+  },
+  "replacing": {
+
+  },
+  "license": "All rights reserved"
+}

@@ -1,0 +1,121 @@
+require 'rubygems'
+require 'rest_connection'
+require 'yaml'
+require 'fileutils'
+require 'sqlite3'
+require File.join(File.dirname(__FILE__), "..", "vmonk", "lib", "cuke_monk")
+
+def cached_deployments()
+  if File.exists?("deployments.cache.yaml")
+    puts "Loading deployments from cache.."
+    deployments = YAML::load(IO.read("deployments.cache.yaml"))
+  else
+    deployments = Deployment.find_by(:nickname) { |nick| nick.include?(ENV['DEPLOYMENTS_TAG']) }
+    File.open("deployments.cache.yaml", "w") {|f| f.write(deployments.to_yaml)}
+  end
+  deployments
+end
+
+desc "Release MySQL DNS records for reuse"
+task :release_dns do
+  raise "Please setup DEPLOYMENT environment variable" unless ENV['DEPLOYMENT']
+  SQLite3::Database.new("shared.db") do |db|
+    q = db.query("UPDATE mysql_dns SET owner=NULL where owner='#{ENV['DEPLOYMENT']}'")
+    q.close
+    db.query("SELECT * FROM mysql_dns") do |result|
+      puts result.entries
+    end
+  end
+end
+
+desc "Release ALL MySQL DNS records for reuse"
+task :release_all_dns do
+  SQLite3::Database.new("shared.db") do |db|
+    q = db.query("UPDATE mysql_dns SET owner=NULL")
+    q.close
+    db.query("SELECT * FROM mysql_dns") do |result|
+      puts result.entries
+    end
+  end
+end
+
+desc "Run Parallel Cucumber Features and post results"
+task :run_parallel_features do
+  raise "FATAL: please setup $FEATURE environment variable with the filename of Cuke feature test." unless ENV['FEATURE']
+  raise "FATAL: please setup DEPLOYMENTS_TAG environment variable, for finding your set of deployments" unless ENV['DEPLOYMENTS_TAG']
+
+  cm = CukeMonk.new
+  set = Deployment.find_by(:nickname) { |nick| nick.include?(ENV['DEPLOYMENTS_TAG']) }
+  puts "Found: #{set.size} deployments matching #{ENV['DEPLOYMENTS_TAG']}"
+  feature_name = ENV["FEATURE"]
+  FileUtils.mkdir_p("log")
+  ENV['REST_CONNECTION_LOG'] = "log/rest_connection.log"
+  deployment_nicknames = set.map &:nickname
+  cm.run_tests(deployment_nicknames, feature_name)
+  cm.generate_reports
+end
+
+desc "Parallel Cuke test on a set of deployments"
+task :run_parallel_features_old do
+  raise "FATAL: please setup $FEATURE environment variable with the filename of Cuke feature test." unless ENV['FEATURE']
+  raise "FATAL: please setup DEPLOYMENTS_TAG environment variable, for finding your set of deployments" unless ENV['DEPLOYMENTS_TAG']
+  set = Deployment.find_by(:nickname) { |nick| nick.include?(ENV['DEPLOYMENTS_TAG']) }
+  puts "Found: #{set.size} deployments matching #{ENV['DEPLOYMENTS_TAG']}"
+  feature_name = ENV["FEATURE"]
+  FileUtils.mkdir_p("log")
+  children = []
+  set.each do |dep|
+    ENV['DEPLOYMENT'] = dep.nickname
+    ENV['REST_CONNECTION_LOG'] = "log/rest_connection.#{ENV['DEPLOYMENT']}-#{dep.nickname}.log"
+    children << Process.fork {
+      cmd = "cucumber #{feature_name} --out 'log/#{ENV['DEPLOYMENT']}-#{dep.nickname}.log'"
+      puts "RUNNING: #{cmd}"
+      success = system(cmd)
+      if success
+        FileUtils.mv("log/#{ENV['DEPLOYMENT']}-#{dep.nickname}.log","log/COMPLETED-#{ENV['DEPLOYMENT']}-#{dep.nickname}.log")
+      else
+        FileUtils.mv("log/#{ENV['DEPLOYMENT']}-#{dep.nickname}.log","log/FAILED-#{ENV['DEPLOYMENT']}-#{dep.nickname}.log")
+      end
+    }
+  end
+
+  Signal.trap("SIGINT") do
+    puts "Caught CTRL-C, killing children.."
+    children.each {|c| Process.kill("INT", c)}
+    sleep 1
+    children.each {|c| Process.kill("INT", c)}
+  end
+
+  children.each {|c| Process.wait2(c)}
+  puts "Run finished"
+  
+end
+
+desc "TERMINATE all servers in all deployments specified by DEPLOYMENTS_TAG"
+task :kill_all do
+  raise "FATAL: please setup DEPLOYMENTS_TAG environment variable, for finding your set of deployments" unless ENV['DEPLOYMENTS_TAG']
+  set = cached_deployments 
+  set.each {|n| STDOUT.puts n.nickname}
+  STDOUT.puts "10 seconds till ..TERMINATING all servers in these deployments ^^^^. CTRL-C to abort."
+  sleep 10
+  set.each do |deploy|
+    servers = deploy.servers
+    servers.each { |s| s.stop }
+  end
+end
+
+desc "RELAUNCH all *running servers in deployments specified by DEPLOYMENTS_TAG"
+task :relaunch_all do
+  raise "FATAL: please setup DEPLOYMENTS_TAG environment variable, for finding your set of deployments" unless ENV['DEPLOYMENTS_TAG']
+  set = cached_deployments 
+  set.each {|n| STDOUT.puts n.nickname}
+  STDOUT.puts "10 seconds till ..RELAUNCHING all servers in these deployments ^^^^. CTRL-C to abort."
+  sleep 10
+  set.each do |deploy|
+    my_servers = deploy.servers
+    my_servers.each do |s| 
+      s.relaunch
+    end
+  end
+end
+
