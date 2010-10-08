@@ -1,0 +1,109 @@
+{
+  "recipes": {
+
+  },
+  "groupings": {
+
+  },
+  "long_description": "= DESCRIPTION:\n\n= REQUIREMENTS:\n\n= ATTRIBUTES: \n\n= USAGE:\n\n",
+  "recommendations": {
+
+  },
+  "dependencies": {
+    "git": [
+
+    ],
+    "cucumber": [
+
+    ]
+  },
+  "maintainer": "RightScale, Inc.",
+  "suggestions": {
+
+  },
+  "description": "Installs\/Configures resat",
+  "maintainer_email": "cary@rightscale.com",
+  "name": "resat",
+  "conflicting": {
+
+  },
+  "providing": {
+
+  },
+  "platforms": {
+
+  },
+  "version": "0.1.0",
+  "attributes": {
+    "resat\/git_key": {
+      "calculated": false,
+      "type": "string",
+      "choice": [
+
+      ],
+      "description": "The private SSH key of the git repository.",
+      "display_name": "Git Repository Credentials",
+      "require": true,
+      "recipes": [
+
+      ],
+      "required": "optional"
+    },
+    "resat\/test\/template": {
+      "calculated": false,
+      "type": "string",
+      "choice": [
+
+      ],
+      "description": "The type of ServerTemplate to test.",
+      "display_name": "Template Type",
+      "require": true,
+      "recipes": [
+        "resat::do_deployment_create",
+        "resat::do_deployment_destroy",
+        "resat::do_deployment_reboot",
+        "resat::do_deployment_shutdown"
+      ],
+      "required": "optional"
+    },
+    "resat\/test\/type": {
+      "calculated": false,
+      "type": "string",
+      "choice": [
+
+      ],
+      "description": "Selects deployment config directory, also which tagged features should be run. See http:\/\/wiki.github.com\/aslakhellesoy\/cucumber\/tags",
+      "display_name": "Test Type",
+      "require": true,
+      "recipes": [
+        "resat::do_run_features",
+        "resat::do_deployment_create",
+        "resat::do_deployment_destroy",
+        "resat::do_deployment_reboot",
+        "resat::do_deployment_shutdown"
+      ],
+      "required": "optional"
+    },
+    "resat\/test\/os": {
+      "calculated": false,
+      "type": "string",
+      "choice": [
+
+      ],
+      "description": "The platform to test on.",
+      "display_name": "Test Platform",
+      "require": true,
+      "recipes": [
+        "resat::do_deployment_create",
+        "resat::do_deployment_destroy",
+        "resat::do_deployment_reboot",
+        "resat::do_deployment_shutdown"
+      ],
+      "required": "optional"
+    }
+  },
+  "replacing": {
+
+  },
+  "license": "All rights reserved"
+}

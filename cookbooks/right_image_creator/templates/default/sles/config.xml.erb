@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<image schemaversion="3.7" name="RightImage_foo">
+	<description type="system">
+		<author>Martin Rhoads</author>
+		<contact>martin@rightscale.com</contact>
+		<specification>RightImage</specification>
+	</description>
+	<preferences>
+		<type primary="true" >ec2</type>
+                <type filesystem="ext4" boot="vmxboot/suse-11.2">vmx</type>
+                <type filesystem="ext4" boot="xenboot/suse-11.2">xen</type>
+		<version>1.1.2</version>
+		<packagemanager>zypper</packagemanager>
+		<rpm-check-signatures>false</rpm-check-signatures>
+	</preferences>
+        <users group="root">
+                <user pwd="$1$wYJUgpM5$RXMMeASDc035eX.NbYWFl0" home="/root" name="root"/>
+        </users>
+	<repository type="yast2" >
+		<source path="/usr/share/kiwi/repo/suse-repo/suse-sle11-repo"/>
+     </repository>
+	<packages type="image">
+                <package name="bootsplash-branding-openSUSE" bootinclude="true" bootdelete="true"/>
+                <package name="gfxboot-branding-openSUSE" bootinclude="true" bootdelete="true"/>
+                <package name="kernel-default"/>
+                <package name="kernel-xen"/>
+                <package name="vim"/>
+                <opensusePattern name="base"/>
+                <% node.right_image_creator.guest_packages.split.each do |p| -%>
+		<package name="<%= p %>"/>
+                <% end -%>
+	</packages>
+        <packages type="xen">
+                <package name="kernel-xen"/>
+                <package name="xen"/>
+        </packages>
+        <packages type="vmware">
+        </packages>
+        <xenconfig memory="512">
+                <xendisk device="/dev/sda"/>
+        </xenconfig>
+        <vmwareconfig memory="512">
+                <vmwaredisk controller="ide" id="0"/>
+        </vmwareconfig>
+        <packages type="bootstrap">
+                <package name="filesystem"/>
+                <package name="glibc-locale"/>
+        </packages>
+</image>

@@ -1,0 +1,13 @@
+= DESCRIPTION:
+
+This tests the 
+ * bd_lvmros cookbook
+ * block_device resource
+ * block_device/lvm_ros provider
+
+= REQUIREMENTS:
+
+= ATTRIBUTES: 
+
+= USAGE:
+

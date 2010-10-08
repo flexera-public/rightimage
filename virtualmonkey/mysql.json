@@ -1,0 +1,101 @@
+{
+  "test_name": "MySQL 5.1 v2 test",
+
+  "cuke_tags": "@mysql_5.1",
+
+  "dns": "true",
+
+  "servers": {
+    "master": "https://my.rightscale.com/api/acct/2901/server_templates/46536",
+    "slave": "https://my.rightscale.com/api/acct/2901/server_templates/46536"
+  },
+
+  "clouds": {
+    "ec2": {
+      "regions": {
+        "us-east": {
+          "cloud_id": "1",
+          "ssh_key": "https://my.rightscale.com/api/acct/2901/ec2_ssh_keys/7053",
+          "security_group": "https://my.rightscale.com/api/acct/2901/ec2_security_groups/6411",
+          "private_key_path": "/root/.ssh/publish-test",
+
+          "images": [
+            { "name": "Ubuntu_9.10_i386_v4.5.0" , "id": "ami-9b6488f2", "arch": "i386" , "href": "https://my.rightscale.com/api/acct/2901/ec2_images/109218294" },
+            { "name": "Ubuntu_9.10_x64_v4.5.0" , "id": "ami-cf6a86a6", "arch": "x86_64" , "href": "https://my.rightscale.com/api/acct/2901/ec2_images/109186430" }
+          ],
+          
+          "inputs": {
+            "PRIVATE_SSH_KEY"          : "key:publish-test:1"
+          }
+       },
+
+       "us-west": {
+         "cloud_id": "3",
+         "ssh_key": "https://my.rightscale.com/api/acct/2901/ec2_ssh_keys/197758",
+         "security_group": "https://my.rightscale.com/api/acct/2901/ec2_security_groups/97863",
+         "private_key_path": "/root/.ssh/publish-test-west",
+
+         "images": [
+           { "name": "Ubuntu_9.10_i386_v4.5.0" , "id": "ami-3d451478", "arch": "i386" , "href": "https://my.rightscale.com/api/acct/2901/ec2_images/109183830" },
+           { "name": "Ubuntu_9.10_x64_v4.5.0" , "id": "ami-3f45147a", "arch": "x86_64" , "href": "https://my.rightscale.com/api/acct/2901/ec2_images/109183837" }
+         ],
+
+         "inputs": {
+            "PRIVATE_SSH_KEY"          : "key:publish-test-west:3"
+          }
+        },
+
+       "eu": {
+         "cloud_id": "2",
+         "ssh_key": "https://my.rightscale.com/api/acct/2901/ec2_ssh_keys/198006",
+         "security_group": "https://my.rightscale.com/api/acct/2901/ec2_security_groups/48972",
+         "private_key_path": "/root/.ssh/publish-test-eu",
+          
+         "images": [ 
+           { "name": "Ubuntu_9.10_i386_v4.5.0" , "id": "ami-35a78c41", "arch": "i386" , "href": "https://my.rightscale.com/api/acct/2901/ec2_images/109189743" },
+           { "name": "Ubuntu_9.10_x64_v4.5.0" , "id": "ami-25a78c51", "arch": "x86_64" , "href": "https://my.rightscale.com/api/acct/2901/ec2_images/109208062" }
+         ],
+          
+         "inputs": {
+            "PRIVATE_SSH_KEY"          : "key:publish-test-eu:2"
+          } 
+        }
+      },        
+
+      "instance_types": {
+        "i386": [
+          "m1.small",
+          "c1.medium" 
+        ],
+    
+        "x86_64": [
+          "m1.large",
+          "m1.xlarge"
+        ] 
+      }
+    }
+  },
+
+
+  "inputs": {
+    "DBADMIN_PASSWORD"            : "text:admin_passwd",
+    "DBADMIN_USER"                : "text:admin_user",
+    "DBREPLICATION_PASSWORD"      : "text:replication_passwd",
+    "DBREPLICATION_USER"          : "text:replication_user",
+    "DBAPPLICATION_PASSWORD"      : "text:application_passwd",
+    "DBAPPLICATION_USER"          : "text:application_user",
+    "DB_BACKUP_KEEP_DAILY"        : "text:4",
+    "DB_BACKUP_KEEP_LAST"         : "text:10",
+    "DB_BACKUP_KEEP_MONTHLY"      : "text:1",
+    "DB_BACKUP_KEEP_WEEKLY"       : "text:1",
+    "DB_BACKUP_KEEP_YEARLY"       : "text:1",
+    "DB_LINEAGE_NAME"             : "text:app_test51",
+    "DNSMADEEASY_PASSWORD"        : "cred:DNSMADEEASY_TEST_PASSWORD",
+    "DNSMADEEASY_USER"            : "cred:DNSMADEEASY_TEST_USER",
+    "INIT_SLAVE_AT_BOOT"          : "text:false",
+    "MASTER_DB_DNSNAME"           : "text:master-ebs-stripe1.test.rightscale.com",
+    "OPT_SYS_LVM_SWAP_SIZE_IN_G"  : "ignore:$ignore", 
+    "SLAVE_DB_DNSID"              : "text:4635264"
+  }
+  
+}

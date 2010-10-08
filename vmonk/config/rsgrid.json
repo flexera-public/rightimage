@@ -1,0 +1,10 @@
+{
+"RAILS_ENV"            : "text:development",
+"RSGRID_ERROR_QUEUE"   : "text:1273531916264_RSGrid_Quickstart_Error",
+"RSGRID_BUCKET"        : "text:RSGrid_Quickstart_2901_1273531916264",
+"RUNDIR"               : "text:/mnt/rightgrid",
+"RSGRID_OUTPUT_QUEUE"  : "text:1273531916264_RSGrid_Quickstart_Output",
+"RSGRID_INPUT_QUEUE"   : "text:1273531916264_RSGrid_Quickstart_Input",
+"RSGRID_AUDIT_QUEUE"   : "text:1273531916264_RSGrid_Quickstart_Audit"
+}
+

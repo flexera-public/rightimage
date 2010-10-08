@@ -1,0 +1,60 @@
+{
+  "test_name": "tomcat 6 FE and APP",
+  "cuke_tags": "@foo",
+
+  "servers": {
+    "frontend1": "https://my.rightscale.com/api/acct/2901/server_templates/44210",
+    "frontend2": "https://my.rightscale.com/api/acct/2901/server_templates/44210",
+    "appserver1": "https://my.rightscale.com/api/acct/2901/server_templates/18769",
+    "appserver2": "https://my.rightscale.com/api/acct/2901/server_templates/18769"
+  },
+
+  "clouds": {
+    "ec2": {
+      "regions": {
+        "us-east": {
+          "cloud_id": "1",
+          "ssh_key": "https://my.rightscale.com/api/acct/2901/ec2_ssh_keys/7053",
+          "security_group": "https://my.rightscale.com/api/acct/2901/ec2_security_groups/6411",
+          "private_key_path": "/root/.ssh/publish-test",
+
+          "images": [
+            { "name": "Ubuntu_9.10_i386_v4.5.0" , "id": "ami-9b6488f2", "arch": "i386" , "href": "https://my.rightscale.com/api/acct/2901/ec2_images/109218294" }
+          ],
+          
+          "inputs": {
+            "PRIVATE_SSH_KEY"          : "key:publish-test:1"
+          }
+        }
+      },
+
+      "instance_types": {
+        "i386": [
+          "m1.small",
+          "c1.medium" 
+        ],
+    
+        "x86_64": [
+          "m1.large",
+          "m1.xlarge"
+        ] 
+      }
+    }
+  },
+
+
+  "inputs": {
+    "APPLICATION"              : "text:tomcatapp",
+    "DBAPPLICATION_PASSWORD"   : "cred:DBAPPLICATION_PASSWORD",
+    "DBAPPLICATION_USER"       : "cred:DBAPPLICATION_USER",
+    "DB_SCHEMA_NAME"           : "text:app_test",
+    "HEALTH_CHECK_URI"         : "ignore:$ignore",
+    "LB_HOSTNAME"              : "env:EC2_LOCAL_HOSTNAME",
+    "MASTER_DB_DNSNAME"        : "text:#{ENV['EC2_PUBLIC_HOSTNAME']}",
+    "OPT_SVN_PASSWORD"         : "cred:martin_svn_passwd",
+    "OPT_SVN_USERNAME"         : "cred:martin_svn_user",
+    "SVN_APP_REPOSITORY"       : "text:https://wush.net/svn/rightscale/unified_test_app/tomcat/dist",
+    "WEBSITE_DNS"              : "text:reg-tomcat.test.rightscale.com"
+  }
+  
+}

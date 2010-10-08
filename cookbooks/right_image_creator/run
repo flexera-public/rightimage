@@ -1,0 +1,5 @@
+#!/bin/bash 
+
+dirname=$(readlink -e $(dirname $0))
+
+chef-solo  -c $dirname/solo.rb -j $dirname/run.json 

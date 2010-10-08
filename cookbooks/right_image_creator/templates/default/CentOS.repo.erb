@@ -1,0 +1,61 @@
+#
+# This file uses a new mirrorlist system developed by Lance Davis for CentOS.
+# The mirror system uses the connecting IP address of the client and the
+# update status of each mirror to pick mirrors that are updated to and
+# geographically close to the client.  You should use this for CentOS updates
+# unless you are manually picking other mirrors.
+#
+# If the mirrorlist= does not work for you, as a fall back you can try the
+# remarked out baseurl= line instead.
+#
+#
+
+[base]
+name=CentOS-$releasever - Base
+baseurl=<%= node[:right_image_creator][:mirror] %>/centos/$releasever/os/$basearch/
+failovermethod=priority
+gpgcheck=1
+enabled=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-5
+
+[updates]
+name=CentOS-$releasever - Updates
+baseurl=<%= node[:right_image_creator][:mirror] %>/centos/$releasever/updates/$basearch/
+failovermethod=priority
+enabled=1
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-5
+
+#packages used/produced in the build but not released
+[addons]
+name=CentOS-$releasever - Addons
+baseurl=<%= node[:right_image_creator][:mirror] %>/centos/$releasever/addons/$basearch/
+failovermethod=priority
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-5
+
+#additional packages that may be useful
+[extras]
+name=CentOS-$releasever - Extras
+baseurl=<%= node[:right_image_creator][:mirror] %>/centos/$releasever/extras/$basearch/
+failovermethod=priority
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-5
+
+#additional packages that extend functionality of existing packages
+[centosplus]
+name=CentOS-$releasever - Plus
+baseurl=<%= node[:right_image_creator][:mirror] %>/centos/$releasever/centosplus/$basearch/
+failovermethod=priority
+gpgcheck=1
+enabled=0
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-5
+
+[epel]
+name=Extra Packages for Enterprise Linux 5 - $basearch
+baseurl=<%= node[:right_image_creator][:mirror] %>/epel/5/$basearch
+failovermethod=priority
+enabled=1
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL
+

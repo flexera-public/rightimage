@@ -1,0 +1,103 @@
+{
+  "recipes": {
+    "storage_test::test_s3": "",
+    "storage_test::test_cloudfiles": "",
+    "storage_test::get_file": ""
+  },
+  "groupings": {
+
+  },
+  "long_description": "= DESCRIPTION:\n\n= REQUIREMENTS:\n\n= ATTRIBUTES: \n\n= USAGE:\n\n",
+  "recommendations": {
+
+  },
+  "dependencies": {
+    "bd_lvmros": [
+
+    ]
+  },
+  "maintainer": "RightScale, Inc.",
+  "suggestions": {
+
+  },
+  "description": "Installs\/Configures storage_test",
+  "maintainer_email": "cary@rightscale.com",
+  "name": "storage_test",
+  "conflicting": {
+
+  },
+  "providing": {
+
+  },
+  "platforms": {
+
+  },
+  "version": "0.1.0",
+  "attributes": {
+    "test\/cloudfiles\/user": {
+      "calculated": false,
+      "type": "string",
+      "choice": [
+
+      ],
+      "display_name": "Rackspace Username",
+      "required": "required",
+      "recipes": [
+        "storage_test::test_cloudfiles"
+      ]
+    },
+    "test\/s3\/key": {
+      "calculated": false,
+      "type": "string",
+      "choice": [
+
+      ],
+      "display_name": "Amazon Secret Access Key",
+      "required": "required",
+      "recipes": [
+        "storage_test::test_s3"
+      ]
+    },
+    "test\/s3\/user": {
+      "calculated": false,
+      "type": "string",
+      "choice": [
+
+      ],
+      "display_name": "Amazon Access Key ID",
+      "required": "required",
+      "recipes": [
+        "storage_test::test_s3"
+      ]
+    },
+    "test\/cloudfiles\/key": {
+      "calculated": false,
+      "type": "string",
+      "choice": [
+
+      ],
+      "display_name": "Rackspace Authorization Key",
+      "required": "required",
+      "recipes": [
+        "storage_test::test_cloudfiles"
+      ]
+    },
+    "test\/container": {
+      "calculated": false,
+      "default": "regression_test_area",
+      "type": "string",
+      "choice": [
+
+      ],
+      "display_name": "Test Container",
+      "recipes": [
+
+      ],
+      "required": "optional"
+    }
+  },
+  "replacing": {
+
+  },
+  "license": "All rights reserved"
+}

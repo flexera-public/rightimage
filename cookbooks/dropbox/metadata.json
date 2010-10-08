@@ -1,0 +1,76 @@
+{
+  "recipes": {
+    "dropbox::default": "Install dropbox and register instance."
+  },
+  "groupings": {
+
+  },
+  "long_description": "",
+  "recommendations": {
+
+  },
+  "dependencies": {
+
+  },
+  "maintainer": "RightScale, Inc.",
+  "suggestions": {
+
+  },
+  "description": "Installs\/Configures dropbox",
+  "maintainer_email": "cary@rightscale.com",
+  "name": "dropbox",
+  "conflicting": {
+
+  },
+  "providing": {
+
+  },
+  "platforms": {
+
+  },
+  "version": "0.1.0",
+  "attributes": {
+    "dropbox\/email": {
+      "calculated": false,
+      "type": "string",
+      "choice": [
+
+      ],
+      "description": "Email address linked to your dropbox account.",
+      "display_name": "Dropbox User Email",
+      "required": "required",
+      "recipes": [
+        "dropbox::default"
+      ]
+    },
+    "dropbox\/password": {
+      "calculated": false,
+      "type": "string",
+      "choice": [
+
+      ],
+      "description": "Passwod for your dropbox user account.",
+      "display_name": "Dropbox Password",
+      "required": "required",
+      "recipes": [
+        "dropbox::default"
+      ]
+    },
+    "dropbox": {
+      "calculated": false,
+      "type": "hash",
+      "choice": [
+
+      ],
+      "display_name": "Dropbox Application Settings",
+      "recipes": [
+
+      ],
+      "required": "optional"
+    }
+  },
+  "replacing": {
+
+  },
+  "license": "All rights reserved"
+}

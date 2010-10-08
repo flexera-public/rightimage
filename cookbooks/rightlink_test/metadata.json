@@ -1,0 +1,54 @@
+{
+  "replacing": {
+
+  },
+  "dependencies": {
+
+  },
+  "groupings": {
+
+  },
+  "long_description": "= DESCRIPTION:\n\nRightLink test suite.  \n\nFunctional test suite for the the RightLink project.\n\nhttp:\/\/wiki.github.com\/rightscale\/right_link\/\n\n= REQUIREMENTS:\n\n= ATTRIBUTES: \nnone\n\n= USAGE:\n\n",
+  "recommendations": {
+
+  },
+  "description": "Installs\/Configures rightlink_test",
+  "maintainer": "RightScale, Inc.",
+  "name": "rightlink_test",
+  "suggestions": {
+
+  },
+  "maintainer_email": "cary@rightscale.com",
+  "conflicting": {
+
+  },
+  "recipes": {
+    "rightlink_test::state_test_check_value": "Verifies attribute setup in state_test_setup was persisted. This should be run as an operational script.",
+    "rightlink_test::resource_remote_recipe_ping": "Called by resource_remote_recipe_test_start -- Add as a operational script.",
+    "rightlink_test::tag_break_point_test": "Add a breakpoint at tag_break_point_test_should_never_run recipe and reboots server.",
+    "rightlink_test::core_env_test": "Verifies all require rightscale environment variables are available in the Chef node.",
+    "rightlink_test::tag_break_point_test_should_never_run": "Used by tag_break_point_test. This must be the last boot script in your template.",
+    "rightlink_test::resource_remote_recipe_test_start": "Starts the remote_recipe 'ping-pong' test.  This must be run as an operational script (or you will get stuck in an endless loop)",
+    "rightlink_test::persist_test_setup": "Persists a resource to file for use in a separate converge. This can be boot or op script.",
+    "rightlink_test::persist_test_check": "Verifies resource created in persist_test_setup was persisted. This should be run as an operational script.",
+    "rightlink_test::ohai_plugin_test": "Verifies all custom ohai plugin values are available in the Chef node.",
+    "rightlink_test::resource_server_collection_test": "Tests the ability to query tags on the local server.",
+    "rightlink_test::resource_remote_recipe_pong": "Called by resource_remote_recipe_test_start -- Add as a operational script.",
+    "rightlink_test::state_test_setup": "Overwrites default attribute the first time run. This can be boot or op script.",
+    "rightlink_test::resource_right_link_tag_test": "Test the ability to add and remove tags.",
+    "rightlink_test::tag_cookbook_path_test": "Copies this repo to a local dir, sets the cookbook_path tag, and reboots server.",
+    "rightlink_test::resource_remote_recipe_setup": "Tags a server as a ping receiver.  Any server with this tag needs resource_remote_recipe_ping & resource_remote_recipe_pong as operational scripts.",
+    "rightlink_test::ruby_warning_test": "Generate a ruby warning. Recipe should not fail.  Recommend running as boot script."
+  },
+  "platforms": {
+
+  },
+  "version": "0.1.0",
+  "attributes": {
+
+  },
+  "providing": {
+
+  },
+  "license": "All rights reserved"
+}
