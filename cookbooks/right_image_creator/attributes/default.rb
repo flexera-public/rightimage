@@ -35,7 +35,7 @@ when "centos"
   set[:right_image_creator][:host_packages] = "swig"
   set[:right_image_creator][:package_type] = "rpm"
 when "suse"
-  set[:right_image_creator][:guest_packages] = "vim openssh gcc"
+  set[:right_image_creator][:guest_packages] = "gcc"
 
   set[:right_image_creator][:host_packages] = "kiwi"
 end

@@ -1,0 +1,5 @@
+#!/bin/bash
+#
+# only used in autobuild to remove devel repo before checkin into production repo
+
+sed -i -e 's;<repository type="rpm-md"><source path="obs://Devel:AmazonEC2/SLE_11_SP1_Update"/></repository>;;' config.kiwi

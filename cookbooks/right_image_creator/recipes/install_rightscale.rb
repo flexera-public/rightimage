@@ -27,15 +27,6 @@ chroot $ROOT /tmp/rubygems_install.sh
 EOC
 end
 
-# Install rightscale package based on revision number
-if node[:right_image_creator][:rightscale_release] =~ /4\.[0-9]*\.[0-9]*/
-  log "Building image with RunRightScripts package."
-  include_recipe "right_image_creator::install_runrightscripts"
-else
-  log "Building image with RightLink package."
-  include_recipe "right_image_creator::install_rightlink"
-end
-
 remote_file "/tmp/s3sync.tgz" do 
    source "s3sync.tgz" 
    backup false
@@ -47,7 +38,15 @@ bash "install_s3_sync" do
     chroot #{node[:right_image_creator][:mount_dir]} ln -sf /home/s3sync/s3sync.rb /usr/local/bin/s3sync
     chroot #{node[:right_image_creator][:mount_dir]} ln -sf /home/s3sync/s3cmd.rb /usr/local/bin/s3cmd
   EOC
+end
 
+# Install rightscale package based on revision number
+if node[:right_image_creator][:rightscale_release] =~ /4\.[0-9]*\.[0-9]*/
+  log "Building image with RunRightScripts package."
+  include_recipe "right_image_creator::install_runrightscripts"
+else
+  log "Building image with RightLink package."
+  include_recipe "right_image_creator::install_rightlink"
 end
 
 bash "setup_motd" do

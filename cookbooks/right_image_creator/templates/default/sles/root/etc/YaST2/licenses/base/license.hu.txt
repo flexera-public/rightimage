@@ -1,0 +1,276 @@
+SUSE(R) Linux Enterprise Server („SLES (tm)”)11 SP1
+Novell(R) szoftverlicenc-szerződés
+
+A SZERZŐDÉST GONDOSAN OLVASSA EL. A SZOFTVER (ÉS ÖSSZETEVŐINEK) TELEPÍTÉSÉVEL
+VAGY MÁS MÓDON TÖRTÉNŐ HASZNÁLATÁVAL ELFOGADJA EZEN SZERZŐDÉS FELTÉTELEIT. HA
+NEM FOGADJA EL A FELTÉTELEKET, NE TÖLTSE LE, NE TELEPÍTSE ÉS NE HASZNÁLJA A
+SZOFTVERT.
+
+JOGOK ÉS LICENCEK
+
+A jelen Novell szoftverlicenc-szerződés („Szerződés”) jogszerű megállapodás Ön
+(egy jogi vagy egy természetes személy) és a Novell, Inc. („Novell”) között.  A
+Szerződés címében megnevezett szoftvertermék, adathordozó (ha van ilyen) és a
+kísérő dokumentáció (a továbbiakban összefoglaló néven: „Szoftver”) az Egyesült
+Államok és más országok szerzői jogi törvényeinek és egyezményeinek védelme
+alatt áll, és a jelen Szerződés hatálya alá esik.  Minden letöltött vagy egyéb
+módon kézhez kapott, a Szoftverhez tartozó frissítés és terméktámogatási
+kiadás, amelyhez nincs külön, a jelen szerződést felülbíráló licencszerződés
+mellékelve, a Szoftver részének tekintendő, és ennek megfelelően a jelen
+Szerződés rendelkezései vonatkoznak rá.  Ha a jelen Szoftver frissítés vagy
+terméktámogatás keretében kapott kiadás, akkor a frissítési vagy
+terméktámogatási kiadás telepítéséhez vagy használatához Önnek rendelkeznie
+kell a frissíteni kívánt Szoftver megfelelő verziójával, amelyhez megfelelő
+példányszámú, érvényes licenc tartozik. 
+
+A Szoftver egy több összetevőből álló moduláris kialakítású operációs rendszer,
+amelynek összetevőire külön licencfeltételek vonatkozhatnak.  A Szoftver a
+Novell kollektív munkájának eredménye; és annak ellenére, hogy nincs a Novell
+tulajdonában a Szoftver valamennyi összetevője, a Szoftverrel kapcsolatos
+kollektív munkára vonatkozó szerzői jog a Novell tulajdona.  
+
+Az összetevők többsége függetlenül kifejlesztett nyílt forráskódú csomag,
+amelyhez külön licencfeltételek tartoznak.    Az egyes külön
+licencfeltételekkel ellátott összetevőkhöz tartozó licencjogait azok a
+licencfeltételek határozzák meg; a jelen szerződés feltételei semmilyen
+mértékben nem korlátozzák és egyéb módon sem befolyásolják az ilyen
+licencfeltételek szerint Önt megillető esetleges jogokat és az Ön
+kötelezettségeit, vagy az Önre vonatkozó feltételeket; ha azonban Ön a Szoftver
+bármelyik összetevőjének másolatát a Szoftvertől elkülönítve terjeszti, minden
+példányról el kell távolítania a Novell védjegyeit, arculati jegyeit és
+emblémáit.
+
+A Szervezetén belül korlátlan számú példányt készíthet a Szoftverről, és a
+Szoftver korlátlan számú példányát használhatja. A „Szervezet” kifejezés jogi
+személyt jelent, de nem értendők ide az olyan leányvállalatok és társult
+vállalkozások, amelyek adózási vagy jogi szempontból külön kezelendők. A
+magánszektorban Szervezet lehet például egy vállalat, egy társulás vagy egy
+tröszt, kivéve a szervezet összes olyan leányvállalatát vagy társult
+vállalkozását, amelynek külön adószáma vagy cégbejegyzési száma van. A
+közszektorban Szervezet lehet például egy meghatározott kormányzati testület
+vagy egy helyi hatóság.
+
+EGYÉB LICENCFELTÉTELEK ÉS KORLÁTOZÁSOK
+
+A Szoftvert az Egyesült Államok („USA”) és más országok szerzői jogi törvényei
+és egyezményei védik, és a jelen Szerződés feltételei vonatkoznak rá.  Ön a
+Szoftver licencét kapta meg, nem magát a Szoftvert.
+
+A Szoftver lehet együtt csomagolva más szoftverprogramokkal („Együtt csomagolt
+programok”). Az egyes külön licencfeltételekkel ellátott Együtt csomagolt
+programokhoz tartozó licencjogait azok a licencfeltételek határozzák meg; a
+jelen Szerződés feltételei semmilyen mértékben nem korlátozzák és egyéb módon
+sem befolyásolják az ilyen licencfeltételek szerint Önt megillető esetleges
+jogokat és az Ön kötelezettségeit vagy az Önre vonatkozó feltételeket.  
+
+A Novell minden jogot fenntart, amelyet kifejezetten meg nem adott Önnek. 1)
+Nem fordíthatja és nem fejtheti vissza a Szoftvert, és nem elemezheti annak
+belső felépítését, csak a vonatkozó törvényi rendelkezésekben kifejezetten
+engedélyezett módon és mértékben; és (2) nem adhatja tovább a jelen
+Szerződésben foglalt Szoftvert vagy licencjogokat sem részben, sem egészében.
+
+KARBANTARTÁS ÉS TÁMOGATÁS
+
+A Novell nem köteles a Szoftver támogatására vagy karbantartására, kivéve, ha a
+megvásárolt szolgáltatás kifejezetten tartalmazza a szoftvertámogatást vagy a
+karbantartást.  Amennyiben Ön ilyen jellegű szolgáltatást vásárol, és nincs
+különálló, kifejezetten a támogatási vagy karbantartási szolgáltatásokra
+vonatkozó szerződés, akkor a támogatási vagy karbantartási szolgáltatások
+(továbbiakban: Szolgáltatások) vonatkozásában jelen Szerződés rendelkezései az
+irányadók.  A Novell aktuális támogatási ajánlatairól a
+http://www.novell.com/support címen találhatók további tudnivalók.
+
+TULAJDONJOGOK
+
+A Szoftverrel kapcsolatban Ön semmiféle jogcímet vagy tulajdonjogot nem szerez.
+ A Szoftverrel és a Szolgáltatásokkal kapcsolatos minden szellemi tulajdonjog
+és jogcím, beleértve az azok adaptációira és másolataira vonatkozó jogokat is,
+a Novell és/vagy licenceket forgalmazó vállalatok tulajdona.  A Szolgáltatások
+keretében kapott bármilyen anyag, amelyhez nincsenek külön, a jelen szerződést
+felülbíráló használati feltételek mellékelve, a Szoftver részének tekintendő,
+és ennek megfelelően a jelen Szerződés rendelkezései vonatkoznak rá.  A licenc
+megszerzésével Ön csak a Szoftver használatára kapott feltételekhez kötött
+engedélyt.
+
+KORLÁTOZOTT GARANCIA
+
+A Novell a vásárlás dátumától számított kilencven (90) napon keresztül
+garantálja, (1) hogy minden adathordozó, amelyen a Szoftvert szállítja, mentes
+a fizikai hibáktól; és (2) a Szoftver működése lényegében megfelel a vele
+szállított dokumentációban ismertetettnek.  Ha a vásárlástól számított
+kilencven (90) napon belül visszajuttatja a Novellnek a hibás cikkeket, illetve
+bejelenti a leírástól való eltérést, a Novell saját kizárólagos hatáskörében
+dönt arról, hogy megoldást nyújt-e az eltérésre, vagy visszatéríti Önnek a
+Szoftverért kifizetett licencdíjakat. A Szoftver nem rendeltetésszerű
+használata vagy nem engedélyezett módosítása érvényteleníti a jelen garanciát.
+A FENTI GARANCIA AZ EGYETLEN ÉS KIZÁRÓLAGOS JOGORVOSLAT, AMELYET ÖN IGÉNYBE
+VEHET, ÉS HELYETTESÍT MINDEN EGYÉB KIFEJEZETT ÉS HALLGATÓLAGOS GARANCIÁT.  (A
+fenti garancia nem érvényes az ingyenesen biztosított Szoftverekre.  AZ ILYEN
+SZOFTVERT CSAK „JELENLEGI FORMÁJÁBAN”, BÁRMIFÉLE GARANCIA NÉLKÜL KAPTA MEG.)
+
+Szolgáltatások. A Novell szavatolja, hogy professzionális módon, az általánosan
+elfogadott iparági szabványokkal összhangban nyújtja a Szolgáltatásokat.  Ez a
+szavatosság a szolgáltatások elfogadását követő 90 napig érvényes.  E
+szavatosság megsértése esetén a Novell egyedüli kötelessége, hogy – saját
+belátása szerint – módosítsa a Szolgáltatásokat, hogy azok megfeleljenek ennek
+a szavatosságnak, illetve térítse vissza az Ön által a Novell számára fizetett
+összegnek akkora részét, amely az ezen szavatosság előírásait nem teljesítő
+Szolgáltatásokat fedezi.  Mivel a Novell által nyújtott műszaki szolgáltatások
+során bizonyos fájlok módosulhatnak vagy sérülhetnek, az Ön felelőssége
+rendszereinek elszigetelése és biztonsági mentése.
+
+A SZOFTVERT NEM VESZÉLYES, HIBAMENTES MŰKÖDÉST MEGKÖVETELŐ ONLINE
+VEZÉRLŐBERENDEZÉSEKKEL EGYÜTT TÖRTÉNŐ HASZNÁLATRA VAGY FORGALMAZÁSRA TERVEZTÜK
+ÉS GYÁRTOTTUK, ILLETVE NEM ILYEN CÉLOKRA SZOLGÁL; NEM ALKALMAS TEHÁT NUKLEÁRIS
+LÉTESÍTMÉNYEKBEN, REPÜLÉSIRÁNYÍTÓ RENDSZEREKBEN, KOMMUNIKÁCIÓS ÉS
+VEZÉRLŐRENDSZEREKBEN, KÖZVETLEN ÉLETFENNTARTÓ ESZKÖZÖKBEN, FEGYVERRENDSZEREKBEN
+ÉS MÁS OLYAN HELYEN TÖRTÉNŐ HASZNÁLATRA, AHOL A SZOFTVER HIBÁJA KÖZVETLENÜL
+HALÁLT, SZEMÉLYI SÉRÜLÉST VAGY SÚLYOS FIZIKAI ÉS KÖRNYEZETI KÁROKAT OKOZHAT.
+
+A SZOFTVER CSAK BIZONYOS SZÁMÍTÓGÉPEKKEL ÉS OPERÁCIÓS RENDSZEREKKEL
+KOMPATIBILIS. NEM KOMPATIBILIS RENDSZEREK ESETÉRE NEM NYÚJTUNK GARANCIÁT A
+SZOFTVERRE. A kompatibilitással kapcsolatos felvilágosításért forduljon a
+Novell vállalathoz vagy a viszonteladóhoz.
+
+Nem Novell-termékek.  A Szoftvernek részei lehetnek, illetve vele együtt
+csomagolva lehetnek a Novell vállalattól független licencadótól származó
+hardvereszközök vagy szoftverprogramok is. A NOVELL NEM VÁLLAL GARANCIÁT MÁS
+CÉGEK TERMÉKEIRE VAGY SZOLGÁLTATÁSAIRA. MINDEN ILYEN TERMÉK VAGY SZOLGÁLTATÁS
+„ADOTT ÁLLAPOTÁBAN” KERÜL FORGALOMBA. A NEM A NOVELL ÁLTAL GYÁRTOTT TERMÉKEKRE
+AZOK LICENCADÓJA VÁLLAL GARANCIÁT AZ ADOTT LICENCADÓ VONATKOZÓ
+GARANCIAFELTÉTELEINEK MEGFELELŐEN.
+
+AMENNYIBEN A TÖRVÉNY MÁS MÓDON EZT NEM KORLÁTOZZA, A NOVELL ELHÁRÍT ÉS KIZÁR
+MINDENNEMŰ VÉLELMEZETT GARANCIÁT, BELEÉRTVE AZ ELADHATÓSÁGRA, AZ ADOTT CÉLRA
+VALÓ ALKALMASSÁGRA, A JOGCÍMRE VAGY A JOGSÉRTÉSMENTESSÉGRE VONATKOZÓ GARANCIÁT
+IS. A NOVELL SEMMILYEN OLYAN GARANCIÁT, KÖTELEZETTSÉGET ÉS ÍGÉRETET NEM VÁLLAL,
+AMELY NINCS KIFEJEZETTEN RÖGZÍTVE A JELEN KORLÁTOZOTT GARANCIÁBAN. A NOVELL NEM
+GARANTÁLJA, HOGY A SZOFTVER VAGY A SZOLGÁLTATÁS KIELÉGÍTI AZ ÖN ÁLTAL
+TÁMASZTOTT KÖVETELMÉNYEKET, ÉS NEM GARANTÁLJA A SZOFTVER VAGY A SZOLGÁLTATÁS
+ZAVARTALAN MŰKÖDÉSÉT SEM.  Vannak jogrendszerek, amelyek nem engedélyezik
+bizonyos garanciák kizárását vagy korlátozását, így előfordulhat, hogy a fenti
+korlátozások egy része nem vonatkozik Önre. A jelen korlátozott garancia
+bizonyos jogokkal ruházza fel Önt. Ezenkívül más, országonként vagy
+jogrendszerenként eltérő jogai is lehetnek.
+
+FELELŐSSÉGKORLÁTOZÁS
+
+(a) Járulékos veszteségek.  SEM A NOVELL, SEM ANNAK LICENCADÓI, LEÁNYVÁLLALATAI
+VAGY ALKALMAZOTTAI NEM VÁLLALNAK FELELŐSSÉGET SEMMILYEN KÖRÜLMÉNYEK KÖZÖTT A
+SZOFTVER VAGY A SZOLGÁLTATÁS HASZNÁLATÁBÓL VAGY HASZNÁLHATATLANSÁGÁBÓL EREDŐ
+KÜLÖNLEGES, VÉLETLEN, JÁRULÉKOS, KÖZVETETT, JOGSÉRTŐ, GAZDASÁGI VAGY
+BÜNTETŐJOGI KÁRÉRT, BELEÉRTVE, DE EZEKRE NEM KORLÁTOZVA, AZ ELMARADT
+NYERESÉGÉRT, ELVESZTETT ÜZLETI LEHETŐSÉGÉRT VAGY ADATÉRT, MÉG ABBAN AZ ESETBEN
+SEM, HA FIGYELMEZTETTÉK A KÁR BEKÖVETKEZTÉNEK LEHETŐSÉGÉRE.
+(b) Közvetlen károk. A NOVELL ÖSSZEVONT FELELŐSSÉGE KÖZVETLEN TÁRGYI VAGY
+SZEMÉLYI KÁROK ESETÉN (FÜGGETLENÜL ATTÓL, HOGY EGY ESEMÉNY VAGY ESEMÉNYEK
+SOROZATA TÖRTÉNT-E) SEMMILYEN ESETBEN NEM HALADHATJA MEG A KÁRRAL ÖSSZEFÜGGŐ
+SZOFTVERÉRT VAGY SZOLGÁLTATÁSÉRT ÖN ÁLTAL FIZETETT VÉTELÁR 1,25-SZÖRÖSÉT
+[ILLETVE 50 AMERIKAI DOLLÁRT, HA INGYEN JUTOTT A SZOFTVERHEZ].  A fenti
+kizárások és korlátozások nem vonatkoznak a halálhoz és a személyi sérüléshez
+kapcsolódó követelésekre. A kártérítési felelősség kizárását és korlátozását
+tiltó jogrendszerekben a Novell az adott jogrendszer által megengedett
+maximális mértékben kizárja, illetve korlátozza a felelősségét.
+
+ÁLTALÁNOS FELTÉTELEK
+
+Hatály.  A jelen Szerződés azon a napon lép hatályba, amelyen Ön jogszerűen
+megvásárolja a szoftvert, és automatikusan hatályát veszti, ha Ön a Szerződés
+bármely rendelkezését megsérti.  
+
+Teljesítményteszt.  A jelen teljesítményvizsgálati korlátozás akkor vonatkozik
+Önre, ha Ön szoftverfejlesztő vagy licencadó, illetve ha Ön teszteli a
+Szoftvert a szoftverfejlesztő vagy licencadó utasításai szerint vagy nevében. 
+A Novell indokolatlanul vissza nem tartható előzetes írásbeli hozzájárulása
+nélkül Ön nem hozhatja nyilvánosságra vagy nem adhatja át harmadik félnek a
+Szoftver bármely teljesítményvizsgálatának eredményeit. Ha Ön olyan termékek
+licencadója,amelyek funkciójukat tekintve hasonlóak a Szoftverhez, vagy a
+Szoftver konkurensei (Hasonló termékek), illetve ilyen licencadó nevében jár
+el, és a jelen korlátozás megszegésével közreadja a Szoftver
+teljesítményvizsgálatának eredményeit, akkor tekintet nélkül a Hasonló termék
+végfelhasználói licencszerződésében foglalt ellentétes rendelkezésekre, és a
+Novellt megillető esetleges egyéb jogorvoslat mellett, a Novellnek jogában áll
+teljesítményvizsgálatokat végezni  a Hasonló termékeken és nyilvánosságra hozni
+ezen teljesítményvizsgálatok eredményeit; és Ön ezúton kifejezi, hogy jogosult
+ilyen jogot biztosítani a Novellnek.
+
+Nyílt forráskód.  A jelen Szerződés feltételei semmilyen mértékben nem
+korlátozzák, és egyéb módon sem befolyásolják a Szoftverben található bármely
+nyílt forráskódhoz tartozó bármely vonatkozó nyílt forráskódú licenc szerint
+Önt megillető esetleges jogokat és az Ön kötelezettségeit, vagy az Önre
+vonatkozó feltételeket.
+
+Átadás.  Tilos a jelen Szerződést a Novell előzetes írásbeli hozzájárulása
+nélkül átruházni vagy megbízásba adni.
+
+Illetékes joghatóság.  A jelen Szerződésre az Egyesült Államok Utah államának
+törvényei vonatkoznak. A jelen szerződéshez kapcsolódó esetleges jogviták
+csakis Utah állam illetékes bíróságai előtt rendezhetők.  Ha viszont az Ön
+elsődleges lakóhelye, illetve székhelye az Európai Unió vagy az Európai
+Szabadkereskedelmi Társulás (EFTA) tagállamában található, a jelen Szerződésre
+az adott ország jogrendszere vonatkozik, és az esetleges jogviták csak az adott
+ország illetékes bírósága előtt rendezhetők.
+
+A szerződés teljessége.  A jelen Szerződés képezi az Ön és a Novell között
+létrejött teljes megállapodást és szerződést, és csak az Ön és a Novell
+vállalat felhatalmazott képviselője által aláírt írásos megállapodásban
+egészíthető ki vagy módosítható.  EGYETLEN LICENCADÓ, FORGALMAZÓ, KERESKEDŐ,
+VISZONTELADÓ, ÜGYNÖK, ELADÓ VAGY ALKALMAZOTT SEM JOGOSULT A JELEN SZERZŐDÉS
+MÓDOSÍTÁSÁRA VAGY OLYAN AJÁNLAT VAGY ÍGÉRET KÖZLÉSÉRE, AMELY NINCS ÖSSZHANGBAN
+A SZERZŐDÉSBEN FOGLALTAKKAL, ILLETVE KIEGÉSZÍTI AZOKAT.
+
+Lemondó nyilatkozat.  A jelen Szerződés értelmében járó jogokról való lemondás
+csak írásban tehető meg, a lemondási nyilatkozatot tevő fél kellő
+jogosultsággal rendelkező képviselőjének aláírásával. A Szerződés megsértéséből
+vagy a teljesítés elmulasztásából eredő jogokról való múltbeli vagy jelenlegi
+lemondó nyilatkozat nem értelmezhető a jelen Szerződésből eredő jövőbeli
+jogokról történő lemondásról.
+
+A rendelkezések szétválaszthatósága.  Ha a jelen Szerződés bármely
+rendelkezésre érvénytelennek vagy jogilag nem kötelező érvényűnek bizonyul,
+akkor azt a rendelkezést úgy kell értelmezni, korlátozni, módosítani, vagy
+szükség esetén a szerződésről leválasztani, hogy megszűnjék az érvénytelensége,
+illetve jogilag nem kötelező érvénye; ilyen esetben a Szerződés többi
+rendelkezésének hatálya változatlan marad.
+
+Exportjóváhagyás.  A jelen Szerződésben foglalt termékekre vagy technikai
+információkra az Amerikai Egyesült Államok exportálási szabályozásai és más
+országok kereskedelmi törvényei vonatkozhatnak. A felek elfogadják, hogy
+betartják az összes exportszabályozási intézkedést, és beszerzik az anyagok
+exportálásához, újraexportálásához vagy importálásához szükséges összes
+engedélyt vagy besorolást.  A felek elfogadják, hogy nem exportálnak és nem
+újraexportálnak termékeket az Amerikai Egyesült Államok aktuális exporttilalmi
+listáján szereplő helyekre vagy az Amerikai Egyesült Államok exporttörvényei
+szerinti bármely embargó alatt álló vagy terrorizmust támogató országba.  A
+felek nem használják az anyagokat tiltott nukleáris, rakéta-, vegyi és
+biológiai fegyverekkel kapcsolatos célra.  A Novell termékek Amerikai Egyesült
+Államokból való exportálása előtt tájékozódjon az Ipari és Biztonsági Hivatal
+(Bureau of Industry and Security) webhelyén: www.bis.doc.gov. A Novell
+szoftverek exportálásával kapcsolatos további tájékoztatás a
+http://www.novell.com/company/legal/ webhelyen olvasható.  Kérésére a Novell
+konkrét tájékoztatással szolgál a betartandó korlátozásokról.  A Novell azonban
+nem vállal felelősséget arra vonatkozóan, ha Ön nem szerzi meg a szükséges
+exportjóváhagyásokat.
+
+Az Egyesült Államok Kormányának korlátozott jogai.  Az Egyesült Államok
+kormánya által történő használatra, sokszorosításra és nyilvánosságra hozatalra
+a következő jogszabályok, illetve az azokat felváltó, vonatkozó rendelkezések
+érvényesek: FAR 52.227-14 (1987. június) Alternate III (1987. június), FAR
+52.227-19 (1987. június), illetve DFARS 252.227-7013 (b)(3) (1995. november). 
+
+A vállalkozó/gyártó: Novell, Inc., 1800 South Novell Place, Provo, Utah 84606.
+
+Egyéb formátumok.  Kifejezetten kizárjuk az Egyesült Nemzeteknek az Áruk
+nemzetközi kereskedelmére vonatkozó konvenciójának alkalmazását.
+
+(c)1993, 2000-2010 Novell, Inc. Minden jog fenntartva.
+(04232010)
+
+A Novell és a SUSE LINUX a Novell, Inc. bejegyzett védjegye, a SLES a Novell,
+Inc. védjegye az Egyesült Államokban és más országokban. 
+
+Minden, harmadik félhez tartozó védjegy az adott tulajdonos védjegye.
+
+
+
+

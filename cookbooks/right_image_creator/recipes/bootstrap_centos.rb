@@ -72,6 +72,10 @@ test -e /dev/ptmx #|| chroot $imagedir mknod --mode 666 /dev/ptmx c 5 2
 # Shadow file needs to be setup prior install additional packages
 chroot #{node[:right_image_creator][:mount_dir]} authconfig --enableshadow --useshadow --enablemd5 --updateall
 
+if [ "#{node[:right_image_creator][:release]}" == "5.2" && "#{node[:right_image_creator][:arch]}" == i386 ] ; then
+  # install guest packages on CentOS 5.2 i386 host to work around yum problem
+  yum -c /tmp/yum.conf -y install #{node[:right_image_creator][:guest_packages]}
+fi
 yum -c /tmp/yum.conf --installroot=#{node[:right_image_creator][:mount_dir]} -y install  #{node[:right_image_creator][:guest_packages]}
 #yum -c /tmp/yum.conf --installroot=#{node[:right_image_creator][:mount_dir]} -y remove avahi avahi-compat-libdns_sd bluez* gnome-bluetooth* 
 yum -c /tmp/yum.conf --installroot=#{node[:right_image_creator][:mount_dir]} -y clean all

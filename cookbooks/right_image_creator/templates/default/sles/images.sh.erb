@@ -1,44 +1,25 @@
-#!/bin/sh
-test -f /.kconfig && . /.kconfig
-test -f /.profile && . /.profile
+#!/bin/bash
+export LANG=C
 
-echo "Configure image: [$kiwi_iname]..."
+echo "Cleaning zypper log"
+[ -e /var/log/zypper.log ] && echo -n > /var/log/zypper.log
 
-#==========================================
-# remove unneded kernel files
-#------------------------------------------
-suseStripKernel
+echo "Clearing unique ids"
+rm -fv /var/lib/dbus/machine-id
+rm -fv /var/lib/zypp/AnonymousUniqueId
 
-#==========================================
-# setup gfxboot
-#------------------------------------------
-suseGFXBoot SLES grub
+echo "Rebuilding rpm database"
+rpm --rebuilddb
 
-#==========================================
-# remove unneeded packages
-#------------------------------------------
-rpm -e --nodeps --noscripts \
-	$(rpm -q `baseGetPackagesForDeletion` | grep -v "is not installed")
+echo "Cleaning kiwi files in image"
+rm -rfv /etc/ImageVersion
+rm -rfv /base-system
+rm -rfv /var/cache/kiwi
+rm -rfv /var/lib/dpkg
 
-#==========================================
-# remove unneeded files
-#------------------------------------------
-suseStripInitrd
-
-#==========================================
-# remove unneeded files in case of Xen
-#------------------------------------------
-rm -rf /var
-rm -rf /usr/lib/ConsoleKit
-rm -rf /usr/share/getopt
-rm -rf /usr/share/hwinfo
-rm -rf /usr/share/nls
-rm -rf /usr/i586-suse-linux
-rm -rf /etc/ConsoleKit
-
-#==========================================
-# umount /proc
-#------------------------------------------
-umount /proc &>/dev/null
+# These two lines must be together; otherwise things will break
+# Use the udev device list as our device list 
+rm -rfv /dev/*
+cp -av /lib/udev/devices/* /dev/
 
 exit 0
