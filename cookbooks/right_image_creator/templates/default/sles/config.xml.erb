@@ -31,10 +31,10 @@
 		<source path="http://us-east-1-ec2-update.susecloud.net/repo/install/SLES11-SP1/sle-11-x86_64"/>
 	</repository>
         <repository type="rpm-dir">
-                <source path="/root/standard/x86_64"/>
+                <source path="<%= @rpm_dir %>/x86_64"/>
         </repository>
         <repository type="rpm-dir">
-                <source path="/root/standard/noarch"/>
+                <source path="<%= @rpm_dir %>/noarch"/>
         </repository>
 	<packages type="image">
           <% node.right_image_creator.guest_packages.split.each do |p| -%>

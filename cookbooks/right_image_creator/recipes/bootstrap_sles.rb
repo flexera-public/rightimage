@@ -1,4 +1,7 @@
 
+
+
+
 kiwi_dir = "/mnt/kiwi" 
 
 node.right_image_creator.host_packages.each { |p| package p }
@@ -26,10 +29,24 @@ directory "#{kiwi_dir}/root/etc/zypp/services.d" do
 end
 
 
+
+absolute_filename=`readlink -e $(readlink -f #{__FILE__})`
+
+puts "absolute_filename = #{absolute_filename}"
+
+cookbook_dir = File.dirname( File.dirname absolute_filename)
+
+puts "cookbook_dir = #{cookbook_dir}"
+rpm_dir = File.join( cookbook_dir, 'files', 'default', 'sles' )
+
+
 %w{root/include root/linuxrc root/preinit config.sh config.xml images.sh root/etc/zypp/repos.d/susecloud:SLE11-SDK-SP1.repo root/etc/zypp/repos.d/susecloud:SLE11-SDK-SP1-Updates.repo root/etc/zypp/repos.d/susecloud:SLE11-WebYaST-SP1.repo root/etc/zypp/repos.d/susecloud:SLE11-WebYaST-SP1-Updates.repo root/etc/zypp/repos.d/susecloud:SLES11-Extras.repo root/etc/zypp/repos.d/susecloud:SLES11-SP1.repo root/etc/zypp/repos.d/susecloud:SLES11-SP1-Updates.repo root/etc/zypp/services.d/susecloud.repo root/etc/zypp/systemCheck root/etc/zypp/zypp.conf  root/etc/zypp/zypper.conf
 }.each do |t| 
   template "#{kiwi_dir}/#{t}" do 
     source "sles/#{t}.erb"
+    variables({
+      :rpm_dir => rpm_dir
+    })
   end
 end
 
