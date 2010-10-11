@@ -8,10 +8,23 @@ directory kiwi_dir  do
   action :delete
 end
 
+
 directory "#{kiwi_dir}/root" do 
   recursive true
   action :create
 end
+
+
+directory "#{kiwi_dir}/root/etc/zypp/repos.d" do 
+  recursive true
+  action :create
+end
+
+directory "#{kiwi_dir}/root/etc/zypp/services.d" do 
+  recursive true
+  action :create
+end
+
 
 %w{root/include root/linuxrc root/preinit config.sh config.xml images.sh root/etc/zypp/repos.d/susecloud:SLE11-SDK-SP1.repo root/etc/zypp/repos.d/susecloud:SLE11-SDK-SP1-Updates.repo root/etc/zypp/repos.d/susecloud:SLE11-WebYaST-SP1.repo root/etc/zypp/repos.d/susecloud:SLE11-WebYaST-SP1-Updates.repo root/etc/zypp/repos.d/susecloud:SLES11-Extras.repo root/etc/zypp/repos.d/susecloud:SLES11-SP1.repo root/etc/zypp/repos.d/susecloud:SLES11-SP1-Updates.repo root/etc/zypp/services.d/susecloud.repo root/etc/zypp/systemCheck root/etc/zypp/zypp.conf  root/etc/zypp/zypper.conf
 }.each do |t| 
