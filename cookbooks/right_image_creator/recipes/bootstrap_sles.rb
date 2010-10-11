@@ -13,11 +13,13 @@ directory "#{kiwi_dir}/root" do
   action :create
 end
 
-%w{root/include root/linuxrc root/preinit config.sh config.xml images.sh}.each do |t| 
+%w{root/include root/linuxrc root/preinit config.sh config.xml images.sh root/etc/zypp/repos.d/susecloud:SLE11-SDK-SP1.repo root/etc/zypp/repos.d/susecloud:SLE11-SDK-SP1-Updates.repo root/etc/zypp/repos.d/susecloud:SLE11-WebYaST-SP1.repo root/etc/zypp/repos.d/susecloud:SLE11-WebYaST-SP1-Updates.repo root/etc/zypp/repos.d/susecloud:SLES11-Extras.repo root/etc/zypp/repos.d/susecloud:SLES11-SP1.repo root/etc/zypp/repos.d/susecloud:SLES11-SP1-Updates.repo root/etc/zypp/services.d/susecloud.repo root/etc/zypp/systemCheck root/etc/zypp/zypp.conf  root/etc/zypp/zypper.conf
+}.each do |t| 
   template "#{kiwi_dir}/#{t}" do 
     source "sles/#{t}.erb"
   end
 end
+
 
 bash "config md5s and run" do 
   cwd kiwi_dir
