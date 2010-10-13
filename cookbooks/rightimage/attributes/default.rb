@@ -32,6 +32,9 @@ when "centos"
 
   rightimage[:guest_packages] << " kernel-xen" if rightimage[:cloud] == "euca"
 
+  rightimage[:guest_packages] << " iscsi-initiator-utils" if rightimage[:cloud] == "vmops"
+
+
   set[:rightimage][:host_packages] = "swig"
   set[:rightimage][:package_type] = "rpm"
 when "suse"
