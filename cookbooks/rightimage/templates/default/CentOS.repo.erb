@@ -12,7 +12,7 @@
 
 [base]
 name=CentOS-$releasever - Base
-baseurl=<%= node[:right_image_creator][:mirror] %>/centos/$releasever/os/$basearch/
+baseurl=<%= node[:rightimage][:mirror] %>/centos/$releasever/os/$basearch/
 failovermethod=priority
 gpgcheck=1
 enabled=1
@@ -20,7 +20,7 @@ gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-5
 
 [updates]
 name=CentOS-$releasever - Updates
-baseurl=<%= node[:right_image_creator][:mirror] %>/centos/$releasever/updates/$basearch/
+baseurl=<%= node[:rightimage][:mirror] %>/centos/$releasever/updates/$basearch/
 failovermethod=priority
 enabled=1
 gpgcheck=1
@@ -29,7 +29,7 @@ gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-5
 #packages used/produced in the build but not released
 [addons]
 name=CentOS-$releasever - Addons
-baseurl=<%= node[:right_image_creator][:mirror] %>/centos/$releasever/addons/$basearch/
+baseurl=<%= node[:rightimage][:mirror] %>/centos/$releasever/addons/$basearch/
 failovermethod=priority
 gpgcheck=1
 gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-5
@@ -37,7 +37,7 @@ gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-5
 #additional packages that may be useful
 [extras]
 name=CentOS-$releasever - Extras
-baseurl=<%= node[:right_image_creator][:mirror] %>/centos/$releasever/extras/$basearch/
+baseurl=<%= node[:rightimage][:mirror] %>/centos/$releasever/extras/$basearch/
 failovermethod=priority
 gpgcheck=1
 gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-5
@@ -45,7 +45,7 @@ gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-5
 #additional packages that extend functionality of existing packages
 [centosplus]
 name=CentOS-$releasever - Plus
-baseurl=<%= node[:right_image_creator][:mirror] %>/centos/$releasever/centosplus/$basearch/
+baseurl=<%= node[:rightimage][:mirror] %>/centos/$releasever/centosplus/$basearch/
 failovermethod=priority
 gpgcheck=1
 enabled=0
@@ -53,7 +53,7 @@ gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-5
 
 [epel]
 name=Extra Packages for Enterprise Linux 5 - $basearch
-baseurl=<%= node[:right_image_creator][:mirror] %>/epel/5/$basearch
+baseurl=<%= node[:rightimage][:mirror] %>/epel/5/$basearch
 failovermethod=priority
 enabled=1
 gpgcheck=1

@@ -1,5 +1,5 @@
 #
-# Cookbook Name:: right_image_creator
+# Cookbook Name:: rightimage
 # Recipe:: default
 #
 # Copyright 2010, Example Com
@@ -18,6 +18,6 @@
 #
 
 
-include_recipe "right_image_creator::clean"
-include_recipe "right_image_creator::bootstrap_ubuntu"
-include_recipe "right_image_creator::install_rightscale"
+include_recipe "rightimage::clean"
+include_recipe "rightimage::bootstrap_ubuntu"
+include_recipe "rightimage::install_rightscale"

@@ -37,7 +37,7 @@
                 <source path="<%= @rpm_dir %>/noarch"/>
         </repository>
 	<packages type="image">
-          <% node.right_image_creator.guest_packages.split.each do |p| -%>
+          <% node.rightimage.guest_packages.split.each do |p| -%>
           <package name="<%= p %>"/>
           <% end -%>
           <package name="aaa_base"/>

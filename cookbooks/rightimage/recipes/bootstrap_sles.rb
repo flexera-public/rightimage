@@ -4,7 +4,7 @@
 
 kiwi_dir = "/mnt/kiwi" 
 
-node.right_image_creator.host_packages.each { |p| package p }
+node.rightimage.host_packages.each { |p| package p }
    
 directory kiwi_dir  do
   recursive true
@@ -65,10 +65,10 @@ cat << EOF > .checksum.md5
 EOF
 
 ## make sure that proc is not mounted
-umount -lf #{node.right_image_creator.mount_dir}/proc || true 
+umount -lf #{node.rightimage.mount_dir}/proc || true 
 
 set -x
-kiwi --force-new-root  --prepare #{kiwi_dir} --root #{node.right_image_creator.mount_dir} --logfile terminal
+kiwi --force-new-root  --prepare #{kiwi_dir} --root #{node.rightimage.mount_dir} --logfile terminal
 
 EOS
 end

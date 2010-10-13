@@ -1,5 +1,5 @@
 #
-# Cookbook Name:: right_image_creator
+# Cookbook Name:: rightimage
 # Recipe:: default
 #
 # Copyright 2010, Example Com
@@ -17,8 +17,8 @@
 # limitations under the License.
 #
 
-node[:right_image_creator][:host_packages].each { |p| package p }
+node[:rightimage][:host_packages].each { |p| package p }
 
-include_recipe "right_image_creator::clean"
-include_recipe "right_image_creator::bootstrap_centos"
-include_recipe "right_image_creator::install_rightscale"
+include_recipe "rightimage::clean"
+include_recipe "rightimage::bootstrap_centos"
+include_recipe "rightimage::install_rightscale"

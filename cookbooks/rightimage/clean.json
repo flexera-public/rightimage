@@ -1,4 +1,4 @@
 {
-  "recipes": [ "right_image_creator::clean" ]
+  "recipes": [ "rightimage::clean" ]
 }
  

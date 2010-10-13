@@ -1,15 +1,15 @@
-deb <%= node[:right_image_creator][:mirror] %>/ubuntu <%= node[:right_image_creator][:release] %> main restricted universe multiverse
-#deb-src http://archive.ubuntu.com/ubuntu/ <%= node[:right_image_creator][:release] %>/ubuntu main restricted universe multiverse
+deb <%= node[:rightimage][:mirror] %>/ubuntu <%= node[:rightimage][:release] %> main restricted universe multiverse
+#deb-src http://archive.ubuntu.com/ubuntu/ <%= node[:rightimage][:release] %>/ubuntu main restricted universe multiverse
 
 ## MAJOR BUG FIX UPDATES produced after the final release
-deb <%= node[:right_image_creator][:mirror] %>/ubuntu <%= node[:right_image_creator][:release] %>-updates main restricted universe multiverse
-#deb-src http://archive.ubuntu.com/ubuntu/ <%= node[:right_image_creator][:release] %>/ubuntu-updates main restricted universe multiverse
+deb <%= node[:rightimage][:mirror] %>/ubuntu <%= node[:rightimage][:release] %>-updates main restricted universe multiverse
+#deb-src http://archive.ubuntu.com/ubuntu/ <%= node[:rightimage][:release] %>/ubuntu-updates main restricted universe multiverse
 
 ## UBUNTU SECURITY UPDATES
-deb <%= node[:right_image_creator][:mirror] %>/ubuntu <%= node[:right_image_creator][:release] %>-security main restricted universe multiverse
-#deb-src http://archive.ubuntu.com/ubuntu/ <%= node[:right_image_creator][:release] %>-security main restricted universe multiverse
+deb <%= node[:rightimage][:mirror] %>/ubuntu <%= node[:rightimage][:release] %>-security main restricted universe multiverse
+#deb-src http://archive.ubuntu.com/ubuntu/ <%= node[:rightimage][:release] %>-security main restricted universe multiverse
 
 ## BACKPORTS REPOSITORY (Unsupported.  May contain illegal packages.  Use at own risk.)
-deb <%= node[:right_image_creator][:mirror] %>/ubuntu <%= node[:right_image_creator][:release] %>-backports main restricted universe multiverse
-#deb-src http://archive.ubuntu.com/ubuntu/ <%= node[:right_image_creator][:release] %>/ubuntu-backports main restricted universe multiverse
+deb <%= node[:rightimage][:mirror] %>/ubuntu <%= node[:rightimage][:release] %>-backports main restricted universe multiverse
+#deb-src http://archive.ubuntu.com/ubuntu/ <%= node[:rightimage][:release] %>/ubuntu-backports main restricted universe multiverse
 

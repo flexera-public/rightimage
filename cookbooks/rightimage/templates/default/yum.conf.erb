@@ -17,7 +17,7 @@ metadata_expire=1800
 
 [base]
 name = none
-baseurl = http://<%= node[:right_image_creator][:install_mirror] %>/centos/<%= node[:right_image_creator][:release] %>/os/<%= node[:right_image_creator][:arch] %>/archive/<%= node[:right_image_creator][:install_mirror_date] %>/
+baseurl = http://<%= node[:rightimage][:install_mirror] %>/centos/<%= node[:rightimage][:release] %>/os/<%= node[:rightimage][:arch] %>/archive/<%= node[:rightimage][:install_mirror_date] %>/
 failovermethod=priority
 gpgcheck=1
 enabled=1
@@ -25,7 +25,7 @@ gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-5
 
 [addons]
 name = none
-baseurl = http://<%= node[:right_image_creator][:install_mirror] %>/centos/<%= node[:right_image_creator][:release] %>/addons/<%= node[:right_image_creator][:arch] %>/archive/<%= node[:right_image_creator][:install_mirror_date] %>/
+baseurl = http://<%= node[:rightimage][:install_mirror] %>/centos/<%= node[:rightimage][:release] %>/addons/<%= node[:rightimage][:arch] %>/archive/<%= node[:rightimage][:install_mirror_date] %>/
 failovermethod=priority
 gpgcheck=1
 enabled=1
@@ -33,7 +33,7 @@ gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-5
 
 [centosplus]
 name = none
-baseurl = http://<%= node[:right_image_creator][:install_mirror] %>/centos/<%= node[:right_image_creator][:release] %>/centosplus/<%= node[:right_image_creator][:arch] %>/archive/<%= node[:right_image_creator][:install_mirror_date] %>/
+baseurl = http://<%= node[:rightimage][:install_mirror] %>/centos/<%= node[:rightimage][:release] %>/centosplus/<%= node[:rightimage][:arch] %>/archive/<%= node[:rightimage][:install_mirror_date] %>/
 failovermethod=priority
 gpgcheck=1
 enabled=1
@@ -41,7 +41,7 @@ gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-5
 
 [extras]
 name = none
-baseurl = http://<%= node[:right_image_creator][:install_mirror] %>/centos/<%= node[:right_image_creator][:release] %>/extras/<%= node[:right_image_creator][:arch] %>/archive/<%= node[:right_image_creator][:install_mirror_date] %>/
+baseurl = http://<%= node[:rightimage][:install_mirror] %>/centos/<%= node[:rightimage][:release] %>/extras/<%= node[:rightimage][:arch] %>/archive/<%= node[:rightimage][:install_mirror_date] %>/
 failovermethod=priority
 gpgcheck=1
 enabled=1
@@ -49,7 +49,7 @@ gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-5
 
 [updates]
 name = none
-baseurl = http://<%= node[:right_image_creator][:install_mirror] %>/centos/<%= node[:right_image_creator][:release] %>/updates/<%= node[:right_image_creator][:arch] %>/archive/<%= node[:right_image_creator][:install_mirror_date] %>/
+baseurl = http://<%= node[:rightimage][:install_mirror] %>/centos/<%= node[:rightimage][:release] %>/updates/<%= node[:rightimage][:arch] %>/archive/<%= node[:rightimage][:install_mirror_date] %>/
 failovermethod=priority
 gpgcheck=1
 enabled=1
@@ -57,7 +57,7 @@ gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-5
 
 [epel]
 name = none
-baseurl = http://<%= node[:right_image_creator][:install_mirror] %>/epel/5/<%= node[:right_image_creator][:arch] %>/archive/<%= node[:right_image_creator][:install_mirror_date] %>/
+baseurl = http://<%= node[:rightimage][:install_mirror] %>/epel/5/<%= node[:rightimage][:arch] %>/archive/<%= node[:rightimage][:install_mirror_date] %>/
 failovermethod=priority
 gpgcheck=1
 enabled=1
@@ -65,7 +65,7 @@ gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL
 
 [rightscale-epel]
 name = none
-baseurl = http://<%= node[:right_image_creator][:install_mirror] %>/rightscale_software/epel/5/<%= node[:right_image_creator][:arch] %>/archive/<%= node[:right_image_creator][:install_mirror_date] %>/
+baseurl = http://<%= node[:rightimage][:install_mirror] %>/rightscale_software/epel/5/<%= node[:rightimage][:arch] %>/archive/<%= node[:rightimage][:install_mirror_date] %>/
 failovermethod=priority
 gpgcheck=0
 enabled=1

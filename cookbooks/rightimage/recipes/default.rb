@@ -1,5 +1,5 @@
 #
-# Cookbook Name:: right_image_creator
+# Cookbook Name:: rightimage
 # Recipe:: default
 #
 # Copyright 2010, Example Com
@@ -18,5 +18,5 @@
 #
 
 
-include_recipe "right_image_creator::do_#{node.platform.downcase}"
-include_recipe "right_image_creator::do_#{node.right_image_creator.cloud.downcase}" if node.right_image_creator.cloud
+include_recipe "rightimage::do_#{node.platform.downcase}"
+include_recipe "rightimage::do_#{node.rightimage.cloud.downcase}" if node.rightimage.cloud

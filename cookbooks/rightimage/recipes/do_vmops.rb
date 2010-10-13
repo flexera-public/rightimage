@@ -2,9 +2,9 @@ class Chef::Resource::Bash
   include RightScale::RightImage::Helper
 end
 
-include_recipe "right_image_creator::install_vhd-util"
+include_recipe "rightimage::install_vhd-util"
 
-source_image = "#{node.right_image_creator.mount_dir}" 
+source_image = "#{node.rightimage.mount_dir}" 
 destination_image = "/mnt/vmops_image"
 destination_image_mount = "/mnt/vmops_image_mount"
 vhd_image = destination_image + '.vhd'
@@ -14,7 +14,7 @@ bash "create_vmops_image" do
     set -e 
     set -x
 
-    source_image="#{node.right_image_creator.mount_dir}" 
+    source_image="#{node.rightimage.mount_dir}" 
     destination_image="#{destination_image}"
     destination_image_mount="#{destination_image_mount}"
 
@@ -58,8 +58,8 @@ bash "do_vmops" do
     rm -rf $mount_dir/lib/modules/*
     yum -c /tmp/yum.conf --installroot=$mount_dir -y install kernel-xen
     rm -f $mount_dir/boot/initrd*
-    chroot $mount_dir mkinitrd --omit-scsi-modules --with=xennet   --with=xenblk  --preload=xenblk  initrd-#{node.right_image_creator.vmops.kernel}  #{node.right_image_creator.vmops.kernel}
-    mv $mount_dir/initrd-#{node.right_image_creator.vmops.kernel}  $mount_dir/boot/.
+    chroot $mount_dir mkinitrd --omit-scsi-modules --with=xennet   --with=xenblk  --preload=xenblk  initrd-#{node.rightimage.vmops.kernel}  #{node.rightimage.vmops.kernel}
+    mv $mount_dir/initrd-#{node.rightimage.vmops.kernel}  $mount_dir/boot/.
 
     # clean out packages
     yum -c /tmp/yum.conf --installroot=$mount_dir -y clean all
@@ -97,10 +97,10 @@ bash "convert_to_vhd" do
     bzip2 #{image_name}.vhd
 
     # upload image
-    export AWS_ACCESS_KEY_ID=#{node.right_image_creator.aws_access_key_id_for_upload}
-    export AWS_SECRET_ACCESS_KEY=#{node.right_image_creator.aws_secret_access_key_for_upload}
+    export AWS_ACCESS_KEY_ID=#{node.rightimage.aws_access_key_id_for_upload}
+    export AWS_SECRET_ACCESS_KEY=#{node.rightimage.aws_secret_access_key_for_upload}
     export AWS_CALLING_FORMAT=SUBDOMAIN 
-    /usr/local/bin/s3cmd put #{node.right_image_creator.image_upload_bucket}:#{image_name}.vhd.bz2 /mnt/#{image_name}.vhd.bz2 x-amz-acl:public-read
+    /usr/local/bin/s3cmd put #{node.rightimage.image_upload_bucket}:#{image_name}.vhd.bz2 /mnt/#{image_name}.vhd.bz2 x-amz-acl:public-read
 
   EOH
 end
