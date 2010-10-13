@@ -5,7 +5,8 @@
 kiwi_dir = "/mnt/kiwi" 
 
 node.rightimage.host_packages.each { |p| package p }
-   
+  
+ 
 directory kiwi_dir  do
   recursive true
   action :delete
@@ -29,15 +30,26 @@ directory "#{kiwi_dir}/root/etc/zypp/services.d" do
 end
 
 
+## download the suse dev rpm's
+rpm_dir = "/root/sles_rpms"
+rpm_handle = 'http://devs-us-west.s3.amazonaws.com/martin/sles_rpms.tgz'
+rpm_package = 'sles_rpms.tgz'
 
-absolute_filename=`readlink -e $(readlink -f #{__FILE__})`
+remote_file "/root/#{rpm_package}"  do
+  source rom_handle
+  mode "0644"
+  checksum "abfd99cb841553b7b40f7b70f69fc6f57cca2797" # A SHA256 (or portion thereof) of the file.
+end
 
-puts "absolute_filename = #{absolute_filename}"
+bash 'setup_rpm_dir' do 
+  code <<-EOS
+set -ex
+rm -rf #{rpm_dir}
+mkdir -p #{rpm_dir}
+tar -xzf /root/#{rpm_package} -C #{rpm_dir}
 
-cookbook_dir = File.dirname( File.dirname absolute_filename)
-
-puts "cookbook_dir = #{cookbook_dir}"
-rpm_dir = File.join( cookbook_dir, 'files', 'default', 'sles' )
+EOS
+end
 
 
 %w{root/include root/linuxrc root/preinit config.sh config.xml images.sh root/etc/zypp/repos.d/susecloud:SLE11-SDK-SP1.repo root/etc/zypp/repos.d/susecloud:SLE11-SDK-SP1-Updates.repo root/etc/zypp/repos.d/susecloud:SLE11-WebYaST-SP1.repo root/etc/zypp/repos.d/susecloud:SLE11-WebYaST-SP1-Updates.repo root/etc/zypp/repos.d/susecloud:SLES11-Extras.repo root/etc/zypp/repos.d/susecloud:SLES11-SP1.repo root/etc/zypp/repos.d/susecloud:SLES11-SP1-Updates.repo root/etc/zypp/services.d/susecloud.repo root/etc/zypp/systemCheck root/etc/zypp/zypp.conf  root/etc/zypp/zypper.conf
