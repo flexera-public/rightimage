@@ -1,1 +1,0 @@
-set_unless[:persist_test][:path] = "/tmp/persist.txt"  # default path

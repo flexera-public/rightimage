@@ -1,0 +1,265 @@
+Contrato de Licença de Software da Novell(R) para o SUSE(R) Linux Enterprise
+Server ("SLES (tm)")11 SP1
+
+LEIA ESTE CONTRATO COM ATENÇÃO. AO INSTALAR OU DE QUALQUER OUTRA FORMA UTILIZAR
+O SOFTWARE (INCLUINDO SEUS COMPONENTES), VOCĘ ESTÁ CONCORDANDO COM OS TERMOS
+DESTE CONTRATO. CASO VOCÊ NÃO CONCORDE COM ESTES TERMOS, NÃO FAÇA O DOWNLOAD,
+NÃO INSTALE E NÃO UTILIZE O SOFTWARE.
+
+DIREITOS E LICENÇAS
+
+Este Contrato de Licença de Software da Novell ("Contrato") é um acordo legal
+entre Você (entidade ou pessoa) e a Novell, Inc. ("Novell").  O produto de
+software identificado no título deste Contrato, qualquer mídia e sua respectiva
+documentação (coletivamente o "Software") estão protegidos pelas leis e pelos
+tratados de direitos autorais dos Estados Unidos ("EUA") e de outros países,
+estando sujeitos aos termos deste Contrato.  Qualquer versão de atualização ou
+suporte do Software da qual Você possa fazer download ou que possa receber que
+não seja acompanhada por um contrato de licença que substitua expressamente
+este Contrato é um Software regido por este Contrato.  Se o Software for uma
+versão de Atualização ou de Suporte, Você deverá ter licenciado de forma válida
+a versão e as instalações do Software que estão sendo atualizadas ou recebendo
+suporte para instalar ou usar a versão de Atualização ou de Suporte. 
+
+O Software é um sistema operacional modular, formado por diversos componentes
+que podem ser fornecidos com termos de licença separados.  O Software é um
+trabalho coletivo da Novell; embora a Novell não tenha a propriedade dos
+direitos autorais de todos os componentes do Software, a Novell detém os
+direitos autorais do trabalho coletivo do Software.  
+
+A maior parte dos componentes é composta por pacotes de código-fonte aberto,
+desenvolvidos de forma independente e acompanhados de termos de licença
+separados.    Seus direitos de licença em relação aos componentes individuais
+fornecidos com termos de licença separados são definidos por esses termos; nada
+neste contrato deve restringir, limitar ou, de outra forma, afetar quaisquer
+direitos ou obrigações que Você possa ter, ou condições às quais Você possa
+estar sujeito, sob tais termos de licença; no entanto, se Você distribuir
+cópias de qualquer componente independente do Software, deverá remover de cada
+cópia todas as marcas registradas, marcas comerciais e logotipos da Novell.
+
+Você pode fazer e usar cópias ilimitadas do Software dentro de Sua organização.
+O termo "Organização" significa uma entidade jurídica, excluindo subsidiárias e
+afiliadas cuja existência seja independente para fins tributários ou de
+personalidade jurídica. Um exemplo de Organização do setor privado seria uma
+corporação, uma sociedade ou um truste, excluindo quaisquer subsidiárias ou
+afiliadas da organização com números separados de identificação tributária ou
+de registro comercial. No setor público, um exemplo de Organização seria um
+órgão governamental específico ou a autoridade governamental local.
+
+OUTROS TERMOS E RESTRIÇÕES DE LICENÇA
+
+O Software está protegido pelas leis de direito autoral e tratados dos Estados
+Unidos ("EUA"), e de outros países, e está sujeito aos termos deste Contrato. 
+O Software é licenciado para Você, e não vendido.
+
+O Software pode estar acompanhado de outros programas de software ("Programas
+Incluídos"). Seus direitos de licença sobre Programas Incluídos fornecidos com
+termos de licença separados são definidos por esses termos. nada neste contrato
+deve restringir, limitar ou, de outra forma, afetar quaisquer direitos ou
+obrigações que Você possa ter, ou condições às quais Você possa estar sujeito,
+sob tais termos de licença.  
+
+À Novell são reservados todos os direitos que não forem expressamente
+concedidos a Você. Você não pode: (1) reverter a engenharia, descompilar ou
+desmontar o  Software, exceto e apenas dentro do que estiver expressamente
+permitido pela lei aplicável; ou (2) transferir o Software ou Seus direitos de
+licença sob este Contrato, integral ou parcialmente.
+
+MANUTENÇÃO E SUPORTE
+
+A Novell não tem nenhuma obrigação de oferecer suporte ou manutenção, exceto
+quando Você adquire uma oferta que inclua explicitamente os serviços de suporte
+ou manutenção.  Se Você fizer esse tipo de compra e não houver um contrato
+específico separado que se aplique aos serviços de suporte ou manutenção, os
+termos deste Contrato determinarão a provisão de tais serviços de suporte ou
+manutenção ("Serviços").  Para obter mais informações sobre as atuais ofertas
+de suporte da Novell, consulte http://www.novell.com/support.
+
+DIREITOS DE PROPRIEDADE
+
+Nenhum direito de posse ou de propriedade do Software foi transferido a Você. 
+A Novell e/ou seus respectivos licenciadores detêm todo o direito, toda a
+titularidade e todo o interesse sobre todos os direitos de propriedade
+intelectual do Software e dos Serviços, incluindo quaisquer adaptações ou
+cópias deles.  Todo material que Você receber como parte dos Serviços, que não
+inclua termos claramente superiores a este Contrato, será considerado como
+Software e controlado por este Contrato.  Você adquiriu apenas uma licença
+condicional para usar o Software.
+
+GARANTIA LIMITADA
+
+Por noventa (90) dias, a partir da data da aquisição, a Novell garante que (1)
+nenhuma mídia na qual o Software for entregue apresentará defeitos físicos e
+(2) o Software realmente estará de acordo com documentação que o acompanha. Se
+os itens com defeito forem devolvidos à Novell ou se Você reportar a
+não-conformidade à Novell no prazo de noventa (90) dias a partir da data da
+compra, a Novell, de acordo com seus próprios critérios, resolverá a
+não-conformidade ou reembolsará as taxas de licença que Você pagou pelo
+Software. Qualquer uso ou modificação não autorizados do Software anula esta
+garantia.  A GARANTIA PRECEDENTE É SEU ÚNICO E EXCLUSIVO RECURSO E SUBSTITUI
+TODAS AS OUTRAS GARANTIAS, EXPRESSAS OU IMPLÍCITAS.  (A garantia precedente não
+se aplica ao Software fornecido gratuitamente.  TAL SOFTWARE É OFERECIDO "NA
+FORMA COMO FOI FORNECIDO" SEM QUAISQUER GARANTIAS DE QUALQUER ESPÉCIE.)
+
+Serviços.  A Novell garante que todos os Serviços adquiridos serão fornecidos
+de forma profissional e de acordo com padrões geralmente aceitos pelo setor. 
+Esta garantia terá a validade de noventa (90) dias a contar da data do
+fornecimento dos Serviços.  Caso haja qualquer violação desta garantia, a única
+obrigação da Novell será corrigir os Serviços para que eles estejam em
+conformidade com esta garantia ou, a critério próprio, reembolsar o valor pago
+por Você à Novell pela parte dos Serviços que não estiver em conformidade com
+esta garantia.  Como alguns arquivos podem ser alterados ou danificados
+enquanto a Novell estiver fornecendo serviços técnicos, Você concorda em tomar
+as medidas apropriadas para isolar e fazer o backup de Seus sistemas.
+
+O SOFTWARE NÃO É DESENVOLVIDO, FABRICADO OU DESTINADO AO USO OU À DISTRIBUIÇÃO
+COM EQUIPAMENTO DE CONTROLE ONLINE EM AMBIENTES PERIGOSOS QUE EXIJAM DESEMPENHO
+LIVRE DE FALHAS, COMO OPERAÇÃO DE INSTALAÇÕES NUCLEARES, NAVEGAÇÃO AÉREA,
+SISTEMAS DE COMUNICAÇÃO OU DE CONTROLE, MÁQUINAS DE SUPORTE DIRETO À VIDA,
+SISTEMAS DE ARMAS OU OUTRAS UTILIZAÇÕES NAS QUAIS A FALHA DO SOFTWARE POSSA
+CAUSAR MORTE, ACIDENTES PESSOAIS OU DANOS FÍSICOS OU AMBIENTAIS GRAVES.
+
+O SOFTWARE SÓ É COMPATÍVEL COM DETERMINADOS COMPUTADORES E SISTEMAS
+OPERACIONAIS.  A GARANTIA DO SOFTWARE NÃO É VÁLIDA PARA SISTEMAS
+NÃO-COMPATÍVEIS. Entre em contato com a Novell ou com Seu revendedor para obter
+informações sobre compatibilidade.
+
+Produtos Não Pertencentes à Novell. O Software pode incluir ou fazer parte de
+um bundle com hardware ou outros programas de software ou serviços licenciados
+ou vendidos por outra entidade que não a Novell. A NOVELL NÃO GARANTE PRODUTOS
+OU SERVIÇOS DE TERCEIROS. QUALQUER UM DESSES PRODUTOS OU SERVIÇOS É FORNECIDO
+"NO ESTADO EM QUE SE ENCONTRA". QUALQUER SERVIÇO DE GARANTIA, SE HOUVER, PARA
+PRODUTOS NÃO PERTENCENTES À NOVELL É FORNECIDO PELO LICENCIADOR DO PRODUTO, DE
+ACORDO COM AS GARANTIAS APLICÁVEIS DO PRÓPRIO LICENCIADOR.
+
+A NÃO SER NAS FORMAS LIMITADAS POR LEI, A NOVELL REJEITA E ISENTA-SE DE TODA E
+QUALQUER GARANTIA IMPLÍCITA, INCLUSIVE QUAISQUER GARANTIAS DE COMERCIALIZAÇÃO,
+ADEQUAÇÃO A UM PROPÓSITO ESPECÍFICO, TITULARIDADE OU NÃO-VIOLAÇÃO.  A NOVELL
+NÃO CONCEDE QUALQUER GARANTIA, REPRESENTAÇÃO OU COMPROMISSO ALÉM DAQUELES
+EXPRESSAMENTE ESTABELECIDOS NESTA GARANTIA LIMITADA. A NOVELL NĂO GARANTE QUE O
+SOFTWARE OU OS SERVIÇOS ATENDERĂO ŔS SUAS NECESSIDADES OU QUE A OPERAÇĂO DO
+SOFTWARE OU DOS SERVIÇOS NĂO SOFRERÁ INTERRUPÇŐES.  Algumas jurisdições não
+permitem determinadas isenções de responsabilidade e limitações de garantias;
+portanto, partes das limitações descritas acima podem não se aplicar a Você.
+Esta garantia limitada Lhe concede direitos específicos, e Você também poderá
+ter outros direitos que variam de acordo com o estado ou a jurisdição.
+
+LIMITAÇĂO DE RESPONSABILIDADE
+
+(a) Perdas Conseqüências. A NOVELL OU QUALQUER UM DE SEUS AGENTES, SUBSIDIÁRIAS
+OU FUNCIONÁRIOS NÃO SERÁ RESPONSÁVEL, EM HIPÓTESE ALGUMA, POR QUAISQUER DANOS
+ESPECIAIS, CIRCUNSTANCIAIS, GRAVES, INDIRETOS, ILÍCITOS, ECONÔMICOS OU
+PUNITIVOS DECORRENTES DO USO OU DA INCAPACIDADE DE USAR O SOFTWARE OU OS
+SERVIÇOS, INCLUINDO, SEM LIMITAÇÃO, PERDA DE LUCROS, NEGÓCIOS OU DADOS, MESMO
+SE AVISADOS DA POSSIBILIDADE DESSES DANOS.
+(b) Danos diretos. EM HIPÓTESE ALGUMA, A RESPONSABILIDADE AGREGADA DA NOVELL
+POR DANOS DIRETOS Ŕ PROPRIEDADE OU A PESSOAS (EM UMA INSTÂNCIA OU SÉRIE DE
+INSTÂNCIAS) EXCEDERÁ 1,25 VEZ O VALOR PAGO PELO SOFTWARE OU PELOS SERVIÇOS A
+PARTIR DOS QUAIS ESSA RECLAMAÇĂO SE ORIGINOU (OU US$ 50,00 SE VOCĘ RECEBEU O
+SOFTWARE GRATUITAMENTE).  As exclusões e as limitações acima não se aplicarão
+às reclamações referentes a morte ou a danos físicos. Nas jurisdições que não
+permitem a exclusão ou a limitação de danos, a responsabilidade da Novell
+deverá ser limitada ou excluída de acordo com o máximo permitido nessas
+jurisdições.
+
+TERMOS GERAIS
+
+Vigência.  Este Contrato entrará em vigor na data em que Você adquirir
+legalmente o Software e terminará automaticamente se Você violar qualquer um de
+seus termos.  
+
+Teste de Benchmark.  Esta restrição aos testes de benchmark aplica-se a Você
+caso Você seja desenvolvedor ou licenciador de software, ou caso esteja
+executando testes no Software para um desenvolvedor ou licenciador ou em nome
+dele.  Sem o prévio consentimento por escrito da Novell, você não pode deter,
+publicar ou divulgar para terceiros os resultados de qualquer teste de
+benchmark do Software. Se você for um licenciador de produtos funcionalmente
+similares ao Software ou de produtos concorrentes do Software ("Produtos
+similares"), ou se estiver agindo em benefício de tal licenciador, e Você
+publicar ou divulgar informações de benchmark do Software, violando esta
+restrição, então, não obstante qualquer disposição em contrário existente no
+contrato de licença de usuário final do Produto similar, e além de quaisquer
+outros recursos dos quais a Novell possa dispor, a Novell terá o direito de
+executar testes de benchmark em Produtos similares e divulgar e publicar essas
+informações de benchmark, e Você, por meio deste instrumento, alega que tem
+autoridade para conceder tal direito à Novell.
+
+Código-fonte Aberto.  Nenhuma parte deste Contrato deve restringir, limitar ou
+afetar qualquer direito ou obrigação que Você possa ter, ou as condições às
+quais Você possa estar sujeito, em qualquer licença de código-fonte aberto para
+qualquer código-fonte aberto contido ao Software.
+
+Transferência.  Este Contrato não pode ser transferido ou atribuído sem a
+prévia aprovação por escrito da Novell.
+
+Lei e Jurisdição.  Este Contrato é regido pelas leis do estado de Utah, EUA.
+Qualquer ação legal relativa a este Contrato só poderá ser levada às cortes da
+jurisdição competente do estado de Utah.  No entanto, se Seu país de residência
+for um estado membro da União Européia ou da Associação de Livre Comércio
+Européia, este Contrato será regido pelas leis desse país e qualquer ação legal
+só poderá ser levada à corte da jurisdição competente desse país.
+
+Contrato Completo.  Este Contrato estabelece o entendimento e o acordo
+completos entre Você e a Novell. Ele só poderá ser corrigido ou modificado
+mediante um contrato por escrito, aprovado por Você e por um representante
+autorizado da Novell.  NENHUM LICENCIADOR, DISTRIBUIDOR, COMERCIANTE,
+VAREJISTA, REVENDEDOR, VENDEDOR OU FUNCIONÁRIO ESTÁ AUTORIZADO A MODIFICAR ESTE
+CONTRATO OU A FAZER QUALQUER REPRESENTAÇÃO OU PROMESSA QUE SEJA DIFERENTE OU
+ADICIONAL AOS TERMOS DESTE CONTRATO.
+
+Desistência.  Nenhuma desistência de qualquer direito deste Contrato será
+efetiva, a não ser que seja feita por escrito e assinada por um representante
+devidamente autorizado da parte responsável. Nenhuma desistência a qualquer
+direito passado ou presente decorrente de qualquer violação ou falha na
+execução será considerada como uma desistência de qualquer direito futuro
+decorrente deste Contrato.
+
+Separação.  Se qualquer provisão deste Contrato for inválida ou se não puder
+ser imposta, essa provisão será interpretada, limitada, modificada ou, se
+necessário, dividida, de acordo com a necessidade, para eliminar a invalidade
+ou a incapacidade de imposição, e as outras provisões deste Contrato
+permanecerão inalteradas.
+
+Conformidade com as Leis de Exportação.  Quaisquer informações técnicas ou
+sobre produtos fornecidas segundo os termos do presente Contrato estão sujeitas
+aos controles de exportação dos EUA e às leis comerciais de outros países. As
+partes concordam em manter a conformidade com todas as regulamentações de
+controle de exportação e em obter quaisquer licenças ou classificações exigidas
+para exportar, reexportar ou importar materiais para distribuição.  As partes
+concordam em não exportar ou reexportar para entidades que constam das listas
+atuais de exclusão de exportação dos Estados Unidos ou para todos os países sob
+embargo ou que abrigam organizações terroristas, de acordo com o especificado
+pelas leis de exportação dos Estados Unidos.  As partes não utilizarão os
+produtos para fins proibidos associados a armas nucleares, mísseis ou armas
+químicas e biológicas.  Consulte a página do Bureau of Industry and Security na
+Web www.bis.doc.gov antes de exportar os produtos da Novell a partir dos EUA.
+Para obter mais informações sobre como exportar o software da Novell, consulte
+http://www.novell.com/company/legal/.  Mediante solicitação, a Novell fornecerá
+informações específicas sobre as restrições aplicáveis.  No entanto, a Novell
+não assumirá qualquer responsabilidade se Você não obtiver as aprovações
+necessárias para exportação.
+
+Direitos Restritos do Governo dos EUA.  O uso, a duplicação ou a divulgação
+pelo governo dos EUA estão sujeitos às restrições dos regulamentos FAR
+52.227-14 (junho de 1987) Alternativa III (junho de 1987), FAR 52.227-19 (junho
+de 1987) ou DFARS 252.227-7013 (b)(3) (novembro de 1995), ou às cláusulas
+sucessoras aplicáveis. 
+
+O Contratante/Fabricante é a Novell, Inc., 1800 South Novell Place, Provo, Utah
+84606.
+
+Outros.  A aplicação da Convenção de Contratos das Nações Unidas para a Venda
+Internacional de Produtos está expressamente excluída.
+
+(c)1993, 2000-2010 Novell, Inc. Todos os direitos reservados.
+(04232010)
+
+Novell e SUSE LINUX são marcas comerciais registradas, e SLES é uma marca
+comercial da Novell, Inc. nos Estados Unidos e em outros países. 
+
+Todas as marcas registradas de terceiros pertencem a seus respectivos
+proprietários.
+
+
+
+

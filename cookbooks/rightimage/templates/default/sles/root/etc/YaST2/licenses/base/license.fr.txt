@@ -1,0 +1,272 @@
+SUSE(R) Linux Enterprise Server ("SLES (tm)")11 SP1
+Accord de Licence de Logiciel Novell(r)
+
+EN INSTALLANT OU EN UTILISANT CE LOGICIEL (Y COMPRIS SES COMPOSANTS) DE TOUTE
+AUTRE MANIÈRE, VOUS ACCEPTEZ LES CLAUSES DU PRÉSENT ACCORD. SI VOUS N'ACCEPTEZ
+PAS CES TERMES, NE TÉLÉCHARGEZ PAS, N'INSTALLEZ PAS ET N'UTILISEZ PAS LE
+LOGICIEL.
+
+DROITS ET LICENCES
+
+Le logiciel identifié dans le titre de cet Accord, le support (le cas échéant)
+et la documentation qui l'accompagne (ci-après collectivement dénommés le "
+logiciel ") sont protégés par les lois et traités sur le Copyright en vigueur
+aux États-Unis et dans d'autres pays, et sont soumis aux termes de cet Accord.
+Toute version de mise à jour ou de support du logiciel que vous pouvez
+télécharger ou recevoir et qui n'est pas accompagnée d'un accord de licence
+remplaçant expressément le présent accord est considérée comme un logiciel et
+régie par le présent accord. Si le Logiciel est une version de mise à jour ou
+de support, Vous devez disposer d'une licence acquise de manière licite pour la
+version et le nombre de Logiciels mis à jour ou pris en charge, afin
+d'installer ou d'utiliser la version de mise à jour ou de support. 
+
+Le Logiciel est un système d'exploitation modulaire qui inclut plusieurs
+composants pouvant être accompagnés de conditions de licence distinctes. Le
+Logiciel est une ouvre collective de Novell. Bien que les droits d'auteur des
+composants du Logiciel ne soient pas la propriété de Novell, Novell détient les
+droits d'auteur de l'ouvre collective pour le Logiciel. 
+
+La plupart des composants sont des paquetages Open Source, développés de
+manière indépendante et accompagnés par des clauses de licence à part. Vos
+droits de licence concernant les différents composants accompagnés de
+conditions de licence distinctes sont définis par lesdites condition rien dans
+le présent Accord ne restreint, limite ou affecte de toute autre façon des
+droits ou obligations que vous pouvez avoir en vertu desdites conditions de
+licence.Toutefois, si vous distribuez des copies de ces composants
+indépendamment du Logiciel, vous devez supprimer les marques de Novell, la
+présentation des produits et les logos de chaque exemplaire.
+
+Vous êtes autorisé à effectuer et utiliser un nombre illimité de copies du
+Logiciel au sein de votre entreprise. Le terme à (" Organisation ") désigne une
+entité juridique, à l'exclusion des filiales et autres sociétés affiliées ayant
+une existence propre pour des motifs fiscaux ou de personnalité juridique. Dans
+le secteur privé, une société, un partenariat ou un trust, à l'exclusion de
+leurs filiales ou autres sociétés affiliées dotées d'un numéro deà TVA ou deà
+SIRET propre, sont autant d'exemples d'Organisation. Dans le secteur public,
+une institution publique spécifique ou une autorité publique locale sont
+légalement des exemples d'Organisation.
+
+AUTRES CLAUSES ET RESTRICTIONS DE LICENCE
+
+Le Logiciel est protégé en vertu des lois et des traités relatifs au droit
+d'auteur en vigueur aux États-Unis et dans d'autres pays, et est soumisaux
+clauses du présent Accord. Le logiciel vous est concédés sous licence. Il ne
+vous est pas vendu.
+
+Le Logiciel peut être regroupé avec d'autres programmes logiciels (les "
+Programmes associés "). Vos droits de licence concernant les Programmes
+associés qui sont accompagnés par des clauses de licence v part sont définis
+par lesdites clauses. Aucune disposition du présent Accord ne pourra
+restreindre, limiter ou affecter de toute autre manière un droit que vous avez,
+une obligation qui vous incombe ou une condition qui s'applique à vous,
+conformément aux clauses de cette licence à part. 
+
+Novell se réserve tous les droits qui ne Vous sont pas expressément concédés.
+Vous ne pouvez pas : (1) soumettre le Logiciel à un processus d'ingénierie
+inverse, ni le décompiler ou le désassembler, sauf si et uniquement si ces
+opérations sont expressément autorisées par la législation en vigueur ; ou (2)
+transférer le Logiciel ou vos droits de licence accordés dans le cadre de cet
+Accord, que ce soit en tout ou partie.
+
+MAINTENANCE ET SUPPORT
+
+Le cas échéant et si aucun accord distinct ne s'applique spécifiquement aux
+services d'assistance technique, les termes du présent Accord régissent la
+fourniture desdits services (les "Services"). Pour plus d'informations sur les
+offres de support actuelles, visitez le site Web de Novell à l'adresse
+http://www.novell.com/support.
+
+DROITS DE PROPRIÉTÉ
+
+Ce n'est en aucun cas un titre de propriété ou un droit de propriété sur le
+Logiciel qui vous est transféré. Novell et/ou ses concconcdants conservent tous
+les droits, titres et intérêts de propriété intellectuelle attachés au Logiciel
+et aux Services, y compris ceux portant sur toute adaptation ou copie dudit
+Logiciel et desdits Services. Tout matériel que Vous recevez comme Services qui
+n'est pas accompagné par des termes remplaçant expressément le présent Accord
+est considérée comme un logiciel et régie par le présent accord. Vous avez
+uniquement acquis une licence conditionnelle d'utilisation du Logiciel.
+
+GARANTIE LIMITÉE
+
+Pendant une période de quatre-vingt-dix (90) jours à compter de la date
+d'achat, Novell garantit que (1) tout support sur lequel est livré le Logiciel
+est exempt de défaut matériel, et que (2) le Logiciel est conforme, pour
+l'essentiel, à la documentation qui l'accompagne. Si les articles défectueux
+sont renvoyàs à Novell ou si vous signalez toute non-conformità à Novell dans
+les quatre-vingt-dix (90) jours à compter de la date d'achat, Novell pourra, à
+sa seule convenance, corriger la non-conformité ou vous rembourser les frais de
+licence du Logiciel. Une utilisation ou une modification non autorisée du
+Logiciel annulerait cette garantie. LA GARANTIE SUSMENTIONNÉE CONSTITUE VOTRE
+SEUL ET UNIQUE RECOURS ET REMPLACE TOUTE AUTRE GARANTIE, EXPRESSE OU IMPLICITE.
+(La garantie susmentionnée ne s'applique pas aux logiciels fournis
+gratuitement. CES LOGICIELS SONT FOURNIS "TELS QUELS" SANS AUCUNE GARANTIE
+D'AUCUNE SORTE).
+
+Services. Novell garantit que les Services acquis seront fournis de façon
+professionnelle et dans les règles de l'art. La présente garantie sera valable
+pendant quatre-vingt-dix (90)jours après la fourniture des Services. En cas de
+rupture de garantie, la seule obligation de Novell, à son entière discrétion,
+sera soit de corriger les Services de sorte qu'ils soient conformes à la
+présente garantie, soit de vous rembourser le montant versé à Novell pour la
+portion des Services non conformes aux termes de la présente garantie. Les
+fichiers pouvant être altérés ou endommagés lors de la fourniture des services
+techniques par Novell, Vous acceptez de prendre les mesures appropriées pour
+isoler et sauvegarder Vos systèmes.
+
+LE LOGICIEL N'A PAS ÉTÉ CONÇU, FABRIQUÉ OU PRÉVU POUR UNE UTILISATION OU UNE
+DISTRIBUTION SUR UN ÉQUIPEMENT FONCTIONNANT DANS UN ENVIRONNEMENT DANGEREUX ET
+QUI NÉCESSITE DES PERFORMANCES N'OFFRANT PLUS TOUTE LA SÉCURITÉ NÉCESSAIRE :
+FONCTIONNEMENT SUR DES INSTALLATIONS NUCLÉAIRES, NAVIGATION AÉRIENNE,
+COMMUNICATIONS OU SYSTÈMES DE CONTRÔLE, ÉQUIPEMENTS DE SAUVETAGE, SYSTÈMES
+D'ARMES OU AUTRES UTILISATIONS AU COURS DESQUELLES UNE PANNE DU LOGICIEL
+POURRAIT ENTRAÎNER DIRECTEMENT LA MORT, DES BLESSURES CORPORELLES OU UNE
+DÉTÉRIORATION GRAVE DE L'ENVIRONNEMENT.
+
+CE LOGICIEL N'EST COMPATIBLE QU'AVEC CERTAINS ORDINATEURS ET SYSTÈMES
+D'EXPLOITATION. LA GARANTIE N'EST PAS APPLICABLE AUX SYSTÈMES NON COMPATIBLES.
+Pour toute question de compatibilité, veuillez contacter Novell ou votre
+revendeur.
+
+Produits d'un autre éditeur. Le Logiciel peut inclure ou faire partie d'une
+offre groupée qui inclut du matériel ou d'autres programmes ou services
+informatiques cédés sous licence ou vendus par un fournisseur autre que Novell.
+NOVELL NE GARANTIT PAS LES PRODUITS OU SERVICES FOURNIS PAR DES TIERS. CES
+PRODUITS OU SERVICES SONT FOURNIS PAR NOVELL "TELS QUELS". TOUTE GARANTIE
+ÉVENTUELLE SUR CES PRODUITS PEUT UNIQUEMENT ÊTRE DONNÉE, LE CAS ÉCHÉANT, PAR LE
+CONCÉDANT DESDITS PRODUITS
+
+SOUS RÉSERVE DES LOIS IMPÉRATIVES CONTRAIRES, NOVELL EXCLUT TOUTE GARANTIE
+IMPLICITE RELATIVE AU LOGICIEL, NOTAMMENT TOUTE GARANTIE DE DÉTENTION DES
+DROITS DE PROPRIÉTÉ, DE NON-VIOLATION DES DROITS DE PROPRIÉTÉ INTELLECTUELLE
+DES TIERS, AINSI QUE TOUTE GARANTIE QUE LE LOGICIEL PRÉSENTERAIT DES QUALITÉS
+SPÉCIFIQUES OU QU'IL CONVIENDRAIT À UN USAGE PARTICULIER. NOVELL NE PROPOSE
+AUCUNE GARANTIE, REPRÉSENTATION OU PROMESSE NON INDIQUÉE EXPRESSÉMENT DANS LA
+PRÉSENTE GARANTIE LIMITÉE. NOVELL NE GARANTIT PAS QUE LE LOGICIEL OU LES
+SERVICES SATISFERONT À VOS EXIGENCES OU QU'ILS FONCTIONNERONT DE MANIÈRE
+ININTERROMPUE. Certaines juridictions n'autorisent pas certaines exclusions ou
+limitations de garantie. Par conséquent, il se peut qu'une partie des
+limitations susmentionnées ne vous soient pas applicables. La présente garantie
+limitée Vous confère des droits spécifiques, auxquels peuvent s'ajouter
+d'autres droits variables en fonction de la législation en vigueur dans l'État
+ou la juridiction dont Vous relevez. 
+
+LIMITATION DE LA RESPONSABILITÉ
+
+(a) à Pertes indirectes. NOVELL, SES CONCÉDANTS, FILIALES OU EMPLOYÉS, NE
+POURRONT EN AUCUN CAS ÊTRE TENUS POUR RESPONSABLES À RAISON DES PRÉJUDICES
+INDIRECTS, ACCESSOIRES OU SPÉCIAUX (QU'ILS SOIENT MATÉRIELS OU IMMATÉRIELS),
+RÉSULTANT DE L'UTILISATION OU DE L'IMPOSSIBILITÉ D'UTILISER LE LOGICIEL, Y
+COMPRIS, DE FAÇON NON LIMITATIVE, EN CAS DE PERTE FINANCIÈRE, DE MANQUE À
+GAGNER OU DE PERTE DE DONNÉES ET CE, INDÉPENDAMMENT DU CARACTÈRE PRÉVISIBLE OU
+NON DESDITS PRÉJUDICES.
+(b) à Dommages directs. EN AUCUN CAS LA RESPONSABILITÉ GLOBALE DE NOVELL EN
+MATIÈRE DE PRÉJUDICES DIRECTS MATÉRIELS OU IMMATÉRIELS (QU'IL S'AGISSE D'UN CAS
+UNIQUE OU RÉPÉTÉ) NE POURRA ÊTRE ENGAGÉE AU-DELÀ DE 125% DU MONTANT PAYÉ PAR
+VOUS POUR LE LOGICIEL (OU 40EUROS (50USD) SI LE LOGICIEL VOUS A ÉTÉ FOURNI À
+TITRE GRACIEUX). Les exclusions et limitations susmentionnées ne peuvent pas
+être appliquées à des réclamations en rapport avec un décès ou des blessures
+corporelles. Dans le cas des juridictions qui n'autorisent pas l'exclusion ou
+la limitation des dommages, la responsabilité de Novell sera limitée ou exclue
+dans la mesure maximale permise par lesdites juridictions.
+
+CONDITIONS GÉNÉRALES
+
+Durée. Le présent Accord entre en vigueur à la date à laquelle Vous acquérez
+légalement le Logiciel. Il sera automatiquement résilié si Vous ne respectez
+pas l'une de ses conditions. 
+
+Tests d'évaluation des performances. Cette limitation sur les tests
+d'évaluation des performances Vous concerne si Vous êtes un développeur
+logiciel ou un concédant ou si Vous effectuez des tests sur le Logiciel sous la
+direction ou pour le compte d'un développeur de logiciels ou d'un concédant.
+Sans l'accord préalable écrit de Novell (Novell ne devant pas s'opposer à cet
+accord de manière excessive), vous ne pouvez pas publier ou dévoiler à un tiers
+les résultats d'un test d'évaluation des performances du Logiciel. Si Vous êtes
+concédant de produits en concurrence avec le Logiciel ou aux fonctionnalités
+similaires à celles du Logiciel ("Produits Similaires") ou agissez au nom de
+tels concédants, et que Vous publiez ou divulguez des informations sur les
+tests d'évaluation du Logiciel en violation de cette restriction, sauf mention
+contraire dans l'accord de licence de l'utilisateur final du Produit similaire
+et outre les recours que Novell pourrait utiliser, Novell est autorisé à
+effectuer les tests d'évaluation des performances sur des Produits similaires
+et à divulguer et publier les résultats et Vous faites ainsi valoir que Vous
+avez l'autorité de concéder ces droits à Novell.
+
+Open Source. Rien dans le présent Accord ne peut restreindre, limiter ou
+affecter tout droit dont Vous disposez, ou toute obligation ou condition à
+laquelle Vous pouvez être soumis, en vertu de toute licence relative à l'Open
+Source applicable pour tout code Open Source contenu dans le Logiciel. 
+
+Cession de licence. Le présent Accord ne peut en aucun cas faire l'objet d'une
+cession sans l'accord préalable écrit de Novell.
+
+Loi et juridiction. Le présent Accord est régi par les lois de l'État de
+l'Utah, aux États-Unis. Toute action en justice relative à cet Accord ne peut
+être portée que devant les tribunaux compétents de l'État de l'Utah. Si,
+toutefois, le pays de votre résidence principale est un état membre de l'Union
+européenne ou de l'Association européenne de libre-échange, le présent Accord
+est régi par les lois de ce pays. Toute action en justice ne peut alors être
+portée que devant les tribunaux compétents de ce pays.
+
+Accord complet. Le présent Accord définit la totalité des conventions entre
+Vous et Novell et ne peut être amendé ou modifié que par un accord écrit conclu
+entre Vous et un représentant autorisé de Novell. AUCUN CONCÉDANT DE LICENCE,
+DISTRIBUTEUR, VENDEUR, DÉTAILLANT, REVENDEUR, REPRÉSENTANT OU EMPLOYÉ N'EST
+AUTORISÉ À MODIFIER CET ACCORD OU À ENGAGER DES RESPONSABILITÉS DISTINCTES DE
+CELLES INCLUSES DANS LES PRÉSENTES CLAUSES DE L'ACCORD.
+
+Renonciation. Toute renonciation à l'un des droits octroyés par le présent
+Accord devra, pour prendre effet, être formulée par écrit et signée par un
+représentant dûment autorisé de la partie concernée. Toute renonciation du
+droit passé ou présent causé par la violation de l'une des clauses du présent
+Accord représentera une renonciation des droits futurs liés à cet Accord.
+
+Rupture de l'accord. Si l'une des clauses de cet Accord perd sa valeur
+juridique ou sa force exécutoire, ladite disposition sera analysée, limitée,
+modifiée ou, le cas échéant, résiliée afin d'éliminer son inapplicabilité; par
+contre, les autres dispositions conserveront leur applicabilité.
+
+Conformité aux exigences d'exportation. Tous les produits ou informations
+techniques fournis dans le cadre de cet Accord peuvent être soumis à des
+contrôles d'exportation aux États-Unis et à la législation commerciale d'autres
+pays. Les parties s'engagent à respecter toutes les réglementations de contrôle
+d'exportation et à obtenir les autorisations ou classifications nécessaires
+pour exporter, réexporter ou importer des livrables. Les parties s'engagent à
+ne pas exporter ou réexporter vers des entités figurant sur les listes
+d'exclusion d'exportation américaines ou vers des pays sous embargo des
+États-Unis ou représentant une menace terroriste conformément à la législation
+des États-Unis en matière d'exportation. Les parties s'engagent à ne pas
+employer de livrables à des fins d'utilisation illicite d'armes nucléaires, de
+missiles ou d'armes biochimiques. Avant d'exporter des produits Novell depuis
+les États-Unis, consultez la page Web (en anglais) du "Bureau of Industry and
+Security" www.bis.doc.gov. Reportez-vous légalement à la page
+http://www.novell.com/company/legal/ pour plus d'informations sur l'exportation
+de logiciels Novell. Novell s'engage à Vous fournir, sur demande, les
+informations spécifiques relatives aux limitations applicables. Toutefois,
+Novell décline toute responsabilité dans le cas où vous n'obtiendriez pas les
+approbations d'exportation nécessaires.
+
+Droits du Gouvernement des États-Unis. Toute utilisation, reproduction ou
+divulgation de la part du Gouvernement des États-Unis est soumise aux
+limitations prévues par les dispositions légales suivantes: FAR 52.227-14 (juin
+1987) Alternate III (juin 1987), FAR 52.227-19 (juin 1987) ou DFARS
+252.227-7013 (b)(3) (nov. 1995), ou par les clauses ultérieures appliquées en
+remplacement des dispositions légales ci-avant.
+
+Fabricant: Novell, Inc. 1800 South Novell Place, Provo, Utah 84606.
+
+Autre. L'application de la Convention des Nations Unies sur les contrats de
+vente internationale de marchandises est expressément exclue.
+
+(c)1993, 2000-2010 Novell, Inc. Tous droits réservés.
+(04232010)
+
+Novell et SUSE LINUX sont des marques déposées de Novell, Inc. aux États-Unis
+et dans d'autres pays. 
+
+Toutes les marques tierces sont la propriété de leurs détenteurs respectifs.
+
+
+
+

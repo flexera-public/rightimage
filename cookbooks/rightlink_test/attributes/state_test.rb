@@ -1,1 +1,0 @@
-set_unless[:state_test][:value] = nil  # default value

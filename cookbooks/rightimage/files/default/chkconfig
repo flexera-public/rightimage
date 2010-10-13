@@ -1,0 +1,43 @@
+#!/bin/bash -x
+
+chkconfig --add postfix
+chkconfig --level 4 postfix on 
+chkconfig --level 4 psacct on
+chkconfig --level 4 smartd off
+chkconfig --level 4 anacron off
+chkconfig --level 4 acpid off
+chkconfig --level 4 auditd off
+chkconfig --level 4 irqbalance off
+chkconfig --level 4 mdmpd off
+chkconfig --level 4 portmap off
+chkconfig --level 4 nfslock off
+chkconfig --level 4 sendmail off
+chkconfig --level 4 cpuspeed off
+chkconfig --level 4 autofs off
+chkconfig --level 4 rpcidmapd off
+chkconfig --level 4 rpcsvcgssd off
+chkconfig --level 4 rpcgssd off
+chkconfig --level 4 pcscd off
+chkconfig --level 4 gpm off
+chkconfig --level 4 hidd off
+chkconfig --level 4 yum-updatesd off
+chkconfig --del acpid
+chkconfig --del auditd
+chkconfig --del irqbalance
+chkconfig --del mdmpd
+chkconfig --del NetworkManager
+chkconfig --del dund
+chkconfig --del firstboot
+chkconfig --del irda
+chkconfig --del smartd
+chkconfig --del kudzu
+chkconfig --del hidd
+chkconfig --del gpm
+chkconfig --del pcscd
+chkconfig --del cpuspeed
+chkconfig --del rdisc
+chkconfig --del sendmail
+chkconfig --del readahead_later
+chkconfig --del wpa_supplicant
+chkconfig --del pand
+chkconfig --del netplugd
