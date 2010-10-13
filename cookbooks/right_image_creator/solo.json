@@ -1,9 +1,0 @@
-{
-  "right_image_creator": {
-    "platform": "ubuntu",
-    "release" : "karmic",
-    "arch"    : "i386"
-  },
-  "recipes": [ "right_image_creator" ]
-}
- 
