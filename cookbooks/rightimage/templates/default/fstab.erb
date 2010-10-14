@@ -1,14 +1,14 @@
 <%= node[:rightimage][:root_mount] %>  /         ext3    defaults        0 0
 
 
-<% unless node[:rightimage][:fstab][:ephemeral_mount_opts].nil? -%>
+<% unless node[:rightimage][:fstab][:ephemeral_mount_opts] == nil -%>
 <%= node[:rightimage][:ephemeral_mount] %>   /mnt      ext3    <%= node[:rightimage][:fstab][:ephemeral_mount_opts] %>        0 0
 <% else -%>
 <%= node[:rightimage][:ephemeral_mount] %>   /mnt      ext3    defaults        0 0
 <% end -%>
 
 
-<% unless node[:rightimage][:swap_mount].nil? -%>
+<% unless node[:rightimage][:swap_mount] == nil -%>
 <%= node[:rightimage][:swap_mount] %>  swap      swap    <%= node[:rightimage][:fstab][:swap_mount_opts] %>        0 0
 <% end -%>
 
