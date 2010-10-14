@@ -30,7 +30,8 @@ attribute "rightimage/platform",
 attribute "rightimage/release",
   :display_name => "release",
   :description => "the release of the image to build",
-  :required => true
+  :required => true,
+  :recipes => [ "rightimage::do_euca" ,"rightimage::do_ec2" , "rightimage::do_centos" , "rightimage::do_ubuntu" , "rightimage::do_sles" , "rightimage::default" , "rightimage::do_vmops" ]
   
 attribute "rightimage/arch",
   :display_name => "arch",
