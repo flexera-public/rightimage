@@ -76,6 +76,7 @@ case rightimage[:cloud]
       set[:rightimage][:fstab][:ephemeral_mount_opts] = "defaults"
       set[:rightimage][:fstab][:swap] = "defaults"
   when "vmops"
+    set[:rightimage][:fstab][:ephemeral_mount_opts] = "defaults"
     set[:rightimage][:root_mount] = "/dev/xvda"
     set[:rightimage][:ephemeral_mount] = "/dev/xvdb"
 end
