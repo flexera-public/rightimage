@@ -1,0 +1,1 @@
+alias rightimage='chef-solo -l debug -c $RIGHTIMAGE/run/solo.rb -j $RIGHTIMAGE/run/solo.json'
