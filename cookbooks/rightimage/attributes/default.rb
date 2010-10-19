@@ -11,6 +11,7 @@ set[:rightimage][:build_dir] = "/mnt/vmbuilder"
 set[:rightimage][:mount_dir] = "/mnt/image"
 set[:rightimage][:virtual_environment] = "xen"
 set[:rightimage][:install_mirror] = "mirror.rightscale.com"
+set[:rightimage][:default_mirror] = "mirror.rightscale.com"
 set_unless[:rightimage][:image_name_override] = ""
 set[:rightimage][:install_mirror_date] = "latest" 
 
@@ -102,22 +103,17 @@ case rightimage[:platform]
 
 end
 
-# set default mirrors and EC2 endpoint
+# set EC2 endpoint
 case rightimage[:region]
   when "us-east"
-    set[:rightimage][:mirror] = "http://ec2-us-east-mirror.rightscale.com"
     set[:rightimage][:ec2_endpoint] = "https://ec2.us-east-1.amazonaws.com"
   when "us-west"
-    set[:rightimage][:mirror] = "http://ec2-us-west-mirror.rightscale.com"
     set[:rightimage][:ec2_endpoint] = "https://ec2.us-west-1.amazonaws.com"
   when "eu-west"
-    set[:rightimage][:mirror] = "http://ec2-eu-west-mirror.rightscale.com"
     set[:rightimage][:ec2_endpoint] = "https://ec2.eu-west-1.amazonaws.com"
   when "ap-southeast"
-    set[:rightimage][:mirror] = "http://ec2-ap-southeast-mirror.rightscale.com"
     set[:rightimage][:ec2_endpoint] = "https://ec2.ap-southeast-1.amazonaws.com"
   else
-    set[:rightimage][:mirror] = "http://mirror.rightscale.com"
     set[:rightimage][:ec2_endpoint] = "https://ec2.us-east-1.amazonaws.com"
 end #if rightimage[:cloud] == "ec2" 
 

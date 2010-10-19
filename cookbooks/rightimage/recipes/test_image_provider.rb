@@ -1,4 +1,7 @@
 
+
+
+
 rightimage_image "test_image" do 
   platform 'ubuntu'
   release 'lucid'
@@ -7,5 +10,4 @@ rightimage_image "test_image" do
   action :create
   directory '/tmp/image4'
   mirror 'http://127.0.0.1:9999/ubuntu'
-  
 end

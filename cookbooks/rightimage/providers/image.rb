@@ -29,32 +29,23 @@ end
 
 
 action :create do
-
   install_command = debootstrap_command new_resource.release , new_resource.architecture , new_resource.directory, new_resource.mirror
-
   text =  <<-EOF
-set -ex
-
+    set -ex
     sudo umount -lf #{new_resource.directory} || true 
     sudo rm -rf #{new_resource.directory}
     sudo mkdir #{new_resource.directory}
     sudo  mount -t ramfs -o size=200m image-provider-fs #{new_resource.directory}
-
     #{install_command}
-
-EOF
+  EOF
   STDERR.puts "script = #{text}"
-
-          
   status = POpen4::popen4(text) do  |stdout, stderr, stdin, pid|
-
     stdout.each do |line|
       STDERR.puts line 
     end
-
   end
-   
 end
+
  
 action :delete do
   execute "delete database" do

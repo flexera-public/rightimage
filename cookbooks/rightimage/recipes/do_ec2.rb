@@ -104,12 +104,6 @@ bash "do_depmod" do
 end if node[:rightimage][:platform] == "centos"
 
 
-#  - configure mirrors
-template "#{node[:rightimage][:mount_dir]}#{node[:rightimage][:mirror_file_path]}" do 
-  source node[:rightimage][:mirror_file] 
-  backup false
-end unless node[:rightimage][:platform] == "centos"
-
 
 #  - bundle and upload
 bash "bundle_upload_ec2" do 

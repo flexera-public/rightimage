@@ -4,7 +4,8 @@ template "/tmp/yum.conf" do
   source "yum.conf.erb"
   backup false
   variables ({
-    :bootstrap => true
+    :bootstrap => true,
+    :mirror => node.rightimage.install_mirror
   })
 end
 
@@ -218,6 +219,10 @@ end
 template "#{node[:rightimage][:mount_dir]}/etc/yum.repos.d/CentOS-Base.repo" do 
   source "yum.conf.erb"
   backup false
+  variables ({
+    :bootstrap => false,
+    :mirror => node.rightimage.default_mirror
+  })
 end
 
 template "#{node[:rightimage][:mount_dir]}/root/.gemrc" do 

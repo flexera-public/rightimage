@@ -11,8 +11,8 @@ case node[:rightimage][:platform]
         --suite=#{node[:rightimage][:release]} \
         -d #{node[:rightimage][:build_dir]} \
         --rootsize=#{node[:rightimage][:root_size]} \
-        --install-mirror=http://mirror.rightscale.com/ubuntu \
-        --install-security-mirror=http://mirror.rightscale.com/ubuntu \
+        --install-mirror=http://#{node.rightimage.install_mirror}/ubuntu \
+        --install-security-mirror=http://#{node.rightimage.install_mirror}/ubuntu \
         --components=main,restricted,universe,multiverse \
         --lang=#{node[:rightimage][:lang]} "
     if node[:rightimage][:arch] == "i386"
@@ -24,12 +24,7 @@ case node[:rightimage][:platform]
     node[:rightimage][:guest_packages].split.each { |p| bootstrap_cmd << " --addpkg " + p} 
 
 puts "bootstrap_cmd = " + bootstrap_cmd
-  else 
-
-    template "/tmp/yum.conf" do
-      source "yum.conf.erb"
-      backup false
-    end
+ 
 end
 
 log "Configuring Image..."
@@ -159,4 +154,15 @@ EOS
     EOH
   end
 end
+
+
+template File.join mount_dir, node.rightimage.mirror_file_path
+  source node.rightimage.mirror_file
+  backup false
+  variables ({
+    :mirror => node.rightimage.default_mirror
+  })
+end
+
+execute "chroot #{node.rightimage.mount_dir} apt-get update -y"
 
