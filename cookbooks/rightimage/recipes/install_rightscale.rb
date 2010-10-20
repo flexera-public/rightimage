@@ -6,12 +6,12 @@ bash "install_rubygems" do
 set -e
 set -x
 ROOT=#{node[:rightimage][:mount_dir]}
-wget -O $ROOT/tmp/rubygems.tgz http://rubyforge.org/frs/download.php/56227/rubygems-1.3.3.tgz
+wget -O $ROOT/tmp/rubygems.tgz http://rubyforge.org/frs/download.php/70696/rubygems-1.3.7.tgz
 mkdir -p $ROOT/tmp/rubygems
 tar -xzvf $ROOT/tmp/rubygems.tgz  -C $ROOT/tmp/rubygems
 cat <<-CHROOT_SCRIPT > $ROOT/tmp/rubygems_install.sh
 #!/bin/bash -ex
-cd /tmp/rubygems/rubygems-1.3.3/
+cd /tmp/rubygems/rubygems-1.3.7/
 ruby setup.rb 
 if [ "#{node[:rightimage][:platform]}" == "ubuntu" ]; then
   ln -sf /usr/bin/gem1.8 /usr/bin/gem

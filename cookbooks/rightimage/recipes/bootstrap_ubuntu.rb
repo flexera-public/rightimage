@@ -23,7 +23,7 @@ case node[:rightimage][:platform]
     end
     node[:rightimage][:guest_packages].split.each { |p| bootstrap_cmd << " --addpkg " + p} 
 
-puts "bootstrap_cmd = " + bootstrap_cmd
+    Chef::Log.info "vmbuilder bootstrap command is: " + bootstrap_cmd
   else 
 
     template "/tmp/yum.conf" do
@@ -76,7 +76,7 @@ EOS
     chmod +x /tmp/configure_script
     #{bootstrap_cmd} --exec=/tmp/configure_script
 
-    if [ "#{node[:rightimage][:release]}" == "lucid" ] ;then
+    if [ "#{node[:rightimage][:release]}" == "lucid" ] || [ "#{node[:rightimage][:release]}" == "maverick" ] ;then
       image_name=`cat /mnt/vmbuilder/xen.conf  | grep xvda1 | grep -v root  | cut -c 25- | cut -c -9`
     else
       image_name="root.img"
@@ -98,7 +98,7 @@ EOH
   not_if "test -e /mnt/vmbuilder/root.img"
 end
 
-if node[:rightimage][:release] == "lucid" 
+if node[:rightimage][:release] == "lucid" || node[:rightimage][:release] == "maverick"
 
   # Fix apt config so it does not install all recommended packages
   log "Fixing apt.conf APT::Install-Recommends setting prior to installing Java"
@@ -122,7 +122,7 @@ echo "Setting APT::Install-Recommends to false"
 echo "APT::Install-Recommends \"0\";" > /etc/apt/apt.conf
 
 cp /etc/apt/sources.list /etc/apt/sources.java.sav
-echo "deb http://archive.canonical.com/ lucid partner" >> /etc/apt/sources.list
+echo "deb http://archive.canonical.com/ #{node[:rightimage][:release]} partner" >> /etc/apt/sources.list
 apt-get update
 
 apt-get -y install debconf-utils
