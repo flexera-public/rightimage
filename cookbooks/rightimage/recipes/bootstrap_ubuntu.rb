@@ -11,8 +11,8 @@ case node[:rightimage][:platform]
         --suite=#{node[:rightimage][:release]} \
         -d #{node[:rightimage][:build_dir]} \
         --rootsize=#{node[:rightimage][:root_size]} \
-        --install-mirror=http://mirror.rightscale.com/ubuntu \
-        --install-security-mirror=http://mirror.rightscale.com/ubuntu \
+        --install-mirror=http://us.ec2.archive.ubuntu.com/ubuntu \
+        --install-security-mirror=http://us.ec2.archive.ubuntu.com/ubuntu \
         --components=main,restricted,universe,multiverse \
         --lang=#{node[:rightimage][:lang]} "
     if node[:rightimage][:arch] == "i386"
@@ -23,7 +23,7 @@ case node[:rightimage][:platform]
     end
     node[:rightimage][:guest_packages].split.each { |p| bootstrap_cmd << " --addpkg " + p} 
 
-puts "bootstrap_cmd = " + bootstrap_cmd
+    Chef::Log.info "vmbuilder bootstrap command is: " + bootstrap_cmd
   else 
 
     template "/tmp/yum.conf" do
@@ -76,7 +76,7 @@ EOS
     chmod +x /tmp/configure_script
     #{bootstrap_cmd} --exec=/tmp/configure_script
 
-    if [ "#{node[:rightimage][:release]}" == "lucid" ] ;then
+    if [ "#{node[:rightimage][:release]}" == "lucid" ] || [ "#{node[:rightimage][:release]}" == "maverick" ] ;then
       image_name=`cat /mnt/vmbuilder/xen.conf  | grep xvda1 | grep -v root  | cut -c 25- | cut -c -9`
     else
       image_name="root.img"

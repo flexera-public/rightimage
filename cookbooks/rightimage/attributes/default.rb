@@ -10,11 +10,11 @@ set[:rightimage][:root_size] = "2048"
 set[:rightimage][:build_dir] = "/mnt/vmbuilder"
 set[:rightimage][:mount_dir] = "/mnt/image"
 set[:rightimage][:virtual_environment] = "xen"
-set[:rightimage][:install_mirror] = "mirror.rightscale.com"
+set[:rightimage][:install_mirror] = "localhost:9999"
 set_unless[:rightimage][:image_name_override] = ""
 set[:rightimage][:install_mirror_date] = "latest" 
 
-default[:rightimage][:platform] = UNKNOWN
+default[:rightimage][:platform] = "ubuntu"
 default[:rightimage][:cloud] = "ec2"
 default[:rightimage][:release] = UNKNOWN
 
@@ -60,6 +60,9 @@ case rightimage[:release]
       set[:rightimage][:guest_packages] = rightimage[:guest_packages] + " linux-image-virtual" 
       rightimage[:host_packages] << " python-vm-builder  devscripts"
     end
+  when "maverick"
+    rightimage[:host_packages] << " python-vm-builder-ec2 devscripts"
+    set[:rightimage][:guest_packages] = rightimage[:guest_packages] + " linux-image-virtual grub-legacy-ec2"
 end if rightimage[:platform] == "ubuntu" 
 
 # set cloud stuff
@@ -275,6 +278,45 @@ when "lucid"
       set[:rightimage][:ramdisk_id] = nil
     when "x86_64"
       set[:rightimage][:kernel_id] = "aki-20354b72"
+      set[:rightimage][:ramdisk_id] = nil
+    end
+  end
+when "maverick"
+  case rightimage[:region]
+  when "us-east"
+    case rightimage[:arch]
+    when "i386" 
+      set[:rightimage][:kernel_id] = "aki-407d9529"
+      set[:rightimage][:ramdisk_id] = nil
+    when "x86_64"
+      set[:rightimage][:kernel_id] = "aki-427d952b"
+      set[:rightimage][:ramdisk_id] = nil
+    end
+  when "us-west"
+    case rightimage[:arch]
+    when "i386" 
+      set[:rightimage][:kernel_id] = "aki-99a0f1dc"
+      set[:rightimage][:ramdisk_id] = nil
+    when "x86_64"
+      set[:rightimage][:kernel_id] = "aki-9ba0f1de"
+      set[:rightimage][:ramdisk_id] = nil
+    end
+  when "eu-west" 
+    case rightimage[:arch]
+    when "i386" 
+      set[:rightimage][:kernel_id] = "aki-4deec439"
+      set[:rightimage][:ramdisk_id] = nil
+    when "x86_64"
+      set[:rightimage][:kernel_id] = "aki-4feec43b"
+      set[:rightimage][:ramdisk_id] = nil
+    end
+  when "ap-southeast"
+    case rightimage[:arch]
+    when "i386" 
+      set[:rightimage][:kernel_id] = "aki-13d5aa41"
+      set[:rightimage][:ramdisk_id] = nil
+    when "x86_64"
+      set[:rightimage][:kernel_id] = "aki-11d5aa43"
       set[:rightimage][:ramdisk_id] = nil
     end
   end
