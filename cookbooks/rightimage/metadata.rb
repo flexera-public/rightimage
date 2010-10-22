@@ -124,12 +124,18 @@ attribute "rightimage/aws_secret_access_key_for_upload",
   :required => "required",
   :recipes => [ "rightimage::do_euca" ,"rightimage::do_ec2" , "rightimage::do_centos" , "rightimage::do_sles" , "rightimage::do_ubuntu" , "rightimage::default" , "rightimage::do_vmops" ]
 
-
 attribute "rightimage/debug",
   :display_name => "debug",
   :description => "toggles debug mode",
   :required => "optional",
   :recipes => [ "rightimage::do_centos" , "rightimage::do_sles" , "rightimage::do_ubuntu" , "rightimage::default" , "rightimage::bootstrap_centos" , "rightimage::bootstrap_sles" , "rightimage::bootstrap_ubuntu" ]
+
+attribute "rightimage/install_mirror_date",
+  :display_name => "install_mirror_date",
+  :description => "date to install from",
+  :required => "optional",
+  :recipes => [ "rightimage::do_centos" , "rightimage::default" , "rightimage::bootstrap_centos" ]
+
 
 
 ## euca inputs  

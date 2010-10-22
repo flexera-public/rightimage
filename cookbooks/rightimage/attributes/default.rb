@@ -12,7 +12,7 @@ set[:rightimage][:mount_dir] = "/mnt/image"
 set[:rightimage][:virtual_environment] = "xen"
 set[:rightimage][:install_mirror] = "mirror.rightscale.com"
 set_unless[:rightimage][:image_name_override] = ""
-set[:rightimage][:install_mirror_date] = "latest" 
+set_unless[:rightimage][:install_mirror_date] = "latest" 
 
 default[:rightimage][:platform] = UNKNOWN
 default[:rightimage][:cloud] = "ec2"
