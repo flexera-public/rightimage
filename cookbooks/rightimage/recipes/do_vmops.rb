@@ -68,6 +68,9 @@ bash "do_vmops" do
     echo "2:2345:respawn:/sbin/mingetty xvc0" >> $mount_dir/etc/inittab
     echo "xvc0" >> $mount_dir/etc/securetty
 
+    # configure dns timeout 
+    echo 'timeout 300;' > $mount_dir/etc/dhclient.conf
+
     mkdir -p $mount_dir/etc/rightscale.d
     echo "vmops" > $mount_dir/etc/rightscale.d/cloud
 
