@@ -98,6 +98,13 @@ EOH
   not_if "test -e /mnt/vmbuilder/root.img"
 end
 
+
+if node[:rightimage][:release] == "maverick"
+  template "/mnt/image/boot/grub/menu.lst" do
+    source "menu.lst.erb"
+  end
+end
+
 if node[:rightimage][:release] == "lucid" || node[:rightimage][:release] == "maverick"
 
   # Fix apt config so it does not install all recommended packages
