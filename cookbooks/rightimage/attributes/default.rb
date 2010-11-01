@@ -27,9 +27,9 @@ when "ubuntu"
 
   case rightimage[:release]
     when "maverick"
-      set[:rightimage][:host_packages] += " apt-cacher"
+      rightimage[:host_packages] << " apt-cacher"
     else
-      set[:rightimage][:host_packages] += " apt-proxy"
+      rightimage[:host_packages] << " apt-proxy"
   end
 
   set[:rightimage][:package_type] = "deb"

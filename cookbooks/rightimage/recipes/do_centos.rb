@@ -17,7 +17,7 @@
 # limitations under the License.
 #
 
-node[:rightimage][:host_packages].each { |p| package p }
+node[:rightimage][:host_packages].split.each { |p| package p }
 
 include_recipe "rightimage::clean"
 include_recipe "rightimage::bootstrap_centos"
