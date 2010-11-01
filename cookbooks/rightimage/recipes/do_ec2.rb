@@ -274,13 +274,22 @@ if node[:rightimage][:cloud] == "ec2"
     EOH
   end 
 
+  # Install RestConnection (in compile phase)
+  r = gem_package "rest_connection" do
+    gem_binary "/opt/rightscale/sandbox/bin/gem"
+    action :nothing
+  end
+  r.run_action(:install)
+  Gem.clear_paths
+
+  # Tag the images that were just created
   ruby_block "tag the images" do
     block do
       require 'rest_connection'
-      settings_accessor = Tag.new
-      settings_accessor.settings[:user] = node[:rest_connection][:user]
-      settings_accessor.settings[:pass] = node[:rest_connection][:pass]
-      settings_accessor.settings[:api_url] = node[:rest_connection][:api_url]
+      settings_accessor = Tag.new.connection.settings
+      settings_accessor[:user] = node[:rest_connection][:user]
+      settings_accessor[:pass] = node[:rest_connection][:pass]
+      settings_accessor[:api_url] = node[:rest_connection][:api_url]
       tag_these = IO.read("/tmp/tag_these_images.csv").split(",")
       tag_these.each do |ami|
         cloud_id = 1
