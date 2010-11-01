@@ -8,7 +8,6 @@ end
 #  - insert proper init scripts (rackspace needs lvm hack)
 
 # TODO: add uuca tools for centos 
-=begin
 #  - create /etc/rightscale.d/cloud
 execute "echo -n #{node[:rightimage][:cloud]} > #{node[:rightimage][:mount_dir]}/etc/rightscale.d/cloud" do 
   creates "#{node[:rightimage][:mount_dir]}/etc/rightscale.d/cloud"
@@ -279,8 +278,7 @@ if node[:rightimage][:cloud] == "ec2"
   end
   r.run_action(:install)
   Gem.clear_paths
-=end
-if true
+
   # Tag the images that were just created
   ruby_block "tag the images" do
     block do
