@@ -8,9 +8,7 @@ end
 #  - insert proper init scripts (rackspace needs lvm hack)
 
 # TODO: add uuca tools for centos 
-
-
-
+=begin
 #  - create /etc/rightscale.d/cloud
 execute "echo -n #{node[:rightimage][:cloud]} > #{node[:rightimage][:mount_dir]}/etc/rightscale.d/cloud" do 
   creates "#{node[:rightimage][:mount_dir]}/etc/rightscale.d/cloud"
@@ -281,20 +279,30 @@ if node[:rightimage][:cloud] == "ec2"
   end
   r.run_action(:install)
   Gem.clear_paths
-
+=end
+if true
   # Tag the images that were just created
   ruby_block "tag the images" do
     block do
+      @cloud_names = { "us-east" => "1", "eu-west" => "2", "us-west" => "3","ap-southeast" => "4"}
+      @region = nil
+      @cloud_names.each do |cloud_name, cloud_id|
+        @region = cloud_id if node[:ec2][:placement_availability_zone].include?(cloud_name)
+      end
+      require 'rubygems'
       require 'rest_connection'
-      settings_accessor = Tag.new.connection.settings
+      settings_accessor = Tag.connection.settings
       settings_accessor[:user] = node[:rest_connection][:user]
       settings_accessor[:pass] = node[:rest_connection][:pass]
       settings_accessor[:api_url] = node[:rest_connection][:api_url]
+      settings_accessor[:common_headers] = {"X_API_VERSION"=>"1.0"}
+
       tag_these = IO.read("/tmp/tag_these_images.csv").split(",")
       tag_these.each do |ami|
-        cloud_id = 1
-        resource_href = "https://my.rightscale.com/api/acct/0/ec2_images/#{ami}?cloud_id=#{cloud_id}"
-        raise "FATAL: could not find ami from the super hacky ssh log file tailer, aborting." if ami.blank?
+        ami.chomp!
+        resource_href = "https://my.rightscale.com/api/acct/0/ec2_images/#{ami}?cloud_id=#{@region}"
+        Chef::Log.info("setting image TAG for #{resource_href}")
+        raise "FATAL: could not find ami, aborting." if ami.blank?
         timeout = 0
         while(timeout <= 1200)
           begin
@@ -303,7 +311,7 @@ if node[:rightimage][:cloud] == "ec2"
           rescue => e
             timeout += 60
             sleep 60
-            puts "retrying TAG"
+            Chef::Log.info("retrying TAG for #{timeout}s")
           end
         end
         raise "FATAL: could not tag image after 1200 seconds. Aborting" if timeout >= 1200
