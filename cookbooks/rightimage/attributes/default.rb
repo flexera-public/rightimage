@@ -69,7 +69,8 @@ case rightimage[:release]
       rightimage[:host_packages] << " python-vm-builder  devscripts"
     end
   when "maverick"
-    rightimage[:host_packages] << " python-vm-builder-ec2 devscripts"
+    # python-vm-builder installed from custom debs
+    rightimage[:host_packages] << " devscripts"
     set[:rightimage][:guest_packages] = rightimage[:guest_packages] + " linux-image-virtual grub-legacy-ec2"
 end if rightimage[:platform] == "ubuntu" 
 

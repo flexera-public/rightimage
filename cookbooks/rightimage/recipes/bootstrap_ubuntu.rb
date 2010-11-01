@@ -3,10 +3,26 @@ mount_dir = node[:rightimage][:mount_dir]
 #install prereq packages
 node[:rightimage][:host_packages].split.each { |p| package p} 
 
-
 #create bootstrap command
 case node[:rightimage][:platform]
   when "ubuntu"
+    if rightimage[:release] == "maverick"
+      # install vmbuilder from deb files
+      remote_file "/tmp/python-vm-builder.deb" do
+        source "python-vm-builder.deb"
+      end
+      remote_file "/tmp/python-vm-builder.deb" do
+        source "python-vm-builder-ec2.deb"
+      end 
+      ruby "install python-vm-builder debs with dependencies" do
+        block do
+          Chef::Log.info(`dpkg -i /tmp/python-vm-builder.deb`)
+          Chef::Log.info(`dpkg -i /tmp/python-vm-builder-ec2.deb`)
+          Chef::Log.info(`apt-get -fy install`)
+        end
+      end
+    end
+
     bootstrap_cmd = "/usr/bin/vmbuilder  #{node[:rightimage][:virtual_environment]} ubuntu -o \
         --suite=#{node[:rightimage][:release]} \
         -d #{node[:rightimage][:build_dir]} \
