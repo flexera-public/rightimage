@@ -271,12 +271,34 @@ bash "bundle_upload_ec2" do
   rm -f /tmp/AWS_X509_KEY.pem
   rm -f  /tmp/AWS_X509_CERT.pem
 
-#EOS
-  #chmod +x /tmp/script
-
   EOH
+
+  ruby_block "tag the images" do
+    block do
+      require 'rest_connection'
+      settings_accessor = Tag.new
+      settings_accessor.settings[:user] = node[:rest_connection][:user]
+      settings_accessor.settings[:pass] = node[:rest_connection][:pass]
+      settings_accessor.settings[:api_url] = node[:rest_connection][:api_url]
+      tag_these = IO.read("/tmp/tag_these_images.csv").split(",")
+      tag_these.each do |ami|
+        cloud_id = 1
+        resource_href = "https://my.rightscale.com/api/acct/0/ec2_images/#{ami}?cloud_id=#{cloud_id}"
+        raise "FATAL: could not find ami from the super hacky ssh log file tailer, aborting." if ami.blank?
+        timeout = 0
+        while(timeout <= 1200)
+          begin
+            Tag.set(resource_href, ["provides:rs_agent_type=right_link"])
+            break
+          rescue => e
+            timeout += 60
+            sleep 60
+            puts "retrying TAG"
+          end
+        end
+        raise "FATAL: could not tag image after 1200 seconds. Aborting" if timeout >= 1200
+      end
+    end
+  end
+
 end if node[:rightimage][:cloud] == "ec2"
-
-
-
-      

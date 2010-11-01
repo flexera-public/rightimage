@@ -17,6 +17,20 @@ recipe "rightimage::do_euca", "migrates the created image to eucalyptus"
 recipe "rightimage::do_vmops", "migrates the created image to cloud.com" 
 recipe "rightimage::install_vhd-util", "install the vhd-util tool"
 
+attribute "rest_connection/user",
+  :display_name => "rightscale email",
+  :description => "your email address @rightscale",
+  :required => true
+
+attribute "rest_connection/pass",
+  :display_name => "rightscale pass",
+  :description => "your password",
+  :required => true
+ 
+attribute "rest_connection/api_url",
+  :display_name => "the rightscale account specific api url to use",
+  :description => "eg. https://my.rightscale.com/api/acct/1234 (where 1234 is your account id)",
+  :required => true
 
 
 #
