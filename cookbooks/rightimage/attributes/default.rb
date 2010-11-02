@@ -25,7 +25,7 @@ when "ubuntu"
 
   set[:rightimage][:host_packages] = "openjdk-6-jre openssl ca-certificates"
 
-  case rightimage[:release]
+  case node[:lsb][:codename]
     when "maverick"
       rightimage[:host_packages] << " apt-cacher"
     else
@@ -66,10 +66,9 @@ case rightimage[:release]
       rightimage[:host_packages] << " python-vm-builder-ec2 devscripts"
     else
       set[:rightimage][:guest_packages] = rightimage[:guest_packages] + " linux-image-virtual" 
-      rightimage[:host_packages] << " python-vm-builder  devscripts"
+      rightimage[:host_packages] << " devscripts"
     end
   when "maverick"
-    # python-vm-builder installed from custom debs
     rightimage[:host_packages] << " devscripts"
     set[:rightimage][:guest_packages] = rightimage[:guest_packages] + " linux-image-virtual grub-legacy-ec2"
 end if rightimage[:platform] == "ubuntu" 

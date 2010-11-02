@@ -6,7 +6,7 @@ node[:rightimage][:host_packages].split.each { |p| package p}
 #create bootstrap command
 case node[:rightimage][:platform]
   when "ubuntu"
-    if node[:rightimage][:release] == "maverick"
+    if node[:lsb][:codename] == "maverick" || node[:lsb][:codename] == "lucid"
       # install vmbuilder from deb files
       remote_file "/tmp/python-vm-builder.deb" do
         source "python-vm-builder.deb"
