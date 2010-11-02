@@ -17,6 +17,7 @@
 # limitations under the License.
 #
 
-
-include_recipe "rightimage::do_#{node.platform.downcase}"
-include_recipe "rightimage::do_#{node.rightimage.cloud.downcase}" if node.rightimage.cloud
+unless node.rightimage.manual_mode == "true"
+  include_recipe "rightimage::do_#{node.platform.downcase}"
+  include_recipe "rightimage::do_#{node.rightimage.cloud.downcase}" if node.rightimage.cloud
+end

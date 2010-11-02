@@ -18,24 +18,30 @@ recipe "rightimage::do_vmops", "migrates the created image to cloud.com"
 recipe "rightimage::install_vhd-util", "install the vhd-util tool"
 
 attribute "rest_connection/user",
-  :display_name => "rightscale email",
-  :description => "your email address @rightscale",
+  :display_name => "API User",
+  :description => "RightScale API username. Ex. you@rightscale.com",
   :required => true
 
 attribute "rest_connection/pass",
-  :display_name => "rightscale pass",
-  :description => "your password",
+  :display_name => "API Password",
+  :description => "Rightscale API password.",
   :required => true
  
 attribute "rest_connection/api_url",
-  :display_name => "the rightscale account specific api url to use",
-  :description => "eg. https://my.rightscale.com/api/acct/1234 (where 1234 is your account id)",
+  :display_name => "API URL",
+  :description => "The rightscale account specific api url to use.  Ex. https://my.rightscale.com/api/acct/1234 (where 1234 is your account id)",
   :required => true
-
 
 #
 # required
 #
+attribute "rightimage/manual_mode",
+  :display_name => "Manual Mode",
+  :description => "Sets the template's operation mode. Ex. 'true' = don't build at boot time.",
+  :required => true,
+  :default => "true",
+  :recipes => [ "rightimage::default" ]
+
 attribute "rightimage/platform",
   :display_name => "platform",
   :description => "the os of the image to build",

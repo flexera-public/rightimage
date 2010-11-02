@@ -221,6 +221,20 @@
         "description": "aws_secret_access_key",
         "display_name": "aws_secret_access_key"
       },
+      "rightimage/manual_mode": {
+        "required": "required",
+        "calculated": false,
+        "choice": [
+
+        ],
+        "default": "true",
+        "type": "string",
+        "recipes": [
+          "rightimage::default"
+        ],
+        "description": "Sets the template's operation mode. Ex. 'true' = don't build at boot time.",
+        "display_name": "Manual Mode"
+      },
       "rightimage/euca/walrus_url": {
         "required": "required",
         "calculated": false,
@@ -289,8 +303,8 @@
         "recipes": [
 
         ],
-        "description": "your password",
-        "display_name": "rightscale pass"
+        "description": "Rightscale API password.",
+        "display_name": "API Password"
       },
       "rightimage/euca/euca_cert": {
         "required": "required",
@@ -434,8 +448,8 @@
         "recipes": [
 
         ],
-        "description": "eg. https://my.rightscale.com/api/acct/1234 (where 1234 is your account id)",
-        "display_name": "the rightscale account specific api url to use"
+        "description": "The rightscale account specific api url to use.  Ex. https://my.rightscale.com/api/acct/1234 (where 1234 is your account id)",
+        "display_name": "API URL"
       },
       "rightimage/euca/secret_access_key_admin": {
         "required": "required",
@@ -550,8 +564,8 @@
         "recipes": [
 
         ],
-        "description": "your email address @rightscale",
-        "display_name": "rightscale email"
+        "description": "RightScale API username. Ex. you@rightscale.com",
+        "display_name": "API User"
       }
     },
     "maintainer": "RightScale, Inc.",
