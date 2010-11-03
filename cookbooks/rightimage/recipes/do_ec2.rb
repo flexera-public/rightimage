@@ -338,18 +338,19 @@ ENV['REST_CONNECTION_LOG'] = "/tmp/rest_connection.log"
         Chef::Log.info("setting image TAG for #{resource_href}")
         raise "FATAL: could not find ami, aborting." if ami.blank?
         timeout = 0
-        while(timeout <= 1200)
+	TIMEOUT_LIMIT = 90
+        while(timeout <= TIMEOUT_LIMIT)
           begin
             Tag.set(resource_href, ["provides:rs_agent_type=right_link"])
             break
-          rescue => e
+          rescue => Exception e
             Chef::Log.info(e.to_s)
-            timeout += 60
+            timeout += 1
             sleep 60
             Chef::Log.info("retrying TAG for #{timeout}s")
           end
         end
-        raise "FATAL: could not tag image after 1200 seconds. Aborting" if timeout >= 1200
+        raise "FATAL: could not tag image after #{timeout} minutes. Aborting" if timeout >= TIMEOUT_LIMIT
       end
 
         resource_href = Tag.connection.settings[:api_url] + "/ec2_images/#{tag_these[0]}?cloud_id=#{@region}"
