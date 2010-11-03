@@ -222,7 +222,7 @@
         "display_name": "aws_secret_access_key"
       },
       "rightimage/manual_mode": {
-        "required": "required",
+        "required": "optional",
         "calculated": false,
         "choice": [
 

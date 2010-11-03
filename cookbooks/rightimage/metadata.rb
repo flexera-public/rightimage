@@ -38,7 +38,6 @@ attribute "rest_connection/api_url",
 attribute "rightimage/manual_mode",
   :display_name => "Manual Mode",
   :description => "Sets the template's operation mode. Ex. 'true' = don't build at boot time.",
-  :required => true,
   :default => "true",
   :recipes => [ "rightimage::default" ]
 
