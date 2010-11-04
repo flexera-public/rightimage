@@ -249,7 +249,7 @@ if node[:rightimage][:cloud] == "ec2"
     image_id_s3=`echo -n $image_out_s3 | awk '{ print $2 }'`
     image_id_ebs=`echo -n $image_out_ebs | awk '{ print $2 }'`
 
-    echo "$image_id_s3,$image_id_ebs" > /tmp/tag_these_images.csv
+    echo "$image_id_s3,$image_id_ebs" > /var/tmp/tag_these_images.csv
 
 ## detach volume
     ec2-detach-volume $vol_id \
