@@ -295,7 +295,7 @@ if node[:rightimage][:cloud] == "ec2"
       settings_accessor[:api_url] = node[:rest_connection][:api_url]
       settings_accessor[:common_headers] = {"X_API_VERSION"=>"1.0"}
 
-      tag_these = IO.read("/tmp/tag_these_images.csv").split(",")
+      tag_these = IO.read("/var/tmp/tag_these_images.csv").split(",")
       tag_these.each do |ami|
         ami.chomp!
         resource_href = "https://my.rightscale.com/api/acct/0/ec2_images/#{ami}?cloud_id=#{@region}"
