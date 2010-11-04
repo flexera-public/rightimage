@@ -194,6 +194,8 @@ if node[:rightimage][:cloud] == "ec2"
       --url #{node[:rightimage][:ec2_endpoint]} \
       --instance #{node[:ec2][:instance_id]} 
 
+    sleep 10
+
 ## loop and wait for volume to become available
     while [ 1 ]; do 
       vol_status=`ec2-describe-volumes $vol_id  --private-key /tmp/AWS_X509_KEY.pem --cert /tmp/AWS_X509_CERT.pem --url #{node[:rightimage][:ec2_endpoint]}`
@@ -219,6 +221,8 @@ if node[:rightimage][:cloud] == "ec2"
       
 # parse out snapshot id
     snap_id=`echo -n $snap_out | awk '{ print $2 }'`
+
+    sleep 10
 
 ## loop and wait for snapshot to become available
     while [ 1 ]; do 
