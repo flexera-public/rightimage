@@ -222,59 +222,59 @@ when "karmic"
   end
 # These come from http://uec-images.ubuntu.com/query/lucid/server/released.current.txt
 # DO NOT LISTEN TO WHAT THE AMAZON WEB PAGE SAYS
-# lucid	server	release	20100827	ebs	amd64	ap-southeast-1	ami-d2354b80	aki-20354b72	
-# lucid	server	release	20100827	ebs	i386	ap-southeast-1	ami-2c354b7e	aki-38354b6a	
-# lucid	server	release	20100827	instance-store	amd64	ap-southeast-1	ami-26354b74	aki-20354b72	
-# lucid	server	release	20100827	instance-store	i386	ap-southeast-1	ami-3e354b6c	aki-38354b6a	
-# lucid	server	release	20100827	ebs	amd64	eu-west-1	ami-3abf954e	aki-5cbf9528	
-# lucid	server	release	20100827	ebs	i386	eu-west-1	ami-38bf954c	aki-58be942c	
-# lucid	server	release	20100827	instance-store	amd64	eu-west-1	ami-4ebf953a	aki-5cbf9528	
-# lucid	server	release	20100827	instance-store	i386	eu-west-1	ami-fabe948e	aki-58be942c	
-# lucid	server	release	20100827	ebs	amd64	us-east-1	ami-1634de7f	aki-da37ddb3	
-# lucid	server	release	20100827	ebs	i386	us-east-1	ami-1234de7b	aki-5037dd39	
-# lucid	server	release	20100827	instance-store	amd64	us-east-1	ami-4234de2b	aki-da37ddb3	
-# lucid	server	release	20100827	instance-store	i386	us-east-1	ami-1437dd7d	aki-5037dd39	
-# lucid	server	release	20100827	ebs	amd64	us-west-1	ami-12f3a257	aki-04f3a241	
-# lucid	server	release	20100827	ebs	i386	us-west-1	ami-10f3a255	aki-a8f0a1ed	
-# lucid	server	release	20100827	instance-store	amd64	us-west-1	ami-16f3a253	aki-04f3a241	
-# lucid	server	release	20100827	instance-store	i386	us-west-1	ami-7af3a23f	aki-a8f0a1ed	
-#
+# lucid server  release 20101020  ebs amd64 ap-southeast-1  ami-06067854  aki-6c06783e  
+# lucid server  release 20101020  ebs i386  ap-southeast-1  ami-00067852  aki-70067822  
+# lucid server  release 20101020  instance-store  amd64 ap-southeast-1  ami-14067846  aki-6c06783e  
+# lucid server  release 20101020  instance-store  i386  ap-southeast-1  ami-60067832  aki-70067822  
+# lucid server  release 20101020  ebs amd64 eu-west-1 ami-f6340182  aki-14340160  
+# lucid server  release 20101020  ebs i386  eu-west-1 ami-f4340180  aki-62340116  
+# lucid server  release 20101020  instance-store  amd64 eu-west-1 ami-1e34016a  aki-14340160  
+# lucid server  release 20101020  instance-store  i386  eu-west-1 ami-4a34013e  aki-62340116  
+# lucid server  release 20101020  ebs amd64 us-east-1 ami-4a0df923  aki-6a0cf803  
+# lucid server  release 20101020  ebs i386  us-east-1 ami-480df921  aki-6603f70f  
+# lucid server  release 20101020  instance-store  amd64 us-east-1 ami-da0cf8b3  aki-6a0cf803  
+# lucid server  release 20101020  instance-store  i386  us-east-1 ami-a403f7cd  aki-6603f70f  
+# lucid server  release 20101020  ebs amd64 us-west-1 ami-880c5ccd  aki-ea0c5caf  
+# lucid server  release 20101020  ebs i386  us-west-1 ami-8c0c5cc9  aki-e40c5ca1  
+# lucid server  release 20101020  instance-store  amd64 us-west-1 ami-860c5cc3  aki-ea0c5caf  
+# lucid server  release 20101020  instance-store  i386  us-west-1 ami-e80c5cad  aki-e40c5ca1
+
 when "lucid"
   case rightimage[:region]
   when "us-east"
     case rightimage[:arch]
     when "i386" 
-      set[:rightimage][:kernel_id] = "aki-5037dd39"
+      set[:rightimage][:kernel_id] = "aki-6a0cf803"
       set[:rightimage][:ramdisk_id] = nil
     when "x86_64"
-      set[:rightimage][:kernel_id] = "aki-da37ddb3"
+      set[:rightimage][:kernel_id] = "aki-6603f70f"
       set[:rightimage][:ramdisk_id] = nil
     end
   when "us-west"
     case rightimage[:arch]
     when "i386" 
-      set[:rightimage][:kernel_id] = "aki-a8f0a1ed"
+      set[:rightimage][:kernel_id] = "aki-e40c5ca1"
       set[:rightimage][:ramdisk_id] = nil
     when "x86_64"
-      set[:rightimage][:kernel_id] = "aki-04f3a241"
+      set[:rightimage][:kernel_id] = "aki-ea0c5caf"
       set[:rightimage][:ramdisk_id] = nil
     end
   when "eu-west" 
     case rightimage[:arch]
     when "i386" 
-      set[:rightimage][:kernel_id] = "aki-58be942c"
+      set[:rightimage][:kernel_id] = "aki-62340116"
       set[:rightimage][:ramdisk_id] = nil
     when "x86_64"
-      set[:rightimage][:kernel_id] = "aki-5cbf9528"
+      set[:rightimage][:kernel_id] = "aki-14340160"
       set[:rightimage][:ramdisk_id] = nil
     end
   when "ap-southeast"
     case rightimage[:arch]
     when "i386" 
-      set[:rightimage][:kernel_id] = "aki-38354b6a"
+      set[:rightimage][:kernel_id] = "aki-70067822"
       set[:rightimage][:ramdisk_id] = nil
     when "x86_64"
-      set[:rightimage][:kernel_id] = "aki-20354b72"
+      set[:rightimage][:kernel_id] = "aki-6c06783e"
       set[:rightimage][:ramdisk_id] = nil
     end
   end
