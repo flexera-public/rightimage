@@ -110,11 +110,10 @@ template "#{node[:rightimage][:mount_dir]}#{node[:rightimage][:mirror_file_path]
   backup false
 end unless node[:rightimage][:platform] == "centos"
 
-if node[:rightimage][:cloud] == "ec2"
-#  - bundle and upload
-  bash "bundle_upload_ec2" do 
-    #action :nothing
 
+#  - bundle and upload
+bash "bundle_upload_ec2" do 
+    only_if { node[:rightimage][:cloud] == "ec2" }
 ## remember to move this down if you comment it out
 #cat <<-EOS > /tmp/script
     code <<-EOH
@@ -276,6 +275,6 @@ if node[:rightimage][:cloud] == "ec2"
     rm -f  /tmp/AWS_X509_CERT.pem
 
     EOH
-  end 
+end 
 
 include_recipe "rightimage::do_tag_images"

@@ -87,6 +87,6 @@ ENV['REST_CONNECTION_LOG'] = "/tmp/rest_connection.log"
 
         resource_href = Tag.connection.settings[:api_url] + "/ec2_images/#{tag_these[1]}?cloud_id=#{@region}"
 	new_setting = MultiCloudImageCloudSettingInternal.create(:multi_cloud_image_href => @mci_ebs.href, :cloud_id => @region.to_i, :ec2_image_href => resource_href, :aws_instance_type => @instance_type)
-    end
   end
 end
+
