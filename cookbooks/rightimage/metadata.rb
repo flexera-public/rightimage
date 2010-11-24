@@ -16,6 +16,7 @@ recipe "rightimage::do_ec2", "migrates the created image to ec2"
 recipe "rightimage::do_euca", "migrates the created image to eucalyptus" 
 recipe "rightimage::do_vmops", "migrates the created image to cloud.com" 
 recipe "rightimage::install_vhd-util", "install the vhd-util tool"
+recipe "rightimage::do_tag_images", "adds rightscale tags to images (onlt ec2 currently supported)"
 
 attribute "rest_connection/user",
   :display_name => "API User",
