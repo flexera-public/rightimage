@@ -16,7 +16,7 @@ Gem.clear_paths
 
 # Tag EC2 images
 ruby_block "tag EC2 images" do
-    only_if { rightimage[:cloud] == "ec2" }
+    only_if { node[:rightimage][:cloud] == "ec2" }
     block do
       @cloud_names = { "us-east" => "1", "eu-west" => "2", "us-west" => "3","ap-southeast" => "4"}
       @region = nil
