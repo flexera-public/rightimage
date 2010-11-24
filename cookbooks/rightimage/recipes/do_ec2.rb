@@ -338,12 +338,12 @@ ENV['REST_CONNECTION_LOG'] = "/tmp/rest_connection.log"
         Chef::Log.info("setting image TAG for #{resource_href}")
         raise "FATAL: could not find ami, aborting." if ami.blank?
         timeout = 0
-	TIMEOUT_LIMIT = 90
+        TIMEOUT_LIMIT = 90
         while(timeout <= TIMEOUT_LIMIT)
           begin
             Tag.set(resource_href, ["provides:rs_agent_type=right_link"])
             break
-          rescue => Exception e
+          rescue Exception => e
             Chef::Log.info(e.to_s)
             timeout += 1
             sleep 60
