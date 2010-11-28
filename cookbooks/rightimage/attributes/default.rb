@@ -22,9 +22,7 @@ set_unless[:rightimage][:install_mirror_date] = "latest"
 
 # set base os packages
 case rightimage[:platform]
-when "ubuntu" 
-
-    
+when "ubuntu"   
   set[:rightimage][:guest_packages] = "ubuntu-standard binutils ruby1.8 curl unzip openssh-server ruby1.8-dev build-essential autoconf automake libtool logrotate rsync openssl openssh-server ca-certificates libopenssl-ruby1.8 subversion vim libreadline-ruby1.8 irb rdoc1.8 git-core liberror-perl libdigest-sha1-perl dmsetup emacs rake screen mailutils nscd bison ncurses-dev zlib1g-dev libreadline5-dev readline-common libxslt1-dev sqlite3 libxml2 flex libshadow-ruby1.8 postfix sysstat iptraf"
 
   set[:rightimage][:host_packages] = "openjdk-6-jre openssl ca-certificates"
@@ -66,7 +64,7 @@ case rightimage[:release]
     rightimage[:host_packages] << " python-vm-builder-ec2"
   when "lucid"
     if rightimage[:cloud] == "ec2"
-      set[:rightimage][:guest_packages] = rightimage[:guest_packages] + " linux-image-2.6.32-308-ec2 linux-image-2.6.32-305-ec2" 
+      set[:rightimage][:guest_packages] = rightimage[:guest_packages] + " linux-image-2.6.32-309-ec2 linux-image-2.6.32-308-ec2 linux-image-2.6.32-305-ec2" 
       rightimage[:host_packages] << " python-vm-builder-ec2 devscripts"
     else
       set[:rightimage][:guest_packages] = rightimage[:guest_packages] + " linux-image-virtual" 
