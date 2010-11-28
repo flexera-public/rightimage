@@ -211,7 +211,7 @@ bash "bundle_upload_ec2" do
     mount /dev/sdj $ebs_mount
 
 ## mount EBS volume, rsync, and unmount ebs volume
-    rsync -a  --exclude=tmp --exclude=proc $image_mount/ $ebs_mount/
+    rsync -a $image_mount/ $ebs_mount/
     umount $ebs_mount
 
 ## snapshot the ebs volume and save the snapshot id
