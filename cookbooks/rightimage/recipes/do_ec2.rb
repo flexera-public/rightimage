@@ -213,6 +213,9 @@ bash "bundle_upload_ec2" do
     mkfs.ext3 -F /dev/sdj
     mount /dev/sdj $ebs_mount
 
+## Centos rsync barks if no proc
+    mount -t proc none #{node[:rightimage][:mount_dir]}/proc
+
 ## mount EBS volume, rsync, and unmount ebs volume
     rsync -a $image_mount/ $ebs_mount/
     umount $ebs_mount
