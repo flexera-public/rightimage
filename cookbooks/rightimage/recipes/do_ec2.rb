@@ -128,6 +128,9 @@ bash "bundle_upload_ec2" do
     export EC2_HOME=/home/ec2
 
     umount "#{node[:rightimage][:mount_dir]}/proc" || true
+
+        echo "CKP: release:#{node[:rightimage][:release]} region:#{node[:rightimage][:region]} arch:#{node[:rightimage][:arch]} kernel: #{node[:rightimage][:kernel_id]} ramdisk:#{node[:rightimage][:ramdisk_id]} "
+
     
     kernel_opt=""
     if [ -n "#{node[:rightimage][:kernel_id]}" ]; then

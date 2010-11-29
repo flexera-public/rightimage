@@ -330,8 +330,7 @@ when "maverick"
       set[:rightimage][:ramdisk_id] = nil
     end
   end
-when "5.4"
-when "5.2"
+when "5.4", "5.2"
   case rightimage[:region]
   when "us-east"
     case rightimage[:arch]
