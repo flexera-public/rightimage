@@ -128,9 +128,6 @@ bash "bundle_upload_ec2" do
     export EC2_HOME=/home/ec2
 
     umount "#{node[:rightimage][:mount_dir]}/proc" || true
-
-        echo "CKP: release:#{node[:rightimage][:release]} region:#{node[:rightimage][:region]} arch:#{node[:rightimage][:arch]} kernel: #{node[:rightimage][:kernel_id]} ramdisk:#{node[:rightimage][:ramdisk_id]} "
-
     
     kernel_opt=""
     if [ -n "#{node[:rightimage][:kernel_id]}" ]; then
@@ -212,9 +209,6 @@ bash "bundle_upload_ec2" do
 ## format and mount volume
     mkfs.ext3 -F /dev/sdj
     mount /dev/sdj $ebs_mount
-
-## Centos rsync barks if no proc
-    mount -t proc none #{node[:rightimage][:mount_dir]}/proc
 
 ## mount EBS volume, rsync, and unmount ebs volume
     rsync -a $image_mount/ $ebs_mount/
