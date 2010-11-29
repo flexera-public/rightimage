@@ -46,6 +46,7 @@
           "rightimage::do_sles",
           "rightimage::do_ubuntu",
           "rightimage::default",
+          "rightimage::build_image",
           "rightimage::do_vmops"
         ],
         "description": "aws_509_cert",
@@ -62,6 +63,7 @@
           "rightimage::do_euca",
           "rightimage::do_ec2",
           "rightimage::default",
+          "rightimage::build_image",
           "rightimage::do_vmops"
         ],
         "description": "The image name is created automaticaaly.  Set this value if you want to override the default image name.",
@@ -81,6 +83,7 @@
           "rightimage::do_ubuntu",
           "rightimage::do_sles",
           "rightimage::default",
+          "rightimage::build_image",
           "rightimage::do_vmops"
         ],
         "description": "an optional postfix for the image name",
@@ -100,6 +103,7 @@
           "rightimage::do_ubuntu",
           "rightimage::do_sles",
           "rightimage::default",
+          "rightimage::build_image",
           "rightimage::do_vmops"
         ],
         "description": "the release of the image to build",
@@ -156,6 +160,7 @@
           "rightimage::do_sles",
           "rightimage::do_ubuntu",
           "rightimage::default",
+          "rightimage::build_image",
           "rightimage::bootstrap_centos",
           "rightimage::bootstrap_sles",
           "rightimage::bootstrap_ubuntu"
@@ -177,6 +182,7 @@
           "rightimage::do_sles",
           "rightimage::do_ubuntu",
           "rightimage::default",
+          "rightimage::build_image",
           "rightimage::do_vmops"
         ],
         "description": "aws_secret_access_key_for_upload",
@@ -196,6 +202,7 @@
           "rightimage::do_sles",
           "rightimage::do_ubuntu",
           "rightimage::default",
+          "rightimage::build_image",
           "rightimage::do_vmops"
         ],
         "description": "aws_509_key",
@@ -215,6 +222,7 @@
           "rightimage::do_sles",
           "rightimage::do_ubuntu",
           "rightimage::default",
+          "rightimage::build_image",
           "rightimage::do_vmops",
           "rightimage::do_vmops"
         ],
@@ -262,6 +270,7 @@
           "rightimage::do_ubuntu",
           "rightimage::do_sles",
           "rightimage::default",
+          "rightimage::build_image",
           "rightimage::do_vmops"
         ],
         "description": "aws_account_number",
@@ -355,6 +364,7 @@
         "recipes": [
           "rightimage::do_centos",
           "rightimage::default",
+          "rightimage::build_image",
           "rightimage::bootstrap_centos"
         ],
         "description": "date to install from",
@@ -387,6 +397,7 @@
           "rightimage::do_sles",
           "rightimage::do_ubuntu",
           "rightimage::default",
+          "rightimage::build_image",
           "rightimage::do_vmops"
         ],
         "description": "aws_access_key_id for the uplaod bucket",
@@ -419,6 +430,7 @@
           "rightimage::do_ubuntu",
           "rightimage::do_sles",
           "rightimage::default",
+          "rightimage::build_image",
           "rightimage::do_vmops",
           "rightimage::do_vmops"
         ],
@@ -478,6 +490,7 @@
           "rightimage::do_ubuntu",
           "rightimage::do_sles",
           "rightimage::default",
+          "rightimage::build_image",
           "rightimage::do_vmops"
         ],
         "description": "the bucket to upload the image to",
@@ -536,6 +549,7 @@
           "rightimage::do_ubuntu",
           "rightimage::do_sles",
           "rightimage::default",
+          "rightimage::build_image",
           "rightimage::do_vmops"
         ],
         "description": "an optional prefix for the image name",
@@ -578,11 +592,12 @@
     },
     "recipes": {
       "rightimage::do_ec2": "migrates the created image to ec2",
-      "rightimage::default": "build image based on host platform",
+      "rightimage::default": "starts builds image automatically at boot. See 'manual_mode' input to enable.",
       "rightimage::bootstrap_sles": "bootstraps a basic sles image",
       "rightimage::bootstrap_ubuntu": "bootstraps a basic ubuntu image",
       "rightimage::install_rightscale": "installs rightscale",
       "rightimage::install_vhd-util": "install the vhd-util tool",
+      "rightimage::build_image": "build image based on host platform",
       "rightimage::do_tag_images": "adds rightscale tags to images (onlt ec2 currently supported)",
       "rightimage::do_euca": "migrates the created image to eucalyptus",
       "rightimage::do_centos": "coordinate a centos install",

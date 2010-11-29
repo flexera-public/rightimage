@@ -3,7 +3,8 @@ maintainer_email "support@rightscale.com"
 description      "image building tools"
 version          "0.0.1"
 
-recipe "rightimage::default", "build image based on host platform" 
+recipe "rightimage::default", "starts builds image automatically at boot. See 'manual_mode' input to enable." 
+recipe "rightimage::build_image", "build image based on host platform"
 recipe "rightimage::clean", "cleans everything" 
 recipe "rightimage::do_ubuntu", "coordinate an ubuntu install" 
 recipe "rightimage::do_centos", "coordinate a centos install" 
@@ -51,7 +52,7 @@ attribute "rightimage/release",
   :display_name => "release",
   :description => "the release of the image to build",
   :required => true,
-  :recipes => [ "rightimage::do_euca" ,"rightimage::do_ec2" , "rightimage::do_centos" , "rightimage::do_ubuntu" , "rightimage::do_sles" , "rightimage::default" , "rightimage::do_vmops" ]
+  :recipes => [ "rightimage::do_euca" ,"rightimage::do_ec2" , "rightimage::do_centos" , "rightimage::do_ubuntu" , "rightimage::do_sles" , "rightimage::default", "rightimage::build_image" , "rightimage::do_vmops" ]
   
 attribute "rightimage/arch",
   :display_name => "arch",
@@ -82,79 +83,79 @@ attribute "rightimage/image_upload_bucket",
   :display_name => "image_upload_bucket",
   :description => "the bucket to upload the image to",
   :required => "required",
-  :recipes => [ "rightimage::do_euca" ,"rightimage::do_ec2" , "rightimage::do_centos" , "rightimage::do_ubuntu" , "rightimage::do_sles" , "rightimage::default" , "rightimage::do_vmops" ]
+  :recipes => [ "rightimage::do_euca" ,"rightimage::do_ec2" , "rightimage::do_centos" , "rightimage::do_ubuntu" , "rightimage::do_sles" , "rightimage::default", "rightimage::build_image" , "rightimage::do_vmops" ]
   
 attribute "rightimage/image_prefix",
   :display_name => "image_prefix",
   :description => "an optional prefix for the image name",
   :required => "optional",
-  :recipes => [ "rightimage::do_euca" ,"rightimage::do_ec2" , "rightimage::do_centos" , "rightimage::do_ubuntu" , "rightimage::do_sles" , "rightimage::default" , "rightimage::do_vmops" ]
+  :recipes => [ "rightimage::do_euca" ,"rightimage::do_ec2" , "rightimage::do_centos" , "rightimage::do_ubuntu" , "rightimage::do_sles" , "rightimage::default", "rightimage::build_image" , "rightimage::do_vmops" ]
   
 attribute "rightimage/image_postfix",
   :display_name => "image_postfix",
   :description => "an optional postfix for the image name",
   :required => "optional",
-  :recipes => [ "rightimage::do_euca" ,"rightimage::do_ec2" , "rightimage::do_centos" , "rightimage::do_ubuntu" , "rightimage::do_sles" , "rightimage::default" , "rightimage::do_vmops" ]
+  :recipes => [ "rightimage::do_euca" ,"rightimage::do_ec2" , "rightimage::do_centos" , "rightimage::do_ubuntu" , "rightimage::do_sles" , "rightimage::default", "rightimage::build_image" , "rightimage::do_vmops" ]
   
 attribute "rightimage/image_name_override",
   :display_name => "Image Name Override",
   :description => "The image name is created automaticaaly.  Set this value if you want to override the default image name.",
   :required => "optional",
-  :recipes => [ "rightimage::do_euca" ,"rightimage::do_ec2", "rightimage::default" , "rightimage::do_vmops" ]
+  :recipes => [ "rightimage::do_euca" ,"rightimage::do_ec2", "rightimage::default", "rightimage::build_image" , "rightimage::do_vmops" ]
   
 attribute "rightimage/aws_account_number",
   :display_name => "aws_account_number",
   :description => "aws_account_number",
   :required => "required",
-  :recipes => [ "rightimage::do_euca" ,"rightimage::do_ec2" , "rightimage::do_centos" , "rightimage::do_ubuntu" , "rightimage::do_sles" , "rightimage::default" , "rightimage::do_vmops" ]
+  :recipes => [ "rightimage::do_euca" ,"rightimage::do_ec2" , "rightimage::do_centos" , "rightimage::do_ubuntu" , "rightimage::do_sles" , "rightimage::default", "rightimage::build_image" , "rightimage::do_vmops" ]
   
 attribute "rightimage/aws_access_key_id",
   :display_name => "aws_access_key_id",
   :description => "aws_access_key_id",
   :required => "required",
-  :recipes => [ "rightimage::do_euca" ,"rightimage::do_ec2" , "rightimage::do_centos" , "rightimage::do_ubuntu" , "rightimage::do_sles" , "rightimage::default" , "rightimage::do_vmops" , "rightimage::do_vmops" ]
+  :recipes => [ "rightimage::do_euca" ,"rightimage::do_ec2" , "rightimage::do_centos" , "rightimage::do_ubuntu" , "rightimage::do_sles" , "rightimage::default", "rightimage::build_image" , "rightimage::do_vmops" , "rightimage::do_vmops" ]
   
 attribute "rightimage/aws_secret_access_key",
   :display_name => "aws_secret_access_key",
   :description => "aws_secret_access_key",
   :required => "required",
-  :recipes => [ "rightimage::do_euca" ,"rightimage::do_ec2" , "rightimage::do_centos" , "rightimage::do_sles" , "rightimage::do_ubuntu" , "rightimage::default" , "rightimage::do_vmops" , "rightimage::do_vmops" ]
+  :recipes => [ "rightimage::do_euca" ,"rightimage::do_ec2" , "rightimage::do_centos" , "rightimage::do_sles" , "rightimage::do_ubuntu" , "rightimage::default", "rightimage::build_image" , "rightimage::do_vmops" , "rightimage::do_vmops" ]
   
 attribute "rightimage/aws_509_key",
   :display_name => "aws_509_key",
   :description => "aws_509_key",
   :required => "required",
-  :recipes => [ "rightimage::do_euca" ,"rightimage::do_ec2" , "rightimage::do_centos" , "rightimage::do_sles" , "rightimage::do_ubuntu" , "rightimage::default" , "rightimage::do_vmops" ]
+  :recipes => [ "rightimage::do_euca" ,"rightimage::do_ec2" , "rightimage::do_centos" , "rightimage::do_sles" , "rightimage::do_ubuntu" , "rightimage::default", "rightimage::build_image" , "rightimage::do_vmops" ]
   
 attribute "rightimage/aws_509_cert",
   :display_name => "aws_509_cert",
   :description => "aws_509_cert",
   :required => "required",
-  :recipes => [ "rightimage::do_euca" ,"rightimage::do_ec2" , "rightimage::do_centos" , "rightimage::do_sles" , "rightimage::do_ubuntu" , "rightimage::default" , "rightimage::do_vmops" ]
+  :recipes => [ "rightimage::do_euca" ,"rightimage::do_ec2" , "rightimage::do_centos" , "rightimage::do_sles" , "rightimage::do_ubuntu" , "rightimage::default", "rightimage::build_image" , "rightimage::do_vmops" ]
  
 attribute "rightimage/aws_access_key_id_for_upload",
   :display_name => "aws_access_key_id_for_upload",
   :description => "aws_access_key_id for the uplaod bucket",
   :required => "required",
-  :recipes => [ "rightimage::do_euca" ,"rightimage::do_ec2" , "rightimage::do_centos" , "rightimage::do_sles" , "rightimage::do_ubuntu" , "rightimage::default" , "rightimage::do_vmops" ]
+  :recipes => [ "rightimage::do_euca" ,"rightimage::do_ec2" , "rightimage::do_centos" , "rightimage::do_sles" , "rightimage::do_ubuntu" , "rightimage::default", "rightimage::build_image" , "rightimage::do_vmops" ]
   
 attribute "rightimage/aws_secret_access_key_for_upload",
   :display_name => "aws_secret_access_key_for_upload",
   :description => "aws_secret_access_key_for_upload",
   :required => "required",
-  :recipes => [ "rightimage::do_euca" ,"rightimage::do_ec2" , "rightimage::do_centos" , "rightimage::do_sles" , "rightimage::do_ubuntu" , "rightimage::default" , "rightimage::do_vmops" ]
+  :recipes => [ "rightimage::do_euca" ,"rightimage::do_ec2" , "rightimage::do_centos" , "rightimage::do_sles" , "rightimage::do_ubuntu" , "rightimage::default", "rightimage::build_image" , "rightimage::do_vmops" ]
 
 attribute "rightimage/debug",
   :display_name => "debug",
   :description => "toggles debug mode",
   :required => "optional",
-  :recipes => [ "rightimage::do_centos" , "rightimage::do_sles" , "rightimage::do_ubuntu" , "rightimage::default" , "rightimage::bootstrap_centos" , "rightimage::bootstrap_sles" , "rightimage::bootstrap_ubuntu" ]
+  :recipes => [ "rightimage::do_centos" , "rightimage::do_sles" , "rightimage::do_ubuntu" , "rightimage::default", "rightimage::build_image" , "rightimage::bootstrap_centos" , "rightimage::bootstrap_sles" , "rightimage::bootstrap_ubuntu" ]
 
 attribute "rightimage/install_mirror_date",
   :display_name => "install_mirror_date",
   :description => "date to install from",
   :required => "optional",
-  :recipes => [ "rightimage::do_centos" , "rightimage::default" , "rightimage::bootstrap_centos" ]
+  :recipes => [ "rightimage::do_centos" , "rightimage::default", "rightimage::build_image" , "rightimage::bootstrap_centos" ]
 
 
 
