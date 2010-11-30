@@ -76,25 +76,27 @@ EOF
      # Create the MCIs, if they don't exist.
      
      if s3_ami
-      if @mci_s3 = MultiCloudImageInternal.find_by(:name) {|n| n =~ /#{image_name}/ }.first
+      Chef::Log.info("Create or add MCI for S3 image_name.")
+      if @mci_s3 = MultiCloudImage.find_by(:name) {|n| n =~ /#{image_name}/ }.first
         Chef::Log.info("Found Existing MCI with same name, re-using.. #{@mci_s3.href}")
       else
         @mci_s3 = MultiCloudImageInternal.create(:name => "#{image_name}", :description => "")
       end
       
       resource_href = Tag.connection.settings[:api_url] + "/ec2_images/#{s3_ami}?cloud_id=#{@region}"
-	    new_setting = MultiCloudImageCloudSettingInternal.create(:multi_cloud_image_href => @mci_s3.href, :cloud_id => @region.to_i, :ec2_image_href => resource_href, :aws_instance_type => @instance_type)
+      new_setting = MultiCloudImageCloudSettingInternal.create(:multi_cloud_image_href => @mci_s3.href, :cloud_id => @region.to_i, :ec2_image_href => resource_href, :aws_instance_type => @instance_type)
     end
 
     if ebs_ami
-      if @mci_ebs = MultiCloudImageInternal.find_by(:name) {|n| n =~ /#{image_name}_EBS/}.first
+      Chef::Log.info("Create or add MCI for EBS image_name.")
+      if @mci_ebs = MultiCloudImage.find_by(:name) {|n| n =~ /#{image_name}_EBS/}.first
         Chef::Log.info("Found Existing MCI with same name, re-using..")
       else
         @mci_ebs = MultiCloudImageInternal.create(:name => "#{image_name}_EBS", :description => "")
       end
 
       resource_href = Tag.connection.settings[:api_url] + "/ec2_images/#{ebs_ami}?cloud_id=#{@region}"
-	    new_setting = MultiCloudImageCloudSettingInternal.create(:multi_cloud_image_href => @mci_ebs.href, :cloud_id => @region.to_i, :ec2_image_href => resource_href, :aws_instance_type => @instance_type)
+      new_setting = MultiCloudImageCloudSettingInternal.create(:multi_cloud_image_href => @mci_ebs.href, :cloud_id => @region.to_i, :ec2_image_href => resource_href, :aws_instance_type => @instance_type)
     end
   
   end
