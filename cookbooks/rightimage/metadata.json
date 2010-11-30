@@ -42,6 +42,8 @@
         "recipes": [
           "rightimage::do_euca",
           "rightimage::do_ec2",
+          "rightimage::ec2_s3_bundle",
+          "rightimage::ec2_ebs_bundle",
           "rightimage::do_tag_images",
           "rightimage::do_centos",
           "rightimage::do_sles",
@@ -63,6 +65,8 @@
         "recipes": [
           "rightimage::do_euca",
           "rightimage::do_ec2",
+          "rightimage::ec2_s3_bundle",
+          "rightimage::ec2_ebs_bundle",
           "rightimage::do_tag_images",
           "rightimage::default",
           "rightimage::build_image",
@@ -81,6 +85,8 @@
         "recipes": [
           "rightimage::do_euca",
           "rightimage::do_ec2",
+          "rightimage::ec2_s3_bundle",
+          "rightimage::ec2_ebs_bundle",
           "rightimage::do_tag_images",
           "rightimage::do_centos",
           "rightimage::do_ubuntu",
@@ -102,6 +108,8 @@
         "recipes": [
           "rightimage::do_euca",
           "rightimage::do_ec2",
+          "rightimage::ec2_s3_bundle",
+          "rightimage::ec2_ebs_bundle",
           "rightimage::do_tag_images",
           "rightimage::do_centos",
           "rightimage::do_ubuntu",
@@ -182,6 +190,8 @@
         "recipes": [
           "rightimage::do_euca",
           "rightimage::do_ec2",
+          "rightimage::ec2_s3_bundle",
+          "rightimage::ec2_ebs_bundle",
           "rightimage::do_tag_images",
           "rightimage::do_centos",
           "rightimage::do_sles",
@@ -203,6 +213,8 @@
         "recipes": [
           "rightimage::do_euca",
           "rightimage::do_ec2",
+          "rightimage::ec2_s3_bundle",
+          "rightimage::ec2_ebs_bundle",
           "rightimage::do_tag_images",
           "rightimage::do_centos",
           "rightimage::do_sles",
@@ -224,6 +236,8 @@
         "recipes": [
           "rightimage::do_euca",
           "rightimage::do_ec2",
+          "rightimage::ec2_s3_bundle",
+          "rightimage::ec2_ebs_bundle",
           "rightimage::do_tag_images",
           "rightimage::do_centos",
           "rightimage::do_sles",
@@ -273,6 +287,8 @@
         "recipes": [
           "rightimage::do_euca",
           "rightimage::do_ec2",
+          "rightimage::ec2_s3_bundle",
+          "rightimage::ec2_ebs_bundle",
           "rightimage::do_tag_images",
           "rightimage::do_centos",
           "rightimage::do_ubuntu",
@@ -401,6 +417,8 @@
         "recipes": [
           "rightimage::do_euca",
           "rightimage::do_ec2",
+          "rightimage::ec2_s3_bundle",
+          "rightimage::ec2_ebs_bundle",
           "rightimage::do_tag_images",
           "rightimage::do_centos",
           "rightimage::do_sles",
@@ -435,6 +453,8 @@
         "recipes": [
           "rightimage::do_euca",
           "rightimage::do_ec2",
+          "rightimage::ec2_s3_bundle",
+          "rightimage::ec2_ebs_bundle",
           "rightimage::do_tag_images",
           "rightimage::do_centos",
           "rightimage::do_ubuntu",
@@ -496,6 +516,8 @@
         "recipes": [
           "rightimage::do_euca",
           "rightimage::do_ec2",
+          "rightimage::ec2_s3_bundle",
+          "rightimage::ec2_ebs_bundle",
           "rightimage::do_tag_images",
           "rightimage::do_centos",
           "rightimage::do_ubuntu",
@@ -556,6 +578,8 @@
         "recipes": [
           "rightimage::do_euca",
           "rightimage::do_ec2",
+          "rightimage::ec2_s3_bundle",
+          "rightimage::ec2_ebs_bundle",
           "rightimage::do_tag_images",
           "rightimage::do_centos",
           "rightimage::do_ubuntu",
@@ -603,14 +627,16 @@
     "conflicting": {
     },
     "recipes": {
+      "rightimage::ec2_s3_bundle": "bundle and upload s3 image (ec2 only)",
       "rightimage::do_ec2": "migrates the created image to ec2",
       "rightimage::default": "starts builds image automatically at boot. See 'manual_mode' input to enable.",
+      "rightimage::ec2_ebs_bundle": "create EBS image snapshot (ec2 only)",
       "rightimage::bootstrap_sles": "bootstraps a basic sles image",
       "rightimage::bootstrap_ubuntu": "bootstraps a basic ubuntu image",
       "rightimage::install_rightscale": "installs rightscale",
       "rightimage::install_vhd-util": "install the vhd-util tool",
       "rightimage::build_image": "build image based on host platform",
-      "rightimage::do_tag_images": "adds rightscale tags to images (onlt ec2 currently supported)",
+      "rightimage::do_tag_images": "adds rightscale tags to images (only ec2 currently supported)",
       "rightimage::do_euca": "migrates the created image to eucalyptus",
       "rightimage::do_centos": "coordinate a centos install",
       "rightimage::do_vmops": "migrates the created image to cloud.com",

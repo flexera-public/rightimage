@@ -38,21 +38,9 @@ ENV['REST_CONNECTION_LOG'] = "/tmp/rest_connection.log"
       ::File.open(File.join(restcondir, "rest_api_config.yaml"),"w") {|f| f.write(restcon_config)}
       require 'rubygems'
       require 'rest_connection'
-# incase of RACE, let's sleep randomly here lol
+      
+      # incase of RACE, let's sleep randomly here lol
       sleep rand(120)
-
-# Create the MCIs, if they don't exist.
-      if @mci_s3 = MultiCloudImageInternal.find_by(:name) {|n| n =~ /#{image_name}/ }.first
-        Chef::Log.info("Found Existing MCI with same name, re-using.. #{@mci_s3.href}")
-      else
-        @mci_s3 = MultiCloudImageInternal.create(:name => "#{image_name}", :description => "")
-      end
-
-      if @mci_ebs = MultiCloudImageInternal.find_by(:name) {|n| n =~ /#{image_name}_EBS/}.first
-        Chef::Log.info("Found Existing MCI with same name, re-using..")
-      else
-        @mci_ebs = MultiCloudImageInternal.create(:name => "#{image_name}_EBS", :description => "")
-      end
 
       if node[:rightimage][:arch] == "i386"
         @instance_type = "m1.small"
@@ -60,7 +48,12 @@ ENV['REST_CONNECTION_LOG'] = "/tmp/rest_connection.log"
         @instance_type = "m1.large"
       end
 
-      tag_these = IO.read("/var/tmp/tag_these_images.csv").split(",")
+      s3_ami = (::File.exists?("/var/tmp/s3_image_id")) ? IO.read("/var/tmp/s3_image_id") : nil
+      ebs_ami = (::File.exists?("/var/tmp/ebs_image_id")) ? IO.read("/var/tmp/ebs_image_id") : nil
+
+      tag_these = [ ]
+      tag_these << s3_ami if s3_ami
+      tag_these << ebs_ami if ebs_ami
       tag_these.each do |ami|
         ami.chomp!
         resource_href = Tag.connection.settings[:api_url] + "/ec2_images/#{ami}?cloud_id=#{@region}"
@@ -82,11 +75,30 @@ ENV['REST_CONNECTION_LOG'] = "/tmp/rest_connection.log"
         raise "FATAL: could not tag image after #{timeout} minutes. Aborting" if timeout >= TIMEOUT_LIMIT
       end
 
-        resource_href = Tag.connection.settings[:api_url] + "/ec2_images/#{tag_these[0]}?cloud_id=#{@region}"
-	new_setting = MultiCloudImageCloudSettingInternal.create(:multi_cloud_image_href => @mci_s3.href, :cloud_id => @region.to_i, :ec2_image_href => resource_href, :aws_instance_type => @instance_type)
+     # Create the MCIs, if they don't exist.
+     
+     if s3_ami
+      if @mci_s3 = MultiCloudImageInternal.find_by(:name) {|n| n =~ /#{image_name}/ }.first
+        Chef::Log.info("Found Existing MCI with same name, re-using.. #{@mci_s3.href}")
+      else
+        @mci_s3 = MultiCloudImageInternal.create(:name => "#{image_name}", :description => "")
+      end
+      
+      resource_href = Tag.connection.settings[:api_url] + "/ec2_images/#{s3_ami}?cloud_id=#{@region}"
+	    new_setting = MultiCloudImageCloudSettingInternal.create(:multi_cloud_image_href => @mci_s3.href, :cloud_id => @region.to_i, :ec2_image_href => resource_href, :aws_instance_type => @instance_type)
+    end
 
-        resource_href = Tag.connection.settings[:api_url] + "/ec2_images/#{tag_these[1]}?cloud_id=#{@region}"
-	new_setting = MultiCloudImageCloudSettingInternal.create(:multi_cloud_image_href => @mci_ebs.href, :cloud_id => @region.to_i, :ec2_image_href => resource_href, :aws_instance_type => @instance_type)
+    if ebs_ami
+      if @mci_ebs = MultiCloudImageInternal.find_by(:name) {|n| n =~ /#{image_name}_EBS/}.first
+        Chef::Log.info("Found Existing MCI with same name, re-using..")
+      else
+        @mci_ebs = MultiCloudImageInternal.create(:name => "#{image_name}_EBS", :description => "")
+      end
+
+      resource_href = Tag.connection.settings[:api_url] + "/ec2_images/#{ebs_ami}?cloud_id=#{@region}"
+	    new_setting = MultiCloudImageCloudSettingInternal.create(:multi_cloud_image_href => @mci_ebs.href, :cloud_id => @region.to_i, :ec2_image_href => resource_href, :aws_instance_type => @instance_type)
+    end
+  
   end
 end
 
