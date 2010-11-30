@@ -1,6 +1,3 @@
-class Chef::Resource::Bash
-  include RightScale::RightImage::Helper
-end
 class Chef::Resource::RubyBlock
   include RightScale::RightImage::Helper
 end
@@ -32,15 +29,16 @@ restcon_config =<<EOF
 :common_headers: 
   X_API_VERSION: "1.0"
 EOF
-ENV['REST_CONNECTION_LOG'] = "/tmp/rest_connection.log"
-	restcondir = ::File.join(::File.expand_path("~"), ".rest_connection")
-	FileUtils.mkdir_p(restcondir)
+      ENV['REST_CONNECTION_LOG'] = "/tmp/rest_connection.log"
+      restcondir = ::File.join(::File.expand_path("~"), ".rest_connection")
+      FileUtils.mkdir_p(restcondir)
       ::File.open(File.join(restcondir, "rest_api_config.yaml"),"w") {|f| f.write(restcon_config)}
       require 'rubygems'
       require 'rest_connection'
       
-      # incase of RACE, let's sleep randomly here lol
-      sleep rand(120)
+      sleepy_time = rand(30)
+      Chef::Log.info("incase of RACE, let's sleep randomly here lol. sleep time: #{sleepy_time}")
+      sleep(sleepy_time)
 
       if node[:rightimage][:arch] == "i386"
         @instance_type = "m1.small"
@@ -51,6 +49,7 @@ ENV['REST_CONNECTION_LOG'] = "/tmp/rest_connection.log"
       s3_ami = (::File.exists?("/var/tmp/s3_image_id")) ? IO.read("/var/tmp/s3_image_id") : nil
       ebs_ami = (::File.exists?("/var/tmp/ebs_image_id")) ? IO.read("/var/tmp/ebs_image_id") : nil
 
+      TIMEOUT_LIMIT = 90
       tag_these = [ ]
       tag_these << s3_ami if s3_ami
       tag_these << ebs_ami if ebs_ami
@@ -60,16 +59,15 @@ ENV['REST_CONNECTION_LOG'] = "/tmp/rest_connection.log"
         Chef::Log.info("setting image TAG for #{resource_href}")
         raise "FATAL: could not find ami, aborting." if ami.blank?
         timeout = 0
-        TIMEOUT_LIMIT = 90
         while(timeout <= TIMEOUT_LIMIT)
           begin
             Tag.set(resource_href, ["provides:rs_agent_type=right_link"])
             break
           rescue Exception => e
             Chef::Log.info(e.to_s)
-            timeout += 1
-            sleep 60
-            Chef::Log.info("retrying TAG for #{timeout}s")
+            Chef::Log.info("retrying TAG after #{timeout} minute.")
+            timeout += 0.5
+            sleep 30
           end
         end
         raise "FATAL: could not tag image after #{timeout} minutes. Aborting" if timeout >= TIMEOUT_LIMIT
