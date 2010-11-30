@@ -35,8 +35,6 @@ remote_file "#{node[:rightimage][:mount_dir]}/etc/sysconfig/network-scripts/ifcf
   backup false
 end
 
-
-
 bash "bootstrap_centos" do 
 
   code <<-EOF
@@ -48,12 +46,12 @@ mkdir -p #{node[:rightimage][:mount_dir]}/etc
 touch #{node[:rightimage][:mount_dir]}/etc/fstab
 mkdir -p #{node[:rightimage][:mount_dir]}/proc
 umount #{node[:rightimage][:mount_dir]}/proc || true
-mount -t proc none #{node[:rightimage][:mount_dir]}/proc
 
+# TODO: MUST CHROOT WHEN MOUNTING PROC
+chroot #{node[:rightimage][:mount_dir]} mount -t proc none /proc
 
 ## bootstrap base OS
 yum -c /tmp/yum.conf --installroot=#{node[:rightimage][:mount_dir]} -y groupinstall Base 
-
 
 /sbin/MAKEDEV -d #{node[:rightimage][:mount_dir]}/dev -x console
 /sbin/MAKEDEV -d #{node[:rightimage][:mount_dir]}/dev -x null
@@ -86,7 +84,6 @@ rm #{node[:rightimage][:mount_dir]}/var/lib/rpm/__*
 chroot #{node[:rightimage][:mount_dir]} rpm --rebuilddb
 
 mkdir -p #{node[:rightimage][:mount_dir]}/etc/ssh
-
 
 echo 'hwcap 0 nosegneg' > #{node[:rightimage][:mount_dir]}/etc/ld.so.conf.d/libc6-xen.conf
 chroot #{node[:rightimage][:mount_dir]} /sbin/ldconfig -v
