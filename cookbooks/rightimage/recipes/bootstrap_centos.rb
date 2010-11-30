@@ -46,9 +46,7 @@ mkdir -p #{node[:rightimage][:mount_dir]}/etc
 touch #{node[:rightimage][:mount_dir]}/etc/fstab
 mkdir -p #{node[:rightimage][:mount_dir]}/proc
 umount #{node[:rightimage][:mount_dir]}/proc || true
-
-# TODO: MUST CHROOT WHEN MOUNTING PROC
-chroot #{node[:rightimage][:mount_dir]} mount -t proc none /proc
+mount --bind /proc #{node[:rightimage][:mount_dir]}/proc
 
 ## bootstrap base OS
 yum -c /tmp/yum.conf --installroot=#{node[:rightimage][:mount_dir]} -y groupinstall Base 

@@ -86,7 +86,10 @@ bash "bundle_upload_ebs" do
     mount /dev/sdj $ebs_mount
 
 ## mount EBS volume, rsync, and unmount ebs volume
-    rsync -a $image_mount/ $ebs_mount/
+    rsync -a $image_mount/ $ebs_mount/ --exclude '/proc'
+## recreate the /proc mountpoint
+    mkdir -p $ebs_mount/proc
+#    mount --bind /proc $ebs_mount/proc
     umount $ebs_mount
 
 ## snapshot the ebs volume and save the snapshot id
