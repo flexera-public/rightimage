@@ -80,6 +80,9 @@ yum -c /tmp/yum.conf --installroot=#{node[:rightimage][:mount_dir]} -y clean all
 rm #{node[:rightimage][:mount_dir]}/var/lib/rpm/__*
 chroot #{node[:rightimage][:mount_dir]} rpm --rebuilddb
 
+## Remove yum-fastestmirror plugin
+chroot #{node[:rightimage][:mount_dir]} rpm -e --nodeps yum-fastestmirror
+
 mkdir -p #{node[:rightimage][:mount_dir]}/etc/ssh
 
 echo 'hwcap 0 nosegneg' > #{node[:rightimage][:mount_dir]}/etc/ld.so.conf.d/libc6-xen.conf
