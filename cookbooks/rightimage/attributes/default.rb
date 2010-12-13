@@ -78,7 +78,9 @@ end if rightimage[:platform] == "ubuntu"
 # set cloud stuff
 case rightimage[:cloud]
   when "ec2" 
-    set[:rightimage][:root_mount] = "/dev/sda1" 
+    set[:rightimage][:root_mount][:dev] = "/dev/sda1"
+    set[:rightimage][:root_mount][:dump] = "0" 
+    set[:rightimage][:root_mount][:fsck] = "0" 
     set[:rightimage][:ephemeral_mount] = "/dev/sdb" 
     set[:rightimage][:swap_mount] = "/dev/sda3"  unless rightimage[:arch]  == "x86_64"
     case rightimage[:platform]
@@ -91,7 +93,9 @@ case rightimage[:cloud]
     end
   when "vmops"
     set[:rightimage][:fstab][:ephemeral_mount_opts] = "defaults"
-    set[:rightimage][:root_mount] = "/dev/xvda"
+    set[:rightimage][:root_mount][:dev] = "/dev/xvda"
+    set[:rightimage][:root_mount][:dump] = "1" 
+    set[:rightimage][:root_mount][:fsck] = "1" 
     set[:rightimage][:ephemeral_mount] = "/dev/xvdb"
 end
 

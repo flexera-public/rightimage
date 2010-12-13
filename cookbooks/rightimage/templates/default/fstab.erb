@@ -1,17 +1,12 @@
-<%= node[:rightimage][:root_mount] %>  /         ext3    defaults        0 0
-
-
+<%= node[:rightimage][:root_mount][:dev] %>  /         ext3    defaults        <%= node[:rightimage][:root_mount][:dump] %> <%= node[:rightimage][:root_mount][:fsck] %>
 <% unless node[:rightimage][:fstab][:ephemeral_mount_opts] == nil -%>
 <%= node[:rightimage][:ephemeral_mount] %>   /mnt      ext3    <%= node[:rightimage][:fstab][:ephemeral_mount_opts] %>        0 0
 <% else -%>
 <%= node[:rightimage][:ephemeral_mount] %>   /mnt      ext3    defaults        0 0
 <% end -%>
-
-
 <% unless node[:rightimage][:swap_mount] == nil -%>
 <%= node[:rightimage][:swap_mount] %>  swap      swap    <%= node[:rightimage][:fstab][:swap_mount_opts] %>        0 0
 <% end -%>
-
 <% if node[:rightimage][:platform] == "centos" -%>
 none       /dev/pts  devpts  gid=5,mode=620  0 0
 none       /dev/shm  tmpfs   defaults        0 0
