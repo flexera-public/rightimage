@@ -72,7 +72,7 @@ chroot #{node[:rightimage][:mount_dir]} authconfig --enableshadow --useshadow --
 yum -c /tmp/yum.conf -y install #{node[:rightimage][:guest_packages]}
 # install the guest packages in the chroot
 yum -c /tmp/yum.conf --installroot=#{node[:rightimage][:mount_dir]} -y install  #{node[:rightimage][:guest_packages]}
-yum -c /tmp/yum.conf --installroot=#{node[:rightimage][:mount_dir]} -y remove avahi avahi-compat-libdns_sd bluez* gnome-bluetooth* 
+yum -c /tmp/yum.conf --installroot=#{node[:rightimage][:mount_dir]} -y remove avahi avahi-compat-libdns_sd bluez* gnome-bluetooth* cups
 yum -c /tmp/yum.conf --installroot=#{node[:rightimage][:mount_dir]} -y clean all
 
 

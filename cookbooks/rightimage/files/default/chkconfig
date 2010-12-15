@@ -41,4 +41,3 @@ chkconfig --del readahead_later
 chkconfig --del wpa_supplicant
 chkconfig --del pand
 chkconfig --del netplugd
-chkconfig --del cups
