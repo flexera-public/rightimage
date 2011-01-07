@@ -86,10 +86,10 @@ set -x
 end if node[:rightimage][:platform] == "centos"
 
 # drop in amazon's recompiled xfs module 
-#remote_file "#{node[:rightimage][:mount_dir]}/lib/modules/2.6.21.7-2.fc8xen/kernel/fs/xfs/xfs.ko" do 
-  #source "xfs.ko.#{node[:rightimage][:arch]}"
-  #backup false
-#end if node[:rightimage][:platform] == "centos"
+remote_file "#{node[:rightimage][:mount_dir]}/lib/modules/2.6.21.7-2.fc8xen/kernel/fs/xfs/xfs.ko" do 
+  source "xfs.ko.#{node[:rightimage][:arch]}"
+  backup false
+end if node[:rightimage][:platform] == "centos" && node[:rightimage][:arch] == "i386"
 
 bash "do_depmod" do 
   code <<-EOH
