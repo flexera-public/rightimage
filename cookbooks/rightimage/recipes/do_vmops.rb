@@ -100,10 +100,10 @@ bash "convert_to_vhd" do
     bzip2 #{image_name}.vhd
 
     # upload image
-    export AWS_ACCESS_KEY_ID=#{node.rightimage.aws_access_key_id_for_upload}
-    export AWS_SECRET_ACCESS_KEY=#{node.rightimage.aws_secret_access_key_for_upload}
-    export AWS_CALLING_FORMAT=SUBDOMAIN 
-    /usr/local/bin/s3cmd -v put #{node.rightimage.image_upload_bucket}:#{image_name}.vhd.bz2 /mnt/#{image_name}.vhd.bz2 x-amz-acl:public-read --progress
+    # export AWS_ACCESS_KEY_ID=#{node.rightimage.aws_access_key_id_for_upload}
+    # export AWS_SECRET_ACCESS_KEY=#{node.rightimage.aws_secret_access_key_for_upload}
+    # export AWS_CALLING_FORMAT=SUBDOMAIN 
+    # /usr/local/bin/s3cmd -v put #{node.rightimage.image_upload_bucket}:#{image_name}.vhd.bz2 /mnt/#{image_name}.vhd.bz2 x-amz-acl:public-read --progress
 
   EOH
 end
