@@ -44,3 +44,7 @@ chkconfig --del netplugd
 chkconfig --del cups
 chkconfig --del avahi-daemon
 chkconfig --del avahi-dnsconfd
+
+#CentOS 5.2 does not support all these pacakges, to compensate exit with 0 for now
+#TODO: add conditionals for dist
+exit 0

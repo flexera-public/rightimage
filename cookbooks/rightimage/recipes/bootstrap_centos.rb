@@ -67,8 +67,9 @@ test -e /dev/ptmx #|| chroot $imagedir mknod --mode 666 /dev/ptmx c 5 2
               
 # Shadow file needs to be setup prior install additional packages
 chroot #{node[:rightimage][:mount_dir]} authconfig --enableshadow --useshadow --enablemd5 --updateall
-
 # install guest packages on CentOS 5.2 i386 host to work around yum problem
+yum -c /tmp/yum.conf -y clean all
+yum -c /tmp/yum.conf -y makecache
 yum -c /tmp/yum.conf -y install #{node[:rightimage][:guest_packages]}
 # install the guest packages in the chroot
 yum -c /tmp/yum.conf --installroot=#{node[:rightimage][:mount_dir]} -y install  #{node[:rightimage][:guest_packages]}
