@@ -232,7 +232,7 @@ bash "clean_db" do
 end
 
 bash "setup_debug" do 
-  only_if { node[:rightimage][:debug] == "true"  }
+  only_if { node[:rightimage][:debug] == "true"  && (image_name =~ /dev/i) != nil }
   code <<-EOH
     set -e
     set -x
