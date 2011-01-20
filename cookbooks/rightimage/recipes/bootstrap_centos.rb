@@ -1,4 +1,9 @@
-
+class Chef::Resource::Bash
+  include RightScale::RightImage::Helper
+end
+class Chef::Resource::RubyBlock
+  include RightScale::RightImage::Helper
+end
 
 template "/tmp/yum.conf" do 
   source "yum.conf.erb"
