@@ -46,8 +46,8 @@ end
 bash "install_s3_sync" do 
   code <<-EOC
     tar -xzf /tmp/s3sync.tgz -C #{node[:rightimage][:mount_dir]}/home
-    chroot #{node[:rightimage][:mount_dir]} ln -sf /home/s3sync/s3sync.rb /usr/local/bin/s3sync
-    chroot #{node[:rightimage][:mount_dir]} ln -sf /home/s3sync/s3cmd.rb /usr/local/bin/s3cmd
+    chroot #{node[:rightimage][:mount_dir]} cp -pf /home/s3sync/s3sync.rb /usr/local/bin/s3sync
+    chroot #{node[:rightimage][:mount_dir]} cp -pf /home/s3sync/s3cmd.rb /usr/local/bin/s3cmd
   EOC
 end
 
