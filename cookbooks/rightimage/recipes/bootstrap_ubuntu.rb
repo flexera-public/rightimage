@@ -162,7 +162,7 @@ apt-get -y install sun-java6-jdk
 
 cat >/etc/profile.d/java.sh <<EOF
 
-JAVA_HOME=/usr
+JAVA_HOME=/usr/lib/jvm/java-6-sun
 export JAVA_HOME
 
 EOF
