@@ -46,20 +46,38 @@ template "#{destination_image_mount}/etc/fstab" do
   backup false
 end
 
-
-bash "do_vmops" do 
+bash "mount proc" do 
   code <<-EOH
 #!/bin/bash -ex
     set -e 
     set -x
     mount_dir=#{destination_image_mount}
     mount -t proc none $mount_dir/proc
+  EOH
+end
+
+bash "install xen kernel" do 
+  only_if { node[:rightimage][:virtual_environment] == "xen" } 
+  code <<-EOH
+#!/bin/bash -ex
+    set -e 
+    set -x
+    mount_dir=#{destination_image_mount}
     rm -f $mount_dir/boot/vmlinu* 
     rm -rf $mount_dir/lib/modules/*
     yum -c /tmp/yum.conf --installroot=$mount_dir -y install kernel-xen
     rm -f $mount_dir/boot/initrd*
     chroot $mount_dir mkinitrd --omit-scsi-modules --with=xennet   --with=xenblk  --preload=xenblk  initrd-#{node.rightimage.vmops.kernel}  #{node.rightimage.vmops.kernel}
     mv $mount_dir/initrd-#{node.rightimage.vmops.kernel}  $mount_dir/boot/.
+  EOH
+end
+
+bash "configure for cloudstack" do 
+  code <<-EOH
+#!/bin/bash -ex
+    set -e 
+    set -x
+    mount_dir=#{destination_image_mount}
 
     # clean out packages
     yum -c /tmp/yum.conf --installroot=$mount_dir -y clean all
