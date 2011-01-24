@@ -67,8 +67,24 @@ bash "install xen kernel" do
     rm -rf $mount_dir/lib/modules/*
     yum -c /tmp/yum.conf --installroot=$mount_dir -y install kernel-xen
     rm -f $mount_dir/boot/initrd*
-    chroot $mount_dir mkinitrd --omit-scsi-modules --with=xennet   --with=xenblk  --preload=xenblk  initrd-#{node.rightimage.vmops.kernel}  #{node.rightimage.vmops.kernel}
-    mv $mount_dir/initrd-#{node.rightimage.vmops.kernel}  $mount_dir/boot/.
+    chroot $mount_dir mkinitrd --omit-scsi-modules --with=xennet   --with=xenblk  --preload=xenblk  initrd-#{node[:rightimage][:kernel_id]}  #{node[:rightimage][:kernel_id]}
+    mv $mount_dir/initrd-#{node[:rightimage][:kernel_id]}  $mount_dir/boot/.
+  EOH
+end
+
+bash "install kvm kernel" do 
+  only_if { node[:rightimage][:virtual_environment] == "kvm" } 
+  code <<-EOH
+#!/bin/bash -ex
+    set -e 
+    set -x
+    mount_dir=#{destination_image_mount}
+    rm -f $mount_dir/boot/vmlinu* 
+    rm -rf $mount_dir/lib/modules/*
+    yum -c /tmp/yum.conf --installroot=$mount_dir -y install kmod-kvm
+    rm -f $mount_dir/boot/initrd*
+    chroot /mnt/image/ mkinitrd --omit-scsi-modules --with=kvm --with=kvm-amd --with=kvm-intel -v initrd-#{node[:rightimage][:kernel_id]} #{node[:rightimage][:kernel_id]}
+    mv $mount_dir/initrd-#{node[:rightimage][:kernel_id]}  $mount_dir/boot/.
   EOH
 end
 
