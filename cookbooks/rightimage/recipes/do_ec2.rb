@@ -85,11 +85,30 @@ set -x
   EOH
 end if node[:rightimage][:platform] == "centos"
 
-# drop in amazon's recompiled xfs module 
+### wush #3718: ec2 xfs module hack for specific centos kernel 
+if node[:rightimage][:platform] == "centos"
+  if ["aki-a71cf9ce", "aki-873667c2", "aki-7e0d250a", "aki-15f58a47"].include?(node[:rightimage][:kernel_id])
+
+# drop if fixed xfs module
 remote_file "#{node[:rightimage][:mount_dir]}/lib/modules/2.6.21.7-2.fc8xen/kernel/fs/xfs/xfs.ko" do 
   source "xfs.ko.#{node[:rightimage][:arch]}"
   backup false
 end if node[:rightimage][:platform] == "centos" && node[:rightimage][:arch] == "i386"
+
+# setup module install on reboot
+bash "wush #3718: ec2 xfs module hack for specific centos kernel"
+  code <<-EOH
+cat > /etc/sysconfig/modules/xfs.modules <<-EOF
+#!/bin/sh
+  insmod /lib/modules/2.6.21.7-2.fc8xen/kernel/fs/xfs/xfs.ko 
+EOF
+  chmod 0770 /etc/sysconfig/modules/xfs.modules
+  EOH
+end
+
+  end
+end
+### end #3718
 
 bash "do_depmod" do 
   code <<-EOH
@@ -97,7 +116,6 @@ bash "do_depmod" do
   for module_version in $(cd #{node[:rightimage][:mount_dir]}/lib/modules; ls); do
     chroot #{node[:rightimage][:mount_dir]} depmod -a $module_version
   done
-
   EOH
 end if node[:rightimage][:platform] == "centos"
 
