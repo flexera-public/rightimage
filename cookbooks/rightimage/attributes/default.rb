@@ -46,6 +46,7 @@ when "centos"
 
 
   set[:rightimage][:host_packages] = "swig"
+
   set[:rightimage][:package_type] = "rpm"
 when "suse"
   set[:rightimage][:guest_packages] = "gcc"
@@ -106,6 +107,14 @@ case rightimage[:cloud]
       set[:rightimage][:kernel_id] = "2.6.18-164.15.1.el5.centos.plus"
       rightimage[:kernel_id] << "xen" if rightimage[:virtual_environment] == "xen"
     end
+end
+
+# virtualization stuff
+case rightimage[:virtual_environment]
+  when "kvm"
+    rightimage[:host_packages] << " qemu" # image management package
+    set[:rightimage][:root_mount][:dev] = "/dev/VolGroup00/LogVol00"
+
 end
 
 # set rightscale stuff

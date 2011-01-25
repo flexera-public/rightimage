@@ -115,18 +115,22 @@ bash "configure for cloudstack" do
 end
 
 
-bash "convert_to_vhd" do 
+bash "backup raw image" do 
+  cwd File.dirname destination_image
+  code <<-EOH
+    raw_image=$(basename #{destination_image})
+    cp -v $raw_image $raw_image.bak 
+  EOH
+end
+
+bash "xen convert and upload" do 
+  only_if { node[:rightimage][:virtual_environment] == "xen" } 
   cwd File.dirname destination_image
   code <<-EOH
     set -e
     set -x
-    
-    
     raw_image=$(basename #{destination_image})
     vhd_image=${raw_image}.vhd
-
-    cp $raw_image $raw_image.bak 
-
     vhd-util convert -s 0 -t 1 -i $raw_image -o $vhd_image
     vhd-util convert -s 1 -t 2 -i $vhd_image -o #{image_name}.vhd
     bzip2 #{image_name}.vhd
@@ -140,3 +144,19 @@ bash "convert_to_vhd" do
   EOH
 end
 
+bash "upload image" do 
+  only_if { node[:rightimage][:virtual_environment] == "kvm" } 
+  cwd File.dirname destination_image
+  code <<-EOH
+    set -e
+    set -x
+    raw_image=$(basename #{destination_image})
+    qemu-img convert -O qcow2 $raw_image ${raw_image}.qcow2
+
+    # upload image
+    # export AWS_ACCESS_KEY_ID=#{node.rightimage.aws_access_key_id_for_upload}
+    # export AWS_SECRET_ACCESS_KEY=#{node.rightimage.aws_secret_access_key_for_upload}
+    # export AWS_CALLING_FORMAT=SUBDOMAIN 
+    # /usr/local/bin/s3cmd -v put #{node.rightimage.image_upload_bucket}:#{image_name}.vhd.bz2 /mnt/#{image_name}.vhd.bz2 x-amz-acl:public-read --progress
+  EOH
+end
