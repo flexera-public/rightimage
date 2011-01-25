@@ -17,6 +17,6 @@
 # limitations under the License.
 #
 
-unless node.rightimage.manual_mode == "true"
+unless node[:rightimage][:manual_mode] == "true"
   include_recipe "rightimage::build_image"
 end
