@@ -160,7 +160,12 @@ attribute "rightimage/install_mirror_date",
   :required => "optional",
   :recipes => [ "rightimage::do_centos" , "rightimage::default", "rightimage::build_image" , "rightimage::bootstrap_centos" ]
 
-
+attribute "rightimage/virtual_environment",
+  :display_name => "Hypervisor",
+  :description => "Which hypervisor is this image for? ['xen'|'kvm']",
+  :required => "optional",
+  :default => "xen",
+  :recipes => [ "rightimage::do_vmops" ]
 
 ## euca inputs  
 attribute "rightimage/euca/user",

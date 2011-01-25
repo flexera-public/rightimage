@@ -79,11 +79,9 @@ bash "install kvm kernel" do
     set -e 
     set -x
     mount_dir=#{destination_image_mount}
-    rm -f $mount_dir/boot/vmlinu* 
-    rm -rf $mount_dir/lib/modules/*
     yum -c /tmp/yum.conf --installroot=$mount_dir -y install kmod-kvm
     rm -f $mount_dir/boot/initrd*
-    chroot /mnt/image/ mkinitrd --omit-scsi-modules --with=kvm --with=kvm-amd --with=kvm-intel -v initrd-#{node[:rightimage][:kernel_id]} #{node[:rightimage][:kernel_id]}
+    chroot $mount_dir mkinitrd --omit-scsi-modules --with=kvm --with=kvm-amd --with=kvm-intel -v initrd-#{node[:rightimage][:kernel_id]} #{node[:rightimage][:kernel_id]}
     mv $mount_dir/initrd-#{node[:rightimage][:kernel_id]}  $mount_dir/boot/.
   EOH
 end
