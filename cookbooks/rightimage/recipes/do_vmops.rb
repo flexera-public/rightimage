@@ -2,7 +2,7 @@ class Chef::Resource::Bash
   include RightScale::RightImage::Helper
 end
 
-include_recipe "rightimage::install_vhd-util"
+include_recipe "rightimage::install_vhd-util" if node[:rightimage][:virtual_environment] == "xen"  
 
 source_image = "#{node.rightimage.mount_dir}" 
 destination_image = "/mnt/vmops_image"
