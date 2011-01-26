@@ -249,6 +249,8 @@
         "description": "Which hypervisor is this image for? ['xen'|'kvm']",
         "display_name": "Hypervisor",
         "recipes": [
+          "rightimage::default",
+          "rightimage::build_image",
           "rightimage::do_vmops"
         ],
         "required": "optional"

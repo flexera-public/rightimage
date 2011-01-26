@@ -165,7 +165,7 @@ attribute "rightimage/virtual_environment",
   :description => "Which hypervisor is this image for? ['xen'|'kvm']",
   :required => "optional",
   :default => "xen",
-  :recipes => [ "rightimage::do_vmops" ]
+  :recipes => [ "rightimage::default", "rightimage::build_image", "rightimage::do_vmops" ]
 
 ## euca inputs  
 attribute "rightimage/euca/user",
