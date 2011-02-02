@@ -2,6 +2,7 @@ class Chef::Resource::Bash
   include RightScale::RightImage::Helper
 end
 
+raise "ERROR: you must set your virtual_environment to kvm!"  if node[:rightimage][:virtual_environment] != "xen"
 include_recipe "rightimage::install_vhd-util" if node[:rightimage][:virtual_environment] == "xen"  
 
 source_image = "#{node.rightimage.mount_dir}" 
@@ -57,7 +58,6 @@ bash "mount proc" do
 end
 
 bash "install xen kernel" do 
-  only_if { node[:rightimage][:virtual_environment] == "xen" } 
   code <<-EOH
 #!/bin/bash -ex
     set -e 
@@ -68,20 +68,6 @@ bash "install xen kernel" do
     yum -c /tmp/yum.conf --installroot=$mount_dir -y install kernel-xen
     rm -f $mount_dir/boot/initrd*
     chroot $mount_dir mkinitrd --omit-scsi-modules --with=xennet   --with=xenblk  --preload=xenblk  initrd-#{node[:rightimage][:kernel_id]}  #{node[:rightimage][:kernel_id]}
-    mv $mount_dir/initrd-#{node[:rightimage][:kernel_id]}  $mount_dir/boot/.
-  EOH
-end
-
-bash "install kvm kernel" do 
-  only_if { node[:rightimage][:virtual_environment] == "kvm" } 
-  code <<-EOH
-#!/bin/bash -ex
-    set -e 
-    set -x
-    mount_dir=#{destination_image_mount}
-    yum -c /tmp/yum.conf --installroot=$mount_dir -y install kmod-kvm
-    rm -f $mount_dir/boot/initrd*
-    chroot $mount_dir mkinitrd --omit-scsi-modules --with=kvm --with=kvm-amd --with=kvm-intel -v initrd-#{node[:rightimage][:kernel_id]} #{node[:rightimage][:kernel_id]}
     mv $mount_dir/initrd-#{node[:rightimage][:kernel_id]}  $mount_dir/boot/.
   EOH
 end
@@ -124,7 +110,6 @@ bash "backup raw image" do
 end
 
 bash "xen convert and upload" do 
-  only_if { node[:rightimage][:virtual_environment] == "xen" } 
   cwd File.dirname destination_image
   code <<-EOH
     set -e
@@ -144,19 +129,3 @@ bash "xen convert and upload" do
   EOH
 end
 
-bash "upload image" do 
-  only_if { node[:rightimage][:virtual_environment] == "kvm" } 
-  cwd File.dirname destination_image
-  code <<-EOH
-    set -e
-    set -x
-    raw_image=$(basename #{destination_image})
-    qemu-img convert -O qcow2 $raw_image ${raw_image}.qcow2
-
-    # upload image
-    # export AWS_ACCESS_KEY_ID=#{node.rightimage.aws_access_key_id_for_upload}
-    # export AWS_SECRET_ACCESS_KEY=#{node.rightimage.aws_secret_access_key_for_upload}
-    # export AWS_CALLING_FORMAT=SUBDOMAIN 
-    # /usr/local/bin/s3cmd -v put #{node.rightimage.image_upload_bucket}:#{image_name}.vhd.bz2 /mnt/#{image_name}.vhd.bz2 x-amz-acl:public-read --progress
-  EOH
-end

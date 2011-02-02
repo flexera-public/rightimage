@@ -93,11 +93,23 @@ case rightimage[:cloud]
         set[:rightimage][:fstab][:swap] = "defaults"
     end
   when "vmops"
-    set[:rightimage][:fstab][:ephemeral_mount_opts] = "defaults"
-    set[:rightimage][:root_mount][:dev] = "/dev/xvda"
-    set[:rightimage][:root_mount][:dump] = "1" 
-    set[:rightimage][:root_mount][:fsck] = "1" 
-    set[:rightimage][:ephemeral_mount] = "/dev/xvdb"
+    case rightimage[:virtual_environment]
+    when "xen"
+      set[:rightimage][:fstab][:ephemeral_mount_opts] = "defaults"
+      set[:rightimage][:root_mount][:dev] = "/dev/xvda"
+      set[:rightimage][:root_mount][:dump] = "1" 
+      set[:rightimage][:root_mount][:fsck] = "1" 
+      set[:rightimage][:ephemeral_mount] = "/dev/xvdb"
+    when "kvm"
+      rightimage[:host_packages] << " qemu grub"
+      rightimage[:guest_packages] << " grub"
+      set[:rightimage][:fstab][:ephemeral_mount_opts] = "defaults"
+      set[:rightimage][:root_mount][:dev] = "/dev/vda1"
+      set[:rightimage][:root_mount][:dump] = "1" 
+      set[:rightimage][:root_mount][:fsck] = "1" 
+    else
+      raise "ERROR: unsupported virtual_environment for cloudstack"
+    end
     ## set kernel to use for vmops
     case rightimage[:release]
     when "5.2" 
@@ -107,14 +119,6 @@ case rightimage[:cloud]
       set[:rightimage][:kernel_id] = "2.6.18-164.15.1.el5.centos.plus"
       rightimage[:kernel_id] << "xen" if rightimage[:virtual_environment] == "xen"
     end
-end
-
-# virtualization stuff
-case rightimage[:virtual_environment]
-  when "kvm"
-    rightimage[:host_packages] << " qemu" # image management package
-    set[:rightimage][:root_mount][:dev] = "/dev/VolGroup00/LogVol00"
-
 end
 
 # set rightscale stuff
