@@ -23,6 +23,10 @@ bash "create cloudstack-kvm loopback fs" do
   code <<-EOH
     set -e 
     set -x
+  
+    DISK_SIZE_GB=10  
+    BYTES_PER_MB=1024
+    DISK_SIZE_MB=$(($DISK_SIZE_GB * $BYTES_PER_MB))
 
     source_image="#{node.rightimage.mount_dir}" 
     target_raw_path="#{target_raw_path}"
@@ -33,16 +37,15 @@ bash "create cloudstack-kvm loopback fs" do
     umount -lf #{target_mnt} || true
     rm -rf $target_raw_path $target_mnt
     
-    dd if=/dev/zero of=$target_raw_path bs=1M count=10240    
+    dd if=/dev/zero of=$target_raw_path bs=1M count=$DISK_SIZE_MB    
     
     loopdev=#{loop_dev}
     loopmap=#{loop_map}
-    losetup $loopdev
-    sfdisk $loopdev << EOF
-,3,L
-,,L
-,19,S
-EOF
+    losetup $loopdev $target_raw_path
+    
+    parted --script $target_raw_path mklabel gpt
+    parted --script $target_raw_path mkpart ext2 0 100%
+    
     kpartx -a $loopdev
     mke2fs -F -j $loopmap
     mkdir $target_mnt
@@ -85,7 +88,7 @@ bash "setup grub" do
     target_mnt="#{target_mnt}"
     
     chroot $target_mnt mkdir -p /boot/grub
-    chroot $target_mnt cp -p /usr/share/grub/x86_64-readhat/* /boot/grub
+    chroot $target_mnt cp -p /usr/share/grub/x86_64-redhat/* /boot/grub
     chroot $target_mnt ln -s /boot/grub/grub.conf /boot/grub/menu.lst
 
     cat > device.map <<EOF
@@ -159,8 +162,9 @@ bash "unmount target filesystem" do
     loopdev=#{loop_dev}
     loopmap=#{loop_map}
     
+    umount -lf $loopmap
     kpartx -d $loopmap
-    losetup -d $loopdev
+#FIXME    losetup -d $loopdev
   EOH
 end
 
@@ -188,3 +192,4 @@ bash "upload image" do
     # /usr/bin/s3cmd -P put #{bundled_image_path} s3://rightscale-cloudstack-dev/#{bundled_image}
   EOH
 end
+
