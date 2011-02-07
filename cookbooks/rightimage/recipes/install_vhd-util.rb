@@ -1,4 +1,13 @@
-%w{mercurial git ncurses-devel dev86 iasl SDL python-devel libgcrypt-devel uuid-devel openssl-devel}.each do |p| package p end
+case node[:rightimage][:platform]
+  when "centos" 
+    vhd_util_deps=%w{mercurial git ncurses-devel dev86 iasl SDL python-devel libgcrypt-devel uuid-devel openssl-devel} 
+  when "ubuntu"
+    vhd_util_deps=%w{mercurial libncurses5-dev bin86 bcc iasl libsdl1.2debian-all python-dev libgcrypt11-dev uuid-dev libssl-dev}
+  else
+    raise "ERROR: plaform #{node[:rightimage][:platform]} not supported. Please feel free to add support ;) "
+end
+
+vhd_util_deps.each do |p| package p end
 
 remote_file "/tmp/vhd-util-patch" do 
   source "vhd-util-patch"
