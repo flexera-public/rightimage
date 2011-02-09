@@ -96,7 +96,7 @@ remote_file "#{node[:rightimage][:mount_dir]}/lib/modules/2.6.21.7-2.fc8xen/kern
 end if node[:rightimage][:platform] == "centos" && node[:rightimage][:arch] == "i386"
 
 # setup module install on reboot
-bash "wush #3718: ec2 xfs module hack for specific centos kernel"
+bash "wush #3718: ec2 xfs module hack for specific centos kernel" do
   code <<-EOH
 cat > /etc/sysconfig/modules/xfs.modules <<-EOF
 #!/bin/sh
