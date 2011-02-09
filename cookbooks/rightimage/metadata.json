@@ -655,6 +655,7 @@
       "rightimage::build_image": "build image based on host platform",
       "rightimage::do_tag_images": "adds rightscale tags to images (only ec2 currently supported)",
       "rightimage::do_euca": "migrates the created image to eucalyptus",
+      "rightimage::bootstrap_common": "common configuration for linux base images",
       "rightimage::do_centos": "coordinate a centos install",
       "rightimage::do_vmops": "migrates the created image to xen based cloud.com",
       "rightimage::bootstrap_centos": "bootstraps a basic centos image",
