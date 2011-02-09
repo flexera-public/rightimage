@@ -184,17 +184,11 @@ echo "alias ipv6 off" >> #{node[:rightimage][:mount_dir]}/etc/modprobe.conf
 echo "alias net-pf-10 off" >> #{node[:rightimage][:mount_dir]}/etc/modprobe.conf 
 chroot #{node[:rightimage][:mount_dir]} /sbin/chkconfig ip6tables off
 
-
-
-echo "UseDNS  no" >> #{node[:rightimage][:mount_dir]}/etc/ssh/sshd_config
-echo "PermitRootLogin without-password" >> #{node[:rightimage][:mount_dir]}/etc/ssh/sshd_config
-
-
-
 EOF
 
 end
 
+include_recipe "rightimage::bootstrap_common"
 
 remote_file "#{node[:rightimage][:mount_dir]}/root/.bash_profile" do 
   source "bash_profile" 
@@ -236,16 +230,6 @@ bash "clean_db" do
   EOH
 end
 
-bash "setup_debug" do 
-  only_if { node[:rightimage][:debug] == "true"  && (image_name =~ /dev/i) != nil }
-  code <<-EOH
-    set -e
-    set -x
-    ## set root passwd to 'rightscale'
-    echo 'echo root:rightscale | chpasswd' > #{node[:rightimage][:mount_dir]}/tmp/chpasswd
-    chmod +x #{node[:rightimage][:mount_dir]}/tmp/chpasswd
-    chroot #{node[:rightimage][:mount_dir]} /tmp/chpasswd
-    echo 'PermitRootLogin yes' >> #{node[:rightimage][:mount_dir]}/etc/ssh/sshd_config
-    echo 'PasswordAuthentication yes' >> #{node[:rightimage][:mount_dir]}/etc/ssh/sshd_config
-EOH
-end
+
+
+

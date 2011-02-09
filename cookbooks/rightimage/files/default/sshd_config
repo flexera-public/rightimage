@@ -1,5 +1,0 @@
-#Subsystem       sftp    /usr/libexec/openssh/sftp-server
-UseDNS  no
-PermitRootLogin without-password
-
-
