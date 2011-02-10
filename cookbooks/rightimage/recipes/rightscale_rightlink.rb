@@ -1,5 +1,5 @@
-execute "insert_rightscale_release" do 
-  command  "echo -n " + node[:rightimage][:rightscale_release] + " > " + node[:rightimage][:mount_dir] + "/etc/rightscale.d/rightscale-release"
+execute "insert_rightlink_version" do 
+  command  "echo -n " + node[:rightimage][:rightlink_version] + " > " + node[:rightimage][:mount_dir] + "/etc/rightscale.d/rightscale-release"
 end
 
 bash "checkout_repo" do 
@@ -10,7 +10,7 @@ bash "checkout_repo" do
     if [ -d sandbox_builds ]; then mv sandbox_builds sandbox_builds.$RANDOM; fi
     git clone git@github.com:rightscale/sandbox_builds.git 
     cd sandbox_builds 
-    git reset #{node[:rightimage][:git_repo]} --hard
+    git reset #{node[:rightimage][:sandbox_repo_tag]} --hard
     git submodule init 
     git submodule update
     cd repos/right_net
@@ -30,7 +30,7 @@ bash "build_rightlink" do
     cat <<-CHROOT_SCRIPT > #{node[:rightimage][:mount_dir]}/tmp/build_rightlink.sh
 #!/bin/bash -ex
 cd /tmp/sandbox_builds
-export RS_VERSION=#{node[:rightimage][:rightscale_release]}
+export RS_VERSION=#{node[:rightimage][:rightlink_version]}
 rake submodules:sandbox:create   
 rake right_link:#{node[:rightimage][:package_type]}:build
 export AWS_ACCESS_KEY_ID=#{node[:rightimage][:aws_access_key_id_for_upload]}

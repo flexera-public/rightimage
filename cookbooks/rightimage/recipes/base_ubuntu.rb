@@ -17,8 +17,7 @@
 # limitations under the License.
 #
 
-node[:rightimage][:host_packages].each { |p| package p }
 
 include_recipe "rightimage::clean"
-include_recipe "rightimage::bootstrap_sles"
-include_recipe "rightimage::install_rightscale"
+include_recipe "rightimage::bootstrap_ubuntu"
+include_recipe "rightimage::rightscale_install"

@@ -8,7 +8,7 @@ module RightScale
         override_name = node.rightimage.image_name_override
         return override_name if override_name && override_name != ""
         
-        release = node[:rightimage][:rightscale_release]
+        release = node[:rightimage][:rightlink_version]
         suffix = node[:rightimage][:image_postfix]
 
         image_name = ""

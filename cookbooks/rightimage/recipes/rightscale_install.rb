@@ -52,12 +52,12 @@ bash "install_s3_sync" do
 end
 
 # Install rightscale package based on revision number
-if node[:rightimage][:rightscale_release] =~ /4\.[0-9]*\.[0-9]*/
+if node[:rightimage][:rightlink_version] =~ /4\.[0-9]*\.[0-9]*/
   log "Building image with RunRightScripts package."
-  include_recipe "rightimage::install_runrightscripts"
+  include_recipe "rightimage::rightscale_runrightscripts"
 else
   log "Building image with RightLink package."
-  include_recipe "rightimage::install_rightlink"
+  include_recipe "rightimage::rightscale_rightlink"
 end
 
 bash "setup_motd" do

@@ -126,7 +126,4 @@ template "#{node[:rightimage][:mount_dir]}#{node[:rightimage][:mirror_file_path]
   backup false
 end unless node[:rightimage][:platform] == "centos"
 
-include_recipe "rightimage::ec2_ebs_bundle"
-include_recipe "rightimage::ec2_s3_bundle"
-include_recipe "rightimage::do_tag_images"
 

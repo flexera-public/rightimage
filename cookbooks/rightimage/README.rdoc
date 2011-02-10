@@ -1,8 +1,20 @@
 = DESCRIPTION:
 
-= REQUIREMENTS:
-
-= ATTRIBUTES: 
+Builds a RightImage on a loopback filesystem.  Creates base OS install plus the RightScale package and common utils.  
+Then adds the cloud specific settings. Also has the ability to upload and register the RightImage with corresponding 
+cloud.
 
 = USAGE:
+From a RightScale manage host:
 
+rs_run_recipe -n rightimage::build_image
+
+= CONVENTIONS:
+"base" recipes clean, bootstrap and install rightscale on the specified os this gives us a base
+guest image in /mnt/image.
+
+"bootstrap" recipes install the a vanilla base image
+
+"cloud" recipes add cloud specific settings to the guest image
+
+"upload" recipes convert the raw guest image and upload off host instance. 

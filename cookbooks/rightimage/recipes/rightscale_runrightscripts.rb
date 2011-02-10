@@ -1,5 +1,5 @@
 mount_dir = node[:rightimage][:mount_dir]
-package_release_version = node[:rightimage][:rightscale_release]
+package_release_version = node[:rightimage][:rightlink_version]
 target_platform = node[:rightimage][:platform]
 
 remote_file "#{mount_dir}/etc/init.d/righthostname" do

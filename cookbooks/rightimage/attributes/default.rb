@@ -122,7 +122,7 @@ case rightimage[:cloud]
 end
 
 # set rightscale stuff
-set_unless[:rightimage][:rightscale_release] = ""
+set_unless[:rightimage][:rightlink_version] = ""
 set_unless[:rightimage][:aws_access_key_id] = nil
 set_unless[:rightimage][:aws_secret_access_key] = nil
 

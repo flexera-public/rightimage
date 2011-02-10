@@ -153,4 +153,5 @@ bash "bundle_upload_ebs" do
     EOH
 end 
 
+include_recipe "rightimage::do_tag_images"
 
