@@ -118,6 +118,8 @@ case rightimage[:cloud]
     when "5.4" 
       set[:rightimage][:kernel_id] = "2.6.18-164.15.1.el5.centos.plus"
       rightimage[:kernel_id] << "xen" if rightimage[:virtual_environment] == "xen"
+    when "lucid"
+      set[:rightimage][:kernel_id] = "2.6.32-28-server"
     end
 end
 

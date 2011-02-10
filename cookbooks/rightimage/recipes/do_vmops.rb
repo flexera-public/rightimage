@@ -2,8 +2,12 @@ class Chef::Resource::Bash
   include RightScale::RightImage::Helper
 end
 
-raise "ERROR: you must set your virtual_environment to kvm!"  if node[:rightimage][:virtual_environment] != "xen"
+raise "ERROR: you must set your virtual_environment to xen!"  if node[:rightimage][:virtual_environment] != "xen"
+
+#FIXME: vhd-util install fails on ubuntu -- so fix this or convert raw image by hand using a xenserver
+if node[:rightimage][:platform] == "centos"
 include_recipe "rightimage::install_vhd-util" if node[:rightimage][:virtual_environment] == "xen"  
+end
 
 source_image = "#{node.rightimage.mount_dir}" 
 destination_image = "/mnt/vmops_image"
@@ -57,7 +61,9 @@ bash "mount proc" do
   EOH
 end
 
+#TODO: verify that ubuntu bootstrap added correct kernel
 bash "install xen kernel" do 
+  only_if { node[:rightimage][:platform] == "centos" }
   code <<-EOH
 #!/bin/bash -ex
     set -e 
@@ -79,9 +85,6 @@ bash "configure for cloudstack" do
     set -x
     mount_dir=#{destination_image_mount}
 
-    # clean out packages
-    yum -c /tmp/yum.conf --installroot=$mount_dir -y clean all
-
     # enable console access
     echo "2:2345:respawn:/sbin/mingetty xvc0" >> $mount_dir/etc/inittab
     echo "xvc0" >> $mount_dir/etc/securetty
@@ -92,14 +95,49 @@ bash "configure for cloudstack" do
     mkdir -p $mount_dir/etc/rightscale.d
     echo "vmops" > $mount_dir/etc/rightscale.d/cloud
 
+  EOH
+end
+
+bash "centos cleanup" do 
+  only_if { node[:rightimage][:platform] == "centos" }
+  code <<-EOH
+#!/bin/bash -ex
+    set -e 
+    set -x
+    mount_dir=#{destination_image_mount}
+
+    # clean out packages
+    yum -c /tmp/yum.conf --installroot=$mount_dir -y clean all
+
     rm ${mount_dir}/var/lib/rpm/__*
     chroot $mount_dir rpm --rebuilddb
+  EOH
+end
+
+bash "ubuntu cleanup" do 
+  only_if { node[:rightimage][:platform] == "ubuntu" }
+  code <<-EOH
+#!/bin/bash -ex
+    set -e 
+    set -x
+    mount_dir=#{destination_image_mount}
+
+    # TODO
+
+  EOH
+end
+
+bash "unmount proc" do 
+  code <<-EOH
+#!/bin/bash -ex
+    set -e 
+    set -x
+    mount_dir=#{destination_image_mount}
 
     umount -lf $mount_dir/proc
     umount -lf $mount_dir
   EOH
 end
-
 
 bash "backup raw image" do 
   cwd File.dirname destination_image
@@ -128,4 +166,3 @@ bash "xen convert and upload" do
 
   EOH
 end
-
