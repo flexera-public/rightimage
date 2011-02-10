@@ -660,6 +660,7 @@
       "rightimage::bootstrap_common": "common configuration for linux base images",
       "rightimage::base_centos": "coordinate a centos install",
       "rightimage::bootstrap_centos": "bootstraps a basic centos image",
+      "rightimage::upload_vmops": "setup http server for download to test cloud",
       "rightimage::clean": "cleans everything"
     },
     "license": "Apache v2.0",

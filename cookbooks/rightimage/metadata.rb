@@ -20,9 +20,9 @@ recipe "rightimage::cloud_add_euca", "migrates the created image to eucalyptus"
 recipe "rightimage::cloud_add_vmops", "adds requirements for cloudstack based on hypervisor choice"
 recipe "rightimage::install_vhd-util", "install the vhd-util tool"
 recipe "rightimage::do_tag_images", "adds rightscale tags to images (only ec2 currently supported)"
-
 recipe "rightimage::upload_ec2_s3", "bundle and upload s3 image (ec2 only)"
 recipe "rightimage::upload_ec2_ebs", "create EBS image snapshot (ec2 only)"
+recipe "rightimage::upload_vmops", "setup http server for download to test cloud"
 
 
 attribute "rest_connection/user",
