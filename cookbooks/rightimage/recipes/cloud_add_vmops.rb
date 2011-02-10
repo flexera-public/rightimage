@@ -17,4 +17,4 @@
 # limitations under the License.
 #
 
-include_recipe "rightimage::cloud_add_vmops_#{node[:rightimage][:virtual_environment}" 
+include_recipe "rightimage::cloud_add_vmops_#{node[:rightimage][:virtual_environment]}" 

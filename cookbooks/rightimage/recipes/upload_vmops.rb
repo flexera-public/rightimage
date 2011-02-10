@@ -3,18 +3,18 @@ class Chef::Resource::RubyBlock
 end
 
 bash "serve /mnt via http" do
-  code do
+  code <<-EOH
     set -x
     yum -y install httpd
     rm /etc/httpd/conf.d/welcome*
     rm -rf /var/www/html
     ln -s /mnt /var/www/html
     service httpd start
-  end
+  EOH
 end
 
 ruby_block "trigger download to test cloud" do
-  code do
+  block do
     require "uri"
     
     #The public API URL allows access for developers and users to manage their virtual machines or to create their own user interfaces.  Accesses to this URL must be secured.
