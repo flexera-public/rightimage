@@ -17,8 +17,7 @@ recipe "rightimage::bootstrap_common", "common configuration for linux base imag
 recipe "rightimage::rightscale_install", "installs rightscale"
 recipe "rightimage::cloud_add_ec2", "migrates the created image to ec2"
 recipe "rightimage::cloud_add_euca", "migrates the created image to eucalyptus" 
-recipe "rightimage::cloud_add_vmops_xen", "migrates the created image to xen based cloud.com"
-recipe "rightimage::cloud_add_vmops_kvm", "migrates the created image to kvm based cloud.com" 
+recipe "rightimage::cloud_add_vmops", "adds requirements for cloudstack based on hypervisor choice"
 recipe "rightimage::install_vhd-util", "install the vhd-util tool"
 recipe "rightimage::do_tag_images", "adds rightscale tags to images (only ec2 currently supported)"
 

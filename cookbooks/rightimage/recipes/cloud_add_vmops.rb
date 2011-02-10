@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: rightimage
-# Recipe:: default
+# Recipe:: cloud_add_vmops
 #
 # Copyright 2010, Example Com
 #
@@ -17,5 +17,4 @@
 # limitations under the License.
 #
 
-include_recipe "rightimage::base_#{node.platform.downcase}"
-include_recipe "rightimage::cloud_add_#{node.rightimage.cloud.downcase}" if node.rightimage.cloud
+include_recipe "rightimage::cloud_add_vmops_#{node[:rightimage][:virtual_environment}" 
