@@ -643,6 +643,7 @@
     "conflicting": {
     },
     "recipes": {
+      "rightimage::cloud_add_vmops": "adds requirements for cloudstack based on hypervisor choice",
       "rightimage::rightscale_install": "installs rightscale",
       "rightimage::base_sles": "coordinate a sles install",
       "rightimage::cloud_add_euca": "migrates the created image to eucalyptus",
@@ -650,10 +651,8 @@
       "rightimage::default": "starts builds image automatically at boot. See 'manual_mode' input to enable.",
       "rightimage::upload_ec2_ebs": "create EBS image snapshot (ec2 only)",
       "rightimage::upload_ec2_s3": "bundle and upload s3 image (ec2 only)",
-      "rightimage::cloud_add_vmops_kvm": "migrates the created image to kvm based cloud.com",
       "rightimage::bootstrap_sles": "bootstraps a basic sles image",
       "rightimage::bootstrap_ubuntu": "bootstraps a basic ubuntu image",
-      "rightimage::cloud_add_vmops_xen": "migrates the created image to xen based cloud.com",
       "rightimage::base_ubuntu": "coordinate an ubuntu install",
       "rightimage::install_vhd-util": "install the vhd-util tool",
       "rightimage::build_image": "build image based on host platform",
