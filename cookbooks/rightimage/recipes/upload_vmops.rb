@@ -36,6 +36,8 @@ ruby_block "trigger download to test cloud" do
     cmd << "&format=VHD"
     cmd << "&osTypeId=14" # CentOS 5.4 x86
     cmd << "&zoneId=1"
+    cmd << "&isPublic=true"
+    cmd << "&isFeatured=true"
 
     puts "============"
     puts "#{api_url}#{cmd}"
