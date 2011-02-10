@@ -43,8 +43,23 @@ bash "create cloudstack-kvm loopback fs" do
     loopmap=#{loop_map}
     losetup $loopdev $target_raw_path
     
-    parted --script $target_raw_path mklabel gpt
-    parted --script $target_raw_path mkpart ext2 0 100%
+#    parted --script $target_raw_path mklabel gpt
+#    parted --script $target_raw_path mkpart ext2 0 100%
+ 
+#      cat > sfdisk.in <<EOF
+# # partition table for image file
+# unit: sectors
+# 
+# KVMDEV15.raw1 : start=       63, size= 20964762, Id=83
+# KVMDEV15.raw2 : start=        0, size=        0, Id= 0
+# KVMDEV15.raw3 : start=        0, size=        0, Id= 0
+# KVMDEV15.raw4 : start=        0, size=        0, Id= 0
+# EOF
+#     sfdisk $loopdev < sfdisk.in
+
+sfdisk $loopdev << EOF
+0,1304,L
+EOF
     
     kpartx -a $loopdev
     mke2fs -F -j $loopmap
@@ -90,6 +105,9 @@ bash "setup grub" do
     chroot $target_mnt mkdir -p /boot/grub
     chroot $target_mnt cp -p /usr/share/grub/x86_64-redhat/* /boot/grub
     chroot $target_mnt ln -s /boot/grub/grub.conf /boot/grub/menu.lst
+    
+    echo "(hd0) #{node[:rightimage][:root_mount][:dev]}" > $target_mnt/boot/grub/device.map
+    echo "" >> $target_mnt/boot/grub/device.map
 
     cat > device.map <<EOF
 (hd0) #{target_raw_path}
@@ -111,7 +129,7 @@ bash "install kvm kernel" do
     target_mnt=#{target_mnt}
     yum -c /tmp/yum.conf --installroot=$target_mnt -y install kmod-kvm
     rm -f $target_mnt/boot/initrd*
-    chroot $target_mnt mkinitrd --with=ata_piix --with=virtio_blk --with=ext3 -v initrd-#{node[:rightimage][:kernel_id]} #{node[:rightimage][:kernel_id]}
+    chroot $target_mnt mkinitrd --with=ata_piix --with=virtio_blk --with=ext3 --with=virtio_pci --with=dm_mirror --with=dm_snapshot --with=dm_zero -v initrd-#{node[:rightimage][:kernel_id]} #{node[:rightimage][:kernel_id]}
     mv $target_mnt/initrd-#{node[:rightimage][:kernel_id]}  $target_mnt/boot/.
   EOH
 end
@@ -192,4 +210,5 @@ bash "upload image" do
     # /usr/bin/s3cmd -P put #{bundled_image_path} s3://rightscale-cloudstack-dev/#{bundled_image}
   EOH
 end
+
 
