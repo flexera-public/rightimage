@@ -127,7 +127,7 @@ bash "bundle_upload_ebs" do
 
 ## parse out image id
     image_id_ebs=`echo -n $image_out_ebs | awk '{ print $2 }'`
-    echo "$image_id_ebs" > /var/tmp/ebs_image_id
+    echo "$image_id_ebs" > /var/tmp/image_id
 
 ## detach volume
     ec2-detach-volume $vol_id \
