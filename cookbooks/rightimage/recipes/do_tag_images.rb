@@ -8,6 +8,13 @@ r = gem_package "rest_connection" do
   action :nothing
 end
 r.run_action(:install)
+
+r = gem_package "i18n" do
+  gem_binary "/opt/rightscale/sandbox/bin/gem"
+  action :nothing
+end
+r.run_action(:install)
+
 Gem.clear_paths
 
 
