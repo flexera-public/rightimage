@@ -66,5 +66,4 @@ bash "bundle_upload_s3_image" do
     EOH
 end 
 
-include_recipe "rightimage::do_tag_images"
 
