@@ -89,22 +89,17 @@ end if node[:rightimage][:platform] == "centos"
 if node[:rightimage][:platform] == "centos"
   if ["aki-a71cf9ce", "aki-873667c2", "aki-7e0d250a", "aki-15f58a47"].include?(node[:rightimage][:kernel_id])
 
-# drop if fixed xfs module
-remote_file "#{node[:rightimage][:mount_dir]}/lib/modules/2.6.21.7-2.fc8xen/kernel/fs/xfs/xfs.ko" do 
-  source "xfs.ko.#{node[:rightimage][:arch]}"
-  backup false
-end if node[:rightimage][:platform] == "centos" && node[:rightimage][:arch] == "i386"
+    # drop in fixed xfs module
+    remote_file "#{node[:rightimage][:mount_dir]}/lib/modules/2.6.21.7-2.fc8xen/kernel/fs/xfs/xfs.ko" do 
+      source "xfs.ko.#{node[:rightimage][:arch]}"
+      backup false
+    end if node[:rightimage][:platform] == "centos" && node[:rightimage][:arch] == "i386"
 
-# setup module install on reboot
-bash "wush #3718: ec2 xfs module hack for specific centos kernel" do
-  code <<-EOH
-cat > /etc/sysconfig/modules/xfs.modules <<-EOF
-#!/bin/sh
-  insmod /lib/modules/2.6.21.7-2.fc8xen/kernel/fs/xfs/xfs.ko 
-EOF
-  chmod 0770 /etc/sysconfig/modules/xfs.modules
-  EOH
-end
+    # setup module install on reboot
+    remote_file "#{node[:rightimage][:mount_dir]}/etc/sysconfig/modules/xfs.modules" do
+      source "xfs.modules.wush3718.sh"
+      mode "0770"
+    end
 
   end
 end
