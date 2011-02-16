@@ -396,7 +396,6 @@ case rightimage[:cloud]
 	      set[:rightimage][:kernel_id] = "aki-1df58a4f"
 	      set[:rightimage][:ramdisk_id] = "ari-35f58a67"
 	    end
-	  end
 	  when "ap-northeast"
 	    case rightimage[:arch]
 	    when "i386" 
