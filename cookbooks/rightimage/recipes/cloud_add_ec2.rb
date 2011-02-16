@@ -50,7 +50,7 @@ bash "install_ec2_tools" do
     cp -r #{node[:rightimage][:mount_dir]}/tmp/ec2-api-tools-*/* #{node[:rightimage][:mount_dir]}/home/ec2/.
     rsync -av #{node[:rightimage][:mount_dir]}/tmp/ec2-ami-tools-*/ #{node[:rightimage][:mount_dir]}/home/ec2
     rm -r #{node[:rightimage][:mount_dir]}/tmp/ec2-a*
-    echo 'export PATH=$PATH:/home/ec2/bin' >> #{node[:rightimage][:mount_dir]}/etc/profile.d/ec2.sh
+    echo 'export PATH=/home/ec2/bin:${PATH}' >> #{node[:rightimage][:mount_dir]}/etc/profile.d/ec2.sh
     echo 'export EC2_HOME=/home/ec2' >> #{node[:rightimage][:mount_dir]}/etc/profile.d/ec2.sh
   EOH
 end if node[:rightimage][:cloud] == "ec2"
