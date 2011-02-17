@@ -144,8 +144,13 @@ if node[:rightimage][:release] == "lucid"
   end
   bash "install custom lucid kernel" do
     code <<-EOH
-    chroot #{node[:rightimage][:mount_dir]} dpkg -i /tmp/linux-headers*.deb  
-    chroot #{node[:rightimage][:mount_dir]} dpkg -i /tmp/linux-image*.deb  
+cat <<-EOS > #{node[:rightimage][:mount_dir]}/tmp/install_custom_kernel.sh
+#!/bin/bash
+dpkg -i /tmp/linux-headers*.deb
+dpkg -i /tmp/linux-image*.deb
+EOS
+chmod +x #{node[:rightimage][:mount_dir]}/tmp/install_custom_kernel.sh
+chroot #{node[:rightimage][:mount_dir]} /tmp/install_custom_kernel.sh  
 EOH
   end
 end
