@@ -6,6 +6,8 @@ node[:rightimage][:host_packages].split.each { |p| package p}
 #create bootstrap command
 case node[:rightimage][:platform]
   when "ubuntu"
+    # install specialty kernel for testing
+    
     if node[:lsb][:codename] == "maverick" || node[:lsb][:codename] == "lucid"
       # install vmbuilder from deb files
       remote_file "/tmp/python-vm-builder.deb" do
@@ -118,6 +120,30 @@ end
 if node[:rightimage][:release] == "maverick"
   template "/mnt/image/boot/grub/menu.lst" do
     source "menu.lst.erb"
+  end
+end
+
+if node[:rightimage][:release] == "lucid"
+  if node[:rightimage][:arch] == "i386"
+    remote_file "/mnt/image/tmp/linux-headers-2.6.32-313-ec2_2.6.32-313.25+import1_i386.deb" do
+      source "linux-headers-2.6.32-313-ec2_2.6.32-313.25+import1_i386.deb"
+    end
+    remote_file "/mnt/image/tmp/linux-image-2.6.32-313-ec2_2.6.32-313.25+import1_i386.deb" do
+      source "linux-image-2.6.32-313-ec2_2.6.32-313.25+import1_i386.deb"
+    end
+  else
+    remote_file "/mnt/image/tmp/linux-headers-2.6.32-313-ec2_2.6.32-313.25+import1_amd64.deb" do
+      source "linux-headers-2.6.32-313-ec2_2.6.32-313.25+import1_amd64.deb"
+    end
+    remote_file "/mnt/image/tmp/linux-image-2.6.32-313-ec2_2.6.32-313.25+import1_amd64.deb" do
+      source "linux-image-2.6.32-313-ec2_2.6.32-313.25+import1_amd64.deb"
+    end
+  end
+  bash "install custom lucid kernel" do
+    code <<-EOH
+    chroot #{node[:rightimage][:mount_dir]} dpkg -i /tmp/linux-headers*.deb  
+    chroot #{node[:rightimage][:mount_dir]} dpkg -i /tmp/linux-image*.deb  
+EOH
   end
 end
 
