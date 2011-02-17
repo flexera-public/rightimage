@@ -125,18 +125,18 @@ end
 
 if node[:rightimage][:release] == "lucid"
   if node[:rightimage][:arch] == "i386"
-    remote_file "/mnt/image/tmp/linux-headers-2.6.32-313-ec2_2.6.32-313.25+import1_i386.deb" do
-      source "linux-headers-2.6.32-313-ec2_2.6.32-313.25+import1_i386.deb"
+    remote_file "/mnt/image/tmp/linux-headers-2.6.32-313-ec2_2.6.32-313.25_i386.deb" do
+      source "linux-headers-2.6.32-313-ec2_2.6.32-313.25_i386.deb"
     end
-    remote_file "/mnt/image/tmp/linux-image-2.6.32-313-ec2_2.6.32-313.25+import1_i386.deb" do
-      source "linux-image-2.6.32-313-ec2_2.6.32-313.25+import1_i386.deb"
+    remote_file "/mnt/image/tmp/linux-image-2.6.32-313-ec2_2.6.32-313.25_i386.deb" do
+      source "linux-image-2.6.32-313-ec2_2.6.32-313.25_i386.deb"
     end
   else
-    remote_file "/mnt/image/tmp/linux-headers-2.6.32-313-ec2_2.6.32-313.25+import1_amd64.deb" do
-      source "linux-headers-2.6.32-313-ec2_2.6.32-313.25+import1_amd64.deb"
+    remote_file "/mnt/image/tmp/linux-headers-2.6.32-313-ec2_2.6.32-313.25_amd64.deb" do
+      source "linux-headers-2.6.32-313-ec2_2.6.32-313.25_amd64.deb"
     end
-    remote_file "/mnt/image/tmp/linux-image-2.6.32-313-ec2_2.6.32-313.25+import1_amd64.deb" do
-      source "linux-image-2.6.32-313-ec2_2.6.32-313.25+import1_amd64.deb"
+    remote_file "/mnt/image/tmp/linux-image-2.6.32-313-ec2_2.6.32-313.25_amd64.deb" do
+      source "linux-image-2.6.32-313-ec2_2.6.32-313.25_amd64.deb"
     end
   end
   bash "install custom lucid kernel" do
