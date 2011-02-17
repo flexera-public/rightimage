@@ -285,37 +285,37 @@ case rightimage[:cloud]
 	  when "us-east"
 	    case rightimage[:arch]
 	    when "i386" 
-	      set[:rightimage][:kernel_id] = "aki-6603f70f"
+	      set[:rightimage][:kernel_id] = "aki-6cb44705"
 	      set[:rightimage][:ramdisk_id] = nil
 	    when "x86_64"
-	      set[:rightimage][:kernel_id] = "aki-6a0cf803"
+	      set[:rightimage][:kernel_id] = "aki-9ab546f3"
 	      set[:rightimage][:ramdisk_id] = nil
 	    end
 	  when "us-west"
 	    case rightimage[:arch]
 	    when "i386" 
-	      set[:rightimage][:kernel_id] = "aki-e40c5ca1"
+	      set[:rightimage][:kernel_id] = "aki-49aefe0c"
 	      set[:rightimage][:ramdisk_id] = nil
 	    when "x86_64"
-	      set[:rightimage][:kernel_id] = "aki-ea0c5caf"
+	      set[:rightimage][:kernel_id] = "aki-4faefe0a"
 	      set[:rightimage][:ramdisk_id] = nil
 	    end
 	  when "eu-west" 
 	    case rightimage[:arch]
 	    when "i386" 
-	      set[:rightimage][:kernel_id] = "aki-62340116"
+	      set[:rightimage][:kernel_id] = "aki-a7f2c6d3"
 	      set[:rightimage][:ramdisk_id] = nil
 	    when "x86_64"
-	      set[:rightimage][:kernel_id] = "aki-14340160"
+	      set[:rightimage][:kernel_id] = "aki-bdf2c6c9"
 	      set[:rightimage][:ramdisk_id] = nil
 	    end
 	  when "ap-southeast"
 	    case rightimage[:arch]
 	    when "i386" 
-	      set[:rightimage][:kernel_id] = "aki-70067822"
+	      set[:rightimage][:kernel_id] = "aki-8c89f7de"
 	      set[:rightimage][:ramdisk_id] = nil
 	    when "x86_64"
-	      set[:rightimage][:kernel_id] = "aki-6c06783e"
+	      set[:rightimage][:kernel_id] = "aki-8689f7d4"
 	      set[:rightimage][:ramdisk_id] = nil
 	    end
 	  end
