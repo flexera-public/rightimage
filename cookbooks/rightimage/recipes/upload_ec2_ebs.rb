@@ -53,7 +53,7 @@ bash "bundle_upload_ebs" do
     region=`echo  #{node[:ec2][:placement_availability_zone]} | cut -c -$length_minus_one`
 
 ## create EBS volume
-    vol_out=`ec2-create-volume \
+    vol_out=`/home/ec2/bin/ec2-create-volume \
       --private-key /tmp/AWS_X509_KEY.pem \
       --cert /tmp/AWS_X509_CERT.pem \
       --size 10 \
@@ -64,7 +64,7 @@ bash "bundle_upload_ebs" do
     vol_id=`echo -n $vol_out | awk '{ print $2 }'`
 
 ## attach an EBS volume here
-    ec2-attach-volume $vol_id \
+    /home/ec2/bin/ec2-attach-volume $vol_id \
       --private-key /tmp/AWS_X509_KEY.pem \
       --cert /tmp/AWS_X509_CERT.pem \
       --device /dev/sdj \
@@ -75,7 +75,7 @@ bash "bundle_upload_ebs" do
 
 ## loop and wait for volume to become available
     while [ 1 ]; do 
-      vol_status=`ec2-describe-volumes $vol_id  --private-key /tmp/AWS_X509_KEY.pem --cert /tmp/AWS_X509_CERT.pem --url #{node[:rightimage][:ec2_endpoint]}`
+      vol_status=`/home/ec2/bin/ec2-describe-volumes $vol_id  --private-key /tmp/AWS_X509_KEY.pem --cert /tmp/AWS_X509_CERT.pem --url #{node[:rightimage][:ec2_endpoint]}`
       if `echo $vol_status | grep -q "attached"` ; then break; fi
       sleep 1
     done 
@@ -93,7 +93,7 @@ bash "bundle_upload_ebs" do
     umount $ebs_mount
 
 ## snapshot the ebs volume and save the snapshot id
-    snap_out=`ec2-create-snapshot $vol_id \
+    snap_out=`/home/ec2/bin/ec2-create-snapshot $vol_id \
       --private-key /tmp/AWS_X509_KEY.pem \
       --cert /tmp/AWS_X509_CERT.pem \
       --url #{node[:rightimage][:ec2_endpoint]} \
@@ -106,12 +106,12 @@ bash "bundle_upload_ebs" do
 
 ## loop and wait for snapshot to become available
     while [ 1 ]; do 
-      snap_status=`ec2-describe-snapshots $snap_id --private-key /tmp/AWS_X509_KEY.pem --cert /tmp/AWS_X509_CERT.pem --url #{node[:rightimage][:ec2_endpoint]} `
+      snap_status=`/home/ec2/bin/ec2-describe-snapshots $snap_id --private-key /tmp/AWS_X509_KEY.pem --cert /tmp/AWS_X509_CERT.pem --url #{node[:rightimage][:ec2_endpoint]} `
       if `echo $snap_status | grep -q "completed"` ; then break; fi
       sleep 5
     done 
 
-    image_out_ebs=`ec2-register \
+    image_out_ebs=`/home/ec2/bin/ec2-register \
       --private-key /tmp/AWS_X509_KEY.pem \
       --cert /tmp/AWS_X509_CERT.pem \
       --region $region \
@@ -130,7 +130,7 @@ bash "bundle_upload_ebs" do
     echo "$image_id_ebs" > /var/tmp/image_id
 
 ## detach volume
-    ec2-detach-volume $vol_id \
+    /home/ec2/bin/ec2-detach-volume $vol_id \
       --private-key /tmp/AWS_X509_KEY.pem \
       --cert /tmp/AWS_X509_CERT.pem \
       --region $region \
@@ -140,7 +140,7 @@ bash "bundle_upload_ebs" do
     sleep 10
 
 ## delete volume
-    ec2-delete-volume $vol_id \
+    /home/ec2/bin/ec2-delete-volume $vol_id \
       --private-key /tmp/AWS_X509_KEY.pem \
       --cert /tmp/AWS_X509_CERT.pem \
       --url #{node[:rightimage][:ec2_endpoint]} \
