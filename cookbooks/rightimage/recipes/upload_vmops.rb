@@ -2,6 +2,12 @@ class Chef::Resource::RubyBlock
   include RightScale::RightImage::Helper
 end
 
+r = gem_package "nokogiri" do
+  version "1.4.3.1"
+  action :nothing
+end
+r.run_action(:install)
+
 bash "serve /mnt via http" do
   code <<-EOH
     set -x
@@ -16,6 +22,7 @@ end
 ruby_block "trigger download to test cloud" do
   block do
     require "uri"
+    require "nokogiri"
     
     #The public API URL allows access for developers and users to manage their virtual machines or to create their own user interfaces.  Accesses to this URL must be secured.
     #http://173.227.0.170:8080/client/api
@@ -45,8 +52,11 @@ ruby_block "trigger download to test cloud" do
     result = `curl -S -s -o - -f '#{api_url}#{cmd}'`
 
     if result =~ /created/ 
-      puts result.inspect
-      puts "Success"
+      Chef::Log.info("Successfully started download of image to test cloud.")
+      doc = Nokogiri::XML(result)
+      image_id = doc.xpath('//template/id').first.text
+      Chef::Log.info("Writing image id #{image_id} to file...")
+      File.open("/var/tmp/image_id", 'w') {|f| f.write(image_id) }
     else
       raise "ERROR: could not upload image to cloud at #{api_url} due to #{result.inspect}"
     end

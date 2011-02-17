@@ -16,6 +16,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+["libxml2-devel", "libxslt-devel"].each { |p| package p } # required by upload_vmops
 
 unless node[:rightimage][:manual_mode] == "true"
   include_recipe "rightimage::build_image"
