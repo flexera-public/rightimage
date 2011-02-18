@@ -155,6 +155,9 @@ case rightimage[:region]
   when "ap-southeast"
     set[:rightimage][:mirror] = "http://ec2-ap-southeast-mirror.rightscale.com"
     set[:rightimage][:ec2_endpoint] = "https://ec2.ap-southeast-1.amazonaws.com"
+  when "ap-northeast"
+    set[:rightimage][:mirror] = "http://ec2-ap-northeast-mirror.rightscale.com"
+    set[:rightimage][:ec2_endpoint] = "https://ec2.ap-northeast-1.amazonaws.com"
   else
     set[:rightimage][:mirror] = "http://mirror.rightscale.com"
     set[:rightimage][:ec2_endpoint] = "https://ec2.us-east-1.amazonaws.com"
