@@ -127,7 +127,7 @@ bash "bundle_upload_ebs" do
 
 ## parse out image id
     image_id_ebs=`echo -n $image_out_ebs | awk '{ print $2 }'`
-    echo "$image_id_ebs" > /var/tmp/image_id
+    echo "$image_id_ebs" > /var/tmp/image_id_ebs
 
 ## detach volume
     /home/ec2/bin/ec2-detach-volume $vol_id \
@@ -153,4 +153,16 @@ bash "bundle_upload_ebs" do
     EOH
 end 
 
+ruby_block "store image id" do
+  block do
+    image_id = nil
+    
+    # read id which was written in previous stanza
+    ::File.open("/var/tmp/image_id_ebs", "r") { |f| image_id = f.read() }
+    
+    # add to global id store for use by other recipes
+    id_list = RightImage::IdList.new(Chef::Log)
+    id_list.add(image_id, "EBS")
+  end
+end
 

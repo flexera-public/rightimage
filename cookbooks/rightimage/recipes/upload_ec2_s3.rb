@@ -57,7 +57,7 @@ bash "bundle_upload_s3_image" do
 
     ## parse out image id
     image_id_s3=`echo -n $image_out_s3 | awk '{ print $2 }'`
-    echo "$image_id_s3" > /var/tmp/image_id
+    echo "$image_id_s3" > /var/tmp/image_id_s3
 
     #remove keys
     rm -f /tmp/AWS_X509_KEY.pem
@@ -65,5 +65,18 @@ bash "bundle_upload_s3_image" do
 
     EOH
 end 
+
+ruby_block "store image id" do
+  block do
+    image_id = nil
+    
+    # read id which was written in previous stanza
+    ::File.open("/var/tmp/image_id_s3", "r") { |f| image_id = f.read() }
+    
+    # add to global id store for use by other recipes
+    id_list = RightImage::IdList.new(Chef::Log)
+    id_list.add(image_id)
+  end
+end
 
 

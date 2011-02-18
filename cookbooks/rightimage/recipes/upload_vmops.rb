@@ -53,10 +53,14 @@ ruby_block "trigger download to test cloud" do
 
     if result =~ /created/ 
       Chef::Log.info("Successfully started download of image to test cloud.")
+      
+      # Parse out image id from the registration call
       doc = Nokogiri::XML(result)
       image_id = doc.xpath('//template/id').first.text
-      Chef::Log.info("Writing image id #{image_id} to file...")
-      File.open("/var/tmp/image_id", 'w') {|f| f.write(image_id) }
+      
+      # add to global id store for use by other recipes
+      id_list = RightImage::IdList.new(Chef::Log)
+      id_list.add(image_id)
     else
       raise "ERROR: could not upload image to cloud at #{api_url} due to #{result.inspect}"
     end

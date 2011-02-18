@@ -21,30 +21,32 @@ Gem.clear_paths
 
 # Create MCI from image
 ruby_block "Create EC2 MCI" do
-    only_if { node[:rightimage][:cloud] == "ec2" }
     block do
 
-     ami_id = (::File.exists?("/var/tmp/image_id")) ? IO.read("/var/tmp/image_id") : nil
-
-     # Create the MCIs, if they don't exist.
      if node[:rightimage][:arch] == "i386"
         @instance_type = "m1.small"
      else
         @instance_type = "m1.large"
      end
 
-    if ami_id
-      config_rest_connection
-      Chef::Log.info("Create or add MCI for S3 image_name.")
-      if @mci = MultiCloudImage.find_by(:name) {|n| n =~ /#{image_name}/ }.first
-        Chef::Log.info("Found Existing MCI with same name, re-using.. #{@mci.href}")
-      else
-        @mci = MultiCloudImageInternal.create(:name => "#{image_name}", :description => "")
-      end
-      
-      resource_href = Tag.connection.settings[:api_url] + "/ec2_images/#{ami_id}?cloud_id=#{cloud_id}"
-      new_setting = MultiCloudImageCloudSettingInternal.create(:multi_cloud_image_href => @mci.href, :cloud_id => cloud_id.to_i, :ec2_image_href => resource_href, :aws_instance_type => @instance_type)
-    end
+     config_rest_connection
+     images = RightImage::IdList.new(Chef::Log).to_hash
+     raise "FATAL: no image ids found. aborting." if images.empty?
+     images.each do |id, params|
+       
+       # Create the MCIs, if they don't exist.
+       mci_name = image_name
+       mci_name << "_EBS" if params["storage_type"] == "EBS"
+       Chef::Log.info("Create or add to MCI for #{mci_name} on cloud id #{cloud_id}.")
+       if @mci = MultiCloudImage.find_by(:name) {|n| n =~ /#{mci_name}/ }.first
+         Chef::Log.info("Found Existing MCI with same name, re-using.. #{@mci.href}")
+       else
+         @mci = MultiCloudImageInternal.create(:name => "#{mci_name}", :description => "Development Build")
+       end
   
-  end
+       # Add cloud setting for this image    
+       resource_href = Tag.connection.settings[:api_url] + "/ec2_images/#{id}?cloud_id=#{cloud_id}"
+       new_setting = MultiCloudImageCloudSettingInternal.create(:multi_cloud_image_href => @mci.href, :cloud_id => cloud_id.to_i, :ec2_image_href => resource_href, :aws_instance_type => @instance_type)
+      end
+    end  
 end

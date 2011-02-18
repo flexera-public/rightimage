@@ -22,21 +22,13 @@ Gem.clear_paths
 # Tag EC2 images
 ruby_block "tag EC2 images" do
     block do
-
-      TIMEOUT_LIMIT = 90
-
-      image_id_file = "/var/tmp/image_id"
-      Chef::Log.info("Looking for image ids in #{image_id_file}...")
-      ami_list = (::File.exists?(image_id_file)) ? IO.read(image_id_file) : nil
-      tag_these = ami_list.split
-      raise "FATAL: no amis found in file. aborting." if tag_these.empty?
-
-      tag_these.each do |ami|
-        ami.chomp!
-        raise "FATAL: could not find ami, aborting." if ami.blank?
-        config_rest_connection
-        resource_href = Tag.connection.settings[:api_url] + "/ec2_images/#{ami}?cloud_id=#{cloud_id}"
-        Chef::Log.info("setting image TAG for #{resource_href}")
+      TIMEOUT_LIMIT = 90      
+      images = RightImage::IdList.new(Chef::Log).to_hash
+      raise "FATAL: no image ids found. aborting." if images.empty?
+      config_rest_connection
+      images.each do |id, params|
+        resource_href = Tag.connection.settings[:api_url] + "/ec2_images/#{id}?cloud_id=#{cloud_id}"
+        Chef::Log.info("Setting image TAG for #{resource_href}")
         timeout = 0
         while(timeout <= TIMEOUT_LIMIT)
           begin
@@ -49,10 +41,9 @@ ruby_block "tag EC2 images" do
             sleep 30
           end
         end
-        raise "FATAL: could not tag image after #{timeout} minutes. Aborting" if timeout >= TIMEOUT_LIMIT
-      end
-       
-  end
+        raise "FATAL: could not tag image id=#{id} after #{timeout} minutes. Aborting" if timeout >= TIMEOUT_LIMIT
+      end   
+    end
 end
 
 
