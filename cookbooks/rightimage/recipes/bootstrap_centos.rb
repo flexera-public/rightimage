@@ -184,12 +184,6 @@ echo "alias ipv6 off" >> #{node[:rightimage][:mount_dir]}/etc/modprobe.conf
 echo "alias net-pf-10 off" >> #{node[:rightimage][:mount_dir]}/etc/modprobe.conf 
 chroot #{node[:rightimage][:mount_dir]} /sbin/chkconfig ip6tables off
 
-# Make sure that /usr/local/bin is in the path.
-cat<<'EOH'>/etc/profile.d/local_path.sh
-PATH=/usr/local/bin:$PATH
-
-EOH
-
 EOF
 
 end
