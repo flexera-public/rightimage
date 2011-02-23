@@ -360,6 +360,15 @@ case rightimage[:cloud]
 	      set[:rightimage][:kernel_id] = "aki-11d5aa43"
 	      set[:rightimage][:ramdisk_id] = nil
 	    end
+	  when "ap-northeast"
+	    case rightimage[:arch]
+	    when "i386" 
+	      set[:rightimage][:kernel_id] = "aki-d209a2d3"
+	      set[:rightimage][:ramdisk_id] = nil
+	    when "x86_64"
+	      set[:rightimage][:kernel_id] = "aki-d409a2d5"
+	      set[:rightimage][:ramdisk_id] = nil
+	    end
 	  end
 	when "5.4", "5.2"
 	  case rightimage[:region]
