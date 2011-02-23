@@ -14,6 +14,7 @@ r.run_action(:install)
 # Install RestConnection (in compile phase)
 r = gem_package "rest_connection" do
   gem_binary "/opt/rightscale/sandbox/bin/gem"
+  version "0.0.15"
   action :nothing
 end
 r.run_action(:install)
