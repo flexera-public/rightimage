@@ -378,7 +378,6 @@ case rightimage[:cloud]
 	      set[:rightimage][:kernel_id] = "aki-d409a2d5"
 	      set[:rightimage][:ramdisk_id] = nil
 	    end
-	  end
 	when "5.4", "5.2"
 	  case rightimage[:region]
 	  when "us-east"
