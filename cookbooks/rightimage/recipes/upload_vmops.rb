@@ -3,6 +3,7 @@ class Chef::Resource::RubyBlock
 end
 
 r = gem_package "nokogiri" do
+  gem_binary "/opt/rightscale/sandbox/bin/gem"
   version "1.4.3.1"
   action :nothing
 end
@@ -21,6 +22,7 @@ end
 
 ruby_block "trigger download to test cloud" do
   block do
+    require "rubygems"
     require "uri"
     require "nokogiri"
     
