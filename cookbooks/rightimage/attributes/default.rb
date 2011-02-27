@@ -189,7 +189,8 @@ end
 #      "x86_64"  => { :kernel_id => "aki-b51cf9dc", :ramdisk_id => "ari-b31cf9da" },
 #    },
 
-## figure out kernel to use
+## figure out ec2 kernel to use
+if rightimage[:cloud] == "ec2"
 case rightimage[:release]
 when "hardy"
   case rightimage[:region]
@@ -413,4 +414,5 @@ when "5.4", "5.2"
       set[:rightimage][:ramdisk_id] = "ari-a009a2a1"
     end
   end
-end
+end 
+end # if rightimage[:cloud] == "ec2"
