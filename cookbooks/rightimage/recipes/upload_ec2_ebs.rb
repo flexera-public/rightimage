@@ -56,7 +56,7 @@ bash "bundle_upload_ebs" do
     vol_out=`/home/ec2/bin/ec2-create-volume \
       --private-key /tmp/AWS_X509_KEY.pem \
       --cert /tmp/AWS_X509_CERT.pem \
-      --size 10 \
+      --size 8 \
       --url #{node[:rightimage][:ec2_endpoint]} \
       --availability-zone #{node[:ec2][:placement_availability_zone]} `
 
