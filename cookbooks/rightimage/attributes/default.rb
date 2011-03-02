@@ -284,10 +284,12 @@ when "lucid"
   when "us-west"
     case rightimage[:arch]
     when "i386" 
-      set[:rightimage][:kernel_id] = "aki-99a0f1dc"
+      #set[:rightimage][:kernel_id] = "aki-99a0f1dc"
+      set[:rightimage][:kernel_id] = "aki-a13667e4"
       set[:rightimage][:ramdisk_id] = nil
     when "x86_64"
-      set[:rightimage][:kernel_id] = "aki-9ba0f1de"
+      #set[:rightimage][:kernel_id] = "aki-9ba0f1de"
+      set[:rightimage][:kernel_id] = "aki-ad3667e8"
       set[:rightimage][:ramdisk_id] = nil
     end
   when "eu-west" 

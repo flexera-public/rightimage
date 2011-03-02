@@ -85,6 +85,25 @@ set -x
   EOH
 end if node[:rightimage][:platform] == "centos"
 
+# - insert kernel mods (for ubuntu -- test)
+bash "insert_kernel_mods" do
+  code <<-EOH
+#!/bin/bash -ex
+set -e
+set -x
+    echo "installing kernel modules..."
+    if [ "#{node[:rightimage][:arch]}" == "i386" ]; then
+      curl -s http://ec2-downloads.s3.amazonaws.com/ec2-modules-2.6.21.7-2.ec2.v1.2.fc8xen-i686.tgz | tar -xzC #{node[:rightimage][:mount_dir]}/
+    elif [ "#{node[:rightimage][:arch]}" == "x86_64" ]; then
+      curl -s http://ec2-downloads.s3.amazonaws.com/ec2-modules-2.6.21.7-2.ec2.v1.2.fc8xen-x86_64.tgz | tar -xzC #{node[:rightimage][:mount_dir]}/
+    else
+      echo >&2 "architecture is not set properly: #{node[:rightimage][:arch]}"
+      echo >&2 "exiting..."
+      exit 2
+    fi
+  EOH
+end if node[:rightimage][:platform] == "ubuntu"
+
 ### wush #3718: ec2 xfs module hack for specific centos kernel 
 if node[:rightimage][:platform] == "centos"
   if ["aki-a71cf9ce", "aki-873667c2", "aki-7e0d250a", "aki-15f58a47", "aki-a209a2a3"].include?(node[:rightimage][:kernel_id])
