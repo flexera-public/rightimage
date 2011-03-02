@@ -38,18 +38,18 @@ chroot $ROOT /tmp/rubygems_install.sh
 EOC
 end
 
-remote_file "/tmp/s3sync.tgz" do 
-   source "s3sync.tgz" 
-   backup false
-end
-
-bash "install_s3_sync" do 
-  code <<-EOC
-    tar -xzf /tmp/s3sync.tgz -C #{node[:rightimage][:mount_dir]}/home
-    chroot #{node[:rightimage][:mount_dir]} cp -pf /home/s3sync/s3sync.rb /usr/local/bin/s3sync
-    chroot #{node[:rightimage][:mount_dir]} cp -pf /home/s3sync/s3cmd.rb /usr/local/bin/s3cmd
-  EOC
-end
+# remote_file "/tmp/s3sync.tgz" do 
+#    source "s3sync.tgz" 
+#    backup false
+# end
+# 
+# bash "install_s3_sync" do 
+#   code <<-EOC
+#     tar -xzf /tmp/s3sync.tgz -C #{node[:rightimage][:mount_dir]}/home
+#     chroot #{node[:rightimage][:mount_dir]} cp -pf /home/s3sync/s3sync.rb /usr/local/bin/s3sync
+#     chroot #{node[:rightimage][:mount_dir]} cp -pf /home/s3sync/s3cmd.rb /usr/local/bin/s3cmd
+#   EOC
+# end
 
 # Install rightscale package based on revision number
 if node[:rightimage][:rightlink_version] =~ /4\.[0-9]*\.[0-9]*/
