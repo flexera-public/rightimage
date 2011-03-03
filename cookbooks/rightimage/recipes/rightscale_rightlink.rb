@@ -68,6 +68,7 @@ bash "install_rightlink" do
       chroot #{node[:rightimage][:mount_dir]} chkconfig --add rightimage
     fi
 
+    # remove sandbox repo
     rm -rf #{node[:rightimage][:mount_dir]}/tmp/sandbox_builds
   EOC
 end
