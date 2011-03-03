@@ -123,6 +123,38 @@ if node[:rightimage][:release] == "maverick" || node[:rightimage][:release] == "
   end
 end
 
+if node[:rightimage][:release] == "lucid"
+  remote_file "/mnt/image/tmp/linux-headers-2.6.31-307_2.6.31-307.27_all.deb" do
+    source "linux-headers-2.6.31-307_2.6.31-307.27_all.deb"
+  end
+  if node[:rightimage][:arch] == "i386"
+    remote_file "/mnt/image/tmp/linux-headers-2.6.31-307-ec2_2.6.31-307.27_i386.deb" do
+      source "linux-headers-2.6.31-307-ec2_2.6.31-307.27_i386.deb"
+    end
+    remote_file "/mnt/image/tmp/linux-image-2.6.31-307-ec2_2.6.31-307.27_i386.deb" do
+      source "linux-image-2.6.31-307-ec2_2.6.31-307.27_i386.deb"
+    end
+  else
+    remote_file "/mnt/image/tmp/linux-headers-2.6.31-307-ec2_2.6.31-307.27_amd64.deb" do
+      source "linux-headers-2.6.31-307-ec2_2.6.31-307.27_amd64.deb"
+    end
+    remote_file "/mnt/image/tmp/linux-image-2.6.31-307-ec2_2.6.31-307.27_amd64.deb" do
+      source "linux-image-2.6.31-307-ec2_2.6.31-307.27_amd64.deb"
+    end
+  end
+  bash "install custom lucid kernel" do
+    code <<-EOH
+cat <<-EOS > #{node[:rightimage][:mount_dir]}/tmp/install_custom_kernel.sh
+#!/bin/bash
+dpkg -i /tmp/linux-headers*.deb
+dpkg -i /tmp/linux-image*.deb
+EOS
+chmod +x #{node[:rightimage][:mount_dir]}/tmp/install_custom_kernel.sh
+chroot #{node[:rightimage][:mount_dir]} /tmp/install_custom_kernel.sh  
+EOH
+  end
+end
+
 if node[:rightimage][:release] == "lucid" || node[:rightimage][:release] == "maverick"
 
   # Fix apt config so it does not install all recommended packages
