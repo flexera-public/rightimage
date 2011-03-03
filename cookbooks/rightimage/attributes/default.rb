@@ -231,7 +231,7 @@ when "hardy"
       set[:rightimage][:ramdisk_id] = "ari-35f58a67"
     end
   end
-when "karmic"
+when "karmic","lucid"
   case rightimage[:region]
   when "us-east"
     case rightimage[:arch]
@@ -270,7 +270,7 @@ when "karmic"
       set[:rightimage][:ramdisk_id] = "ari-81f38cd3"
     end
   end
-when "lucid"
+when "lucid-DISABLED-DUE-TO-KERNEL-PANICS-LOL"
   case rightimage[:region]
   when "us-east"
     case rightimage[:arch]
