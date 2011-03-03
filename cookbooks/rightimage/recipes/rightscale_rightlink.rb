@@ -44,7 +44,9 @@ export AWS_CALLING_FORMAT=SUBDOMAIN
 
 CHROOT_SCRIPT
     chmod +x #{node[:rightimage][:mount_dir]}/tmp/build_rightlink.sh
-    chroot #{node[:rightimage][:mount_dir]} /tmp/build_rightlink.sh > /tmp/out
+    chroot #{node[:rightimage][:mount_dir]} /tmp/build_rightlink.sh
+    rm -rf #{node[:rightimage][:mount_dir]}/tmp/build_rightlink.sh
+    rm -rf #{node[:rightimage][:mount_dir]}/tmp/sandbox_builds
   EOC
 
 end
