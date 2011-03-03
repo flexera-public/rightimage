@@ -5,7 +5,12 @@ class Chef::Resource::RubyBlock
   include RightScale::RightImage::Helper
 end
 
-#  - bundle and upload
+# Clean up guest image
+rightimage node[:rightimage][:mount_dir] do
+  action :sanitize
+end
+
+# bundle and upload
 bash "bundle_upload_s3_image" do 
     only_if { node[:rightimage][:cloud] == "ec2" }
     code <<-EOH

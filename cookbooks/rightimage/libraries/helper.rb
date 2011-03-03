@@ -1,6 +1,9 @@
 module RightScale
   module RightImage
     module Helper
+  
+      # NOTE: this code is basically duplicated code with the right_image_builder project
+      # albeit out of date duplicated code.  We should share code someday!
       
       # Construct image name.
       def image_name

@@ -100,13 +100,17 @@ bash "configure for cloudstack" do
   EOH
 end
 
-
 bash "backup raw image" do 
   cwd File.dirname destination_image
   code <<-EOH
     raw_image=$(basename #{destination_image})
     cp -v $raw_image $raw_image.bak 
   EOH
+end
+
+# Clean up guest image
+rightimage node[:rightimage][:mount_dir] do
+  action :sanitize
 end
 
 bash "xen convert and upload" do 

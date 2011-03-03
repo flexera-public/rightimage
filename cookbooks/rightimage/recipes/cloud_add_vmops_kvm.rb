@@ -195,6 +195,11 @@ bash "backup raw image" do
   EOH
 end
 
+# Clean up guest image
+rightimage node[:rightimage][:mount_dir] do
+  action :sanitize
+end
+
 bash "upload image" do 
   cwd File.dirname target_raw_path
   code <<-EOH
