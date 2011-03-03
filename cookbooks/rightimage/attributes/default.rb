@@ -231,7 +231,7 @@ when "hardy"
       set[:rightimage][:ramdisk_id] = "ari-35f58a67"
     end
   end
-when "karmic","lucid"
+when "karmic"
   case rightimage[:region]
   when "us-east"
     case rightimage[:arch]
@@ -270,16 +270,16 @@ when "karmic","lucid"
       set[:rightimage][:ramdisk_id] = "ari-81f38cd3"
     end
   end
-when "lucid-DISABLED-DUE-TO-KERNEL-PANICS-LOL"
+when "lucid"
   case rightimage[:region]
   when "us-east"
     case rightimage[:arch]
     when "i386" 
       set[:rightimage][:kernel_id] = "aki-c43cd6ad"
-      set[:rightimage][:ramdisk_id] = nil
+      set[:rightimage][:ramdisk_id] = "ari-d23cd6bb"
     when "x86_64"
       set[:rightimage][:kernel_id] = "aki-1c3dd775"
-      set[:rightimage][:ramdisk_id] = nil
+      set[:rightimage][:ramdisk_id] = "ari-143dd77d" 
     end
   when "us-west"
     case rightimage[:arch]
