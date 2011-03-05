@@ -269,6 +269,15 @@ when "karmic", "lucid"
       set[:rightimage][:kernel_id] = "aki-83f38cd1"
       set[:rightimage][:ramdisk_id] = "ari-81f38cd3"
     end
+  when "ap-northeast"
+    case rightimage[:arch]
+    when "i386" 
+      set[:rightimage][:kernel_id] = "aki-540fa455"
+      set[:rightimage][:ramdisk_id] = "ari-560fa457"
+    when "x86_64"
+      set[:rightimage][:kernel_id] = "aki-620fa463"
+      set[:rightimage][:ramdisk_id] = "ari-640fa465"
+    end
   end
 when "lucid-DISABLED-DUE-TO-KERNEL-BUGS-LOL"
   case rightimage[:region]
