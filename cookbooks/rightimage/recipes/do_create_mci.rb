@@ -38,7 +38,7 @@ ruby_block "Create EC2 MCI" do
        mci_name = image_name
        mci_name << "_EBS" if params["storage_type"] == "EBS"
        Chef::Log.info("Create or add to MCI for #{mci_name} on cloud id #{cloud_id}.")
-       if @mci = MultiCloudImage.find_by(:name) {|n| n =~ /#{mci_name}/ }.first
+       if @mci = MultiCloudImage.find_by(:name) {|n| n == mci_name }.first
          Chef::Log.info("Found Existing MCI with same name, re-using.. #{@mci.href}")
        else
          @mci = MultiCloudImageInternal.create(:name => "#{mci_name}", :description => "Development Build")
