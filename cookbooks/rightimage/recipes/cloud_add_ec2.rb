@@ -52,12 +52,11 @@ bash "install_ec2_tools" do
     rm -r #{node[:rightimage][:mount_dir]}/tmp/ec2-a*
     echo 'export PATH=/home/ec2/bin:${PATH}' >> #{node[:rightimage][:mount_dir]}/etc/profile.d/ec2.sh
     echo 'export EC2_HOME=/home/ec2' >> #{node[:rightimage][:mount_dir]}/etc/profile.d/ec2.sh
+    chroot #{node[:rightimage][:mount_dir]} gem install s3sync --no-ri --no-rdoc
   EOH
 end if node[:rightimage][:cloud] == "ec2"
 
 package "euca2ools" if node[:rightimage][:cloud] == "eucalyptus" && node[:rightimage][:platform] == "ubuntu" 
-
-
 
 #  - insert kernel mods (for centos)
 bash "insert_kernel_mods" do 
