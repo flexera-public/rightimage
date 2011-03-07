@@ -42,6 +42,8 @@ ruby_block "Create EC2 MCI" do
          Chef::Log.info("Found Existing MCI with same name, re-using.. #{@mci.href}")
        else
          @mci = MultiCloudImageInternal.create(:name => "#{mci_name}", :description => "Development Build")
+         mci_util = RightImage::MCI.new(Chef::Log)
+         mci_util.add_rightlink_tag(@mci)
        end
   
        # Add cloud setting for this image    
