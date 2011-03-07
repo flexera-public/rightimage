@@ -20,7 +20,7 @@ module RightImage
       list_load
       key = id.to_s
       key.chomp!
-      @log.info("Adding #{key} to #{(@list)?"existing":"empty"} id list.")
+      @log.info("Adding #{key} to #{(@list) ? 'existing' : 'empty'} id list.")
       entry = { key => { } }
       entry[key]["storage_type"] = storage_type if storage_type
       @list.merge!(entry)
