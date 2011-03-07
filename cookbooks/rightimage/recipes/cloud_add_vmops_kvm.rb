@@ -145,8 +145,8 @@ bash "configure for cloudstack" do
     yum -c /tmp/yum.conf --installroot=$target_mnt -y clean all
 
     # enable console access
-    echo "2:2345:respawn:/sbin/mingetty xvc0" >> $target_mnt/etc/inittab
-    echo "xvc0" >> $target_mnt/etc/securetty
+    #echo "2:2345:respawn:/sbin/mingetty tty2" >> $target_mnt/etc/inittab
+    #echo "tty2" >> $target_mnt/etc/securetty
 
     # configure dns timeout 
     echo 'timeout 300;' > $target_mnt/etc/dhclient.conf
