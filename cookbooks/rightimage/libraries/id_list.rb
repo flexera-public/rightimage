@@ -45,8 +45,10 @@ module RightImage
     # Wipes out the list by deleting the file.
     #
     def clear
-      @log.info("Deleted id list file.")
-      ::File.delete(@file)
+      if ::File.exists?(@file) 
+        @log.info("Deleted id list file.")
+        ::File.delete(@file)
+      end
     end
     
     private
