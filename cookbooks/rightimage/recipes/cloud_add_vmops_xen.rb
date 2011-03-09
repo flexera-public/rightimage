@@ -2,8 +2,7 @@ class Chef::Resource::Bash
   include RightScale::RightImage::Helper
 end
 
-raise "ERROR: you must set your virtual_environment to kvm!"  if node[:rightimage][:virtual_environment] != "xen"
-include_recipe "rightimage::install_vhd-util" if node[:rightimage][:virtual_environment] == "xen"  
+raise "ERROR: you must set your virtual_environment to xen!"  if node[:rightimage][:virtual_environment] != "xen"
 
 source_image = "#{node.rightimage.mount_dir}" 
 destination_image = "/mnt/vmops_image"
@@ -112,6 +111,8 @@ end
 rightimage node[:rightimage][:mount_dir] do
   action :sanitize
 end
+
+include_recipe "rightimage::install_vhd-util" if node[:rightimage][:virtual_environment] == "xen"  
 
 bash "xen convert and upload" do 
   cwd File.dirname destination_image
