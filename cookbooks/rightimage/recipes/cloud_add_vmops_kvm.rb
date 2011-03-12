@@ -106,7 +106,7 @@ bash "setup grub" do
     chroot $target_mnt cp -p /usr/share/grub/x86_64-redhat/* /boot/grub
     chroot $target_mnt ln -s /boot/grub/grub.conf /boot/grub/menu.lst
     
-    echo "(hd0) #{node[:rightimage][:root_mount][:dev]}" > $target_mnt/boot/grub/device.map
+    echo "(hd0) #{node[:rightimage][:grub][:root_device]}" > $target_mnt/boot/grub/device.map
     echo "" >> $target_mnt/boot/grub/device.map
 
     cat > device.map <<EOF
