@@ -9,17 +9,6 @@ r = gem_package "nokogiri" do
 end
 r.run_action(:install)
 
-bash "serve /mnt via http" do
-  code <<-EOH
-    set -x
-    yum -y install httpd
-    rm /etc/httpd/conf.d/welcome*
-    rm -rf /var/www/html
-    ln -s /mnt /var/www/html
-    service httpd start
-  EOH
-end
-
 ruby_block "trigger download to test cloud" do
   block do
     require "rubygems"
