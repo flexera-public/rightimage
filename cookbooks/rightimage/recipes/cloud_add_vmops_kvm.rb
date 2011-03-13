@@ -43,21 +43,7 @@ bash "create cloudstack-kvm loopback fs" do
     loopmap=#{loop_map}
     losetup $loopdev $target_raw_path
     
-#    parted --script $target_raw_path mklabel gpt
-#    parted --script $target_raw_path mkpart ext2 0 100%
- 
-#      cat > sfdisk.in <<EOF
-# # partition table for image file
-# unit: sectors
-# 
-# KVMDEV15.raw1 : start=       63, size= 20964762, Id=83
-# KVMDEV15.raw2 : start=        0, size=        0, Id= 0
-# KVMDEV15.raw3 : start=        0, size=        0, Id= 0
-# KVMDEV15.raw4 : start=        0, size=        0, Id= 0
-# EOF
-#     sfdisk $loopdev < sfdisk.in
-
-sfdisk $loopdev << EOF
+    sfdisk $loopdev << EOF
 0,1304,L
 EOF
     
