@@ -167,8 +167,8 @@ bash "unmount target filesystem" do
     loopmap=#{loop_map}
     
     umount -lf $loopmap
-    kpartx -d $loopmap
-#FIXME    losetup -d $loopdev
+    kpartx -d $loopdev
+    losetup -d $loopdev
   EOH
 end
 
