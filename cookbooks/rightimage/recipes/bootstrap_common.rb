@@ -27,7 +27,7 @@ if node[:rightimage][:debug] == "true"
   raise "ERROR: you must add 'Dev' in image name #{image_name} to enable debug mode" if (image_name !~ /Dev/) 
   
   template "#{node[:rightimage][:mount_dir]}/etc/ssh/sshd_config" do
-    only_if { node[:rightimage][:debug] == "true"  && (image_name !~ /Dev/)  }
+    only_if { node[:rightimage][:debug] == "true"  && (image_name == /Dev/)  }
     source "sshd_config.erb"
     variables({
       :permit_root_login => "yes",
@@ -36,7 +36,7 @@ if node[:rightimage][:debug] == "true"
   end
 
   bash "setup root password" do 
-    only_if { node[:rightimage][:debug] == "true"  && (image_name !~ /Dev/)  }
+    only_if { node[:rightimage][:debug] == "true"  && (image_name == /Dev/)  }
     code <<-EOH
       set -e
       set -x
