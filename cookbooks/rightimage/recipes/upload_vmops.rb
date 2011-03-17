@@ -45,7 +45,7 @@ ruby_block "upload and index s3" do
     os = node[:rightimage][:platform]
     ver = node[:rightimage][:release]
     suffix = (hypervisor == "xen") ? "vhd.bz2" : "qcow2" 
-    key = "#{hypervisor}/#{os}/#{ver}/#{image_name}"
+    key = "#{hypervisor}/#{os}/#{ver}/#{image_name}.{suffix}"
     file = "/mnt/#{image_name}.#{suffix}"  
     cmd = "s3cmd put --progress #{bucket}:#{key} #{file} x-amz-acl:public-read"
     
@@ -55,8 +55,8 @@ ruby_block "upload and index s3" do
 #    Chef::Mixin::Command.run_command(:command => cmd, :environment => env)
     s3 = RightAws::S3.new(s3_id, s3_secret)
     b = s3.bucket(bucket)
-    raise "ERROR: Bucket not found: #{bucket} -- please verify your image_upload_bucket and creds"
-    b.put(key, File.open(file), {}, 'public-read')
+    raise "ERROR: Bucket not found: #{bucket} -- please verify your image_upload_bucket and creds" unless b
+#    b.put(key, File.open(file), {}, 'public-read')
 
     # Update index.html for s3 bucket
     indexer = RightImage::S3HtmlIndexer.new(bucket, s3_id, s3_secret)
