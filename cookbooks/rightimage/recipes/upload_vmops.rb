@@ -23,9 +23,10 @@ ruby_block "upload and index s3" do
     file = "/mnt/#{image_name}*" #FIXME: the extension differs for hypervisors. 
     cmd = "s3cmd put --progress #{bucket}:#{key} #{file} x-amz-acl:public-read"
     
-    Chef.Log.info("Uploading to S3...")
-    Chef.Log.info("CMD: #{cmd}")
-    Kernel.system(env, cmd)
+    Chef::Log.info("Uploading to S3...")
+    Chef::Log.info("CMD: #{cmd}")
+    Chef::Log.info("ENV: #{env.inspect}")
+    Chef::Mixin::Command.run_command(:command => cmd, :environment => env)
 
     # Update index.html for s3 bucket
     indexer = RightImage::S3HtmlIndexer.new(bucket, s3_id, s3_secret)
