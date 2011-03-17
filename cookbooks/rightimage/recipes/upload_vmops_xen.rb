@@ -8,6 +8,7 @@ r = gem_package "nokogiri" do
   action :nothing
 end
 r.run_action(:install)
+Gem.clear_paths
 
 ruby_block "trigger download to test cloud" do
   block do
