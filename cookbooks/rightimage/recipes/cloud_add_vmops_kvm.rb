@@ -10,7 +10,7 @@ target_raw = "target.raw"
 target_raw_path = "/mnt/#{target_raw}"
 target_mnt = "/mnt/target"
 
-bundled_image = "cloustack-kvm.qcow2"
+bundled_image = "#{image_name}.qcow2"
 bundled_image_path = "/mnt/#{bundled_image}"
 
 loop_name="loop0"

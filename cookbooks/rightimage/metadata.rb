@@ -58,8 +58,7 @@ attribute "rightimage/platform",
 attribute "rightimage/release",
   :display_name => "release",
   :description => "the release of the image to build",
-  :required => true,
-  :recipes => [ "rightimage::cloud_add_euca" ,"rightimage::cloud_add_ec2", "rightimage::upload_ec2_s3", "rightimage::upload_ec2_ebs", "rightimage::do_tag_images" , "rightimage::do_create_mci" , "rightimage::base_centos" , "rightimage::base_ubuntu" , "rightimage::base_sles" , "rightimage::default", "rightimage::build_image" , "rightimage::cloud_add_vmops" ]
+  :required => true
   
 attribute "rightimage/arch",
   :display_name => "arch",
@@ -90,7 +89,7 @@ attribute "rightimage/image_upload_bucket",
   :display_name => "image_upload_bucket",
   :description => "the bucket to upload the image to",
   :required => "required",
-  :recipes => [ "rightimage::cloud_add_euca" ,"rightimage::cloud_add_ec2", "rightimage::upload_ec2_s3", "rightimage::upload_ec2_ebs", "rightimage::do_tag_images" , "rightimage::do_create_mci" , "rightimage::base_centos" , "rightimage::base_ubuntu" , "rightimage::base_sles" , "rightimage::default", "rightimage::build_image" , "rightimage::cloud_add_vmops" ]
+  :recipes => [ "rightimage::cloud_add_euca" ,"rightimage::cloud_add_ec2", "rightimage::upload_ec2_s3", "rightimage::upload_ec2_ebs", "rightimage::do_tag_images" , "rightimage::do_create_mci" , "rightimage::base_centos" , "rightimage::base_ubuntu" , "rightimage::base_sles" , "rightimage::default", "rightimage::build_image" , "rightimage::upload_vmops" ]
   
 attribute "rightimage/image_prefix",
   :display_name => "image_prefix",
@@ -108,7 +107,7 @@ attribute "rightimage/image_name_override",
   :display_name => "Image Name Override",
   :description => "The image name is created automaticaaly.  Set this value if you want to override the default image name.",
   :required => "optional",
-  :recipes => [ "rightimage::cloud_add_euca" ,"rightimage::cloud_add_ec2", "rightimage::upload_ec2_s3", "rightimage::upload_ec2_ebs", "rightimage::do_tag_images", "rightimage::default", "rightimage::build_image" , "rightimage::cloud_add_vmops" ]
+  :recipes => [ "rightimage::cloud_add_euca" ,"rightimage::cloud_add_ec2", "rightimage::upload_ec2_s3", "rightimage::upload_ec2_ebs", "rightimage::do_tag_images", "rightimage::default", "rightimage::build_image" , "rightimage::cloud_add_vmops", "rightimage::upload_vmops" ]
   
 attribute "rightimage/aws_account_number",
   :display_name => "aws_account_number",
@@ -120,37 +119,37 @@ attribute "rightimage/aws_access_key_id",
   :display_name => "aws_access_key_id",
   :description => "aws_access_key_id",
   :required => "required",
-  :recipes => [ "rightimage::cloud_add_euca" ,"rightimage::cloud_add_ec2", "rightimage::upload_ec2_s3", "rightimage::upload_ec2_ebs", "rightimage::do_tag_images" , "rightimage::do_create_mci" , "rightimage::base_centos" , "rightimage::base_ubuntu" , "rightimage::base_sles" , "rightimage::default", "rightimage::build_image" , "rightimage::cloud_add_vmops" , "rightimage::cloud_add_vmops" ]
+  :recipes => [ "rightimage::cloud_add_euca" ,"rightimage::cloud_add_ec2", "rightimage::upload_ec2_s3", "rightimage::upload_ec2_ebs", "rightimage::do_tag_images" , "rightimage::do_create_mci" , "rightimage::base_centos" , "rightimage::base_ubuntu" , "rightimage::base_sles" , "rightimage::default", "rightimage::build_image" , "rightimage::cloud_add_vmops" ]
   
 attribute "rightimage/aws_secret_access_key",
   :display_name => "aws_secret_access_key",
   :description => "aws_secret_access_key",
   :required => "required",
-  :recipes => [ "rightimage::cloud_add_euca" ,"rightimage::cloud_add_ec2", "rightimage::upload_ec2_s3", "rightimage::upload_ec2_ebs", "rightimage::do_tag_images" , "rightimage::do_create_mci" , "rightimage::base_centos" , "rightimage::base_sles" , "rightimage::base_ubuntu" , "rightimage::default", "rightimage::build_image" , "rightimage::cloud_add_vmops" , "rightimage::cloud_add_vmops" ]
+  :recipes => [ "rightimage::cloud_add_euca" ,"rightimage::cloud_add_ec2", "rightimage::upload_ec2_s3", "rightimage::upload_ec2_ebs", "rightimage::do_tag_images" , "rightimage::do_create_mci" , "rightimage::base_centos" , "rightimage::base_sles" , "rightimage::base_ubuntu" , "rightimage::default", "rightimage::build_image" , "rightimage::cloud_add_vmops"  ]
   
 attribute "rightimage/aws_509_key",
   :display_name => "aws_509_key",
   :description => "aws_509_key",
   :required => "required",
-  :recipes => [ "rightimage::cloud_add_euca" ,"rightimage::cloud_add_ec2", "rightimage::upload_ec2_s3", "rightimage::upload_ec2_ebs", "rightimage::do_tag_images" , "rightimage::do_create_mci" , "rightimage::base_centos" , "rightimage::base_sles" , "rightimage::base_ubuntu" , "rightimage::default", "rightimage::build_image" , "rightimage::cloud_add_vmops" ]
+  :recipes => [ "rightimage::cloud_add_euca" ,"rightimage::cloud_add_ec2", "rightimage::upload_ec2_s3", "rightimage::upload_ec2_ebs", "rightimage::do_tag_images" , "rightimage::do_create_mci" , "rightimage::base_centos" , "rightimage::base_sles" , "rightimage::base_ubuntu" , "rightimage::default", "rightimage::build_image" ]
   
 attribute "rightimage/aws_509_cert",
   :display_name => "aws_509_cert",
   :description => "aws_509_cert",
   :required => "required",
-  :recipes => [ "rightimage::cloud_add_euca" ,"rightimage::cloud_add_ec2", "rightimage::upload_ec2_s3", "rightimage::upload_ec2_ebs", "rightimage::do_tag_images" , "rightimage::do_create_mci" , "rightimage::base_centos" , "rightimage::base_sles" , "rightimage::base_ubuntu" , "rightimage::default", "rightimage::build_image" , "rightimage::cloud_add_vmops" ]
+  :recipes => [ "rightimage::cloud_add_euca" ,"rightimage::cloud_add_ec2", "rightimage::upload_ec2_s3", "rightimage::upload_ec2_ebs", "rightimage::do_tag_images" , "rightimage::do_create_mci" , "rightimage::base_centos" , "rightimage::base_sles" , "rightimage::base_ubuntu" , "rightimage::default", "rightimage::build_image" ]
  
 attribute "rightimage/aws_access_key_id_for_upload",
   :display_name => "aws_access_key_id_for_upload",
   :description => "aws_access_key_id for the uplaod bucket",
   :required => "required",
-  :recipes => [ "rightimage::cloud_add_euca" ,"rightimage::cloud_add_ec2", "rightimage::upload_ec2_s3", "rightimage::upload_ec2_ebs", "rightimage::do_tag_images" , "rightimage::do_create_mci" , "rightimage::base_centos" , "rightimage::base_sles" , "rightimage::base_ubuntu" , "rightimage::default", "rightimage::build_image" , "rightimage::cloud_add_vmops" ]
+  :recipes => [ "rightimage::cloud_add_euca" ,"rightimage::cloud_add_ec2", "rightimage::upload_ec2_s3", "rightimage::upload_ec2_ebs", "rightimage::do_tag_images" , "rightimage::do_create_mci" , "rightimage::base_centos" , "rightimage::base_sles" , "rightimage::base_ubuntu" , "rightimage::default", "rightimage::build_image" , "rightimage::upload_vmops" ]
   
 attribute "rightimage/aws_secret_access_key_for_upload",
   :display_name => "aws_secret_access_key_for_upload",
   :description => "aws_secret_access_key_for_upload",
   :required => "required",
-  :recipes => [ "rightimage::cloud_add_euca" ,"rightimage::cloud_add_ec2", "rightimage::upload_ec2_s3", "rightimage::upload_ec2_ebs", "rightimage::do_tag_images" , "rightimage::do_create_mci" , "rightimage::base_centos" , "rightimage::base_sles" , "rightimage::base_ubuntu" , "rightimage::default", "rightimage::build_image" , "rightimage::cloud_add_vmops" ]
+  :recipes => [ "rightimage::cloud_add_euca" ,"rightimage::cloud_add_ec2", "rightimage::upload_ec2_s3", "rightimage::upload_ec2_ebs", "rightimage::do_tag_images" , "rightimage::do_create_mci" , "rightimage::base_centos" , "rightimage::base_sles" , "rightimage::base_ubuntu" , "rightimage::default", "rightimage::build_image" , "rightimage::upload_vmops" ]
 
 attribute "rightimage/debug",
   :display_name => "debug",
@@ -168,8 +167,7 @@ attribute "rightimage/virtual_environment",
   :display_name => "Hypervisor",
   :description => "Which hypervisor is this image for? ['xen'|'kvm']",
   :required => "optional",
-  :default => "xen",
-  :recipes => [ "rightimage::default", "rightimage::build_image", "rightimage::cloud_add_vmops" ]
+  :default => "xen"
 
 ## euca inputs  
 attribute "rightimage/euca/user",
