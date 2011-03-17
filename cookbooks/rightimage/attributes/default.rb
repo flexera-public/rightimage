@@ -104,7 +104,7 @@ case rightimage[:cloud]
     when "kvm"
       rightimage[:host_packages] << " qemu grub"
       rightimage[:guest_packages] << " grub"
-      set[:rightimage][:ephemeral_mount] = "/dev/vdb1"
+      set[:rightimage][:ephemeral_mount] = "/dev/vdb"
       set[:rightimage][:fstab][:ephemeral_mount_opts] = "defaults"
       set[:rightimage][:grub][:root_device] = "/dev/vda"
       set[:rightimage][:root_mount][:dev] = "/dev/vda1"
