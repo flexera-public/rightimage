@@ -1,6 +1,3 @@
-require 'rubygems'
-require 'right_aws'
-
 module RightImage
 
   class S3HtmlIndexer
