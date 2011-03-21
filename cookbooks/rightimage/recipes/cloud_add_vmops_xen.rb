@@ -93,9 +93,31 @@ bash "configure for cloudstack" do
 
     rm ${mount_dir}/var/lib/rpm/__*
     chroot $mount_dir rpm --rebuilddb
+  EOH
+end
 
-    umount -lf $mount_dir/proc
-    umount -lf $mount_dir
+bash "unmount proc" do 
+  code <<-EOH
+#!/bin/bash -ex
+    set -e 
+    set -x
+    target_mnt=#{destination_image_mount}
+    umount -lf $target_mnt/proc
+  EOH
+end
+
+# Clean up guest image
+rightimage destination_image_mount do
+  action :sanitize
+end
+
+bash "unmount target filesystem" do 
+  code <<-EOH
+#!/bin/bash -ex
+    set -e 
+    set -x
+    target_mnt=#{destination_image_mount}    
+    umount -lf $target_mnt
   EOH
 end
 
@@ -105,11 +127,6 @@ bash "backup raw image" do
     raw_image=$(basename #{destination_image})
     cp -v $raw_image $raw_image.bak 
   EOH
-end
-
-# Clean up guest image
-rightimage node[:rightimage][:mount_dir] do
-  action :sanitize
 end
 
 include_recipe "rightimage::install_vhd-util" if node[:rightimage][:virtual_environment] == "xen"  

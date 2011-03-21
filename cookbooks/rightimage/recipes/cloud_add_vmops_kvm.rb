@@ -157,6 +157,11 @@ bash "unmount proc & dev" do
   EOH
 end
 
+# Clean up guest image
+rightimage target_mnt do
+  action :sanitize
+end
+
 bash "unmount target filesystem" do 
   code <<-EOH
 #!/bin/bash -ex
@@ -179,11 +184,6 @@ bash "backup raw image" do
     raw_image=$(basename #{target_raw_path})
     cp -v $raw_image $raw_image.bak 
   EOH
-end
-
-# Clean up guest image
-rightimage node[:rightimage][:mount_dir] do
-  action :sanitize
 end
 
 bash "upload image" do 

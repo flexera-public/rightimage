@@ -2,11 +2,6 @@ class Chef::Resource::RubyBlock
   include RightScale::RightImage::Helper
 end
 
-# Clean up guest image
-rightimage node[:rightimage][:mount_dir] do
-  action :sanitize
-end
-
 bash "serve /mnt via http" do
   code <<-EOH
     set -x
