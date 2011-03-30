@@ -633,6 +633,7 @@
       "rightimage::cloud_add_vmops": "adds requirements for cloudstack based on hypervisor choice",
       "rightimage::rightscale_install": "installs rightscale",
       "rightimage::base_sles": "coordinate a sles install",
+      "rightimage::cloud_add_raw": "migrates the create image to a raw file -- useful for new cloud development",
       "rightimage::cloud_add_euca": "migrates the created image to eucalyptus",
       "rightimage::cloud_add_ec2": "migrates the created image to ec2",
       "rightimage::default": "starts builds image automatically at boot. See 'manual_mode' input to enable.",
