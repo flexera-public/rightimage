@@ -106,8 +106,7 @@ attribute "rightimage/image_postfix",
 attribute "rightimage/image_name_override",
   :display_name => "Image Name Override",
   :description => "The image name is created automaticaaly.  Set this value if you want to override the default image name.",
-  :required => "optional",
-  :recipes => [ "rightimage::cloud_add_euca" ,"rightimage::cloud_add_ec2", "rightimage::upload_ec2_s3", "rightimage::upload_ec2_ebs", "rightimage::do_tag_images", "rightimage::default", "rightimage::build_image" , "rightimage::cloud_add_vmops", "rightimage::upload_vmops" ]
+  :required => "optional"
   
 attribute "rightimage/aws_account_number",
   :display_name => "aws_account_number",
