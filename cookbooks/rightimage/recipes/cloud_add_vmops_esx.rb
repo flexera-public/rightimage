@@ -23,7 +23,7 @@ bash "create cloudstack-esx loopback fs" do
   code <<-EOH
     set -e 
     set -x
-  
+
     DISK_SIZE_GB=10  
     BYTES_PER_MB=1024
     DISK_SIZE_MB=$(($DISK_SIZE_GB * $BYTES_PER_MB))
@@ -36,22 +36,26 @@ bash "create cloudstack-esx loopback fs" do
     umount -lf #{target_mnt}/proc || true 
     umount -lf #{target_mnt} || true
     rm -rf $target_raw_path $target_mnt
-    
+
     dd if=/dev/zero of=$target_raw_path bs=1M count=$DISK_SIZE_MB    
-    
+
     loopdev=#{loop_dev}
     loopmap=#{loop_map}
+    umount -lf $loopmap || true
+    kpartx -d $loopdev || true
+    losetup -d $loopdev || true
+
     losetup $loopdev $target_raw_path
-    
+
     sfdisk $loopdev << EOF
 0,1304,L
 EOF
-    
+   
     kpartx -a $loopdev
     mke2fs -F -j $loopmap
     mkdir $target_mnt
     mount $loopmap $target_mnt
-    
+
     rsync -a $source_image/ $target_mnt/
 
   EOH
@@ -84,14 +88,14 @@ bash "setup grub" do
   code <<-EOH
     set -e 
     set -x
-    
+
     target_raw_path="#{target_raw_path}"
     target_mnt="#{target_mnt}"
-    
+
     chroot $target_mnt mkdir -p /boot/grub
     chroot $target_mnt cp -p /usr/share/grub/x86_64-redhat/* /boot/grub
     chroot $target_mnt ln -s /boot/grub/grub.conf /boot/grub/menu.lst
-    
+
     echo "(hd0) #{node[:rightimage][:grub][:root_device]}" > $target_mnt/boot/grub/device.map
     echo "" >> $target_mnt/boot/grub/device.map
 
@@ -103,7 +107,7 @@ root (hd0,0)
 setup (hd0)
 quit
 EOF 
-    
+
   EOH
 end
 
@@ -119,7 +123,7 @@ bash "install vmware tools" do
     chroot $target_mnt curl http://packages.vmware.com/tools/keys/VMWARE-PACKAGING-GPG-RSA-KEY.pub -o $TMP_DIR/rsa.pub
     chroot $target_mnt rpm --import $TMP_DIR/dsa.pub
     chroot $target_mnt rpm --import $TMP_DIR/rsa.pub
-    cat $target_mnt/etc/yum.repos.d/vmware-tools.repo <<EOF
+    cat > $target_mnt/etc/yum.repos.d/vmware-tools.repo <<EOF
 [vmware-tools] 
 name=VMware Tools 
 baseurl=http://packages.vmware.com/tools/esx/latest/rhel5/x86_64
