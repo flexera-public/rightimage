@@ -37,7 +37,7 @@ bash "create loopback fs" do
     loopdev=#{loop_dev}
     losetup $loopdev $target_raw_path
     
-    mke2fs -F -j $loopmap
+    mke2fs -F -j $loopdev
     mkdir $target_mnt
     mount $loopdev $target_mnt
     
