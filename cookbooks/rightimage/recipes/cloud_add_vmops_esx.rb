@@ -111,7 +111,20 @@ EOF
   EOH
 end
 
+bash "create custom initrd" do 
+  code <<-EOH
+#!/bin/bash -ex
+    set -e 
+    set -x
+    target_mnt=#{target_mnt}
+    rm -f $target_mnt/boot/initrd*
+    chroot $target_mnt mkinitrd --with=mptbase --with=mptscsih --with=mptspi --with=scsi_transport_spi --with=ata_piix --with=ext3 --with=dm_mirror --with=dm_snapshot --with=dm_zero -v initrd-#{node[:rightimage][:kernel_id]} #{node[:rightimage][:kernel_id]}
+    mv $target_mnt/initrd-#{node[:rightimage][:kernel_id]}  $target_mnt/boot/.
+  EOH
+end
+
 bash "install vmware tools" do 
+  only_if { false }
   code <<-EOH
 #!/bin/bash -ex
     set -e 
