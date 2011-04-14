@@ -10,7 +10,7 @@ target_raw = "target.raw"
 target_raw_path = "/mnt/#{target_raw}"
 target_mnt = "/mnt/target"
 
-bundled_image = "#{image_name}.vmdk"
+bundled_image = "cloudstack_esx_dev40.vmdk"
 bundled_image_path = "/mnt/#{bundled_image}"
 
 loop_name="loop0"
@@ -53,6 +53,10 @@ EOF
    
     kpartx -a $loopdev
     mke2fs -F -j $loopmap
+    
+    # setup uuid for our root partition
+    tune2fs -U #{node[:rightimage][:root_mount][:uuid]} $loopmap
+    
     mkdir $target_mnt
     mount $loopmap $target_mnt
 
@@ -118,13 +122,12 @@ bash "create custom initrd" do
     set -x
     target_mnt=#{target_mnt}
     rm -f $target_mnt/boot/initrd*
-    chroot $target_mnt mkinitrd --with=mptbase --with=mptscsih --with=mptspi --with=scsi_transport_spi --with=ata_piix --with=ext3 --with=dm_mirror --with=dm_snapshot --with=dm_zero -v initrd-#{node[:rightimage][:kernel_id]} #{node[:rightimage][:kernel_id]}
+    chroot $target_mnt mkinitrd --with=mptbase --with=mptscsih --with=mptspi --with=scsi_transport_spi --with=ata_piix --with=ext3 -v initrd-#{node[:rightimage][:kernel_id]} #{node[:rightimage][:kernel_id]}
     mv $target_mnt/initrd-#{node[:rightimage][:kernel_id]}  $target_mnt/boot/.
   EOH
 end
 
 bash "install vmware tools" do 
-  only_if { false }
   code <<-EOH
 #!/bin/bash -ex
     set -e 
@@ -143,7 +146,8 @@ baseurl=http://packages.vmware.com/tools/esx/latest/rhel5/x86_64
 enabled=1 
 gpgcheck=1
 EOF
-   chroot $target_mnt yum -y install vmware-tools
+   yum -c /tmp/yum.conf --installroot=$target_mnt -y clean all
+   yum -c $target_mnt/etc/yum.conf --installroot=$target_mnt -y install vmware-tools-nox
   EOH
 end
 
@@ -197,14 +201,6 @@ bash "unmount target filesystem" do
     umount -lf $loopmap
     kpartx -d $loopdev
     losetup -d $loopdev
-  EOH
-end
-
-bash "backup raw image" do 
-  cwd File.dirname target_raw_path
-  code <<-EOH
-    raw_image=$(basename #{target_raw_path})
-    cp -v $raw_image $raw_image.bak 
   EOH
 end
 
