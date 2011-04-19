@@ -1,3 +1,11 @@
+# bootstrap_ubuntu.rb
+# 
+# Use vmbuilder to generate a base virtual image.  We will use the image generated here for other recipes to add
+# Cloud and Hypervisor specific details.
+#
+# When this is finished running, you should have a basic image ready in /mnt
+#
+
 mount_dir = node[:rightimage][:mount_dir]
 
 #install prereq packages
@@ -13,13 +21,15 @@ case node[:rightimage][:platform]
       remote_file "/tmp/python-vm-builder.deb" do
         source "python-vm-builder.deb"
       end
-      remote_file "/tmp/python-vm-builder-ec2.deb" do
-        source "python-vm-builder-ec2.deb"
-      end 
+      if node[:rightimage][:virtual_environment] == "ec2" 
+        remote_file "/tmp/python-vm-builder-ec2.deb" do
+          source "python-vm-builder-ec2.deb"
+        end 
+      end
       ruby_block "install python-vm-builder debs with dependencies" do
         block do
           Chef::Log.info(`dpkg -i /tmp/python-vm-builder.deb`)
-          Chef::Log.info(`dpkg -i /tmp/python-vm-builder-ec2.deb`)
+          Chef::Log.info(`dpkg -i /tmp/python-vm-builder-ec2.deb`) if node[:rightimage][:virtual_environment] == 'ec2'
           Chef::Log.info(`apt-get -fy install`)
         end
       end
@@ -52,12 +62,24 @@ end
 
 log "Configuring Image..."
 
+# vmbuilder is defaulting to ext4 and I couldn't find any options to force the filesystem type so I just hacked this.
+# we restore it back to normal later.  
+bash "Comment out ext4 in /etc/mke2fs.conf" do
+  code <<-EOH
+    set -e
+    set -x
+    sed -i '/ext4/,/}/ s/^/#/' /etc/mke2fs.conf 
+  EOH
+end
+
 bash "configure_image"  do
   user "root"
   cwd "/tmp"
   code <<-EOH
     set -e
     set -x
+  
+    modprobe dm-mod
 
     if [ "#{node[:rightimage][:release]}" == "hardy" ]; then
       locale-gen en_US.UTF-8
@@ -92,16 +114,42 @@ fi
 
 EOS
     chmod +x /tmp/configure_script
-    #{bootstrap_cmd} --exec=/tmp/configure_script
+    #{bootstrap_cmd} --exec=/tmp/configure_script > /dev/null 2>&1
 
-    if [ "#{node[:rightimage][:release]}" == "lucid" ] || [ "#{node[:rightimage][:release]}" == "maverick" ] ;then
-      image_name=`cat /mnt/vmbuilder/xen.conf  | grep xvda1 | grep -v root  | cut -c 25- | cut -c -9`
-    else
-      image_name="root.img"
-    fi
+
+case "#{node.rightimage.virtual_environment}" in
+
+  "kvm" )
+      kvm_image=`basename $(ls -1 /mnt/vmbuilder/tmp*.qcow2)`
+      ;;
+
+  "esxi" )
+      kvm_image=`basename $(ls -1 /mnt/vmbuilder/tmp*-flat.vmdk)`
+      ;;
+
+  "ec2"|* )
+      if ( [ "#{node[:rightimage][:release]}" == "lucid" ] || [ "#{node[:rightimage][:release]}" == "maverick" ] ) ; then
+        image_name=`cat /mnt/vmbuilder/xen.conf  | grep xvda1 | grep -v root  | cut -c 25- | cut -c -9`
+      else 
+        kvm=image=$image_name
+      fi
+      ;;
+esac
+
+    set +e
+    loopback_device=/mnt/vmbuilder/$image_name
+    [ -e "/dev/mapper/loop5p1" ] && kpartx -d /dev/loop5
+    losetup -a | grep loop5
+    [ "$?" == "0" ] && losetup -d /dev/loop5
+    set -e
+    qemu-img convert -O raw /mnt/vmbuilder/$kvm_image /mnt/vmbuilder/root.img
+    losetup /dev/loop5 /mnt/vmbuilder/root.img
+    kpartx -a /dev/loop5
+    loopback_device=/dev/mapper/loop5p1
+
     random_dir=/tmp/rightimage-$RANDOM
     mkdir $random_dir
-    mount -o loop /mnt/vmbuilder/$image_name  $random_dir
+    mount -o loop $loopback_device  $random_dir
     umount #{node[:rightimage][:mount_dir]}/proc || true
     rm -rf #{node[:rightimage][:mount_dir]}
     mkdir -p #{node[:rightimage][:mount_dir]}
@@ -110,10 +158,16 @@ EOS
     rm -rf  $random_dir
     mkdir -p #{node[:rightimage][:mount_dir]}/var/man
     chroot #{node[:rightimage][:mount_dir]}  chown -R man:root /var/man
-
-
 EOH
   not_if "test -e /mnt/vmbuilder/root.img"
+end
+
+bash "Restore original ext4 in /etc/mke2fs.conf" do
+  code <<-EOH
+    set -e
+    set -x
+    sed -i '/ext4/,/}/ s/^#//' /etc/mke2fs.conf 
+  EOH
 end
 
 
@@ -150,7 +204,9 @@ dpkg -i /tmp/linux-headers*.deb
 dpkg -i /tmp/linux-image*.deb
 EOS
 chmod +x #{node[:rightimage][:mount_dir]}/tmp/install_custom_kernel.sh
-chroot #{node[:rightimage][:mount_dir]} /tmp/install_custom_kernel.sh  
+
+# Temp disable - it was causing my build to hang. 
+#chroot #{node[:rightimage][:mount_dir]} /tmp/install_custom_kernel.sh  
 EOH
   end
 end
@@ -159,7 +215,6 @@ if node[:rightimage][:release] == "lucid" || node[:rightimage][:release] == "mav
 
   # Fix apt config so it does not install all recommended packages
   log "Fixing apt.conf APT::Install-Recommends setting prior to installing Java"
-   
   log "Installing Sun Java for Lucid..."
 
   guest_java_install = "/tmp/java_install"

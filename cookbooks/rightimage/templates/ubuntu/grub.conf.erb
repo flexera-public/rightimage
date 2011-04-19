@@ -1,0 +1,8 @@
+default=0
+timeout=5
+hiddenmenu
+title <%= node.rightimage.platform %> <%= node.rightimage.release %> (<%= node.rightimage.kernel_id %>) (<%= node.rightimage.virtual_environment %>
+        root (hd0,0)
+        kernel /boot/vmlinuz-<%= node.rightimage.kernel_id %> ro root=<%= node[:rightimage][:root_mount][:dev] %> 
+        initrd /boot/initrd.img-<%= node.rightimage.kernel_id %>
+

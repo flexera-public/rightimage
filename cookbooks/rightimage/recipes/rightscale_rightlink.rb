@@ -44,7 +44,7 @@ export AWS_CALLING_FORMAT=SUBDOMAIN
 
 CHROOT_SCRIPT
     chmod +x #{node[:rightimage][:mount_dir]}/tmp/build_rightlink.sh
-    chroot #{node[:rightimage][:mount_dir]} /tmp/build_rightlink.sh
+    chroot #{node[:rightimage][:mount_dir]} /tmp/build_rightlink.sh > /dev/null
     rm -rf #{node[:rightimage][:mount_dir]}/tmp/build_rightlink.sh
   EOC
 
@@ -62,11 +62,14 @@ bash "install_rightlink" do
     chmod 0770 #{node[:rightimage][:mount_dir]}/root/.rightscale
     chmod 0440 #{node[:rightimage][:mount_dir]}/root/.rightscale/*
 
-    if [ "#{node[:rightimage][:platform]}" == "ubuntu" ]; then
-      chroot #{node[:rightimage][:mount_dir]} update-rc.d rightimage start 96 2 3 4 5 . stop 1 0 1 6 .
-    else
-      chroot #{node[:rightimage][:mount_dir]} chkconfig --add rightimage
-    fi
+    case "#{node.rightimage.platform}" in 
+      "ubuntu" )
+        chroot #{node[:rightimage][:mount_dir]} update-rc.d rightimage start 96 2 3 4 5 . stop 1 0 1 6 .
+        ;; 
+      "ec2"|* )
+        chroot #{node[:rightimage][:mount_dir]} chkconfig --add rightimage
+        ;;
+    esac
 
     # remove sandbox repo
     rm -rf #{node[:rightimage][:mount_dir]}/tmp/sandbox_builds
