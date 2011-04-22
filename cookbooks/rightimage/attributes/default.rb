@@ -113,8 +113,8 @@ case rightimage[:cloud]
     when "esx"
       rightimage[:host_packages] << " qemu grub"
       rightimage[:guest_packages] << " grub"
-      set[:rightimage][:ephemeral_mount] = "/dev/sdb"
-      set[:rightimage][:fstab][:ephemeral_mount_opts] = "defaults"
+      set[:rightimage][:ephemeral_mount] = nil
+      set[:rightimage][:fstab][:ephemeral_mount_opts] = nil
       set[:rightimage][:grub][:root_device] = "/dev/sda"
       set[:rightimage][:root_mount][:uuid] = `uuidgen`.strip
       set[:rightimage][:root_mount][:dev] = "UUID=#{rightimage[:root_mount][:uuid]}"
@@ -389,7 +389,7 @@ when "maverick"
       set[:rightimage][:ramdisk_id] = nil
     end
   end
-when "5.4", "5.2"
+when "5.6", "5.4", "5.2"
   case rightimage[:region]
   when "us-east"
     case rightimage[:arch]
