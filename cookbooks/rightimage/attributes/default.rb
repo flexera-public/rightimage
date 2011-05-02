@@ -96,16 +96,16 @@ case rightimage[:cloud]
   when "vmops"
     case rightimage[:virtual_environment]
     when "xen"
-      set[:rightimage][:fstab][:ephemeral_mount_opts] = "defaults"
       set[:rightimage][:root_mount][:dev] = "/dev/xvda"
       set[:rightimage][:root_mount][:dump] = "1" 
       set[:rightimage][:root_mount][:fsck] = "1" 
-      set[:rightimage][:ephemeral_mount] = "/dev/xvdb"
+      set[:rightimage][:ephemeral_mount] = nil
+      set[:rightimage][:fstab][:ephemeral_mount_opts] = nil
     when "kvm"
       rightimage[:host_packages] << " qemu grub"
       rightimage[:guest_packages] << " grub"
-      set[:rightimage][:ephemeral_mount] = "/dev/vdb"
-      set[:rightimage][:fstab][:ephemeral_mount_opts] = "defaults"
+      set[:rightimage][:ephemeral_mount] = nil
+      set[:rightimage][:fstab][:ephemeral_mount_opts] = nil
       set[:rightimage][:grub][:root_device] = "/dev/vda"
       set[:rightimage][:root_mount][:dev] = "/dev/vda1"
       set[:rightimage][:root_mount][:dump] = "1" 
