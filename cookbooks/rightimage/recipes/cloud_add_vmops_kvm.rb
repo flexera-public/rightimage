@@ -10,14 +10,12 @@ target_raw = "target.raw"
 target_raw_path = "/mnt/#{target_raw}"
 target_mnt = "/mnt/target"
 
-bundled_image = "#{image_name}.qcow2"
-bundled_image_path = "/mnt/#{bundled_image}"
-
 loop_name="loop0"
 loop_dev="/dev/#{loop_name}"
 loop_map="/dev/mapper/#{loop_name}p1"
 
 package "qemu"
+package "grub"
 
 bash "create cloudstack-kvm loopback fs" do 
   code <<-EOH
@@ -65,6 +63,15 @@ bash "mount proc & dev" do
     target_mnt=#{target_mnt}
     mount -t proc none $target_mnt/proc
     mount --bind /dev $target_mnt/dev
+  EOH
+end
+
+bash "install grub" do
+  code <<-EOH
+    set -e 
+    set -x
+    target_mnt="#{target_mnt}"
+    yum -c /tmp/yum.conf --installroot=$target_mnt -y install grub
   EOH
 end
 
@@ -191,14 +198,18 @@ bash "upload image" do
   code <<-EOH
     set -e
     set -x
-    qemu-img convert -O qcow2 #{target_raw_path} #{bundled_image_path}
+    
+    BUNDLED_IMAGE="#{image_name}.qcow2"
+    BUNDLED_IMAGE_PATH="/mnt/$BUNDLED_IMAGE"
+    
+    qemu-img convert -O qcow2 #{target_raw_path} $BUNDLED_IMAGE_PATH
+    bzip2 $BUNDLED_IMAGE_PATH
 
     # upload image
     # export AWS_ACCESS_KEY_ID=#{node.rightimage.aws_access_key_id_for_upload}
     # export AWS_SECRET_ACCESS_KEY=#{node.rightimage.aws_secret_access_key_for_upload}
     # export AWS_CALLING_FORMAT=SUBDOMAIN 
-    # /usr/local/bin/s3cmd -v put #{node.rightimage.image_upload_bucket}:#{image_name}.vhd.bz2 /mnt/#{image_name}.vhd.bz2 x-amz-acl:public-read --progress
-    # /usr/bin/s3cmd -P put #{bundled_image_path} s3://rightscale-cloudstack-dev/#{bundled_image}
+    # s3cmd --progress put #{node.rightimage.image_upload_bucket}:$BUNDLED_IMAGE.bz2 $BUNDLED_IMAGE_PATH.bz2 x-amz-acl:public-read 
   EOH
 end
 
