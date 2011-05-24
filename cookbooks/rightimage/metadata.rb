@@ -24,6 +24,7 @@ recipe "rightimage::do_create_mci", "creates MCI for image(s) (only ec2 currentl
 recipe "rightimage::upload_ec2_s3", "bundle and upload s3 image (ec2 only)"
 recipe "rightimage::upload_ec2_ebs", "create EBS image snapshot (ec2 only)"
 recipe "rightimage::upload_vmops", "setup http server for download to test cloud"
+recipe "rightimage::upload_euca", "bundle and upload euca kernel, ramdisk and image"
 
 
 attribute "rest_connection/user",
