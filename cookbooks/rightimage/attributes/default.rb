@@ -102,8 +102,8 @@ case rightimage[:cloud]
       set[:rightimage][:ephemeral_mount] = nil
       set[:rightimage][:fstab][:ephemeral_mount_opts] = nil
     when "kvm"
-      rightimage[:host_packages] << " qemu grub"
-      rightimage[:guest_packages] << " grub"
+      # rightimage[:host_packages] << " qemu grub"
+      # rightimage[:guest_packages] << " grub"
       set[:rightimage][:ephemeral_mount] = nil
       set[:rightimage][:fstab][:ephemeral_mount_opts] = nil
       set[:rightimage][:grub][:root_device] = "/dev/vda"
