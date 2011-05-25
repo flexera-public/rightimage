@@ -1,3 +1,6 @@
+class Chef::Resource::Bash
+  include RightScale::RightImage::Helper
+end
 
 target_mnt = "/mnt/euca"
 tmp_mnt = "/mnt/euca_tmp"
@@ -75,14 +78,14 @@ bash "copy_image" do
   kernel_output=`euca-register  #{image_name}_admin/#{image_name}.kernel.manifest.xml \
     -a #{node[:rightimage][:euca][:access_key_id_admin]} \
     -s #{node[:rightimage][:euca][:secret_access_key_admin]}   \
-    -U  http://174.46.234.42:8773/services/Eucalyptus`
+    -U #{node[:rightimage][:euca][:euca_url]}`
   echo $kernel_optput
 
   ## register ramdisk
   ramdisk_output=`euca-register  #{image_name}_admin/#{image_name}.initrd.manifest.xml \
     -a #{node[:rightimage][:euca][:access_key_id_admin]} \
     -s #{node[:rightimage][:euca][:secret_access_key_admin]}   \
-    -U  http://174.46.234.42:8773/services/Eucalyptus`
+    -U #{node[:rightimage][:euca][:euca_url]}`
   echo $ramdisk_output
 
   ## collect kernel and ramdisk id's
