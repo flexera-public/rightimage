@@ -90,19 +90,19 @@ attribute "rightimage/image_upload_bucket",
   :display_name => "image_upload_bucket",
   :description => "the bucket to upload the image to",
   :required => "required",
-  :recipes => [ "rightimage::cloud_add_euca" ,"rightimage::cloud_add_ec2", "rightimage::upload_ec2_s3", "rightimage::upload_ec2_ebs", "rightimage::do_tag_images" , "rightimage::do_create_mci" , "rightimage::base_centos" , "rightimage::base_ubuntu" , "rightimage::base_sles" , "rightimage::default", "rightimage::build_image" , "rightimage::upload_vmops" ]
+  :recipes => [ "rightimage::upload_euca" ,"rightimage::cloud_add_ec2", "rightimage::upload_ec2_s3", "rightimage::upload_ec2_ebs", "rightimage::do_tag_images" , "rightimage::do_create_mci" , "rightimage::base_centos" , "rightimage::base_ubuntu" , "rightimage::base_sles" , "rightimage::default", "rightimage::build_image" , "rightimage::upload_vmops" ]
   
 attribute "rightimage/image_prefix",
   :display_name => "image_prefix",
   :description => "an optional prefix for the image name",
   :required => "optional",
-  :recipes => [ "rightimage::cloud_add_euca" ,"rightimage::cloud_add_ec2", "rightimage::upload_ec2_s3", "rightimage::upload_ec2_ebs", "rightimage::do_tag_images" , "rightimage::do_create_mci" , "rightimage::base_centos" , "rightimage::base_ubuntu" , "rightimage::base_sles" , "rightimage::default", "rightimage::build_image" , "rightimage::cloud_add_vmops" ]
+  :recipes => [ "rightimage::upload_euca" ,"rightimage::cloud_add_ec2", "rightimage::upload_ec2_s3", "rightimage::upload_ec2_ebs", "rightimage::do_tag_images" , "rightimage::do_create_mci" , "rightimage::base_centos" , "rightimage::base_ubuntu" , "rightimage::base_sles" , "rightimage::default", "rightimage::build_image" , "rightimage::cloud_add_vmops" ]
   
 attribute "rightimage/image_postfix",
   :display_name => "image_postfix",
   :description => "an optional postfix for the image name",
   :required => "optional",
-  :recipes => [ "rightimage::cloud_add_euca" ,"rightimage::cloud_add_ec2", "rightimage::upload_ec2_s3", "rightimage::upload_ec2_ebs", "rightimage::do_tag_images" , "rightimage::do_create_mci" , "rightimage::base_centos" , "rightimage::base_ubuntu" , "rightimage::base_sles" , "rightimage::default", "rightimage::build_image" , "rightimage::cloud_add_vmops" ]
+  :recipes => [ "rightimage::upload_euca" ,"rightimage::cloud_add_ec2", "rightimage::upload_ec2_s3", "rightimage::upload_ec2_ebs", "rightimage::do_tag_images" , "rightimage::do_create_mci" , "rightimage::base_centos" , "rightimage::base_ubuntu" , "rightimage::base_sles" , "rightimage::default", "rightimage::build_image" , "rightimage::cloud_add_vmops" ]
   
 attribute "rightimage/image_name_override",
   :display_name => "Image Name Override",
@@ -113,43 +113,43 @@ attribute "rightimage/aws_account_number",
   :display_name => "aws_account_number",
   :description => "aws_account_number",
   :required => "required",
-  :recipes => [ "rightimage::cloud_add_euca" ,"rightimage::cloud_add_ec2", "rightimage::upload_ec2_s3", "rightimage::upload_ec2_ebs", "rightimage::do_tag_images" , "rightimage::do_create_mci" , "rightimage::base_centos" , "rightimage::base_ubuntu" , "rightimage::base_sles" , "rightimage::default", "rightimage::build_image" , "rightimage::cloud_add_vmops" ]
+  :recipes => [ "rightimage::cloud_add_ec2", "rightimage::upload_ec2_s3", "rightimage::upload_ec2_ebs", "rightimage::do_tag_images" , "rightimage::do_create_mci" , "rightimage::base_centos" , "rightimage::base_ubuntu" , "rightimage::base_sles" , "rightimage::default", "rightimage::build_image" , "rightimage::cloud_add_vmops" ]
   
 attribute "rightimage/aws_access_key_id",
   :display_name => "aws_access_key_id",
   :description => "aws_access_key_id",
   :required => "required",
-  :recipes => [ "rightimage::cloud_add_euca" ,"rightimage::cloud_add_ec2", "rightimage::upload_ec2_s3", "rightimage::upload_ec2_ebs", "rightimage::do_tag_images" , "rightimage::do_create_mci" , "rightimage::base_centos" , "rightimage::base_ubuntu" , "rightimage::base_sles" , "rightimage::default", "rightimage::build_image" , "rightimage::cloud_add_vmops" ]
+  :recipes => [ "rightimage::cloud_add_ec2", "rightimage::upload_ec2_s3", "rightimage::upload_ec2_ebs", "rightimage::do_tag_images" , "rightimage::do_create_mci" , "rightimage::base_centos" , "rightimage::base_ubuntu" , "rightimage::base_sles" , "rightimage::default", "rightimage::build_image" , "rightimage::cloud_add_vmops" ]
   
 attribute "rightimage/aws_secret_access_key",
   :display_name => "aws_secret_access_key",
   :description => "aws_secret_access_key",
   :required => "required",
-  :recipes => [ "rightimage::cloud_add_euca" ,"rightimage::cloud_add_ec2", "rightimage::upload_ec2_s3", "rightimage::upload_ec2_ebs", "rightimage::do_tag_images" , "rightimage::do_create_mci" , "rightimage::base_centos" , "rightimage::base_sles" , "rightimage::base_ubuntu" , "rightimage::default", "rightimage::build_image" , "rightimage::cloud_add_vmops"  ]
+  :recipes => [ "rightimage::cloud_add_ec2", "rightimage::upload_ec2_s3", "rightimage::upload_ec2_ebs", "rightimage::do_tag_images" , "rightimage::do_create_mci" , "rightimage::base_centos" , "rightimage::base_sles" , "rightimage::base_ubuntu" , "rightimage::default", "rightimage::build_image" , "rightimage::cloud_add_vmops"  ]
   
 attribute "rightimage/aws_509_key",
   :display_name => "aws_509_key",
   :description => "aws_509_key",
   :required => "required",
-  :recipes => [ "rightimage::cloud_add_euca" ,"rightimage::cloud_add_ec2", "rightimage::upload_ec2_s3", "rightimage::upload_ec2_ebs", "rightimage::do_tag_images" , "rightimage::do_create_mci" , "rightimage::base_centos" , "rightimage::base_sles" , "rightimage::base_ubuntu" , "rightimage::default", "rightimage::build_image" ]
+  :recipes => [ "rightimage::cloud_add_ec2", "rightimage::upload_ec2_s3", "rightimage::upload_ec2_ebs", "rightimage::do_tag_images" , "rightimage::do_create_mci" , "rightimage::base_centos" , "rightimage::base_sles" , "rightimage::base_ubuntu" , "rightimage::default", "rightimage::build_image" ]
   
 attribute "rightimage/aws_509_cert",
   :display_name => "aws_509_cert",
   :description => "aws_509_cert",
   :required => "required",
-  :recipes => [ "rightimage::cloud_add_euca" ,"rightimage::cloud_add_ec2", "rightimage::upload_ec2_s3", "rightimage::upload_ec2_ebs", "rightimage::do_tag_images" , "rightimage::do_create_mci" , "rightimage::base_centos" , "rightimage::base_sles" , "rightimage::base_ubuntu" , "rightimage::default", "rightimage::build_image" ]
+  :recipes => [ "rightimage::cloud_add_ec2", "rightimage::upload_ec2_s3", "rightimage::upload_ec2_ebs", "rightimage::do_tag_images" , "rightimage::do_create_mci" , "rightimage::base_centos" , "rightimage::base_sles" , "rightimage::base_ubuntu" , "rightimage::default", "rightimage::build_image" ]
  
 attribute "rightimage/aws_access_key_id_for_upload",
   :display_name => "aws_access_key_id_for_upload",
   :description => "aws_access_key_id for the uplaod bucket",
   :required => "required",
-  :recipes => [ "rightimage::cloud_add_euca" ,"rightimage::cloud_add_ec2", "rightimage::upload_ec2_s3", "rightimage::upload_ec2_ebs", "rightimage::do_tag_images" , "rightimage::do_create_mci" , "rightimage::base_centos" , "rightimage::base_sles" , "rightimage::base_ubuntu" , "rightimage::default", "rightimage::build_image" , "rightimage::upload_vmops" ]
+  :recipes => [ "rightimage::cloud_add_ec2", "rightimage::upload_ec2_s3", "rightimage::upload_ec2_ebs", "rightimage::do_tag_images" , "rightimage::do_create_mci" , "rightimage::base_centos" , "rightimage::base_sles" , "rightimage::base_ubuntu" , "rightimage::default", "rightimage::build_image" , "rightimage::upload_vmops" ]
   
 attribute "rightimage/aws_secret_access_key_for_upload",
   :display_name => "aws_secret_access_key_for_upload",
   :description => "aws_secret_access_key_for_upload",
   :required => "required",
-  :recipes => [ "rightimage::cloud_add_euca" ,"rightimage::cloud_add_ec2", "rightimage::upload_ec2_s3", "rightimage::upload_ec2_ebs", "rightimage::do_tag_images" , "rightimage::do_create_mci" , "rightimage::base_centos" , "rightimage::base_sles" , "rightimage::base_ubuntu" , "rightimage::default", "rightimage::build_image" , "rightimage::upload_vmops" ]
+  :recipes => [ "rightimage::cloud_add_ec2", "rightimage::upload_ec2_s3", "rightimage::upload_ec2_ebs", "rightimage::do_tag_images" , "rightimage::do_create_mci" , "rightimage::base_centos" , "rightimage::base_sles" , "rightimage::base_ubuntu" , "rightimage::default", "rightimage::build_image" , "rightimage::upload_vmops" ]
 
 attribute "rightimage/debug",
   :display_name => "debug",
@@ -174,77 +174,77 @@ attribute "rightimage/euca/user",
   :display_name => "euca user",
   :description => "euca user",
   :required => "required",
-  :recipes => [ "rightimage::cloud_add_euca" ]
+  :recipes => [ "rightimage::upload_euca" ]
   
 attribute "rightimage/euca/walrus_url",
   :display_name => "walrus url",
   :description => "walrus url",
   :required => "required",
-  :recipes => [ "rightimage::cloud_add_euca" ]
+  :recipes => [ "rightimage::upload_euca" ]
 
 attribute "rightimage/euca/euca_url",
   :display_name => "euca url",
   :description => "euca url",
   :required => "required",
-  :recipes => [ "rightimage::cloud_add_euca" ]
+  :recipes => [ "rightimage::upload_euca" ]
 
 attribute "rightimage/euca/access_key_id",
   :display_name => "access key id",
   :description => "access key id",
   :required => "required",
-  :recipes => [ "rightimage::cloud_add_euca" ]
+  :recipes => [ "rightimage::upload_euca" ]
 
 attribute "rightimage/euca/secret_access_key",
   :display_name => "secret access key",
   :description => "secret access key",
   :required => "required",
-  :recipes => [ "rightimage::cloud_add_euca" ]
+  :recipes => [ "rightimage::upload_euca" ]
 
 attribute "rightimage/euca/user_admin",
   :display_name => "euca user admin",
   :description => "euca user for the admin acct",
   :required => "required",
-  :recipes => [ "rightimage::cloud_add_euca" ]
+  :recipes => [ "rightimage::upload_euca" ]
   
 attribute "rightimage/euca/access_key_id_admin",
   :display_name => "access key id admin acct",
   :description => "access key id for admin acct",
   :required => "required",
-  :recipes => [ "rightimage::cloud_add_euca" ]
+  :recipes => [ "rightimage::upload_euca" ]
 
 attribute "rightimage/euca/secret_access_key_admin",
   :display_name => "secret access key admin",
   :description => "secret access key for the admin acct",
   :required => "required",
-  :recipes => [ "rightimage::cloud_add_euca" ]
+  :recipes => [ "rightimage::upload_euca" ]
 
 attribute "rightimage/euca/x509_key_admin",
   :display_name => "x509 key admin",
   :description => "x509 key for the admin acct",
   :required => "required",
-  :recipes => [ "rightimage::cloud_add_euca" ]
+  :recipes => [ "rightimage::upload_euca" ]
 
 attribute "rightimage/euca/x509_cert_admin",
   :display_name => "x509 cert admin",
   :description => "x509 cert for the admin acct",
   :required => "required",
-  :recipes => [ "rightimage::cloud_add_euca" ]
+  :recipes => [ "rightimage::upload_euca" ]
 
 attribute "rightimage/euca/x509_key",
   :display_name => "x509 key ",
   :description => "x509 key ",
   :required => "required",
-  :recipes => [ "rightimage::cloud_add_euca" ]
+  :recipes => [ "rightimage::upload_euca" ]
 
 attribute "rightimage/euca/x509_cert",
   :display_name => "x509 cert ",
   :description => "x509 cert ",
   :required => "required",
-  :recipes => [ "rightimage::cloud_add_euca" ]
+  :recipes => [ "rightimage::upload_euca" ]
 
 attribute "rightimage/euca/euca_cert",
   :display_name => "euca cert",
   :description => "euca cert",
   :required => "required",
-  :recipes => [ "rightimage::cloud_add_euca" ]
+  :recipes => [ "rightimage::upload_euca" ]
 

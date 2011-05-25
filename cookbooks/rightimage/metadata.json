@@ -11,7 +11,7 @@
         "description": "x509 key for the admin acct",
         "display_name": "x509 key admin",
         "recipes": [
-          "rightimage::cloud_add_euca"
+          "rightimage::upload_euca"
         ],
         "required": "required"
       },
@@ -24,7 +24,7 @@
         "description": "x509 cert ",
         "display_name": "x509 cert ",
         "recipes": [
-          "rightimage::cloud_add_euca"
+          "rightimage::upload_euca"
         ],
         "required": "required"
       },
@@ -37,7 +37,7 @@
         "description": "x509 key ",
         "display_name": "x509 key ",
         "recipes": [
-          "rightimage::cloud_add_euca"
+          "rightimage::upload_euca"
         ],
         "required": "required"
       },
@@ -50,7 +50,7 @@
         "description": "euca user for the admin acct",
         "display_name": "euca user admin",
         "recipes": [
-          "rightimage::cloud_add_euca"
+          "rightimage::upload_euca"
         ],
         "required": "required"
       },
@@ -63,7 +63,6 @@
         "description": "aws_509_cert",
         "display_name": "aws_509_cert",
         "recipes": [
-          "rightimage::cloud_add_euca",
           "rightimage::cloud_add_ec2",
           "rightimage::upload_ec2_s3",
           "rightimage::upload_ec2_ebs",
@@ -86,7 +85,6 @@
         "description": "aws_secret_access_key",
         "display_name": "aws_secret_access_key",
         "recipes": [
-          "rightimage::cloud_add_euca",
           "rightimage::cloud_add_ec2",
           "rightimage::upload_ec2_s3",
           "rightimage::upload_ec2_ebs",
@@ -123,7 +121,7 @@
         "description": "an optional postfix for the image name",
         "display_name": "image_postfix",
         "recipes": [
-          "rightimage::cloud_add_euca",
+          "rightimage::upload_euca",
           "rightimage::cloud_add_ec2",
           "rightimage::upload_ec2_s3",
           "rightimage::upload_ec2_ebs",
@@ -193,7 +191,6 @@
         "description": "aws_secret_access_key_for_upload",
         "display_name": "aws_secret_access_key_for_upload",
         "recipes": [
-          "rightimage::cloud_add_euca",
           "rightimage::cloud_add_ec2",
           "rightimage::upload_ec2_s3",
           "rightimage::upload_ec2_ebs",
@@ -230,7 +227,7 @@
         "description": "euca cert",
         "display_name": "euca cert",
         "recipes": [
-          "rightimage::cloud_add_euca"
+          "rightimage::upload_euca"
         ],
         "required": "required"
       },
@@ -243,7 +240,7 @@
         "description": "walrus url",
         "display_name": "walrus url",
         "recipes": [
-          "rightimage::cloud_add_euca"
+          "rightimage::upload_euca"
         ],
         "required": "required"
       },
@@ -270,7 +267,7 @@
         "description": "access key id",
         "display_name": "access key id",
         "recipes": [
-          "rightimage::cloud_add_euca"
+          "rightimage::upload_euca"
         ],
         "required": "required"
       },
@@ -283,7 +280,6 @@
         "description": "aws_509_key",
         "display_name": "aws_509_key",
         "recipes": [
-          "rightimage::cloud_add_euca",
           "rightimage::cloud_add_ec2",
           "rightimage::upload_ec2_s3",
           "rightimage::upload_ec2_ebs",
@@ -346,7 +342,7 @@
         "description": "secret access key",
         "display_name": "secret access key",
         "recipes": [
-          "rightimage::cloud_add_euca"
+          "rightimage::upload_euca"
         ],
         "required": "required"
       },
@@ -359,7 +355,7 @@
         "description": "euca user",
         "display_name": "euca user",
         "recipes": [
-          "rightimage::cloud_add_euca"
+          "rightimage::upload_euca"
         ],
         "required": "required"
       },
@@ -372,7 +368,6 @@
         "description": "aws_account_number",
         "display_name": "aws_account_number",
         "recipes": [
-          "rightimage::cloud_add_euca",
           "rightimage::cloud_add_ec2",
           "rightimage::upload_ec2_s3",
           "rightimage::upload_ec2_ebs",
@@ -396,7 +391,7 @@
         "description": "secret access key for the admin acct",
         "display_name": "secret access key admin",
         "recipes": [
-          "rightimage::cloud_add_euca"
+          "rightimage::upload_euca"
         ],
         "required": "required"
       },
@@ -409,7 +404,6 @@
         "description": "aws_access_key_id for the uplaod bucket",
         "display_name": "aws_access_key_id_for_upload",
         "recipes": [
-          "rightimage::cloud_add_euca",
           "rightimage::cloud_add_ec2",
           "rightimage::upload_ec2_s3",
           "rightimage::upload_ec2_ebs",
@@ -446,7 +440,7 @@
         "description": "euca url",
         "display_name": "euca url",
         "recipes": [
-          "rightimage::cloud_add_euca"
+          "rightimage::upload_euca"
         ],
         "required": "required"
       },
@@ -475,7 +469,6 @@
         "description": "aws_access_key_id",
         "display_name": "aws_access_key_id",
         "recipes": [
-          "rightimage::cloud_add_euca",
           "rightimage::cloud_add_ec2",
           "rightimage::upload_ec2_s3",
           "rightimage::upload_ec2_ebs",
@@ -525,7 +518,7 @@
         "description": "the bucket to upload the image to",
         "display_name": "image_upload_bucket",
         "recipes": [
-          "rightimage::cloud_add_euca",
+          "rightimage::upload_euca",
           "rightimage::cloud_add_ec2",
           "rightimage::upload_ec2_s3",
           "rightimage::upload_ec2_ebs",
@@ -549,7 +542,7 @@
         "description": "x509 cert for the admin acct",
         "display_name": "x509 cert admin",
         "recipes": [
-          "rightimage::cloud_add_euca"
+          "rightimage::upload_euca"
         ],
         "required": "required"
       },
@@ -562,7 +555,7 @@
         "description": "access key id for admin acct",
         "display_name": "access key id admin acct",
         "recipes": [
-          "rightimage::cloud_add_euca"
+          "rightimage::upload_euca"
         ],
         "required": "required"
       },
@@ -575,7 +568,7 @@
         "description": "an optional prefix for the image name",
         "display_name": "image_prefix",
         "recipes": [
-          "rightimage::cloud_add_euca",
+          "rightimage::upload_euca",
           "rightimage::cloud_add_ec2",
           "rightimage::upload_ec2_s3",
           "rightimage::upload_ec2_ebs",
