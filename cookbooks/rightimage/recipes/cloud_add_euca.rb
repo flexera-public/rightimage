@@ -120,7 +120,7 @@ end
 bash "package guest image" do 
   cwd "/mnt"
   code <<-EOH
-    tar czvf #{image_name}.tgz #{target_path}/* 
+    tar czvf #{image_name}.tgz #{target_mnt}/* 
   EOH
 end
 
