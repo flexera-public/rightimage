@@ -79,7 +79,7 @@ end if rightimage[:platform] == "ubuntu"
 
 # set cloud stuff
 case rightimage[:cloud]
-  when "ec2" 
+  when "ec2", "euca" 
     set[:rightimage][:root_mount][:dev] = "/dev/sda1"
     set[:rightimage][:root_mount][:dump] = "0" 
     set[:rightimage][:root_mount][:fsck] = "0" 
