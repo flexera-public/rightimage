@@ -2,25 +2,39 @@ class Chef::Resource::Bash
   include RightScale::RightImage::Helper
 end
 
-source_image = "#{node.rightimage.mount_dir}" 
-target_mnt = "/mnt/euca"
+raise "ERROR: you must set your virtual_environment to xen!"  if node[:rightimage][:virtual_environment] != "xen"
+
+euca_tools_version = "1.3.1"
+
+source_image = node[:rightimage][:mount_dir]
+
+build_root = "/mnt"
+
+target_raw = "eucalyptus.img"
+target_raw_path = "#{build_root}/#{target_raw}"
+guest_root = "#{build_root}/euca"
+
+package_root = "#{build_root}/pkg"
+package_dir = "#{package_root}/euca"
+
 loop_name="loop0"
 loop_dev="/dev/#{loop_name}"
 
-#  - add fstab
-template "#{node[:rightimage][:mount_dir]}/etc/fstab" do
-  source "fstab.erb"
-  backup false
-end
+package "grub"
 
-remote_file "/tmp/euca2ools-1.2-centos-i386.tar.gz" do 
-  source "euca2ools-1.2-centos-i386.tar.gz"
-  backup false
-end
-
-remote_file "/tmp/euca2ools-1.2-centos-x86_64.tar.gz" do 
-  source "euca2ools-1.2-centos-x86_64.tar.gz"
-  backup false
+bash "cleanup" do 
+  code <<-EOH
+    set -x
+    GUEST_ROOT=#{guest_root}
+    source_image="#{source_image}" 
+    loopdev=#{loop_dev}  
+    umount -lf $source_image/proc || true 
+    umount -lf $GUEST_ROOT/proc || true 
+    umount -lf $GUEST_ROOT/dev || true
+    umount -lf $GUEST_ROOT || true
+    losetup -d $loopdev
+    rm -rf $target_raw_path $GUEST_ROOT
+  EOH
 end
 
 bash "create eucalyptus loopback fs" do 
@@ -28,31 +42,66 @@ bash "create eucalyptus loopback fs" do
     set -e 
     set -x
   
-    source_image="#{node.rightimage.mount_dir}" 
-    target_mnt="#{target_mnt}"
+    DISK_SIZE_GB=10  
+    BYTES_PER_MB=1024
+    DISK_SIZE_MB=$(($DISK_SIZE_GB * $BYTES_PER_MB))
 
-    umount -lf #{source_image}/proc || true 
-    umount -lf #{target_mnt}/proc || true 
-    umount -lf #{target_mnt} || true
-    rm -rf $target_mnt
-      
-    mkdir $target_mnt  
-    rsync -a $source_image/ $target_mnt/
-
+    source_image="#{source_image}" 
+    target_raw_path="#{target_raw_path}"
+    GUEST_ROOT="#{guest_root}"
+    
+    dd if=/dev/zero of=$target_raw_path bs=1M count=$DISK_SIZE_MB    
+    
+    loopdev=#{loop_dev}
+    losetup $loopdev $target_raw_path
+    
+    mke2fs -F -j $loopdev
+    mkdir $GUEST_ROOT
+    mount $loopdev $GUEST_ROOT
+    
+    rsync -a $source_image/ $GUEST_ROOT/
   EOH
+end
+
+#  - add fstab
+template "#{guest_root}/etc/fstab" do
+  source "fstab.erb"
+  backup false
+end
+
+remote_file "/tmp/euca2ools-#{euca_tools_version}-centos-i386.tar.gz" do 
+  source "euca2ools-#{euca_tools_version}-centos-i386.tar.gz"
+  backup false
+end
+
+remote_file "/tmp/euca2ools-#{euca_tools_version}-centos-x86_64.tar.gz" do 
+  source "euca2ools-#{euca_tools_version}-centos-x86_64.tar.gz"
+  backup false
 end
 
 bash "mount proc & dev" do 
   code <<-EOH
-#!/bin/bash -ex
     set -e 
     set -x
-    target_mnt=#{target_mnt}
-    mount -t proc none $target_mnt/proc
-    mount --bind /dev $target_mnt/dev
+    GUEST_ROOT=#{guest_root}
+    mount -t proc none $GUEST_ROOT/proc
+    mount --bind /dev $GUEST_ROOT/dev
   EOH
 end
 
+bash "install xen kernel" do 
+  code <<-EOH
+    set -e 
+    set -x
+    GUEST_ROOT=#{guest_root}
+   # rm -f $GUEST_ROOT/boot/vmlinu* 
+  #  rm -rf $GUEST_ROOT/lib/modules/*
+  #  yum -c /tmp/yum.conf --installroot=$GUEST_ROOT -y install kernel-xen
+    rm -f $GUEST_ROOT/boot/initrd*
+    chroot $GUEST_ROOT mkinitrd --omit-scsi-modules --with=xennet   --with=xenblk  --preload=xenblk  initrd-#{node[:rightimage][:kernel_id]}  #{node[:rightimage][:kernel_id]}
+    mv $GUEST_ROOT/initrd-#{node[:rightimage][:kernel_id]}  $GUEST_ROOT/boot/.
+  EOH
+end
 
 package "euca2ools" do
   only_if { node[:rightimage][:platform] == "ubuntu" }
@@ -64,63 +113,86 @@ bash "install euca tools for centos" do
 #!/bin/bash -ex
     set -e 
     set -x
-    target_mnt=#{target_mnt}
+    
+    VERSION=#{euca_tools_version}  
+    GUEST_ROOT=#{guest_root}
       
     # install on host
     cd /tmp
-    tar -xzvf euca2ools-1.2-centos-#{node[:kernel][:machine]}.tar.gz 
-    cd  euca2ools-1.2-centos-#{node[:kernel][:machine]}
+    export ARCH=#{node[:kernel][:machine]}
+    tar -xzvf euca2ools-$VERSION-centos-$ARCH.tar.gz 
+    cd  euca2ools-$VERSION-centos-$ARCH
     rpm -i --force * 
 
-    # install on guest image
-    cp /tmp/euca2ools-1.2-centos-#{node[:rightimage][:arch]}.tar.gz $target_mnt/tmp/.
-    cd $target_mnt/tmp/.
-    tar -xzvf euca2ools-1.2-centos-#{node[:rightimage][:arch]}.tar.gz
-    chroot $target_mnt rpm -i --force /tmp/euca2ools-1.2-centos-#{node[:rightimage][:arch]}/*
+    # install on GUEST_ROOT image
+    cd $GUEST_ROOT/tmp/.
+    export ARCH=#{node[:rightimage][:arch]}
+    cp /tmp/euca2ools-$VERSION-centos-$ARCH.tar.gz $GUEST_ROOT/tmp/.
+    tar -xzvf euca2ools-$VERSION-centos-$ARCH.tar.gz
+    chroot $GUEST_ROOT rpm -i --force /tmp/euca2ools-$VERSION-centos-$ARCH/*
     
   EOH
 end
 
 bash "configure for eucalyptus" do 
   code <<-EOH
-#!/bin/bash -ex
     set -e 
     set -x
-    target_mnt=#{target_mnt}
+    GUEST_ROOT=#{guest_root}
 
     ## insert cloud file
-    mkdir -p /mnt/euca/etc/rightscale.d
-    echo -n "eucalyptus" > /mnt/euca/etc/rightscale.d/cloud
+    mkdir -p $GUEST_ROOT/etc/rightscale.d
+    echo -n "eucalyptus" > $GUEST_ROOT/etc/rightscale.d/cloud
 
     # clean out packages
-    yum -c /tmp/yum.conf --installroot=$target_mnt -y clean all
+    yum -c /tmp/yum.conf --installroot=$GUEST_ROOT -y clean all
     
-    rm ${target_mnt}/var/lib/rpm/__*
-    chroot $target_mnt rpm --rebuilddb
+    rm ${GUEST_ROOT}/var/lib/rpm/__*
+    chroot $GUEST_ROOT rpm --rebuilddb
 
   EOH
 end
 
 bash "unmount proc & dev" do 
   code <<-EOH
-#!/bin/bash -ex
     set -e 
     set -x
-    target_mnt=#{target_mnt}
-    umount -lf $target_mnt/proc
-    umount -lf $target_mnt/dev
+    GUEST_ROOT=#{guest_root}
+    umount -lf $GUEST_ROOT/proc
+    umount -lf $GUEST_ROOT/dev
   EOH
 end
 
-# Clean up guest image
-rightimage target_mnt do
+# Clean up GUEST_ROOT image
+rightimage guest_root do
   action :sanitize
 end
 
 bash "package guest image" do 
   cwd "/mnt"
   code <<-EOH
-    tar czvf #{image_name}.tgz #{target_mnt}/* 
+    set -e 
+    set -x
+    GUEST_ROOT=#{guest_root}
+    image_name=#{image_name}
+    package_dir=#{package_dir}/$image_name
+    rm -rf $package_dir
+    mkdir -p $package_dir
+    mkdir $package_dir/xen-kernel
+    cp $GUEST_ROOT/boot/vmlinuz-2.6.18-164.15.1.el5.centos.plusxen $package_dir/xen-kernel
+    cp $GUEST_ROOT/boot/initrd-2.6.18-164.15.1.el5.centos.plusxen $package_dir/xen-kernel
+    cp #{target_raw_path} $package_dir/$image_name.img
+    tar czvf #{package_dir}/$image_name.tar.gz $package_dir 
   EOH
 end
+
+# bash "unmount" do 
+#   code <<-EOH
+#     set -x
+#     GUEST_ROOT=#{guest_root}
+#     loopdev=#{loop_dev}  
+#     umount -lf $GUEST_ROOT || true
+#     losetup -d $loopdev
+#   EOH
+# end
 
