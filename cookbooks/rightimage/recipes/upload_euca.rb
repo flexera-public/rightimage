@@ -2,8 +2,14 @@ class Chef::Resource::Bash
   include RightScale::RightImage::Helper
 end
 
-target_mnt = "/mnt/euca"
-tmp_mnt = "/mnt/euca_tmp"
+build_root = "/mnt"
+
+target_mnt = "#{build_root}/euca"
+tmp_creds_dir = "#{build_root}/euca_upload_creds"
+
+package_root = "#{build_root}/pkg"
+package_dir = "#{package_root}/euca"
+
 
 ## copy the generic image 
 bash "copy_image" do 
@@ -11,137 +17,112 @@ bash "copy_image" do
 #!/bin/bash  -ex
   set -x
   set -e
+  image_name=#{image_name}
   target_mnt=#{target_mnt}
-  tmp_mnt=#{tmp_mnt}
+  tmp_creds_dir=#{tmp_creds_dir}
+  
+  
+  function eucarc {
+    echo -n "#{node[:rightimage][:euca][:x509_key_admin]}" > $tmp_creds_dir/euca_x509_key
+    export EC2_PRIVATE_KEY=$tmp_creds_dir/euca_x509_key
+    echo -n "#{node[:rightimage][:euca][:x509_cert_admin]}" > $tmp_creds_dir/euca_x509_cert
+    export EC2_CERT=$tmp_creds_dir/euca_x509_cert
+    export EC2_ACCESS_KEY='#{node[:rightimage][:euca][:access_key_id_admin]}'
+    export EC2_SECRET_KEY='#{node[:rightimage][:euca][:secret_access_key_admin]}'
+    # This is a bogus value; Eucalyptus does not need this but client tools do.
+    export EC2_USER_ID='#{node[:rightimage][:euca][:user_admin]}'
+    alias ec2-bundle-image="ec2-bundle-image --cert ${EC2_CERT} --privatekey ${EC2_PRIVATE_KEY} --user ${EC2_USER_ID} --ec2cert ${EUCALYPTUS_CERT}"
+    alias ec2-upload-bundle="ec2-upload-bundle -a ${EC2_ACCESS_KEY} -s ${EC2_SECRET_KEY} --url ${S3_URL} --ec2cert ${EUCALYPTUS_CERT}"
+  }
+  
 
-  rm -rf $tmp_mnt
-  mkdir $tmp_mnt
-  cd $tmp_mnt
+  # 
+  # Get paths to deliverables
+  #
+  package_dir=#{package_dir}
 
-  ## insert keys
-  echo -n "#{node[:rightimage][:euca][:x509_key]}" > $tmp_mnt/euca_x509_key
-  echo -n "#{node[:rightimage][:euca][:x509_cert]}" > $tmp_mnt/euca_x509_cert
-  echo -n "#{node[:rightimage][:euca][:x509_key_admin]}" > $tmp_mnt/euca_x509_key_admin
-  echo -n "#{node[:rightimage][:euca][:x509_cert_admin]}" > $tmp_mnt/euca_x509_cert_admin
-  echo -n "#{node[:rightimage][:euca][:euca_cert]}" > $tmp_mnt/euca_cert
+  image_path=$package_dir/$image_name/$image_name.img
+  if [ !-a $image_path ]; then echo "ERROR: no image found at "$image_path ; exit 1; fi
 
-## bundle kernel and ramdisk. Need to do this as the admin user
+  kernel_name=$(ls $package_dir/$image_name/xen-kernel/ | grep vmlinuz | tail -n 1)
+  kernel_path=$package_dir/$image_name/xen-kernel/$kernel_name
+  if [ !-a $kernel_path ]; then echo "ERROR: no kernel found at "$kernel_path ; exit 1; fi
+  
+  ramdisk_name=$(ls $package_dir/$image_name/xen-kernel/ | grep initrd | tail -n 1) 
+  ramdisk_path=$package_dir/$image_name/xen-kernel/$ramdisk_name
+  if [ !-a $ramdisk_path ]; then echo "ERROR: no ramdisk found at "$ramdisk_path ; exit 1; fi
 
-  ## bundle kernel
-  euca-bundle-image  \
-    -i $target_mnt/boot/$(ls #{node[:rightimage][:mount_dir]}/boot/ | grep vmlinuz | tail -n 1) \
-    -u #{node[:rightimage][:euca][:user_admin]} \
-    -c euca_x509_cert_admin  \
-    -k euca_x509_key_admin   \
-    -d . \
-    --ec2cert euca_cert  \
-    -r #{node[:rightimage][:arch]} \
-    -a #{node[:rightimage][:euca][:access_key_id_admin]} \
-    -s #{node[:rightimage][:euca][:secret_access_key_admin]} \
-    -U #{node[:rightimage][:euca][:euca_url]} \
-    -p #{image_name}.kernel \
-    --kernel true
 
-  ## bundle ramdisk
-  euca-bundle-image  \
-    -i $target_mnt/boot/$(ls #{node[:rightimage][:mount_dir]}/boot/ | grep initrd | tail -n 1) \
-    -u #{node[:rightimage][:euca][:user_admin]} \
-    -c euca_x509_cert_admin  \
-    -k euca_x509_key_admin   \
-    -d . --ec2cert euca_cert  \
-    -r #{node[:rightimage][:arch]} \
-    -a #{node[:rightimage][:euca][:access_key_id_admin]} \
-    -s #{node[:rightimage][:euca][:secret_access_key_admin]} \
-    -U #{node[:rightimage][:euca][:euca_url]} \
-    -p #{image_name}.initrd \
-    --ramdisk true
+  # 
+  # setup paths
+  #
+  export S3_URL=#{node[:rightimage][:euca][:euca_url]}:8773/services/Walrus
+  export EC2_URL=#{node[:rightimage][:euca][:euca_url]}:8773/services/Eucalyptus
 
-  ## upload kernel
-  euca-upload-bundle  \
-    -b #{image_name}_admin \
-    -m #{image_name}.kernel.manifest.xml  \
-    --ec2cert euca_cert \
-    -a #{node[:rightimage][:euca][:access_key_id_admin]} \
-    -s #{node[:rightimage][:euca][:secret_access_key_admin]} \
-    -U #{node[:rightimage][:euca][:walrus_url]} 
+  
+  #
+  # Setup creds for upload
+  #
+  rm -rf $tmp_creds_dir
+  mkdir $tmp_creds_dir
+  cd $tmp_creds_dir
 
-  ## upload ramdisk
-  euca-upload-bundle  \
-    -b #{image_name}_admin \
-    -m #{image_name}.initrd.manifest.xml  \
-    --ec2cert euca_cert \
-    -a #{node[:rightimage][:euca][:access_key_id_admin]} \
-    -s #{node[:rightimage][:euca][:secret_access_key_admin]} \
-    -U #{node[:rightimage][:euca][:walrus_url]} 
+  # Global Cloud Cert
+  export EC2_JVM_ARGS=-Djavax.net.ssl.trustStore=$tmp_creds_dir/jssecacerts
+  echo -n "#{node[:rightimage][:euca][:euca_cert]}" > $tmp_creds_dir/euca_cert
+  export EUCALYPTUS_CERT=$tmp_creds_dir/euca_cert
 
-  ## register kernel
-  kernel_output=`euca-register  #{image_name}_admin/#{image_name}.kernel.manifest.xml \
-    -a #{node[:rightimage][:euca][:access_key_id_admin]} \
-    -s #{node[:rightimage][:euca][:secret_access_key_admin]}   \
-    -U #{node[:rightimage][:euca][:euca_url]}`
-  echo $kernel_optput
 
-  ## register ramdisk
-  ramdisk_output=`euca-register  #{image_name}_admin/#{image_name}.initrd.manifest.xml \
-    -a #{node[:rightimage][:euca][:access_key_id_admin]} \
-    -s #{node[:rightimage][:euca][:secret_access_key_admin]}   \
-    -U #{node[:rightimage][:euca][:euca_url]}`
+  # 
+  # bundle kernel and ramdisk. Need to do this as the admin user
+  #
+  kernel_bucket="centos-kernels"
+
+  # Load Admin Creds
+  eucarc "#{node[:rightimage][:euca][:x509_key_admin]}"     \
+    "#{node[:rightimage][:euca][:x509_cert_admin]}"         \
+    "#{node[:rightimage][:euca][:access_key_id_admin]}"     \
+    "#{node[:rightimage][:euca][:secret_access_key_admin]}" \
+    "#{node[:rightimage][:euca][:user_admin]}"
+  
+  # upload kernel
+  echo `euca-bundle-image -i $kernel_path --kernel true`
+  echo `euca-upload-bundle -b $kernel_bucket -m /tmp/$kernel_name.manifest.xml`  
+  kernel_output=`euca-register $kernel_bucket/$kernel_name.manifest.xml`
+  echo $kernel_output
+  
+  # upload ramdisk
+  echo `euca-bundle-image -i $ramdisk_path --ramdisk true`
+  echo `euca-upload-bundle -b $kernel_bucket -m /tmp/$ramdisk_name.manifest.xml`  
+  ramdisk_output=`euca-register $kernel_bucket/$ramdisk_name.manifest.xml`
   echo $ramdisk_output
-
+    
   ## collect kernel and ramdisk id's
-  kernel_id=`echo -n $kernel_output | awk '{ print $2 }'`
-  ramdisk_id=`echo -n $ramdisk_output | awk '{ print $2 }'`
+  EKI=`echo -n $kernel_output | awk '{ print $2 }'`
+  ERI=`echo -n $ramdisk_output | awk '{ print $2 }'`
 
-  rm -rf $target_mnt/tmp/*
-  rm -rf $target_mnt/proc/*
 
-  cp $tmp_mnt/euca* $target_mnt/tmp/.
+  # 
+  # Upload image. 
+  #
+  image_bucket=$image_name
 
-  ## have to bind /dev to make the euca2ools happy for centos
-  if [ "#{node[:rightimage][:platform]}" == "centos" ]; then 
-    mount --bind /dev/ $target_mnt/dev/
-  fi
+  # Load Account Creds
+  eucarc "#{node[:rightimage][:euca][:x509_key]}"     \
+    "#{node[:rightimage][:euca][:x509_cert]}"         \
+    "#{node[:rightimage][:euca][:access_key_id]}"     \
+    "#{node[:rightimage][:euca][:secret_access_key]}" \
+    "#{node[:rightimage][:euca][:user]}"
 
-chroot $target_mnt euca-bundle-vol  \
-  --arch #{node[:rightimage][:arch]} \
-  --privatekey /tmp/euca_x509_key \
-  --cert /tmp/euca_x509_cert \
-  --ec2cert /tmp/euca_cert \
-  --user #{node[:rightimage][:euca][:user]} \
-  --kernel $kernel_id \
-  --ramdisk $ramdisk_id \
-  --url #{node[:rightimage][:euca][:euca_url]} \
-  --exclude /tmp \
-  --destination /tmp/.  \
-  --prefix #{image_name}
-  #--generate-fstab \
-
-  cp $target_mnt/tmp/#{image_name}* .
-
-  ## unmount bind
-  if [ "#{node[:rightimage][:platform]}" == "centos" ]; then 
-    umount $target_mnt/dev/
-  fi
-
-euca-upload-bundle \
-  --bucket #{image_name} \
-  --manifest #{image_name}.manifest.xml \
-  --access-key #{node[:rightimage][:euca][:access_key_id]} \
-  --secret-key #{node[:rightimage][:euca][:secret_access_key]} \
-  --url #{node[:rightimage][:euca][:walrus_url]} 
-
-## register image
-image_out=`euca-register \
-  #{image_name}/#{image_name}.manifest.xml \
-  --url #{node[:rightimage][:euca][:euca_url]} \
-  -a #{node[:rightimage][:euca][:access_key_id]}  \
-  -s #{node[:rightimage][:euca][:secret_access_key]} `
+  echo `euca-bundle-image -i $image_path --kernel $EKI --ramdisk $ERI`
+  echo `euca-upload-bundle -b $image_bucket -m /tmp/$image_name.img.manifest.xml`
+  image_out=`euca-register $image_bucket/$image_name.img.manifest.xml`
   echo $image_out
 
-# parse out image id to tmp file
-image_id=`echo -n $image_out | awk '{ print $2 }'`
-echo new image id = $image_id
-echo $image_id > /var/tmp/image_id
+  # parse out image id to tmp file
+  image_id=`echo -n $image_out | awk '{ print $2 }'`
+  echo new image id = $image_id
+  echo $image_id > /var/tmp/image_id
 
   EOC
 end
