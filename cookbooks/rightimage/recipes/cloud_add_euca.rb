@@ -94,9 +94,9 @@ bash "install xen kernel" do
     set -e 
     set -x
     GUEST_ROOT=#{guest_root}
-   # rm -f $GUEST_ROOT/boot/vmlinu* 
-  #  rm -rf $GUEST_ROOT/lib/modules/*
-  #  yum -c /tmp/yum.conf --installroot=$GUEST_ROOT -y install kernel-xen
+    rm -f $GUEST_ROOT/boot/vmlinu* 
+    rm -rf $GUEST_ROOT/lib/modules/*
+    yum -c /tmp/yum.conf --installroot=$GUEST_ROOT -y install kernel-xen
     rm -f $GUEST_ROOT/boot/initrd*
     chroot $GUEST_ROOT mkinitrd --omit-scsi-modules --with=xennet   --with=xenblk  --preload=xenblk  initrd-#{node[:rightimage][:kernel_id]}  #{node[:rightimage][:kernel_id]}
     mv $GUEST_ROOT/initrd-#{node[:rightimage][:kernel_id]}  $GUEST_ROOT/boot/.
