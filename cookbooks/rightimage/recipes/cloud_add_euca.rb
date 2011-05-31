@@ -93,13 +93,26 @@ bash "install xen kernel" do
   code <<-EOH
     set -e 
     set -x
+    kernel_id=#{node[:rightimage][:kernel_id]}
+    
+    # Install to guest. 
+    # NOTE: for some reason kernel and modules are not being installed on 
+    #       guest using --installroot option.
     GUEST_ROOT=#{guest_root}
     rm -f $GUEST_ROOT/boot/vmlinu* 
     rm -rf $GUEST_ROOT/lib/modules/*
     yum -c /tmp/yum.conf --installroot=$GUEST_ROOT -y install kernel-xen
+
+    # Also install to host so we can grab kernel and modules 
+    # This is a workaround for the --installroot problem above (hacktastic, I know)
+    yum -c /tmp/yum.conf -y install kernel-xen
+    cp /boot/vmlinuz-$kernel_id $GUEST_ROOT/boot/
+    cp -R /lib/modules/$kernel_id $GUEST_ROOT/lib/modules/$kernel_id
+
+    # Now rebuild ramdisk with xen drivers
     rm -f $GUEST_ROOT/boot/initrd*
-    chroot $GUEST_ROOT mkinitrd --omit-scsi-modules --with=xennet   --with=xenblk  --preload=xenblk  initrd-#{node[:rightimage][:kernel_id]}  #{node[:rightimage][:kernel_id]}
-    mv $GUEST_ROOT/initrd-#{node[:rightimage][:kernel_id]}  $GUEST_ROOT/boot/.
+    chroot $GUEST_ROOT mkinitrd --with=xennet --with=xenblk --preload=xenblk initrd-$kernel_id $kernel_id
+    mv $GUEST_ROOT/initrd-$kernel_id  $GUEST_ROOT/boot/.
   EOH
 end
 
