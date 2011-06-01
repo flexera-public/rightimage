@@ -76,7 +76,7 @@ bash "copy_image" do
   # 
   # bundle kernel and ramdisk. Need to do this as the admin user
   #
-  kernel_bucket="centos-kernels"
+  kernel_bucket=$image_name
 
   # Load Admin Creds
   eucarc "#{node[:rightimage][:euca][:x509_key_admin]}"     \
@@ -107,12 +107,12 @@ bash "copy_image" do
   #
   image_bucket=$image_name
 
-  # Load Account Creds
-  eucarc "#{node[:rightimage][:euca][:x509_key]}"     \
-    "#{node[:rightimage][:euca][:x509_cert]}"         \
-    "#{node[:rightimage][:euca][:access_key_id]}"     \
-    "#{node[:rightimage][:euca][:secret_access_key]}" \
-    "#{node[:rightimage][:euca][:user]}"
+  # # Load Account Creds
+  # eucarc "#{node[:rightimage][:euca][:x509_key]}"     \
+  #   "#{node[:rightimage][:euca][:x509_cert]}"         \
+  #   "#{node[:rightimage][:euca][:access_key_id]}"     \
+  #   "#{node[:rightimage][:euca][:secret_access_key]}" \
+  #   "#{node[:rightimage][:euca][:user]}"
 
   echo `euca-bundle-image -i $image_path --kernel $EKI --ramdisk $ERI`
   echo `euca-upload-bundle -b $image_bucket -m /tmp/$image_name.img.manifest.xml`
