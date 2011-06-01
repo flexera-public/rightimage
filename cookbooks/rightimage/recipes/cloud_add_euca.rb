@@ -15,7 +15,7 @@ target_raw_path = "#{build_root}/#{target_raw}"
 guest_root = "#{build_root}/euca"
 
 package_root = "#{build_root}/pkg"
-package_dir = "#{package_root}/euca"
+cloud_package_root = "#{package_root}/euca"
 
 loop_name="loop0"
 loop_dev="/dev/#{loop_name}"
@@ -188,14 +188,16 @@ bash "package guest image" do
     set -x
     GUEST_ROOT=#{guest_root}
     image_name=#{image_name}
-    package_dir=#{package_dir}/$image_name
+    cloud_package_root=#{cloud_package_root}
+    package_dir=$cloud_package_root/$image_name
     rm -rf $package_dir
     mkdir -p $package_dir
+    cd $cloud_package_root
     mkdir $package_dir/xen-kernel
     cp $GUEST_ROOT/boot/vmlinuz-2.6.18-164.15.1.el5.centos.plusxen $package_dir/xen-kernel
     cp $GUEST_ROOT/boot/initrd-2.6.18-164.15.1.el5.centos.plusxen $package_dir/xen-kernel
     cp #{target_raw_path} $package_dir/$image_name.img
-    tar czvf #{package_dir}/$image_name.tar.gz $package_dir 
+    tar czvf $image_name.tar.gz $image_name 
   EOH
 end
 
