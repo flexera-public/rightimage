@@ -170,81 +170,45 @@ attribute "rightimage/virtual_environment",
   :default => "xen"
 
 ## euca inputs  
-attribute "rightimage/euca/user",
-  :display_name => "euca user",
-  :description => "euca user",
+attribute "rightimage/euca/user_id",
+  :display_name => "Eucalyptus User ID",
+  :description => "The EC2_USER_ID value defined in your eucarc credentials file. User must have admin privileges.",
   :required => "required",
   :recipes => [ "rightimage::upload_euca" ]
   
-attribute "rightimage/euca/walrus_url",
-  :display_name => "walrus url",
-  :description => "walrus url",
-  :required => "required",
-  :recipes => [ "rightimage::upload_euca" ]
-
 attribute "rightimage/euca/euca_url",
-  :display_name => "euca url",
-  :description => "euca url",
+  :display_name => "Eucalyptus URL",
+  :description => "Base URL to your Eucalyptus Cloud Controller. Don't include port. (Ex. http://<server_ip>)",
   :required => "required",
   :recipes => [ "rightimage::upload_euca" ]
 
 attribute "rightimage/euca/access_key_id",
-  :display_name => "access key id",
-  :description => "access key id",
+  :display_name => "Eucalyptus Access Key",
+  :description => "The EC2_ACCESS_KEY value defined in your eucarc credentials file. User must have admin privileges.",
   :required => "required",
   :recipes => [ "rightimage::upload_euca" ]
 
 attribute "rightimage/euca/secret_access_key",
-  :display_name => "secret access key",
-  :description => "secret access key",
-  :required => "required",
-  :recipes => [ "rightimage::upload_euca" ]
-
-attribute "rightimage/euca/user_admin",
-  :display_name => "euca user admin",
-  :description => "euca user for the admin acct",
-  :required => "required",
-  :recipes => [ "rightimage::upload_euca" ]
-  
-attribute "rightimage/euca/access_key_id_admin",
-  :display_name => "access key id admin acct",
-  :description => "access key id for admin acct",
-  :required => "required",
-  :recipes => [ "rightimage::upload_euca" ]
-
-attribute "rightimage/euca/secret_access_key_admin",
-  :display_name => "secret access key admin",
-  :description => "secret access key for the admin acct",
-  :required => "required",
-  :recipes => [ "rightimage::upload_euca" ]
-
-attribute "rightimage/euca/x509_key_admin",
-  :display_name => "x509 key admin",
-  :description => "x509 key for the admin acct",
-  :required => "required",
-  :recipes => [ "rightimage::upload_euca" ]
-
-attribute "rightimage/euca/x509_cert_admin",
-  :display_name => "x509 cert admin",
-  :description => "x509 cert for the admin acct",
+  :display_name => "Eucalyptus Secret Access Key",
+  :description => "The EC2_SECRET_KEY value defined in your eucarc credentials file. User must have admin privileges.",
   :required => "required",
   :recipes => [ "rightimage::upload_euca" ]
 
 attribute "rightimage/euca/x509_key",
-  :display_name => "x509 key ",
-  :description => "x509 key ",
+  :display_name => "Eucalyptus x509 Private Key",
+  :description => "The contents of the file pointed to by the EC2_PRIVATE_KEY value defined in your eucarc credentials file.",
   :required => "required",
   :recipes => [ "rightimage::upload_euca" ]
 
 attribute "rightimage/euca/x509_cert",
-  :display_name => "x509 cert ",
-  :description => "x509 cert ",
+  :display_name => "Eucalyptus x509 Certificate",
+  :description => "The contents of the file pointed to by the EC2_CERT value defined in your eucarc credentials file.",
   :required => "required",
   :recipes => [ "rightimage::upload_euca" ]
 
 attribute "rightimage/euca/euca_cert",
-  :display_name => "euca cert",
-  :description => "euca cert",
+  :display_name => "Eucalyptus Cloud Certificate",
+  :description => "The contents of the file pointed to by the EUCALYPTUS_CERT value defined in your eucarc credentials file.",
   :required => "required",
   :recipes => [ "rightimage::upload_euca" ]
 

@@ -22,20 +22,6 @@ bash "copy_image" do
   tmp_creds_dir=#{tmp_creds_dir}
   
   
-  function eucarc {
-    echo -n "#{node[:rightimage][:euca][:x509_key_admin]}" > $tmp_creds_dir/euca_x509_key
-    export EC2_PRIVATE_KEY=$tmp_creds_dir/euca_x509_key
-    echo -n "#{node[:rightimage][:euca][:x509_cert_admin]}" > $tmp_creds_dir/euca_x509_cert
-    export EC2_CERT=$tmp_creds_dir/euca_x509_cert
-    export EC2_ACCESS_KEY='#{node[:rightimage][:euca][:access_key_id_admin]}'
-    export EC2_SECRET_KEY='#{node[:rightimage][:euca][:secret_access_key_admin]}'
-    # This is a bogus value; Eucalyptus does not need this but client tools do.
-    export EC2_USER_ID='#{node[:rightimage][:euca][:user_admin]}'
-    alias ec2-bundle-image="ec2-bundle-image --cert ${EC2_CERT} --privatekey ${EC2_PRIVATE_KEY} --user ${EC2_USER_ID} --ec2cert ${EUCALYPTUS_CERT}"
-    alias ec2-upload-bundle="ec2-upload-bundle -a ${EC2_ACCESS_KEY} -s ${EC2_SECRET_KEY} --url ${S3_URL} --ec2cert ${EUCALYPTUS_CERT}"
-  }
-  
-
   # 
   # Get paths to deliverables
   #
@@ -54,7 +40,7 @@ bash "copy_image" do
 
 
   # 
-  # setup paths
+  # Setup paths
   #
   export S3_URL=#{node[:rightimage][:euca][:euca_url]}:8773/services/Walrus
   export EC2_URL=#{node[:rightimage][:euca][:euca_url]}:8773/services/Eucalyptus
@@ -72,18 +58,23 @@ bash "copy_image" do
   echo -n "#{node[:rightimage][:euca][:euca_cert]}" > $tmp_creds_dir/euca_cert
   export EUCALYPTUS_CERT=$tmp_creds_dir/euca_cert
 
+  # Load Admin Certs and Creds (loosely based on eucarc file)
+  echo -n "#{node[:rightimage][:euca][:x509_key]}" > $tmp_creds_dir/euca_x509_key
+  export EC2_PRIVATE_KEY=$tmp_creds_dir/euca_x509_key
+  echo -n "#{node[:rightimage][:euca][:x509_cert]}" > $tmp_creds_dir/euca_x509_cert
+  export EC2_CERT=$tmp_creds_dir/euca_x509_cert
+  export EC2_ACCESS_KEY='#{node[:rightimage][:euca][:access_key_id]}'
+  export EC2_SECRET_KEY='#{node[:rightimage][:euca][:secret_access_key]}'
+  # This is a bogus value; Eucalyptus does not need this but client tools do.
+  export EC2_USER_ID='#{node[:rightimage][:euca][:user_id]}'
+  alias ec2-bundle-image="ec2-bundle-image --cert ${EC2_CERT} --privatekey ${EC2_PRIVATE_KEY} --user ${EC2_USER_ID} --ec2cert ${EUCALYPTUS_CERT}"
+  alias ec2-upload-bundle="ec2-upload-bundle -a ${EC2_ACCESS_KEY} -s ${EC2_SECRET_KEY} --url ${S3_URL} --ec2cert ${EUCALYPTUS_CERT}"
+
 
   # 
-  # bundle kernel and ramdisk. Need to do this as the admin user
+  # Bundle kernel and ramdisk. Need to do this as the admin user
   #
   kernel_bucket=$image_name
-
-  # Load Admin Creds
-  eucarc "#{node[:rightimage][:euca][:x509_key_admin]}"     \
-    "#{node[:rightimage][:euca][:x509_cert_admin]}"         \
-    "#{node[:rightimage][:euca][:access_key_id_admin]}"     \
-    "#{node[:rightimage][:euca][:secret_access_key_admin]}" \
-    "#{node[:rightimage][:euca][:user_admin]}"
   
   # upload kernel
   echo `euca-bundle-image -i $kernel_path --kernel true`
@@ -107,13 +98,6 @@ bash "copy_image" do
   #
   image_bucket=$image_name
 
-  # # Load Account Creds
-  # eucarc "#{node[:rightimage][:euca][:x509_key]}"     \
-  #   "#{node[:rightimage][:euca][:x509_cert]}"         \
-  #   "#{node[:rightimage][:euca][:access_key_id]}"     \
-  #   "#{node[:rightimage][:euca][:secret_access_key]}" \
-  #   "#{node[:rightimage][:euca][:user]}"
-
   echo `euca-bundle-image -i $image_path --kernel $EKI --ramdisk $ERI`
   echo `euca-upload-bundle -b $image_bucket -m /tmp/$image_name.img.manifest.xml`
   image_out=`euca-register $image_bucket/$image_name.img.manifest.xml`
@@ -123,6 +107,12 @@ bash "copy_image" do
   image_id=`echo -n $image_out | awk '{ print $2 }'`
   echo new image id = $image_id
   echo $image_id > /var/tmp/image_id
+  
+  
+  #
+  # Remove creds from instance
+  #
+  rm -rf $tmp_creds_dir
 
   EOC
 end

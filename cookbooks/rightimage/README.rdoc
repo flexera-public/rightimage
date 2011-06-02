@@ -5,7 +5,7 @@ Then adds the cloud specific settings. Also has the ability to upload and regist
 cloud.
 
 = USAGE:
-From a RightScale manage host:
+From a RightScale managed host:
 
 rs_run_recipe -n rightimage::build_image
 
