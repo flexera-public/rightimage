@@ -85,8 +85,7 @@ attribute "rightimage/region",
 attribute "rightimage/sandbox_repo_tag",
   :display_name => "sandbox_repo_tag",
   :description => "The tag on the sandbox repo from which to build rightscale package",
-  :required => true,
-  :default => "rightlink_package_5.6.34"
+  :required => true
   
 attribute "rightimage/rightlink_version",
   :display_name => "rightlink_version",
@@ -175,8 +174,7 @@ attribute "rightimage/virtual_environment",
   :display_name => "Hypervisor",
   :description => "Which hypervisor is this image for?",
   :choice => [ "xen", "kvm", "esx" ],
-  :required => "required",
-  :default => "xen"
+  :required => "required"
 
 ## euca inputs  
 attribute "rightimage/euca/user_id",
