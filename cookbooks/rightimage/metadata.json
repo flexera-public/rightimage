@@ -212,7 +212,6 @@
         "choice": [
 
         ],
-        "default": "rightlink_package_5.6.34",
         "type": "string",
         "recipes": [
 
@@ -243,7 +242,6 @@
           "kvm",
           "esx"
         ],
-        "default": "xen",
         "type": "string",
         "recipes": [
 
