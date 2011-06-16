@@ -3,6 +3,19 @@
     "conflicting": {
     },
     "attributes": {
+      "rightimage/image_name": {
+        "required": "required",
+        "calculated": false,
+        "choice": [
+
+        ],
+        "type": "string",
+        "recipes": [
+
+        ],
+        "description": "The name you want to give this new image.",
+        "display_name": "Image Name"
+      },
       "rightimage/rightlink_version": {
         "required": "required",
         "calculated": false,
@@ -14,7 +27,7 @@
 
         ],
         "description": "The RightLink version we are building into our image",
-        "display_name": "rightlink_version"
+        "display_name": "RightLink Version"
       },
       "rightimage/euca/x509_cert": {
         "required": "required",
@@ -51,43 +64,6 @@
         "description": "aws_509_cert",
         "display_name": "aws_509_cert"
       },
-      "rightimage/image_name_override": {
-        "required": "optional",
-        "calculated": false,
-        "choice": [
-
-        ],
-        "type": "string",
-        "recipes": [
-
-        ],
-        "description": "The image name is created automaticaaly.  Set this value if you want to override the default image name.",
-        "display_name": "Image Name Override"
-      },
-      "rightimage/image_postfix": {
-        "required": "optional",
-        "calculated": false,
-        "choice": [
-
-        ],
-        "type": "string",
-        "recipes": [
-          "rightimage::upload_euca",
-          "rightimage::cloud_add_ec2",
-          "rightimage::upload_ec2_s3",
-          "rightimage::upload_ec2_ebs",
-          "rightimage::do_tag_images",
-          "rightimage::do_create_mci",
-          "rightimage::base_centos",
-          "rightimage::base_ubuntu",
-          "rightimage::base_sles",
-          "rightimage::default",
-          "rightimage::build_image",
-          "rightimage::cloud_add_vmops"
-        ],
-        "description": "an optional postfix for the image name",
-        "display_name": "image_postfix"
-      },
       "rightimage/release": {
         "required": "required",
         "calculated": false,
@@ -121,7 +97,8 @@
         "required": "optional",
         "calculated": false,
         "choice": [
-
+          "true",
+          "false"
         ],
         "type": "string",
         "recipes": [
@@ -215,8 +192,8 @@
         "recipes": [
 
         ],
-        "description": "The tag on the sandbox repo from which to build rightscale package",
-        "display_name": "sandbox_repo_tag"
+        "description": "The tag on the sandbox_builds repo from which to build rightscale package.",
+        "display_name": "Sandbox Repository Tag"
       },
       "rightimage/manual_mode": {
         "required": "optional",
@@ -461,8 +438,8 @@
           "rightimage::build_image",
           "rightimage::upload_vmops"
         ],
-        "description": "the bucket to upload the image to",
-        "display_name": "image_upload_bucket"
+        "description": "The bucket to upload the image to.",
+        "display_name": "Image Upload Bucket"
       },
       "rightimage/platform": {
         "required": "required",
@@ -492,30 +469,6 @@
         "description": "The EC2_USER_ID value defined in your eucarc credentials file. User must have admin privileges.",
         "display_name": "Eucalyptus User ID"
       },
-      "rightimage/image_prefix": {
-        "required": "optional",
-        "calculated": false,
-        "choice": [
-
-        ],
-        "type": "string",
-        "recipes": [
-          "rightimage::upload_euca",
-          "rightimage::cloud_add_ec2",
-          "rightimage::upload_ec2_s3",
-          "rightimage::upload_ec2_ebs",
-          "rightimage::do_tag_images",
-          "rightimage::do_create_mci",
-          "rightimage::base_centos",
-          "rightimage::base_ubuntu",
-          "rightimage::base_sles",
-          "rightimage::default",
-          "rightimage::build_image",
-          "rightimage::cloud_add_vmops"
-        ],
-        "description": "an optional prefix for the image name",
-        "display_name": "image_prefix"
-      },
       "rightimage/region": {
         "required": "required",
         "calculated": false,
@@ -530,8 +483,8 @@
         "recipes": [
 
         ],
-        "description": "the EC2 region that the image will reside",
-        "display_name": "region"
+        "description": "The EC2 region in which the image will reside",
+        "display_name": "EC2 Region"
       },
       "rest_connection/user": {
         "required": "required",

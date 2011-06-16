@@ -77,43 +77,31 @@ attribute "rightimage/cloud",
   :required => true
   
 attribute "rightimage/region",
-  :display_name => "region",
-  :description => "the EC2 region that the image will reside",
+  :display_name => "EC2 Region",
+  :description => "The EC2 region in which the image will reside",
   :choice => [ "us-east", "us-west", "eu-west", "ap-southeast", "ap-northeast" ],
   :required => true
   
 attribute "rightimage/sandbox_repo_tag",
-  :display_name => "sandbox_repo_tag",
-  :description => "The tag on the sandbox repo from which to build rightscale package",
+  :display_name => "Sandbox Repository Tag",
+  :description => "The tag on the sandbox_builds repo from which to build rightscale package.",
   :required => true
   
 attribute "rightimage/rightlink_version",
-  :display_name => "rightlink_version",
+  :display_name => "RightLink Version",
   :description => "The RightLink version we are building into our image",
   :required => true
   
 attribute "rightimage/image_upload_bucket",
-  :display_name => "image_upload_bucket",
-  :description => "the bucket to upload the image to",
+  :display_name => "Image Upload Bucket",
+  :description => "The bucket to upload the image to.",
   :required => "required",
   :recipes => [ "rightimage::upload_euca" ,"rightimage::cloud_add_ec2", "rightimage::upload_ec2_s3", "rightimage::upload_ec2_ebs", "rightimage::do_tag_images" , "rightimage::do_create_mci" , "rightimage::base_centos" , "rightimage::base_ubuntu" , "rightimage::base_sles" , "rightimage::default", "rightimage::build_image" , "rightimage::upload_vmops" ]
   
-attribute "rightimage/image_prefix",
-  :display_name => "image_prefix",
-  :description => "an optional prefix for the image name",
-  :required => "optional",
-  :recipes => [ "rightimage::upload_euca" ,"rightimage::cloud_add_ec2", "rightimage::upload_ec2_s3", "rightimage::upload_ec2_ebs", "rightimage::do_tag_images" , "rightimage::do_create_mci" , "rightimage::base_centos" , "rightimage::base_ubuntu" , "rightimage::base_sles" , "rightimage::default", "rightimage::build_image" , "rightimage::cloud_add_vmops" ]
-  
-attribute "rightimage/image_postfix",
-  :display_name => "image_postfix",
-  :description => "an optional postfix for the image name",
-  :required => "optional",
-  :recipes => [ "rightimage::upload_euca" ,"rightimage::cloud_add_ec2", "rightimage::upload_ec2_s3", "rightimage::upload_ec2_ebs", "rightimage::do_tag_images" , "rightimage::do_create_mci" , "rightimage::base_centos" , "rightimage::base_ubuntu" , "rightimage::base_sles" , "rightimage::default", "rightimage::build_image" , "rightimage::cloud_add_vmops" ]
-  
-attribute "rightimage/image_name_override",
-  :display_name => "Image Name Override",
-  :description => "The image name is created automaticaaly.  Set this value if you want to override the default image name.",
-  :required => "optional"
+attribute "rightimage/image_name",
+  :display_name => "Image Name",
+  :description => "The name you want to give this new image.",
+  :required => "required"
   
 attribute "rightimage/aws_account_number",
   :display_name => "aws_account_number",
@@ -160,6 +148,7 @@ attribute "rightimage/aws_secret_access_key_for_upload",
 attribute "rightimage/debug",
   :display_name => "debug",
   :description => "toggles debug mode",
+  :choice => [ "true", "false" ],
   :required => "optional",
   :recipes => [ "rightimage::base_centos" , "rightimage::base_sles" , "rightimage::base_ubuntu" , "rightimage::default", "rightimage::build_image" , "rightimage::bootstrap_centos" , "rightimage::bootstrap_sles" , "rightimage::bootstrap_ubuntu" ]
 

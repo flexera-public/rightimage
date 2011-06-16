@@ -5,27 +5,9 @@ module RightScale
       # NOTE: this code is basically duplicated code with the right_image_builder project
       # albeit out of date duplicated code.  We should share code someday!
       
-      # Construct image name.
       def image_name
-        
-        override_name = node.rightimage.image_name_override
-        return override_name.dup if override_name && override_name != ""
-        
-        release = node[:rightimage][:rightlink_version]
-        suffix = node[:rightimage][:image_postfix]
-
-        image_name = ""
-        image_name << node[:rightimage][:image_prefix] + '_' if node[:rightimage][:image_prefix]
-        image_name << node[:rightimage][:platform].capitalize + '_'
-        image_name << node[:rightimage][:release_number] + '_'
-        if node[:rightimage][:arch] == "x86_64"
-          image_name << "x64" + '_'
-        else
-          image_name << node[:rightimage][:arch] + '_'
-        end
-        image_name << 'v' + release 
-        image_name << '_' + suffix if suffix
-        image_name
+	raise "ERROR: you must specify an image_name!" unless node[:rightimage][:image_name]
+	node[:rightimage][:image_name]
       end   
       
       def cloud_id
