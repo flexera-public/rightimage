@@ -1,29 +1,4 @@
 {
-    "version": "0.0.1",
-    "recipes": {
-      "rightimage::cloud_add_vmops": "adds requirements for cloudstack based on hypervisor choice",
-      "rightimage::rightscale_install": "installs rightscale",
-      "rightimage::base_sles": "coordinate a sles install",
-      "rightimage::cloud_add_raw": "migrates the create image to a raw file -- useful for new cloud development",
-      "rightimage::cloud_add_euca": "migrates the created image to eucalyptus",
-      "rightimage::cloud_add_ec2": "migrates the created image to ec2",
-      "rightimage::default": "starts builds image automatically at boot. See 'manual_mode' input to enable.",
-      "rightimage::upload_ec2_ebs": "create EBS image snapshot (ec2 only)",
-      "rightimage::upload_ec2_s3": "bundle and upload s3 image (ec2 only)",
-      "rightimage::bootstrap_sles": "bootstraps a basic sles image",
-      "rightimage::bootstrap_ubuntu": "bootstraps a basic ubuntu image",
-      "rightimage::base_ubuntu": "coordinate an ubuntu install",
-      "rightimage::do_create_mci": "creates MCI for image(s) (only ec2 currently supported)",
-      "rightimage::upload_euca": "bundle and upload euca kernel, ramdisk and image",
-      "rightimage::install_vhd-util": "install the vhd-util tool",
-      "rightimage::build_image": "build image based on host platform",
-      "rightimage::do_tag_images": "adds rightscale tags to images",
-      "rightimage::bootstrap_common": "common configuration for linux base images",
-      "rightimage::base_centos": "coordinate a centos install",
-      "rightimage::bootstrap_centos": "bootstraps a basic centos image",
-      "rightimage::upload_vmops": "setup http server for download to test cloud",
-      "rightimage::clean": "cleans everything"
-    },
     "maintainer_email": "support@rightscale.com",
     "conflicting": {
     },
@@ -34,6 +9,7 @@
         "choice": [
 
         ],
+        "default": "5.6.34",
         "type": "string",
         "recipes": [
 
@@ -117,7 +93,10 @@
         "required": "required",
         "calculated": false,
         "choice": [
-
+          "5.4",
+          "5.6",
+          "lucid",
+          "maverick"
         ],
         "type": "string",
         "recipes": [
@@ -233,6 +212,7 @@
         "choice": [
 
         ],
+        "default": "rightlink_package_5.6.34",
         "type": "string",
         "recipes": [
 
@@ -244,7 +224,8 @@
         "required": "optional",
         "calculated": false,
         "choice": [
-
+          "true",
+          "false"
         ],
         "default": "true",
         "type": "string",
@@ -255,17 +236,19 @@
         "display_name": "Manual Mode"
       },
       "rightimage/virtual_environment": {
-        "required": "optional",
+        "required": "required",
         "calculated": false,
         "choice": [
-
+          "xen",
+          "kvm",
+          "esx"
         ],
         "default": "xen",
         "type": "string",
         "recipes": [
 
         ],
-        "description": "Which hypervisor is this image for? ['xen'|'kvm']",
+        "description": "Which hypervisor is this image for?",
         "display_name": "Hypervisor"
       },
       "rightimage/aws_account_number": {
@@ -308,7 +291,9 @@
         "required": "required",
         "calculated": false,
         "choice": [
-
+          "ec2",
+          "vmops",
+          "euca"
         ],
         "type": "string",
         "recipes": [
@@ -435,7 +420,8 @@
         "required": "required",
         "calculated": false,
         "choice": [
-
+          "i386",
+          "x86_64"
         ],
         "type": "string",
         "recipes": [
@@ -485,7 +471,9 @@
         "required": "required",
         "calculated": false,
         "choice": [
-
+          "centos",
+          "ubuntu",
+          "suse"
         ],
         "type": "string",
         "recipes": [
@@ -535,13 +523,17 @@
         "required": "required",
         "calculated": false,
         "choice": [
-
+          "us-east",
+          "us-west",
+          "eu-west",
+          "ap-southeast",
+          "ap-northeast"
         ],
         "type": "string",
         "recipes": [
 
         ],
-        "description": "the region that the image will reside",
+        "description": "the EC2 region that the image will reside",
         "display_name": "region"
       },
       "rest_connection/user": {
@@ -560,14 +552,39 @@
     },
     "providing": {
     },
+    "description": "image building tools",
     "dependencies": {
+    },
+    "recipes": {
+      "rightimage::cloud_add_vmops": "adds requirements for cloudstack based on hypervisor choice",
+      "rightimage::rightscale_install": "installs rightscale",
+      "rightimage::base_sles": "coordinate a sles install",
+      "rightimage::cloud_add_raw": "migrates the create image to a raw file -- useful for new cloud development",
+      "rightimage::cloud_add_euca": "migrates the created image to eucalyptus",
+      "rightimage::cloud_add_ec2": "migrates the created image to ec2",
+      "rightimage::default": "starts builds image automatically at boot. See 'manual_mode' input to enable.",
+      "rightimage::upload_ec2_ebs": "create EBS image snapshot (ec2 only)",
+      "rightimage::upload_ec2_s3": "bundle and upload s3 image (ec2 only)",
+      "rightimage::bootstrap_sles": "bootstraps a basic sles image",
+      "rightimage::bootstrap_ubuntu": "bootstraps a basic ubuntu image",
+      "rightimage::base_ubuntu": "coordinate an ubuntu install",
+      "rightimage::do_create_mci": "creates MCI for image(s) (only ec2 currently supported)",
+      "rightimage::upload_euca": "bundle and upload euca kernel, ramdisk and image",
+      "rightimage::install_vhd-util": "install the vhd-util tool",
+      "rightimage::build_image": "build image based on host platform",
+      "rightimage::do_tag_images": "adds rightscale tags to images",
+      "rightimage::bootstrap_common": "common configuration for linux base images",
+      "rightimage::base_centos": "coordinate a centos install",
+      "rightimage::bootstrap_centos": "bootstraps a basic centos image",
+      "rightimage::upload_vmops": "setup http server for download to test cloud",
+      "rightimage::clean": "cleans everything"
     },
     "replacing": {
     },
-    "license": "Apache v2.0",
     "groupings": {
     },
     "long_description": "",
+    "version": "0.0.1",
     "recommendations": {
     },
     "name": "rightimage",
@@ -576,5 +593,5 @@
     },
     "platforms": {
     },
-    "description": "image building tools"
+    "license": "Apache v2.0"
   }

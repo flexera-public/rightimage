@@ -48,43 +48,51 @@ attribute "rest_connection/api_url",
 attribute "rightimage/manual_mode",
   :display_name => "Manual Mode",
   :description => "Sets the template's operation mode. Ex. 'true' = don't build at boot time.",
+  :choice => [ "true", "false" ],
   :default => "true",
   :recipes => [ "rightimage::default" ]
 
 attribute "rightimage/platform",
   :display_name => "platform",
   :description => "the os of the image to build",
+  :choice => [ "centos", "ubuntu", "suse" ],
   :required => true
   
 attribute "rightimage/release",
   :display_name => "release",
   :description => "the release of the image to build",
+  :choice => [ "5.4", "5.6", "lucid", "maverick" ],
   :required => true
   
 attribute "rightimage/arch",
   :display_name => "arch",
   :description => "the arch of the image to build",
+  :choice => [ "i386", "x86_64" ],
   :required => true
   
 attribute "rightimage/cloud",
   :display_name => "cloud",
   :description => "the cloud that the image will reside",
+  :choice => [ "ec2", "vmops", "euca" ], 
   :required => true
   
 attribute "rightimage/region",
   :display_name => "region",
-  :description => "the region that the image will reside",
+  :description => "the EC2 region that the image will reside",
+  :choice => [ "us-east", "us-west", "eu-west", "ap-southeast", "ap-northeast" ],
   :required => true
   
 attribute "rightimage/sandbox_repo_tag",
   :display_name => "sandbox_repo_tag",
   :description => "The tag on the sandbox repo from which to build rightscale package",
-  :required => true
+  :required => true,
+  :default => "rightlink_package_5.6.34"
   
 attribute "rightimage/rightlink_version",
   :display_name => "rightlink_version",
   :description => "The RightLink version we are building into our image",
-  :required => true
+  :required => true,
+  :default => "5.6.34"
   
 attribute "rightimage/image_upload_bucket",
   :display_name => "image_upload_bucket",
@@ -165,8 +173,9 @@ attribute "rightimage/install_mirror_date",
 
 attribute "rightimage/virtual_environment",
   :display_name => "Hypervisor",
-  :description => "Which hypervisor is this image for? ['xen'|'kvm']",
-  :required => "optional",
+  :description => "Which hypervisor is this image for?",
+  :choice => [ "xen", "kvm", "esx" ],
+  :required => "required",
   :default => "xen"
 
 ## euca inputs  
