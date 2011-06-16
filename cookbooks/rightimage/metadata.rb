@@ -90,8 +90,7 @@ attribute "rightimage/sandbox_repo_tag",
 attribute "rightimage/rightlink_version",
   :display_name => "rightlink_version",
   :description => "The RightLink version we are building into our image",
-  :required => true,
-  :default => "5.6.34"
+  :required => true
   
 attribute "rightimage/image_upload_bucket",
   :display_name => "image_upload_bucket",
