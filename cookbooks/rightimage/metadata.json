@@ -77,8 +77,8 @@
         "recipes": [
 
         ],
-        "description": "the release of the image to build",
-        "display_name": "release"
+        "description": "The OS release/version to build into the virtual image.",
+        "display_name": "Guest OS Release"
       },
       "rightimage/euca/x509_key": {
         "required": "required",
@@ -111,8 +111,8 @@
           "rightimage::bootstrap_sles",
           "rightimage::bootstrap_ubuntu"
         ],
-        "description": "toggles debug mode",
-        "display_name": "debug"
+        "description": "If set, a random root password will be set for debugging purposes. NOTE: you must include 'Dev' in the image name or the build with fail.",
+        "display_name": "Development Image?"
       },
       "rightimage/aws_secret_access_key_for_upload": {
         "required": "required",
@@ -273,8 +273,8 @@
         "recipes": [
 
         ],
-        "description": "the cloud that the image will reside",
-        "display_name": "cloud"
+        "description": "The supported cloud for the virtual image.",
+        "display_name": "Target Cloud"
       },
       "rightimage/root_size_gb": {
         "required": "optional",
@@ -347,8 +347,8 @@
           "rightimage::build_image",
           "rightimage::bootstrap_centos"
         ],
-        "description": "date to install from",
-        "display_name": "install_mirror_date"
+        "description": "Repository archive date from which to pull packages. Default: latest",
+        "display_name": "Mirror Freeze Date"
       },
       "rightimage/aws_access_key_id_for_upload": {
         "required": "required",
@@ -420,8 +420,8 @@
         "recipes": [
 
         ],
-        "description": "the arch of the image to build",
-        "display_name": "arch"
+        "description": "The architecture for the virtual image.",
+        "display_name": "Guest OS Architecture"
       },
       "rest_connection/api_url": {
         "required": "required",
@@ -472,8 +472,8 @@
         "recipes": [
 
         ],
-        "description": "the os of the image to build",
-        "display_name": "platform"
+        "description": "The operating system for the virtual image.",
+        "display_name": "Guest OS Platform"
       },
       "rightimage/euca/user_id": {
         "required": "required",

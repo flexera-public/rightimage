@@ -60,26 +60,26 @@ attribute "rightimage/manual_mode",
   :recipes => [ "rightimage::default" ]
 
 attribute "rightimage/platform",
-  :display_name => "platform",
-  :description => "the os of the image to build",
+  :display_name => "Guest OS Platform",
+  :description => "The operating system for the virtual image.",
   :choice => [ "centos", "ubuntu", "suse" ],
   :required => true
   
 attribute "rightimage/release",
-  :display_name => "release",
-  :description => "the release of the image to build",
+  :display_name => "Guest OS Release",
+  :description => "The OS release/version to build into the virtual image.",
   :choice => [ "5.4", "5.6", "lucid", "maverick" ],
   :required => true
   
 attribute "rightimage/arch",
-  :display_name => "arch",
-  :description => "the arch of the image to build",
+  :display_name => "Guest OS Architecture",
+  :description => "The architecture for the virtual image.",
   :choice => [ "i386", "x86_64" ],
   :required => true
   
 attribute "rightimage/cloud",
-  :display_name => "cloud",
-  :description => "the cloud that the image will reside",
+  :display_name => "Target Cloud",
+  :description => "The supported cloud for the virtual image.",
   :choice => [ "ec2", "vmops", "euca" ], 
   :required => true
   
@@ -153,15 +153,15 @@ attribute "rightimage/aws_secret_access_key_for_upload",
   :recipes => [ "rightimage::cloud_add_ec2", "rightimage::upload_ec2_s3", "rightimage::upload_ec2_ebs", "rightimage::do_tag_images" , "rightimage::do_create_mci" , "rightimage::base_centos" , "rightimage::base_sles" , "rightimage::base_ubuntu" , "rightimage::default", "rightimage::build_image" , "rightimage::upload_vmops" ]
 
 attribute "rightimage/debug",
-  :display_name => "debug",
-  :description => "toggles debug mode",
+  :display_name => "Development Image?",
+  :description => "If set, a random root password will be set for debugging purposes. NOTE: you must include 'Dev' in the image name or the build with fail.",
   :choice => [ "true", "false" ],
   :required => "optional",
   :recipes => [ "rightimage::base_centos" , "rightimage::base_sles" , "rightimage::base_ubuntu" , "rightimage::default", "rightimage::build_image" , "rightimage::bootstrap_centos" , "rightimage::bootstrap_sles" , "rightimage::bootstrap_ubuntu" ]
 
 attribute "rightimage/install_mirror_date",
-  :display_name => "install_mirror_date",
-  :description => "date to install from",
+  :display_name => "Mirror Freeze Date",
+  :description => "Repository archive date from which to pull packages. Default: latest",
   :required => "optional",
   :recipes => [ "rightimage::base_centos" , "rightimage::default", "rightimage::build_image" , "rightimage::bootstrap_centos" ]
 
