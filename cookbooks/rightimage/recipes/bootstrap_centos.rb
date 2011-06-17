@@ -49,9 +49,14 @@ set -e
 ## yum is getting mad that /etc/fstab does not exist and that /proc is not mounted
 mkdir -p #{node[:rightimage][:mount_dir]}/etc
 touch #{node[:rightimage][:mount_dir]}/etc/fstab
+
 mkdir -p #{node[:rightimage][:mount_dir]}/proc
 umount #{node[:rightimage][:mount_dir]}/proc || true
 mount --bind /proc #{node[:rightimage][:mount_dir]}/proc
+
+mkdir -p #{node[:rightimage][:mount_dir]}/sys
+umount #{node[:rightimage][:mount_dir]}/sys || true
+mount --bind /sys #{node[:rightimage][:mount_dir]}/sys
 
 ## bootstrap base OS
 yum -c /tmp/yum.conf --installroot=#{node[:rightimage][:mount_dir]} -y groupinstall Base 
@@ -230,6 +235,12 @@ bash "clean_db" do
   EOH
 end
 
+bash "cleanup" do
+  code <<-EOH
+    umount -lf #{node[:rightimage][:mount_dir]}/proc || true
+    umount -lf #{node[:rightimage][:mount_dir]}/sys || true
+  EOH
+end    
 
 
 

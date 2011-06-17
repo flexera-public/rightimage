@@ -123,15 +123,6 @@ case rightimage[:cloud]
     else
       raise "ERROR: unsupported virtual_environment for cloudstack"
     end
-    ## set kernel to use for vmops
-    case rightimage[:release]
-    when "5.2" 
-      set[:rightimage][:kernel_id] = "2.6.18-92.1.22.el5.centos.plus"
-      rightimage[:kernel_id] << "xen" if rightimage[:virtual_environment] == "xen"
-    when "5.4" 
-      set[:rightimage][:kernel_id] = "2.6.18-164.15.1.el5.centos.plus"
-      rightimage[:kernel_id] << "xen" if rightimage[:virtual_environment] == "xen"
-    end
 end
 
 
@@ -204,6 +195,9 @@ case rightimage[:cloud]
       rightimage[:kernel_id] << "xen" if rightimage[:virtual_environment] == "xen"
     when "5.4" 
       set[:rightimage][:kernel_id] = "2.6.18-164.15.1.el5.centos.plus"
+      rightimage[:kernel_id] << "xen" if rightimage[:virtual_environment] == "xen"
+    when "5.6"
+      set[:rightimage][:kernel_id] = "2.6.18-238.12.1.el5.centos.plus"
       rightimage[:kernel_id] << "xen" if rightimage[:virtual_environment] == "xen"
     end
   when "ec2"
