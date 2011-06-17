@@ -40,8 +40,9 @@ if node[:rightimage][:debug] == "true"
     code <<-EOH
       set -e
       set -x
-      ## set root passwd to 'rightscale'
-      echo 'echo root:rightscale | chpasswd' > #{node[:rightimage][:mount_dir]}/tmp/chpasswd
+      ## set random root passwd 
+      < /dev/urandom tr -dc [:alnum:] | head -c14 > #{passwd_file}
+      echo 'echo root:`cat #{passwd_file}` | chpasswd' > #{node[:rightimage][:mount_dir]}/tmp/chpasswd
       chmod +x #{node[:rightimage][:mount_dir]}/tmp/chpasswd
       chroot #{node[:rightimage][:mount_dir]} /tmp/chpasswd
   EOH
