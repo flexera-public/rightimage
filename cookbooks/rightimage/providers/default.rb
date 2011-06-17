@@ -1,4 +1,3 @@
-
 action :sanitize do
   
   ruby_block "sanitize" do
