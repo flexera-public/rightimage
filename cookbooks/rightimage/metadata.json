@@ -276,6 +276,25 @@
         "description": "the cloud that the image will reside",
         "display_name": "cloud"
       },
+      "rightimage/root_size_gb": {
+        "required": "optional",
+        "calculated": false,
+        "choice": [
+          "10",
+          "4",
+          "2"
+        ],
+        "default": "10",
+        "type": "string",
+        "recipes": [
+          "rightimage::cloud_add_vmops",
+          "rightimage::cloud_add_euca",
+          "rightimage::cloud_add_ec2",
+          "rightimage::cloud_add_raw"
+        ],
+        "description": "Sets the size of the virtual image. Units are in GB.",
+        "display_name": "Root Size GB"
+      },
       "rest_connection/pass": {
         "required": "required",
         "calculated": false,

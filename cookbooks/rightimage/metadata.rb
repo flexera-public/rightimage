@@ -45,6 +45,13 @@ attribute "rest_connection/api_url",
 #
 # required
 #
+attribute "rightimage/root_size_gb",
+  :display_name => "Root Size GB",
+  :description => "Sets the size of the virtual image. Units are in GB.",
+  :choice => [ "10", "4", "2" ],
+  :default => "10",
+  :recipes => [ "rightimage::cloud_add_vmops", "rightimage::cloud_add_euca", "rightimage::cloud_add_ec2", "rightimage::cloud_add_raw" ]
+
 attribute "rightimage/manual_mode",
   :display_name => "Manual Mode",
   :description => "Sets the template's operation mode. Ex. 'true' = don't build at boot time.",
