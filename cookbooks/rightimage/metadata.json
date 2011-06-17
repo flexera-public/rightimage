@@ -287,6 +287,8 @@
         "default": "10",
         "type": "string",
         "recipes": [
+          "rightimage::default",
+          "rightimage::build_image",
           "rightimage::cloud_add_vmops",
           "rightimage::cloud_add_euca",
           "rightimage::cloud_add_ec2",

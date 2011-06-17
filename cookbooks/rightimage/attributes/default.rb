@@ -6,7 +6,7 @@ UNKNOWN = :unknown.to_s
 
 set_unless[:rightimage][:debug] = false
 set[:rightimage][:lang] = "en_US.UTF-8"
-set[:rightimage][:root_size] = "2048"
+set_unless[:rightimage][:root_size_gb] = "10"
 set[:rightimage][:build_dir] = "/mnt/vmbuilder"
 set[:rightimage][:mount_dir] = "/mnt/image"
 set_unless[:rightimage][:virtual_environment] = "xen"
@@ -40,13 +40,9 @@ when "ubuntu"
 when "centos" 
   set[:rightimage][:guest_packages] = "wget mlocate nano logrotate ruby ruby-devel ruby-docs ruby-irb ruby-libs ruby-mode ruby-rdoc ruby-ri ruby-tcltk postfix openssl openssh openssh-askpass openssh-clients openssh-server curl gcc* zip unzip bison flex compat-libstdc++-296 cvs subversion autoconf automake libtool compat-gcc-34-g77 mutt sysstat rpm-build fping vim-common vim-enhanced rrdtool-1.2.27 rrdtool-devel-1.2.27 rrdtool-doc-1.2.27 rrdtool-perl-1.2.27 rrdtool-python-1.2.27 rrdtool-ruby-1.2.27 rrdtool-tcl-1.2.27 pkgconfig lynx screen yum-utils bwm-ng createrepo redhat-rpm-config redhat-lsb git nscd xfsprogs swig"
 
-  rightimage[:guest_packages] << " kernel-xen" if rightimage[:cloud] == "euca"
-
   rightimage[:guest_packages] << " iscsi-initiator-utils" if rightimage[:cloud] == "vmops" 
 
-
   set[:rightimage][:host_packages] = "swig"
-
   set[:rightimage][:package_type] = "rpm"
 when "suse"
   set[:rightimage][:guest_packages] = "gcc"

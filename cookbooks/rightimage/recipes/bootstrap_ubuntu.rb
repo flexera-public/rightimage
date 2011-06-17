@@ -28,7 +28,7 @@ case node[:rightimage][:platform]
     bootstrap_cmd = "/usr/bin/vmbuilder  #{node[:rightimage][:virtual_environment]} ubuntu -o \
         --suite=#{node[:rightimage][:release]} \
         -d #{node[:rightimage][:build_dir]} \
-        --rootsize=#{node[:rightimage][:root_size]} \
+        --rootsize=2048 \
         --install-mirror=http://mirror.rightscale.com/ubuntu \
         --install-security-mirror=http://mirror.rightscale.com/ubuntu \
         --components=main,restricted,universe,multiverse \
