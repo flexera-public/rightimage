@@ -20,6 +20,15 @@ cloud_package_root = "#{package_root}/euca"
 loop_name="loop0"
 loop_dev="/dev/#{loop_name}"
 
+
+bash "clean yum" do
+  only_if { node[:platform] == "centos" }
+  code <<-EOH
+    set -x
+    yum clean all
+  EOH
+end
+
 package "grub"
 
 bash "cleanup" do 
@@ -31,6 +40,7 @@ bash "cleanup" do
     umount -lf $source_image/proc || true 
     umount -lf $GUEST_ROOT/proc || true 
     umount -lf $GUEST_ROOT/dev || true
+    umount -lf $GUEST_ROOT/sys || true
     umount -lf $GUEST_ROOT || true
     losetup -d $loopdev
     rm -rf $target_raw_path $GUEST_ROOT
@@ -42,8 +52,7 @@ bash "create eucalyptus loopback fs" do
     set -e 
     set -x
   
-#    DISK_SIZE_GB=10  
-    DISK_SIZE_GB=4  
+    DISK_SIZE_GB=#{node[:rightimage][:root_size_gb]}  
     BYTES_PER_MB=1024
     DISK_SIZE_MB=$(($DISK_SIZE_GB * $BYTES_PER_MB))
 
@@ -87,6 +96,7 @@ bash "mount proc & dev" do
     GUEST_ROOT=#{guest_root}
     mount -t proc none $GUEST_ROOT/proc
     mount --bind /dev $GUEST_ROOT/dev
+    mount --bind /sys $GUEST_ROOT/sys
   EOH
 end
 
@@ -151,8 +161,9 @@ bash "unmount proc & dev" do
     set -e 
     set -x
     GUEST_ROOT=#{guest_root}
-    umount -lf $GUEST_ROOT/proc
-    umount -lf $GUEST_ROOT/dev
+    umount -lf $GUEST_ROOT/proc || true
+    umount -lf $GUEST_ROOT/dev || true
+    umount -lf $GUEST_ROOT/sys || true
   EOH
 end
 
@@ -167,6 +178,7 @@ bash "package guest image" do
     set -e 
     set -x
     GUEST_ROOT=#{guest_root}
+    KERNEL_VERSION=#{node[:rightimage][:kernel_id]}
     image_name=#{image_name}
     cloud_package_root=#{cloud_package_root}
     package_dir=$cloud_package_root/$image_name
@@ -174,20 +186,20 @@ bash "package guest image" do
     mkdir -p $package_dir
     cd $cloud_package_root
     mkdir $package_dir/xen-kernel
-    cp $GUEST_ROOT/boot/vmlinuz-2.6.18-164.15.1.el5.centos.plusxen $package_dir/xen-kernel
-    cp $GUEST_ROOT/boot/initrd-2.6.18-164.15.1.el5.centos.plusxen $package_dir/xen-kernel
+    cp $GUEST_ROOT/boot/vmlinuz-$KERNEL_VERSION $package_dir/xen-kernel
+    cp $GUEST_ROOT/boot/initrd-$KERNEL_VERSION $package_dir/xen-kernel
     cp #{target_raw_path} $package_dir/$image_name.img
     tar czvf $image_name.tar.gz $image_name 
   EOH
 end
 
-# bash "unmount" do 
-#   code <<-EOH
-#     set -x
-#     GUEST_ROOT=#{guest_root}
-#     loopdev=#{loop_dev}  
-#     umount -lf $GUEST_ROOT || true
-#     losetup -d $loopdev
-#   EOH
-# end
+bash "unmount" do 
+  code <<-EOH
+    set -x
+    GUEST_ROOT=#{guest_root}
+    loopdev=#{loop_dev}  
+    umount -lf $GUEST_ROOT || true
+    losetup -d $loopdev
+  EOH
+end
 

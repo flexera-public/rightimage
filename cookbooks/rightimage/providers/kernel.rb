@@ -14,13 +14,14 @@ action :install do
       GUEST_ROOT=#{new_resource.guest_root}
       rm -f $GUEST_ROOT/boot/vmlinu* 
       rm -rf $GUEST_ROOT/lib/modules/*
-      yum -c /tmp/yum.conf --installroot=$GUEST_ROOT -y install kernel-xen
+#       yum -c /tmp/yum.conf --installroot=$GUEST_ROOT -d 10 -e 10 -y install kernel-xen 
+      chroot $GUEST_ROOT yum -d 10 -e 10 -y install kernel-xen
   
       # Also install to host so we can grab kernel and modules 
       # This is a workaround for the --installroot problem above (hacktastic, I know)
-      yum -c /tmp/yum.conf -y install kernel-xen
-      cp /boot/vmlinuz-$kernel_version $GUEST_ROOT/boot/
-      cp -R /lib/modules/$kernel_version $GUEST_ROOT/lib/modules/$kernel_version
+#      yum -c /tmp/yum.conf -y install kernel-xen
+#      cp /boot/vmlinuz-$kernel_version $GUEST_ROOT/boot/
+#      cp -R /lib/modules/$kernel_version $GUEST_ROOT/lib/modules/$kernel_version
   
       # Now rebuild ramdisk with xen drivers
       rm -f $GUEST_ROOT/boot/initrd*
