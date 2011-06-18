@@ -41,10 +41,11 @@ if node[:rightimage][:debug] == "true"
       set -e
       set -x
       ## set random root passwd 
-      < /dev/urandom tr -dc [:alnum:] | head -c14 > #{passwd_file}
-      echo 'echo root:`cat #{passwd_file}` | chpasswd' > #{node[:rightimage][:mount_dir]}/tmp/chpasswd
+      RAND_PASSWD=$(< /dev/urandom tr -dc [:alnum:] | head -c14)
+      echo 'echo root:$RAND_PASSWD | chpasswd' > #{node[:rightimage][:mount_dir]}/tmp/chpasswd
       chmod +x #{node[:rightimage][:mount_dir]}/tmp/chpasswd
       chroot #{node[:rightimage][:mount_dir]} /tmp/chpasswd
+      echo -n $RAND_PASSWD > #{passwd_file}
   EOH
   end
 
