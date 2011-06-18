@@ -8,17 +8,10 @@ module RightScale
       def image_name
 	raise "ERROR: you must specify an image_name!" unless node[:rightimage][:image_name]
 	image_name = node[:rightimage][:image_name]
-        if File.exists?(passwd_file)
-	  image_name << "_#{IO.read(passwd_file)}"
-	end
+	image_name << "_#{node[:rightimage][:random_passwd]}" if node[:rightimage][:debug]
 	image_name
       end   
 
-      # Used to save root password for Dev images
-      def passwd_file
-	"/tmp/random_password"
-      end
-      
       def cloud_id
         cloud_names = { 
           "us-east" => "1", 
