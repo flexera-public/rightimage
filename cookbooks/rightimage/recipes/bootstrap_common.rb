@@ -41,7 +41,7 @@ if node[:rightimage][:debug] == "true"
       set -e
       set -x
       ## set random root passwd 
-      echo 'echo root:#{node[:rightimage][:random_passwd]} | chpasswd' > #{node[:rightimage][:mount_dir]}/tmp/chpasswd
+      echo 'echo root:#{generate_persisted_passwd} | chpasswd' > #{node[:rightimage][:mount_dir]}/tmp/chpasswd
       chmod +x #{node[:rightimage][:mount_dir]}/tmp/chpasswd
       chroot #{node[:rightimage][:mount_dir]} /tmp/chpasswd
   EOH

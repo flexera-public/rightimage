@@ -12,9 +12,6 @@ set[:rightimage][:mount_dir] = "/mnt/image"
 set_unless[:rightimage][:virtual_environment] = "xen"
 set[:rightimage][:install_mirror] = "mirror.rightscale.com"
 
-# Generate random 14 char root password used by dev images
-set[:rightimage][:random_passwd] = generate_persisted_passwd
-
 if rightimage[:platform] == "ubuntu"
 # for using apt-proxy
   set[:rightimage][:install_mirror] = "localhost:9999"

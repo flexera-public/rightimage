@@ -8,9 +8,22 @@ module RightScale
       def image_name
       	raise "ERROR: you must specify an image_name!" unless node[:rightimage][:image_name]
       	name = node[:rightimage][:image_name]
-      	name << "_#{node[:rightimage][:random_passwd]}" if node[:rightimage][:debug]
+      	name << "_#{generate_persisted_passwd}" if node[:rightimage][:debug]
       	name
       end   
+      
+      def generate_persisted_passwd
+        length = 14
+        pw = nil
+        filename = "/tmp/random_passwd"
+        if ::File.exists?(filename)
+          pw = File.open(filename, 'rb') { |f| f.read }
+        else
+          pw = Array.new(length/2) { rand(256) }.pack('C*').unpack('H*').first
+          File.open(filename, 'w') {|f| f.write(pw) }
+        end
+        pw
+      end
 
       def cloud_id
         cloud_names = { 

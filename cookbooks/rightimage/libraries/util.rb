@@ -16,19 +16,6 @@ module RightImage
       @root = root_dir
     end
     
-    def generate_persisted_passwd
-      length = 14
-      pw = nil
-      filename = "/tmp/random_passwd"
-      if ::File.exists?(filename)
-        pw = File.open(filename, 'rb') { |f| f.read }
-      else
-        pw = Array.new(length/2) { rand(256) }.pack('C*').unpack('H*').first
-        File.open(filename, 'w') {|f| f.write(pw) }
-      end
-      pw
-    end
-    
     # Cleaning up image
     #
     def sanitize()
