@@ -13,14 +13,13 @@ set_unless[:rightimage][:virtual_environment] = "xen"
 set[:rightimage][:install_mirror] = "mirror.rightscale.com"
 
 # Generate random 14 char root password used by dev images
-set[:rightimage][:random_passwd] = Array.new(14/2) { rand(256) }.pack('C*').unpack('H*').first
+set[:rightimage][:random_passwd] = generate_persisted_passwd
 
 if rightimage[:platform] == "ubuntu"
 # for using apt-proxy
   set[:rightimage][:install_mirror] = "localhost:9999"
 end
 
-set_unless[:rightimage][:image_name_override] = ""
 set_unless[:rightimage][:install_mirror_date] = "latest" 
 
 # set base os packages

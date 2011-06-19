@@ -6,10 +6,10 @@ module RightScale
       # albeit out of date duplicated code.  We should share code someday!
       
       def image_name
-	raise "ERROR: you must specify an image_name!" unless node[:rightimage][:image_name]
-	image_name = node[:rightimage][:image_name]
-	image_name << "_#{node[:rightimage][:random_passwd]}" if node[:rightimage][:debug]
-	image_name
+      	raise "ERROR: you must specify an image_name!" unless node[:rightimage][:image_name]
+      	name = node[:rightimage][:image_name]
+      	name << "_#{node[:rightimage][:random_passwd]}" if node[:rightimage][:debug]
+      	name
       end   
 
       def cloud_id
