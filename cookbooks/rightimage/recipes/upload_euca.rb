@@ -28,15 +28,30 @@ bash "copy_image" do
   package_dir=#{package_dir}
 
   image_path=$package_dir/$image_name/$image_name.img
-  if [ ! -a $image_path ]; then echo "ERROR: no image found at "$image_path ; exit 1; fi
-
+  if [ -a $image_path ]; then 
+    echo "Image to upload found: "$image_path
+  else
+    echo "ERROR: no image found at "$image_path 
+    exit 1
+  fi
+  
   kernel_name=$(ls $package_dir/$image_name/xen-kernel/ | grep vmlinuz | tail -n 1)
   kernel_path=$package_dir/$image_name/xen-kernel/$kernel_name
-  if [ ! -a $kernel_path ]; then echo "ERROR: no kernel found at "$kernel_path ; exit 1; fi
+  if [ -a $kernel_path ]; then 
+    echo "Kernel to upload found: "$kernel_path
+  else
+    echo "ERROR: no kernel found at "$kernel_path 
+    exit 1
+  fi
   
   ramdisk_name=$(ls $package_dir/$image_name/xen-kernel/ | grep initrd | tail -n 1) 
   ramdisk_path=$package_dir/$image_name/xen-kernel/$ramdisk_name
-  if [ ! -a $ramdisk_path ]; then echo "ERROR: no ramdisk found at "$ramdisk_path ; exit 1; fi
+  if [ -a $ramdisk_path ]; then 
+    echo "Ramdisk to upload found: "$ramdisk_path
+  else
+    echo "ERROR: no ramdisk found at "$ramdisk_path 
+    exit 1
+  fi
 
 
   # 
