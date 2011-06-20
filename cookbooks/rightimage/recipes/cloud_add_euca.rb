@@ -172,6 +172,14 @@ rightimage guest_root do
   action :sanitize
 end
 
+bash "sync fs" do 
+  code <<-EOH
+    set -x
+    sync
+  EOH
+end
+
+
 bash "package guest image" do 
   cwd "/mnt"
   code <<-EOH
