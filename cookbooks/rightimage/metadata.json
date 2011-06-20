@@ -543,6 +543,7 @@
     "dependencies": {
     },
     "recipes": {
+      "rightimage::upload_file_to_s3": "upload specified file to s3",
       "rightimage::cloud_add_vmops": "adds requirements for cloudstack based on hypervisor choice",
       "rightimage::rightscale_install": "installs rightscale",
       "rightimage::base_sles": "coordinate a sles install",
