@@ -132,7 +132,8 @@
           "rightimage::base_ubuntu",
           "rightimage::default",
           "rightimage::build_image",
-          "rightimage::upload_vmops"
+          "rightimage::upload_vmops",
+          "rightimage::upload_file_to_s3"
         ],
         "description": "aws_secret_access_key_for_upload",
         "display_name": "aws_secret_access_key_for_upload"
@@ -370,7 +371,8 @@
           "rightimage::base_ubuntu",
           "rightimage::default",
           "rightimage::build_image",
-          "rightimage::upload_vmops"
+          "rightimage::upload_vmops",
+          "rightimage::upload_file_to_s3"
         ],
         "description": "aws_access_key_id for the uplaod bucket",
         "display_name": "aws_access_key_id_for_upload"
@@ -438,6 +440,19 @@
         "description": "The rightscale account specific api url to use.  Ex. https://my.rightscale.com/api/acct/1234 (where 1234 is your account id)",
         "display_name": "API URL"
       },
+      "rightimage/file_to_upload": {
+        "required": "required",
+        "calculated": false,
+        "choice": [
+
+        ],
+        "type": "string",
+        "recipes": [
+          "rightimage::upload_file_to_s3"
+        ],
+        "description": "The absolute pathname of the file to upload to S3.",
+        "display_name": "File To Upload"
+      },
       "rightimage/image_upload_bucket": {
         "required": "required",
         "calculated": false,
@@ -457,7 +472,8 @@
           "rightimage::base_sles",
           "rightimage::default",
           "rightimage::build_image",
-          "rightimage::upload_vmops"
+          "rightimage::upload_vmops",
+          "rightimage::upload_file_to_s3"
         ],
         "description": "The bucket to upload the image to.",
         "display_name": "Image Upload Bucket"
