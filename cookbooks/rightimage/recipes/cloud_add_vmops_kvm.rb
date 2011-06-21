@@ -193,7 +193,7 @@ bash "backup raw image" do
   EOH
 end
 
-bash "upload image" do 
+bash "package image" do 
   cwd File.dirname target_raw_path
   code <<-EOH
     set -e
@@ -205,11 +205,6 @@ bash "upload image" do
     qemu-img convert -O qcow2 #{target_raw_path} $BUNDLED_IMAGE_PATH
     bzip2 $BUNDLED_IMAGE_PATH
 
-    # upload image
-    # export AWS_ACCESS_KEY_ID=#{node.rightimage.aws_access_key_id_for_upload}
-    # export AWS_SECRET_ACCESS_KEY=#{node.rightimage.aws_secret_access_key_for_upload}
-    # export AWS_CALLING_FORMAT=SUBDOMAIN 
-    # s3cmd --progress put #{node.rightimage.image_upload_bucket}:$BUNDLED_IMAGE.bz2 $BUNDLED_IMAGE_PATH.bz2 x-amz-acl:public-read 
   EOH
 end
 
