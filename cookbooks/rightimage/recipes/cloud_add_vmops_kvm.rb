@@ -151,7 +151,7 @@ bash "configure for cloudstack" do
     chroot $target_mnt rpm --rebuilddb
     
     # set hwclock to UTC
-    chroot $target_mnt echo "UTC" >> /etc/adjtime
+    echo "UTC" >> $target_mnt/etc/adjtime
 
   EOH
 end
