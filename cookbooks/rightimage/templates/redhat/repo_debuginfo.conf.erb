@@ -1,0 +1,13 @@
+[rhel-debuginfo]
+name=Red Hat Enterprise Linux 5Server - <%= node[:rightimage][:arch] %> - Debug
+baseurl=ftp://ftp.redhat.com/pub/redhat/linux/enterprise/5Server/en/os/<%= node[:rightimage][:arch] %>/Debuginfo/
+enabled=0
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+
+[rhel-debuginfo-beta]
+name=Red Hat Enterprise Linux 5Server Beta - <%= node[:rightimage][:arch] %> - Debug
+baseurl=ftp://ftp.redhat.com/pub/redhat/linux/beta/5Server/en/os/<%= node[:rightimage][:arch] %>/Debuginfo/
+enabled=0
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-beta,file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release

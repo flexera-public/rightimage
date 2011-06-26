@@ -1,0 +1,32 @@
+[main]
+cachedir=/var/cache/yum
+keepcache=0
+debuglevel=2
+logfile=/var/log/yum.log
+distroverpkg=redhat-release
+tolerant=1
+exactarch=1
+obsoletes=1
+<% if @bootstrap -%>
+exclude=*-debuginfo
+gpgcheck=0
+pkgpolicy=newest
+reposdir=/dev/null
+<% else -%>
+gpgcheck=1
+plugins=1
+<% end -%>
+metadata_expire=1h
+
+<% if @host -%>
+[rhui-us-east-rhel-server]
+name=Red Hat Enterprise Linux Server (RPMs)
+baseurl=https://rhui.us-east-1.aws.ce.redhat.com/rhuilb/content/dist/rhel/rhui/server/5Server/<%= node[:rightimage][:arch] %>/os
+enabled=1
+gpgcheck=1
+gpgkey=file:///tmp/etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release file:///tmp/etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-auxiliary file:///tmp/etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-beta
+sslverify=1
+sslclientkey=/tmp/etc/pki/entitlement/key.pem
+sslclientcert=/tmp/etc/pki/entitlement/product/content.crt
+sslcacert=/tmp/etc/pki/entitlement/ca.crt
+<% end -%>

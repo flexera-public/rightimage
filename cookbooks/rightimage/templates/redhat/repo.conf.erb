@@ -1,0 +1,10 @@
+[<%= @title %>]
+name = Red Hat Enterprise Linux Server (RPMs)
+baseurl = https://rhui.<%= @host %>.aws.ce.redhat.com/rhuilb/content/dist/rhel/rhui/server/5Server/<%= node[:rightimage][:arch] %>/os
+enabled=1
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-auxiliary file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-beta
+sslverify=1
+sslclientkey=/etc/pki/entitlement/key.pem
+sslclientcert=/etc/pki/entitlement/product/content.crt
+sslcacert=/etc/pki/entitlement/ca.crt

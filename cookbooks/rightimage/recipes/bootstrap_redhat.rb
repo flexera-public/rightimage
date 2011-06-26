@@ -5,12 +5,160 @@ class Chef::Resource::RubyBlock
   include RightScale::RightImage::Helper
 end
 
+# Host files
 template "/tmp/yum.conf" do 
+  source "yum.conf.erb"
+  backup false
+  variables ({
+    :bootstrap => true,
+    :host => true
+  })
+end
+
+directory "/tmp/etc/pki/rpm-gpg" do 
+  recursive true
+end
+
+remote_file "/tmp/etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release" do 
+   source "pki/rpm-gpg/RPM-GPG-KEY-redhat-release"  
+   backup false
+end
+
+remote_file "/tmp/etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-auxiliary" do 
+   source "pki/rpm-gpg/RPM-GPG-KEY-redhat-auxiliary"  
+   backup false
+end
+
+remote_file "/tmp/etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-beta" do 
+   source "pki/rpm-gpg/RPM-GPG-KEY-redhat-beta"  
+   backup false
+end
+
+directory "/tmp/etc/pki/entitlement/product" do 
+  recursive true
+end
+
+remote_file "/tmp/etc/pki/entitlement/ca.crt" do 
+   source "pki/entitlement/ca.crt"  
+   backup false
+end
+
+remote_file "/tmp/etc/pki/entitlement/key.pem" do 
+   source "pki/entitlement/key.pem"  
+   backup false
+end
+
+remote_file "/tmp/etc/pki/entitlement/product/content.crt" do 
+   source "pki/entitlement/product/content.crt"  
+   backup false
+end
+
+
+# Guest files
+template "#{node[:rightimage][:mount_dir]}/etc/yum.conf" do 
   source "yum.conf.erb"
   backup false
   variables ({
     :bootstrap => true
   })
+end
+
+directory "#{node[:rightimage][:mount_dir]}/etc/yum.repos.d" do 
+  recursive true
+end
+
+template "#{node[:rightimage][:mount_dir]}/etc/yum.repos.d/redhat-ap-northeast.repo" do 
+  source "repo.conf.erb"
+  backup false
+  variables ({
+    :title => "rhui-ap-ne-rhel-server",
+    :host => "ap-northeast-1"
+  })
+end
+
+template "#{node[:rightimage][:mount_dir]}/etc/yum.repos.d/redhat-ap-southeast.repo" do 
+  source "repo.conf.erb"
+  backup false
+  variables ({
+    :title => "rhui-ap-se-rhel-server",
+    :host => "ap-southeast-1"
+  })
+end
+
+template "#{node[:rightimage][:mount_dir]}/etc/yum.repos.d/redhat-eu-west.repo" do 
+  source "repo.conf.erb"
+  backup false
+  variables ({
+    :title => "rhui-eu-west-rhel-server",
+    :host => "eu-west-1"
+  })
+end
+
+template "#{node[:rightimage][:mount_dir]}/etc/yum.repos.d/redhat-us-west.repo" do 
+  source "repo.conf.erb"
+  backup false
+  variables ({
+    :title => "rhui-us-west-rhel-server",
+    :host => "us-west-1"
+  })
+end
+
+template "#{node[:rightimage][:mount_dir]}/etc/yum.repos.d/rightscale-epel.conf" do 
+  source "rightscale-epel.conf.erb"
+  backup false
+end
+
+template "#{node[:rightimage][:mount_dir]}/etc/yum.repos.d/rhel-debuginfo.repo" do 
+  source "repo_debuginfo.conf.erb"
+  backup false
+end
+
+template "#{node[:rightimage][:mount_dir]}/etc/yum.repos.d/rhel-source.repo" do 
+  source "repo_source.conf.erb"
+  backup false
+end
+
+template "#{node[:rightimage][:mount_dir]}/etc/yum.repos.d/rightscale-epel.conf" do 
+  source "rightscale-epel.conf.erb"
+  backup false
+end
+
+directory "#{node[:rightimage][:mount_dir]}/etc/pki/rpm-gpg" do 
+  recursive true
+end
+
+remote_file "#{node[:rightimage][:mount_dir]}/etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release" do 
+   source "pki/rpm-gpg/RPM-GPG-KEY-redhat-release"  
+   backup false
+end
+
+remote_file "#{node[:rightimage][:mount_dir]}/etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-auxiliary" do 
+   source "pki/rpm-gpg/RPM-GPG-KEY-redhat-auxiliary"  
+   backup false
+end
+
+remote_file "#{node[:rightimage][:mount_dir]}/etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-beta" do 
+   source "pki/rpm-gpg/RPM-GPG-KEY-redhat-beta"  
+   backup false
+end
+
+directory "#{node[:rightimage][:mount_dir]}/etc/pki/entitlement/product" do 
+  recursive true
+end
+
+remote_file "#{node[:rightimage][:mount_dir]}/etc/pki/entitlement/ca.crt" do 
+   source "pki/entitlement/ca.crt"  
+   backup false
+end
+
+remote_file "#{node[:rightimage][:mount_dir]}/etc/pki/entitlement/key.pem" do 
+   source "pki/entitlement/key.pem"  
+   backup false
+end
+
+remote_file "#{node[:rightimage][:mount_dir]}/etc/pki/entitlement/product/content.crt" do 
+   source "pki/entitlement/product/content.crt"  
+   backup false
 end
 
 directory "#{node[:rightimage][:mount_dir]}/tmp" do 
@@ -40,7 +188,7 @@ remote_file "#{node[:rightimage][:mount_dir]}/etc/sysconfig/network-scripts/ifcf
   backup false
 end
 
-bash "bootstrap_centos" do 
+bash "bootstrap_redhat" do 
 
   code <<-EOF
 set -x
@@ -59,12 +207,12 @@ umount #{node[:rightimage][:mount_dir]}/sys || true
 mount --bind /sys #{node[:rightimage][:mount_dir]}/sys
 
 ## bootstrap base OS
-yum -c /tmp/yum.conf --installroot=#{node[:rightimage][:mount_dir]} -y groupinstall Base 
+chroot #{node[:rightimage][:mount_dir]} yum -y groupinstall Base 
 
-/sbin/MAKEDEV -d #{node[:rightimage][:mount_dir]}/dev -x console
-/sbin/MAKEDEV -d #{node[:rightimage][:mount_dir]}/dev -x null
-/sbin/MAKEDEV -d #{node[:rightimage][:mount_dir]}/dev -x zero
-/sbin/MAKEDEV -d #{node[:rightimage][:mount_dir]}/dev ptmx
+chroot #{node[:rightimage][:mount_dir]} /sbin/MAKEDEV -x console
+chroot #{node[:rightimage][:mount_dir]} /sbin/MAKEDEV -x null
+chroot #{node[:rightimage][:mount_dir]} /sbin/MAKEDEV -x zero
+chroot #{node[:rightimage][:mount_dir]} /sbin/MAKEDEV ptmx
 
 mkdir -p #{node[:rightimage][:mount_dir]}/dev/pts
 mkdir -p #{node[:rightimage][:mount_dir]}/sys/block
@@ -82,9 +230,9 @@ yum -c /tmp/yum.conf -y clean all
 yum -c /tmp/yum.conf -y makecache
 yum -c /tmp/yum.conf -y install #{node[:rightimage][:guest_packages]}
 # install the guest packages in the chroot
-yum -c /tmp/yum.conf --installroot=#{node[:rightimage][:mount_dir]} -y install  #{node[:rightimage][:guest_packages]}
-yum -c /tmp/yum.conf --installroot=#{node[:rightimage][:mount_dir]} -y remove bluez* gnome-bluetooth*
-yum -c /tmp/yum.conf --installroot=#{node[:rightimage][:mount_dir]} -y clean all
+chroot #{node[:rightimage][:mount_dir]} yum -y install  #{node[:rightimage][:guest_packages]}
+chroot #{node[:rightimage][:mount_dir]} yum -y remove bluez* gnome-bluetooth*
+chroot #{node[:rightimage][:mount_dir]} yum -y clean all
 
 
 ## stop crap from going in the logs...    
@@ -217,7 +365,7 @@ remote_file "#{node[:rightimage][:mount_dir]}/etc/profile.d/pkgconfig.sh" do
   backup false
 end
 
-template "#{node[:rightimage][:mount_dir]}/etc/yum.repos.d/CentOS-Base.repo" do 
+template "#{node[:rightimage][:mount_dir]}/etc/yum.conf" do 
   source "yum.conf.erb"
   backup false
 end
