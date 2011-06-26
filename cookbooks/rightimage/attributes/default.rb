@@ -36,7 +36,7 @@ when "ubuntu"
   set[:rightimage][:package_type] = "deb"
   rightimage[:guest_packages] << " euca2ools" if rightimage[:cloud] == "euca"
 
-when "centos" 
+when "centos", "redhat" 
   set[:rightimage][:guest_packages] = "wget mlocate nano logrotate ruby ruby-devel ruby-docs ruby-irb ruby-libs ruby-mode ruby-rdoc ruby-ri ruby-tcltk postfix openssl openssh openssh-askpass openssh-clients openssh-server curl gcc* zip unzip bison flex compat-libstdc++-296 cvs subversion autoconf automake libtool compat-gcc-34-g77 mutt sysstat rpm-build fping vim-common vim-enhanced rrdtool-1.2.27 rrdtool-devel-1.2.27 rrdtool-doc-1.2.27 rrdtool-perl-1.2.27 rrdtool-python-1.2.27 rrdtool-ruby-1.2.27 rrdtool-tcl-1.2.27 pkgconfig lynx screen yum-utils bwm-ng createrepo redhat-rpm-config redhat-lsb git nscd xfsprogs swig"
 
   rightimage[:guest_packages] << " iscsi-initiator-utils" if rightimage[:cloud] == "vmops" 
@@ -84,7 +84,7 @@ case rightimage[:cloud]
       when "ubuntu" 
         set[:rightimage][:fstab][:ephemeral_mount_opts] = "defaults,nobootwait"
         set[:rightimage][:fstab][:swap] = "defaults,nobootwait"
-      when "centos"
+      when "centos", "redhat"
         set[:rightimage][:fstab][:ephemeral_mount_opts] = "defaults"
         set[:rightimage][:fstab][:swap] = "defaults"
     end
@@ -137,6 +137,9 @@ case rightimage[:platform]
                chroot #{rightimage[:mount_dir]} chkconfig --level 4 getsshkey on"
     set[:rightimage][:mirror_file] = "CentOS.repo.erb"
     set[:rightimage][:mirror_file_path] = "/etc/yum.repos.d/CentOS.repo"
+  when "redhat"
+    set[:rightimage][:getsshkey_cmd] = "chroot #{rightimage[:mount_dir]} chkconfig --add getsshkey && \
+               chroot #{rightimage[:mount_dir]} chkconfig --level 4 getsshkey on"
   when UNKNOWN
 
 end
@@ -159,7 +162,7 @@ case rightimage[:region]
     set[:rightimage][:mirror] = "http://ec2-ap-northeast-mirror.rightscale.com"
     set[:rightimage][:ec2_endpoint] = "https://ec2.ap-northeast-1.amazonaws.com"
   else
-    set[:rightimage][:mirror] = "http://mirror.rightscale.com"
+    et[:rightimage][:mirror] = "http://mirror.rightscale.com"
     set[:rightimage][:ec2_endpoint] = "https://ec2.us-east-1.amazonaws.com"
 end #if rightimage[:cloud] == "ec2" 
 
@@ -183,19 +186,21 @@ end
 
 # Select kernel to use based on cloud
 case rightimage[:cloud]
-  when "vmops", "euca"
-    case rightimage[:release]
-    when "5.2" 
-      set[:rightimage][:kernel_id] = "2.6.18-92.1.22.el5.centos.plus"
-      rightimage[:kernel_id] << "xen" if rightimage[:virtual_environment] == "xen"
-    when "5.4" 
-      set[:rightimage][:kernel_id] = "2.6.18-164.15.1.el5.centos.plus"
-      rightimage[:kernel_id] << "xen" if rightimage[:virtual_environment] == "xen"
-    when "5.6"
-      set[:rightimage][:kernel_id] = "2.6.18-238.12.1.el5.centos.plus"
-      rightimage[:kernel_id] << "xen" if rightimage[:virtual_environment] == "xen"
-    end
-  when "ec2"
+when "vmops", "euca"
+  case rightimage[:release]
+  when "5.2" 
+    set[:rightimage][:kernel_id] = "2.6.18-92.1.22.el5.centos.plus"
+    rightimage[:kernel_id] << "xen" if rightimage[:virtual_environment] == "xen"
+  when "5.4" 
+    set[:rightimage][:kernel_id] = "2.6.18-164.15.1.el5.centos.plus"
+    rightimage[:kernel_id] << "xen" if rightimage[:virtual_environment] == "xen"
+  when "5.6"
+    set[:rightimage][:kernel_id] = "2.6.18-238.12.1.el5.centos.plus"
+    rightimage[:kernel_id] << "xen" if rightimage[:virtual_environment] == "xen"
+  end
+when "ec2"
+  case rightimage[:platform]
+  when "ubuntu"
     case rightimage[:release]
     when "hardy"
       case rightimage[:region]
@@ -382,6 +387,9 @@ case rightimage[:cloud]
           set[:rightimage][:ramdisk_id] = nil
         end
       end
+    end
+  when "centos"
+    case rightimage[:release]
     when "5.6", "5.4", "5.2"
       case rightimage[:region]
       when "us-east"
@@ -430,5 +438,45 @@ case rightimage[:cloud]
           set[:rightimage][:ramdisk_id] = "ari-a009a2a1"
         end
       end
-    end 
+    end
+  when "redhat"
+    set[:rightimage][:ramdisk_id] = ""
+    case rightimage[:region]
+    when "us-east"
+      case rightimage[:arch]
+      when "i386" 
+        set[:rightimage][:kernel_id] = "aki-36ed075f"
+      when "x86_64"
+        set[:rightimage][:kernel_id] = "aki-08ed0761"
+      end
+    when "us-west"
+      case rightimage[:arch]
+      when "i386" 
+        set[:rightimage][:kernel_id] = "aki-772c7f32"
+      when "x86_64"
+        set[:rightimage][:kernel_id] = "aki-712c7f34"
+      end
+    when "eu-west"
+      case rightimage[:arch]
+      when "i386" 
+        set[:rightimage][:kernel_id] = "aki-af0a3ddb"
+      when "x86_64"
+        set[:rightimage][:kernel_id] = "aki-a90a3ddd"
+      end
+    when "ap-southeast"
+      case rightimage[:arch]
+      when "i386" 
+        set[:rightimage][:kernel_id] = "aki-9c235ace"
+      when "x86_64"
+        set[:rightimage][:kernel_id] = "aki-82235ad0"
+      end
+    when "ap-northeast"
+      case rightimage[:arch]
+      when "i386" 
+        set[:rightimage][:kernel_id] = "aki-66c06a67"
+      when "x86_64"
+        set[:rightimage][:kernel_id] = "aki-68c06a69"
+      end
+    end
+  end # case rightimage[:platform]
 end # case rightimage[:cloud]
