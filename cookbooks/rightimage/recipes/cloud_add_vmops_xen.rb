@@ -4,6 +4,8 @@ end
 
 raise "ERROR: you must set your virtual_environment to xen!"  if node[:rightimage][:virtual_environment] != "xen"
 
+include_recipe "rightimage::install_vhd-util" if node[:rightimage][:virtual_environment] == "xen"  
+
 source_image = "#{node.rightimage.mount_dir}" 
 destination_image = "/mnt/vmops_image"
 destination_image_mount = "/mnt/vmops_image_mount"
@@ -122,9 +124,7 @@ bash "backup raw image" do
   EOH
 end
 
-include_recipe "rightimage::install_vhd-util" if node[:rightimage][:virtual_environment] == "xen"  
-
-bash "xen convert and upload" do 
+bash "xen convert" do 
   cwd File.dirname destination_image
   code <<-EOH
     set -e
@@ -134,13 +134,6 @@ bash "xen convert and upload" do
     vhd-util convert -s 0 -t 1 -i $raw_image -o $vhd_image
     vhd-util convert -s 1 -t 2 -i $vhd_image -o #{image_name}.vhd
     bzip2 #{image_name}.vhd
-
-    # upload image
-    # export AWS_ACCESS_KEY_ID=#{node.rightimage.aws_access_key_id_for_upload}
-    # export AWS_SECRET_ACCESS_KEY=#{node.rightimage.aws_secret_access_key_for_upload}
-    # export AWS_CALLING_FORMAT=SUBDOMAIN 
-    # /usr/local/bin/s3cmd -v put #{node.rightimage.image_upload_bucket}:#{image_name}.vhd.bz2 /mnt/#{image_name}.vhd.bz2 x-amz-acl:public-read --progress
-
   EOH
 end
 
