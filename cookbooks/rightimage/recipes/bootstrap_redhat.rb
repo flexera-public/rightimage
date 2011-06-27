@@ -7,7 +7,7 @@ end
 
 # Host files
 template "/tmp/yum.conf" do 
-  source "yum.conf.erb"
+  source "redhat/yum.conf.erb"
   backup false
   variables ({
     :bootstrap => true,
@@ -20,22 +20,22 @@ directory "/tmp/yum/pluginconf.d" do
 end
 
 remote_file "/tmp/yum/pluginconf.d/amazon-id.conf" do 
- source "pluginconf.d/amazon-id.conf"  
+ source "redhat/pluginconf.d/amazon-id.conf"  
  backup false
 end
 
-remote_file "/tmp/yum/pluginconf.d/fastestmirror.conf" do 
- source "pluginconf.d/fastestmirror.conf"  
- backup false
-end
+#remote_file "/tmp/yum/pluginconf.d/fastestmirror.conf" do 
+# source "redhat/pluginconf.d/fastestmirror.conf"  
+# backup false
+#end
 
 remote_file "/tmp/yum/pluginconf.d/rhnplugin.conf" do 
- source "pluginconf.d/rhnplugin.conf"  
+ source "redhat/pluginconf.d/rhnplugin.conf"  
  backup false
 end
 
 remote_file "/tmp/yum/pluginconf.d/security.conf" do 
- source "pluginconf.d/security.conf"  
+ source "redhat/pluginconf.d/security.conf"  
  backup false
 end
 
@@ -43,63 +43,63 @@ directory "/tmp/yum/yum-plugins" do
   recursive true
 end
 
-remote_file "/tmp/yum-plugins/amazon-id.py" do 
- source "yum-plugins/amazon-id.py"  
+remote_file "/tmp/yum/yum-plugins/amazon-id.py" do 
+ source "redhat/yum-plugins/amazon-id.py"  
  backup false
 end
 
-remote_file "/tmp/yum-plugins/amazon-id.pyc" do 
- source "yum-plugins/amazon-id.pyc"  
+remote_file "/tmp/yum/yum-plugins/amazon-id.pyc" do 
+ source "redhat/yum-plugins/amazon-id.pyc"  
  backup false
 end
 
-remote_file "/tmp/yum-plugins/amazon-id.pyo" do 
- source "yum-plugins/amazon-id.pyo"  
+remote_file "/tmp/yum/yum-plugins/amazon-id.pyo" do 
+ source "redhat/yum-plugins/amazon-id.pyo"  
  backup false
 end
 
-remote_file "/tmp/yum-plugins/fastestmirror.py" do 
- source "yum-plugins/fastestmirror.py"  
+remote_file "/tmp/yum/yum-plugins/fastestmirror.py" do 
+ source "redhat/yum-plugins/fastestmirror.py"  
  backup false
 end
 
-remote_file "/tmp/yum-plugins/fastestmirror.pyc" do 
- source "yum-plugins/fastestmirror.pyc"  
+remote_file "/tmp/yum/yum-plugins/fastestmirror.pyc" do 
+ source "redhat/yum-plugins/fastestmirror.pyc"  
  backup false
 end
 
-remote_file "/tmp/yum-plugins/fastestmirror.pyo" do 
- source "yum-plugins/fastestmirror.pyo"  
+remote_file "/tmp/yum/yum-plugins/fastestmirror.pyo" do 
+ source "redhat/yum-plugins/fastestmirror.pyo"  
  backup false
 end
 
-remote_file "/tmp/yum-plugins/rhnplugin.py" do 
- source "yum-plugins/rhnplugin.py"  
+remote_file "/tmp/yum/yum-plugins/rhnplugin.py" do 
+ source "redhat/yum-plugins/rhnplugin.py"  
  backup false
 end
 
-remote_file "/tmp/yum-plugins/rhnplugin.pyc" do 
- source "yum-plugins/rhnplugin.pyc"  
+remote_file "/tmp/yum/yum-plugins/rhnplugin.pyc" do 
+ source "redhat/yum-plugins/rhnplugin.pyc"  
  backup false
 end
 
-remote_file "/tmp/yum-plugins/rhnplugin.pyo" do 
- source "yum-plugins/rhnplugin.pyo"  
+remote_file "/tmp/yum/yum-plugins/rhnplugin.pyo" do 
+ source "redhat/yum-plugins/rhnplugin.pyo"  
  backup false
 end
 
-remote_file "/tmp/yum-plugins/security.py" do 
- source "yum-plugins/security.py"  
+remote_file "/tmp/yum/yum-plugins/security.py" do 
+ source "redhat/yum-plugins/security.py"  
  backup false
 end
 
-remote_file "/tmp/yum-plugins/security.pyc" do 
- source "yum-plugins/security.pyc"  
+remote_file "/tmp/yum/yum-plugins/security.pyc" do 
+ source "redhat/yum-plugins/security.pyc"  
  backup false
 end
 
-remote_file "/tmp/yum-plugins/security.pyo" do 
- source "yum-plugins/security.pyo"  
+remote_file "/tmp/yum/yum-plugins/security.pyo" do 
+ source "redhat/yum-plugins/security.pyo"  
  backup false
 end
 
@@ -108,17 +108,17 @@ directory "/tmp/etc/pki/rpm-gpg" do
 end
 
 remote_file "/tmp/etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release" do 
-   source "pki/rpm-gpg/RPM-GPG-KEY-redhat-release"  
+   source "redhat/pki/rpm-gpg/RPM-GPG-KEY-redhat-release"  
    backup false
 end
 
 remote_file "/tmp/etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-auxiliary" do 
-   source "pki/rpm-gpg/RPM-GPG-KEY-redhat-auxiliary"  
+   source "redhat/pki/rpm-gpg/RPM-GPG-KEY-redhat-auxiliary"  
    backup false
 end
 
 remote_file "/tmp/etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-beta" do 
-   source "pki/rpm-gpg/RPM-GPG-KEY-redhat-beta"  
+   source "redhat/pki/rpm-gpg/RPM-GPG-KEY-redhat-beta"  
    backup false
 end
 
@@ -127,124 +127,124 @@ directory "/tmp/etc/pki/entitlement/product" do
 end
 
 remote_file "/tmp/etc/pki/entitlement/ca.crt" do 
-   source "pki/entitlement/ca.crt"  
+   source "redhat/pki/entitlement/ca.crt"  
    backup false
 end
 
 remote_file "/tmp/etc/pki/entitlement/key.pem" do 
-   source "pki/entitlement/key.pem"  
+   source "redhat/pki/entitlement/key.pem"  
    backup false
 end
 
 remote_file "/tmp/etc/pki/entitlement/product/content.crt" do 
-   source "pki/entitlement/product/content.crt"  
+   source "redhat/pki/entitlement/product/content.crt"  
    backup false
 end
 
-
 # Guest files
-template "#{node[:rightimage][:mount_dir]}/etc/yum.conf" do 
-  source "yum.conf.erb"
-  backup false
-  variables ({
-    :bootstrap => true
-  })
+directory "#{node[:rightimage][:mount_dir]}/tmp" do 
+  recursive true
 end
 
 directory "#{node[:rightimage][:mount_dir]}/etc/yum/pluginconf.d" do 
   recursive true
 end
 
+#template "#{node[:rightimage][:mount_dir]}/etc/yum.conf" do 
+#  source "redhat/yum.conf.erb"
+#  backup false
+#end
+
 remote_file "#{node[:rightimage][:mount_dir]}/etc/yum/pluginconf.d/amazon-id.conf" do 
- source "pluginconf.d/amazon-id.conf"  
+ source "redhat/pluginconf.d/amazon-id.conf"  
  backup false
 end
-
-remote_file "#{node[:rightimage][:mount_dir]}/etc/yum/pluginconf.d/fastestmirror.conf" do 
- source "pluginconf.d/fastestmirror.conf"  
- backup false
-end
-
-remote_file "#{node[:rightimage][:mount_dir]}/etc/yum/pluginconf.d/rhnplugin.conf" do 
- source "pluginconf.d/rhnplugin.conf"  
- backup false
-end
-
-remote_file "#{node[:rightimage][:mount_dir]}/etc/yum/pluginconf.d/security.conf" do 
- source "pluginconf.d/security.conf"  
- backup false
-end
+#
+#remote_file "#{node[:rightimage][:mount_dir]}/etc/yum/pluginconf.d/fastestmirror.conf" do 
+# source "redhat/pluginconf.d/fastestmirror.conf"  
+# backup false
+#end
+#
+#remote_file "#{node[:rightimage][:mount_dir]}/etc/yum/pluginconf.d/rhnplugin.conf" do 
+# source "redhat/pluginconf.d/rhnplugin.conf"  
+# backup false
+#end
+#
+#remote_file "#{node[:rightimage][:mount_dir]}/etc/yum/pluginconf.d/security.conf" do 
+# source "redhat/pluginconf.d/security.conf"  
+# backup false
+#end
 
 directory "#{node[:rightimage][:mount_dir]}/usr/lib/yum-plugins" do 
   recursive true
 end
 
 remote_file "#{node[:rightimage][:mount_dir]}/usr/lib/yum-plugins/amazon-id.py" do 
- source "yum-plugins/amazon-id.py"  
+ source "redhat/yum-plugins/amazon-id.py"  
  backup false
 end
 
 remote_file "#{node[:rightimage][:mount_dir]}/usr/lib/yum-plugins/amazon-id.pyc" do 
- source "yum-plugins/amazon-id.pyc"  
+ source "redhat/yum-plugins/amazon-id.pyc"  
  backup false
 end
 
 remote_file "#{node[:rightimage][:mount_dir]}/usr/lib/yum-plugins/amazon-id.pyo" do 
- source "yum-plugins/amazon-id.pyo"  
+ source "redhat/yum-plugins/amazon-id.pyo"  
  backup false
 end
 
-remote_file "#{node[:rightimage][:mount_dir]}/usr/lib/yum-plugins/fastestmirror.py" do 
- source "yum-plugins/fastestmirror.py"  
- backup false
-end
-
-remote_file "#{node[:rightimage][:mount_dir]}/usr/lib/yum-plugins/fastestmirror.pyc" do 
- source "yum-plugins/fastestmirror.pyc"  
- backup false
-end
-
-remote_file "#{node[:rightimage][:mount_dir]}/usr/lib/yum-plugins/fastestmirror.pyo" do 
- source "yum-plugins/fastestmirror.pyo"  
- backup false
-end
-
-remote_file "#{node[:rightimage][:mount_dir]}/usr/lib/yum-plugins/rhnplugin.py" do 
- source "yum-plugins/rhnplugin.py"  
- backup false
-end
-
-remote_file "#{node[:rightimage][:mount_dir]}/usr/lib/yum-plugins/rhnplugin.pyc" do 
- source "yum-plugins/rhnplugin.pyc"  
- backup false
-end
-
-remote_file "#{node[:rightimage][:mount_dir]}/usr/lib/yum-plugins/rhnplugin.pyo" do 
- source "yum-plugins/rhnplugin.pyo"  
- backup false
-end
-
-remote_file "#{node[:rightimage][:mount_dir]}/usr/lib/yum-plugins/security.py" do 
- source "yum-plugins/security.py"  
- backup false
-end
-
-remote_file "#{node[:rightimage][:mount_dir]}/usr/lib/yum-plugins/security.pyc" do 
- source "yum-plugins/security.pyc"  
- backup false
-end
-
-remote_file "#{node[:rightimage][:mount_dir]}/usr/lib/yum-plugins/security.pyo" do 
- source "yum-plugins/security.pyo"  
- backup false
-end
+#remote_file "#{node[:rightimage][:mount_dir]}/usr/lib/yum-plugins/fastestmirror.py" do 
+# source "redhat/yum-plugins/fastestmirror.py"  
+# backup false
+#end
+#
+#remote_file "#{node[:rightimage][:mount_dir]}/usr/lib/yum-plugins/fastestmirror.pyc" do 
+# source "redhat/yum-plugins/fastestmirror.pyc"  
+# backup false
+#end
+#
+#remote_file "#{node[:rightimage][:mount_dir]}/usr/lib/yum-plugins/fastestmirror.pyo" do 
+# source "redhat/yum-plugins/fastestmirror.pyo"  
+# backup false
+#end
+#
+#remote_file "#{node[:rightimage][:mount_dir]}/usr/lib/yum-plugins/rhnplugin.py" do 
+# source "redhat/yum-plugins/rhnplugin.py"  
+# backup false
+#end
+#
+#remote_file "#{node[:rightimage][:mount_dir]}/usr/lib/yum-plugins/rhnplugin.pyc" do 
+# source "redhat/yum-plugins/rhnplugin.pyc"  
+# backup false
+#end
+#
+#remote_file "#{node[:rightimage][:mount_dir]}/usr/lib/yum-plugins/rhnplugin.pyo" do 
+# source "redhat/yum-plugins/rhnplugin.pyo"  
+# backup false
+#end
+#
+#remote_file "#{node[:rightimage][:mount_dir]}/usr/lib/yum-plugins/security.py" do 
+# source "redhat/yum-plugins/security.py"  
+# backup false
+#end
+#
+#remote_file "#{node[:rightimage][:mount_dir]}/usr/lib/yum-plugins/security.pyc" do 
+# source "redhat/yum-plugins/security.pyc"  
+# backup false
+#end
+#
+#remote_file "#{node[:rightimage][:mount_dir]}/usr/lib/yum-plugins/security.pyo" do 
+# source "redhat/yum-plugins/security.pyo"  
+# backup false
+#end
 
 directory "#{node[:rightimage][:mount_dir]}/etc/yum.repos.d" do 
   recursive true
 end
 
 template "#{node[:rightimage][:mount_dir]}/etc/yum.repos.d/redhat-ap-northeast.repo" do 
-  source "repo.conf.erb"
+  source "redhat/repo.conf.erb"
   backup false
   variables ({
     :title => "rhui-ap-ne-rhel-server",
@@ -253,7 +253,7 @@ template "#{node[:rightimage][:mount_dir]}/etc/yum.repos.d/redhat-ap-northeast.r
 end
 
 template "#{node[:rightimage][:mount_dir]}/etc/yum.repos.d/redhat-ap-southeast.repo" do 
-  source "repo.conf.erb"
+  source "redhat/repo.conf.erb"
   backup false
   variables ({
     :title => "rhui-ap-se-rhel-server",
@@ -262,7 +262,7 @@ template "#{node[:rightimage][:mount_dir]}/etc/yum.repos.d/redhat-ap-southeast.r
 end
 
 template "#{node[:rightimage][:mount_dir]}/etc/yum.repos.d/redhat-eu-west.repo" do 
-  source "repo.conf.erb"
+  source "redhat/repo.conf.erb"
   backup false
   variables ({
     :title => "rhui-eu-west-rhel-server",
@@ -271,7 +271,7 @@ template "#{node[:rightimage][:mount_dir]}/etc/yum.repos.d/redhat-eu-west.repo" 
 end
 
 template "#{node[:rightimage][:mount_dir]}/etc/yum.repos.d/redhat-us-west.repo" do 
-  source "repo.conf.erb"
+  source "redhat/repo.conf.erb"
   backup false
   variables ({
     :title => "rhui-us-west-rhel-server",
@@ -279,66 +279,66 @@ template "#{node[:rightimage][:mount_dir]}/etc/yum.repos.d/redhat-us-west.repo" 
   })
 end
 
-template "#{node[:rightimage][:mount_dir]}/etc/yum.repos.d/rightscale-epel.conf" do 
-  source "rightscale-epel.conf.erb"
+template "#{node[:rightimage][:mount_dir]}/etc/yum.repos.d/redhat-us-east.repo" do 
+  source "redhat/repo.conf.erb"
   backup false
+  variables ({
+    :title => "rhui-us-east-rhel-server",
+    :host => "us-east-1"
+  })
 end
 
-template "#{node[:rightimage][:mount_dir]}/etc/yum.repos.d/rhel-debuginfo.repo" do 
-  source "repo_debuginfo.conf.erb"
-  backup false
-end
+#template "#{node[:rightimage][:mount_dir]}/etc/yum.repos.d/rightscale-epel.conf" do 
+#  source "rightscale-epel.conf.erb"
+#  backup false
+#end
 
-template "#{node[:rightimage][:mount_dir]}/etc/yum.repos.d/rhel-source.repo" do 
-  source "repo_source.conf.erb"
-  backup false
-end
+#template "#{node[:rightimage][:mount_dir]}/etc/yum.repos.d/rhel-debuginfo.repo" do 
+#  source "redhat/repo_debuginfo.conf.erb"
+#  backup false
+#end
 
-template "#{node[:rightimage][:mount_dir]}/etc/yum.repos.d/rightscale-epel.conf" do 
-  source "rightscale-epel.conf.erb"
-  backup false
-end
+#template "#{node[:rightimage][:mount_dir]}/etc/yum.repos.d/rhel-source.repo" do 
+#  source "redhat/repo_source.conf.erb"
+#  backup false
+#end
 
-directory "#{node[:rightimage][:mount_dir]}/etc/pki/rpm-gpg" do 
-  recursive true
-end
-
-remote_file "#{node[:rightimage][:mount_dir]}/etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release" do 
-   source "pki/rpm-gpg/RPM-GPG-KEY-redhat-release"  
-   backup false
-end
-
-remote_file "#{node[:rightimage][:mount_dir]}/etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-auxiliary" do 
-   source "pki/rpm-gpg/RPM-GPG-KEY-redhat-auxiliary"  
-   backup false
-end
-
-remote_file "#{node[:rightimage][:mount_dir]}/etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-beta" do 
-   source "pki/rpm-gpg/RPM-GPG-KEY-redhat-beta"  
-   backup false
-end
-
+#directory "#{node[:rightimage][:mount_dir]}/etc/pki/rpm-gpg" do 
+#  recursive true
+#end
+#
+#remote_file "#{node[:rightimage][:mount_dir]}/etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release" do 
+#   source "redhat/pki/rpm-gpg/RPM-GPG-KEY-redhat-release"  
+#   backup false
+#end
+#
+#remote_file "#{node[:rightimage][:mount_dir]}/etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-auxiliary" do 
+#   source "redhat/pki/rpm-gpg/RPM-GPG-KEY-redhat-auxiliary"  
+#   backup false
+#end
+#
+#remote_file "#{node[:rightimage][:mount_dir]}/etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-beta" do 
+#   source "redhat/pki/rpm-gpg/RPM-GPG-KEY-redhat-beta"  
+#   backup false
+#end
+#
 directory "#{node[:rightimage][:mount_dir]}/etc/pki/entitlement/product" do 
   recursive true
 end
 
 remote_file "#{node[:rightimage][:mount_dir]}/etc/pki/entitlement/ca.crt" do 
-   source "pki/entitlement/ca.crt"  
+   source "redhat/pki/entitlement/ca.crt"  
    backup false
 end
 
 remote_file "#{node[:rightimage][:mount_dir]}/etc/pki/entitlement/key.pem" do 
-   source "pki/entitlement/key.pem"  
+   source "redhat/pki/entitlement/key.pem"  
    backup false
 end
 
 remote_file "#{node[:rightimage][:mount_dir]}/etc/pki/entitlement/product/content.crt" do 
-   source "pki/entitlement/product/content.crt"  
+   source "redhat/pki/entitlement/product/content.crt"  
    backup false
-end
-
-directory "#{node[:rightimage][:mount_dir]}/tmp" do 
-  recursive true
 end
 
 remote_file "#{node[:rightimage][:mount_dir]}/tmp/chkconfig" do 
@@ -383,7 +383,7 @@ umount #{node[:rightimage][:mount_dir]}/sys || true
 mount --bind /sys #{node[:rightimage][:mount_dir]}/sys
 
 ## bootstrap base OS
-chroot #{node[:rightimage][:mount_dir]} yum -y groupinstall Base 
+yum -c /tmp/yum.conf --installroot=#{node[:rightimage][:mount_dir]} -y groupinstall Base 
 
 chroot #{node[:rightimage][:mount_dir]} /sbin/MAKEDEV -x console
 chroot #{node[:rightimage][:mount_dir]} /sbin/MAKEDEV -x null
@@ -402,14 +402,13 @@ test -e /dev/ptmx #|| chroot $imagedir mknod --mode 666 /dev/ptmx c 5 2
 # Shadow file needs to be setup prior install additional packages
 chroot #{node[:rightimage][:mount_dir]} authconfig --enableshadow --useshadow --enablemd5 --updateall
 # install guest packages on CentOS 5.2 i386 host to work around yum problem
-yum -c /tmp/yum.conf -y clean all
-yum -c /tmp/yum.conf -y makecache
-yum -c /tmp/yum.conf -y install #{node[:rightimage][:guest_packages]}
+#yum -c /tmp/yum.conf -y clean all
+#yum -c /tmp/yum.conf -y makecache
+#yum -c /tmp/yum.conf -c /etc/yum.repos.d/Epel.repo -y install #{node[:rightimage][:guest_packages]}
 # install the guest packages in the chroot
-chroot #{node[:rightimage][:mount_dir]} yum -y install  #{node[:rightimage][:guest_packages]}
+yum -c /tmp/yum.conf --installroot=#{node[:rightimage][:mount_dir]} -y install #{node[:rightimage][:guest_packages]}
 chroot #{node[:rightimage][:mount_dir]} yum -y remove bluez* gnome-bluetooth*
 chroot #{node[:rightimage][:mount_dir]} yum -y clean all
-
 
 ## stop crap from going in the logs...    
 rm #{node[:rightimage][:mount_dir]}/var/lib/rpm/__*
@@ -433,6 +432,7 @@ perl -p -i -e 's/(.*tty3)/#\1/' #{node[:rightimage][:mount_dir]}/etc/inittab
 perl -p -i -e 's/(.*tty4)/#\1/' #{node[:rightimage][:mount_dir]}/etc/inittab
 perl -p -i -e 's/(.*tty5)/#\1/' #{node[:rightimage][:mount_dir]}/etc/inittab
 perl -p -i -e 's/(.*tty6)/#\1/' #{node[:rightimage][:mount_dir]}/etc/inittab
+touch #{node[:rightimage][:mount_dir]}/etc/resolv.conf
 chroot #{node[:rightimage][:mount_dir]} service network start
 
 echo "PKG_CONFIG_PATH=/usr/lib/pkgconfig:/usr/local/lib/pkgconfig" > #{node[:rightimage][:mount_dir]}/etc/profile.d/pkgconfig.sh
@@ -535,10 +535,13 @@ remote_file "#{node[:rightimage][:mount_dir]}/etc/profile.d/pkgconfig.sh" do
   backup false
 end
 
-template "#{node[:rightimage][:mount_dir]}/etc/yum.conf" do 
-  source "yum.conf.erb"
-  backup false
-end
+#template "#{node[:rightimage][:mount_dir]}/etc/yum.conf" do 
+#  source "redhat/yum.conf.erb"
+#  backup false
+#  variables ({
+#    :bootstrap => true
+#  })
+#end
 
 template "#{node[:rightimage][:mount_dir]}/root/.gemrc" do 
   source "gemrc.erb"
