@@ -15,6 +15,94 @@ template "/tmp/yum.conf" do
   })
 end
 
+directory "/tmp/yum/pluginconf.d" do 
+  recursive true
+end
+
+remote_file "/tmp/yum/pluginconf.d/amazon-id.conf" do 
+ source "pluginconf.d/amazon-id.conf"  
+ backup false
+end
+
+remote_file "/tmp/yum/pluginconf.d/fastestmirror.conf" do 
+ source "pluginconf.d/fastestmirror.conf"  
+ backup false
+end
+
+remote_file "/tmp/yum/pluginconf.d/rhnplugin.conf" do 
+ source "pluginconf.d/rhnplugin.conf"  
+ backup false
+end
+
+remote_file "/tmp/yum/pluginconf.d/security.conf" do 
+ source "pluginconf.d/security.conf"  
+ backup false
+end
+
+directory "/tmp/yum/yum-plugins" do 
+  recursive true
+end
+
+remote_file "/tmp/yum-plugins/amazon-id.py" do 
+ source "yum-plugins/amazon-id.py"  
+ backup false
+end
+
+remote_file "/tmp/yum-plugins/amazon-id.pyc" do 
+ source "yum-plugins/amazon-id.pyc"  
+ backup false
+end
+
+remote_file "/tmp/yum-plugins/amazon-id.pyo" do 
+ source "yum-plugins/amazon-id.pyo"  
+ backup false
+end
+
+remote_file "/tmp/yum-plugins/fastestmirror.py" do 
+ source "yum-plugins/fastestmirror.py"  
+ backup false
+end
+
+remote_file "/tmp/yum-plugins/fastestmirror.pyc" do 
+ source "yum-plugins/fastestmirror.pyc"  
+ backup false
+end
+
+remote_file "/tmp/yum-plugins/fastestmirror.pyo" do 
+ source "yum-plugins/fastestmirror.pyo"  
+ backup false
+end
+
+remote_file "/tmp/yum-plugins/rhnplugin.py" do 
+ source "yum-plugins/rhnplugin.py"  
+ backup false
+end
+
+remote_file "/tmp/yum-plugins/rhnplugin.pyc" do 
+ source "yum-plugins/rhnplugin.pyc"  
+ backup false
+end
+
+remote_file "/tmp/yum-plugins/rhnplugin.pyo" do 
+ source "yum-plugins/rhnplugin.pyo"  
+ backup false
+end
+
+remote_file "/tmp/yum-plugins/security.py" do 
+ source "yum-plugins/security.py"  
+ backup false
+end
+
+remote_file "/tmp/yum-plugins/security.pyc" do 
+ source "yum-plugins/security.pyc"  
+ backup false
+end
+
+remote_file "/tmp/yum-plugins/security.pyo" do 
+ source "yum-plugins/security.pyo"  
+ backup false
+end
+
 directory "/tmp/etc/pki/rpm-gpg" do 
   recursive true
 end
@@ -61,6 +149,94 @@ template "#{node[:rightimage][:mount_dir]}/etc/yum.conf" do
   variables ({
     :bootstrap => true
   })
+end
+
+directory "#{node[:rightimage][:mount_dir]}/etc/yum/pluginconf.d" do 
+  recursive true
+end
+
+remote_file "#{node[:rightimage][:mount_dir]}/etc/yum/pluginconf.d/amazon-id.conf" do 
+ source "pluginconf.d/amazon-id.conf"  
+ backup false
+end
+
+remote_file "#{node[:rightimage][:mount_dir]}/etc/yum/pluginconf.d/fastestmirror.conf" do 
+ source "pluginconf.d/fastestmirror.conf"  
+ backup false
+end
+
+remote_file "#{node[:rightimage][:mount_dir]}/etc/yum/pluginconf.d/rhnplugin.conf" do 
+ source "pluginconf.d/rhnplugin.conf"  
+ backup false
+end
+
+remote_file "#{node[:rightimage][:mount_dir]}/etc/yum/pluginconf.d/security.conf" do 
+ source "pluginconf.d/security.conf"  
+ backup false
+end
+
+directory "#{node[:rightimage][:mount_dir]}/usr/lib/yum-plugins" do 
+  recursive true
+end
+
+remote_file "#{node[:rightimage][:mount_dir]}/usr/lib/yum-plugins/amazon-id.py" do 
+ source "yum-plugins/amazon-id.py"  
+ backup false
+end
+
+remote_file "#{node[:rightimage][:mount_dir]}/usr/lib/yum-plugins/amazon-id.pyc" do 
+ source "yum-plugins/amazon-id.pyc"  
+ backup false
+end
+
+remote_file "#{node[:rightimage][:mount_dir]}/usr/lib/yum-plugins/amazon-id.pyo" do 
+ source "yum-plugins/amazon-id.pyo"  
+ backup false
+end
+
+remote_file "#{node[:rightimage][:mount_dir]}/usr/lib/yum-plugins/fastestmirror.py" do 
+ source "yum-plugins/fastestmirror.py"  
+ backup false
+end
+
+remote_file "#{node[:rightimage][:mount_dir]}/usr/lib/yum-plugins/fastestmirror.pyc" do 
+ source "yum-plugins/fastestmirror.pyc"  
+ backup false
+end
+
+remote_file "#{node[:rightimage][:mount_dir]}/usr/lib/yum-plugins/fastestmirror.pyo" do 
+ source "yum-plugins/fastestmirror.pyo"  
+ backup false
+end
+
+remote_file "#{node[:rightimage][:mount_dir]}/usr/lib/yum-plugins/rhnplugin.py" do 
+ source "yum-plugins/rhnplugin.py"  
+ backup false
+end
+
+remote_file "#{node[:rightimage][:mount_dir]}/usr/lib/yum-plugins/rhnplugin.pyc" do 
+ source "yum-plugins/rhnplugin.pyc"  
+ backup false
+end
+
+remote_file "#{node[:rightimage][:mount_dir]}/usr/lib/yum-plugins/rhnplugin.pyo" do 
+ source "yum-plugins/rhnplugin.pyo"  
+ backup false
+end
+
+remote_file "#{node[:rightimage][:mount_dir]}/usr/lib/yum-plugins/security.py" do 
+ source "yum-plugins/security.py"  
+ backup false
+end
+
+remote_file "#{node[:rightimage][:mount_dir]}/usr/lib/yum-plugins/security.pyc" do 
+ source "yum-plugins/security.pyc"  
+ backup false
+end
+
+remote_file "#{node[:rightimage][:mount_dir]}/usr/lib/yum-plugins/security.pyo" do 
+ source "yum-plugins/security.pyo"  
+ backup false
 end
 
 directory "#{node[:rightimage][:mount_dir]}/etc/yum.repos.d" do 
@@ -239,9 +415,6 @@ chroot #{node[:rightimage][:mount_dir]} yum -y clean all
 rm #{node[:rightimage][:mount_dir]}/var/lib/rpm/__*
 chroot #{node[:rightimage][:mount_dir]} rpm --rebuilddb
 
-## Remove yum-fastestmirror plugin
-chroot #{node[:rightimage][:mount_dir]} rpm -e --nodeps yum-fastestmirror
-
 mkdir -p #{node[:rightimage][:mount_dir]}/etc/ssh
 
 echo 'hwcap 0 nosegneg' > #{node[:rightimage][:mount_dir]}/etc/ld.so.conf.d/libc6-xen.conf
@@ -261,9 +434,6 @@ perl -p -i -e 's/(.*tty4)/#\1/' #{node[:rightimage][:mount_dir]}/etc/inittab
 perl -p -i -e 's/(.*tty5)/#\1/' #{node[:rightimage][:mount_dir]}/etc/inittab
 perl -p -i -e 's/(.*tty6)/#\1/' #{node[:rightimage][:mount_dir]}/etc/inittab
 chroot #{node[:rightimage][:mount_dir]} service network start
-
-rm #{node[:rightimage][:mount_dir]}/etc/yum.repos.d/CentOS-Media.repo
-curl -o #{node[:rightimage][:mount_dir]}/etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL http://download.fedora.redhat.com/pub/epel/RPM-GPG-KEY-EPEL
 
 echo "PKG_CONFIG_PATH=/usr/lib/pkgconfig:/usr/local/lib/pkgconfig" > #{node[:rightimage][:mount_dir]}/etc/profile.d/pkgconfig.sh
 
