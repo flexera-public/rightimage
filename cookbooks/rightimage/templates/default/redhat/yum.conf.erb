@@ -32,18 +32,18 @@ sslclientkey=/tmp/etc/pki/entitlement/key.pem
 sslclientcert=/tmp/etc/pki/entitlement/product/content.crt
 sslcacert=/tmp/etc/pki/entitlement/ca.crt
 
-[epel]
-name = none
-baseurl = http://ec2-us-east-mirror.rightscale.com/epel/5/i386/archive/latest
- http://ec2-us-east-mirror1.rightscale.com/epel/5/i386/archive/latest
- http://ec2-us-east-mirror2.rightscale.com/epel/5/i386/archive/latest
- http://ec2-us-east-mirror3.rightscale.com/epel/5/i386/archive/latest
-failovermethod=priority
-gpgcheck=1
-enabled=1
-gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL
+#[epel]
+#name = none
+#baseurl = http://ec2-us-east-mirror.rightscale.com/epel/5/i386/archive/latest
+# http://ec2-us-east-mirror1.rightscale.com/epel/5/i386/archive/latest
+# http://ec2-us-east-mirror2.rightscale.com/epel/5/i386/archive/latest
+# http://ec2-us-east-mirror3.rightscale.com/epel/5/i386/archive/latest
+#failovermethod=priority
+#gpgcheck=1
+#enabled=1
+#gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL
 
 #RightScale: do not allow collectd version to be modified.
 #Collectd packages handled by SYS Monitoring install rightscript
-exclude=collectd
+#exclude=collectd
 <% end -%>

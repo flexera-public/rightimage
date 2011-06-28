@@ -398,7 +398,10 @@ touch #{node[:rightimage][:mount_dir]}/var/log/yum.log
 mkdir -p #{node[:rightimage][:mount_dir]}/proc
 chroot #{node[:rightimage][:mount_dir]} mount -t devpts none /dev/pts || true
 test -e /dev/ptmx #|| chroot $imagedir mknod --mode 666 /dev/ptmx c 5 2
-              
+
+touch #{node[:rightimage][:mount_dir]}/etc/resolv.conf
+chroot #{node[:rightimage][:mount_dir]} service network start
+
 # Shadow file needs to be setup prior install additional packages
 chroot #{node[:rightimage][:mount_dir]} authconfig --enableshadow --useshadow --enablemd5 --updateall
 # install guest packages on CentOS 5.2 i386 host to work around yum problem
@@ -432,8 +435,6 @@ perl -p -i -e 's/(.*tty3)/#\1/' #{node[:rightimage][:mount_dir]}/etc/inittab
 perl -p -i -e 's/(.*tty4)/#\1/' #{node[:rightimage][:mount_dir]}/etc/inittab
 perl -p -i -e 's/(.*tty5)/#\1/' #{node[:rightimage][:mount_dir]}/etc/inittab
 perl -p -i -e 's/(.*tty6)/#\1/' #{node[:rightimage][:mount_dir]}/etc/inittab
-touch #{node[:rightimage][:mount_dir]}/etc/resolv.conf
-chroot #{node[:rightimage][:mount_dir]} service network start
 
 echo "PKG_CONFIG_PATH=/usr/lib/pkgconfig:/usr/local/lib/pkgconfig" > #{node[:rightimage][:mount_dir]}/etc/profile.d/pkgconfig.sh
 
