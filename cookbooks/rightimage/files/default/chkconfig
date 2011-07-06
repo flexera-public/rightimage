@@ -1,6 +1,31 @@
 #!/bin/bash -x
 
+# Add services
 chkconfig --add postfix
+
+# Most systems default to runlevel 3
+chkconfig --level 3 postfix on 
+chkconfig --level 3 psacct on
+chkconfig --level 3 smartd off
+chkconfig --level 3 anacron off
+chkconfig --level 3 acpid off
+chkconfig --level 3 auditd off
+chkconfig --level 3 irqbalance off
+chkconfig --level 3 mdmpd off
+chkconfig --level 3 portmap off
+chkconfig --level 3 nfslock off
+chkconfig --level 3 sendmail off
+chkconfig --level 3 cpuspeed off
+chkconfig --level 3 autofs off
+chkconfig --level 3 rpcidmapd off
+chkconfig --level 3 rpcsvcgssd off
+chkconfig --level 3 rpcgssd off
+chkconfig --level 3 pcscd off
+chkconfig --level 3 gpm off
+chkconfig --level 3 hidd off
+chkconfig --level 3 yum-updatesd off
+
+# EC2 defaults to runlevel 4 -- why?
 chkconfig --level 4 postfix on 
 chkconfig --level 4 psacct on
 chkconfig --level 4 smartd off
@@ -21,6 +46,8 @@ chkconfig --level 4 pcscd off
 chkconfig --level 4 gpm off
 chkconfig --level 4 hidd off
 chkconfig --level 4 yum-updatesd off
+
+# Delete services
 chkconfig --del acpid
 chkconfig --del auditd
 chkconfig --del irqbalance
