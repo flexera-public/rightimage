@@ -17,7 +17,7 @@ loop_map="/dev/mapper/#{loop_name}p1"
 package "qemu"
 package "grub"
 
-bash "create cloudstack-kvm loopback fs" do 
+bash "create openstack-kvm loopback fs" do
   code <<-EOH
     set -e 
     set -x
@@ -127,7 +127,7 @@ bash "install kvm kernel" do
   EOH
 end
 
-bash "configure for cloudstack" do 
+bash "configure for openstack" do
   code <<-EOH
 #!/bin/bash -ex
     set -e 
@@ -145,7 +145,7 @@ bash "configure for cloudstack" do
     echo 'timeout 300;' > $target_mnt/etc/dhclient.conf
 
     mkdir -p $target_mnt/etc/rightscale.d
-    echo "vmops" > $target_mnt/etc/rightscale.d/cloud
+    echo "openstack" > $target_mnt/etc/rightscale.d/cloud
 
     rm ${target_mnt}/var/lib/rpm/__*
     chroot $target_mnt rpm --rebuilddb
