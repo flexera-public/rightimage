@@ -1,4 +1,16 @@
 #!/bin/bash
+
+### BEGIN INIT INFO
+# Provides:          getsshkey
+# Required-Start:    $remote_fs $syslog
+# Required-Stop:     $remote_fs $syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:
+# Short-Description: Install EC2 instance public keys
+# Description:       Query the EC2 metadata server for trusted SSH keys and write them to root's authorized_keys file
+#
+### END INIT INFO
+
 # chkconfig: 4 11 11
 # description: Query the EC2 metadata server for trusted SSH keys and write \
 #   them to root's authorized_keys file
