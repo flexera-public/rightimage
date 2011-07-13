@@ -183,7 +183,7 @@ end
 
 # Select kernel to use based on cloud
 case rightimage[:cloud]
-  when "vmops", "euca"
+  when "vmops", "euca", "openstack"
     case rightimage[:release]
     when "5.2" 
       set[:rightimage][:kernel_id] = "2.6.18-92.1.22.el5.centos.plus"
