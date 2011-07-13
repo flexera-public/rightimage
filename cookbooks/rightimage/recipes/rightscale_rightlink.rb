@@ -10,7 +10,7 @@ bash "checkout_repo" do
     if [ -d sandbox_builds ]; then mv sandbox_builds sandbox_builds.$RANDOM; fi
     git clone git@github.com:rightscale/sandbox_builds.git 
     cd sandbox_builds 
-    git reset #{node[:rightimage][:sandbox_repo_tag]} --hard
+    git checkout #{node[:rightimage][:sandbox_repo_tag]} --force
     git submodule init 
     git submodule update
     cd repos/right_net
