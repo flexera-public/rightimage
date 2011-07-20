@@ -185,10 +185,13 @@ touch #{node[:rightimage][:mount_dir]}/fastboot
 
 # disable IPV6
 echo "NETWORKING_IPV6=no" >> #{node[:rightimage][:mount_dir]}/etc/sysconfig/network
-echo "alias ipv6 off" >> #{node[:rightimage][:mount_dir]}/etc/modprobe.conf 
-echo "alias net-pf-10 off" >> #{node[:rightimage][:mount_dir]}/etc/modprobe.conf 
+echo "install ipv6 /bin/true" > #{node[:rightimage][:mount_dir]}/etc/modprobe.d/disable-ipv6.conf
+echo "options ipv6 disable=1" >> #{node[:rightimage][:mount_dir]}/etc/modprobe.d/disable-ipv6.conf
 chroot #{node[:rightimage][:mount_dir]} /sbin/chkconfig ip6tables off
 
+# Depricated CentOS 5.3 and older uses this to disable ipv6
+#echo "alias ipv6 off" >> #{node[:rightimage][:mount_dir]}/etc/modprobe.conf 
+#echo "alias net-pf-10 off" >> #{node[:rightimage][:mount_dir]}/etc/modprobe.conf 
 EOF
 
 end
