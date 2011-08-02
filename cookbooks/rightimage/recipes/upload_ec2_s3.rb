@@ -5,8 +5,12 @@ class Chef::Resource::RubyBlock
   include RightScale::RightImage::Helper
 end
 
+build_root = "/mnt"
+
+guest_root = "#{build_root}/#{node[:rightimage][:cloud]}"
+
 # Clean up guest image
-rightimage node[:rightimage][:mount_dir] do
+rightimage guest_root do
   action :sanitize
 end
 
@@ -24,7 +28,7 @@ bash "bundle_upload_s3_image" do
     export PATH=$PATH:/usr/local/bin:/home/ec2/bin
     export EC2_HOME=/home/ec2
 
-    umount "#{node[:rightimage][:mount_dir]}/proc" || true
+    umount "#{guest_root}/proc" || true
     
     kernel_opt=""
     if [ -n "#{node[:rightimage][:kernel_id]}" ]; then
@@ -42,20 +46,20 @@ bash "bundle_upload_s3_image" do
 
     echo "Doing S3 bundle"
   
-    rm -rf "#{node[:rightimage][:mount_dir]}"_temp
-    mkdir -p "#{node[:rightimage][:mount_dir]}"_temp
+    rm -rf "#{guest_root}"_temp
+    mkdir -p "#{guest_root}"_temp
 
     ## so it looks like the ec2 tools are borken as they are bundling /tmp even if --exclude is set, so:
-    rm -rf #{node[:rightimage][:mount_dir]}/tmp/*
+    rm -rf #{guest_root}/tmp/*
 
     ## it looks like /tmp perms are not getting set correctly, so do:
-    chroot #{node[:rightimage][:mount_dir]} chmod 1777 /tmp
+    chroot #{guest_root} chmod 1777 /tmp
 
     echo bundling...
-    /home/ec2/bin/ec2-bundle-vol -r #{node[:rightimage][:arch]} -d "#{node[:rightimage][:mount_dir]}"_temp -k  /tmp/AWS_X509_KEY.pem -c  /tmp/AWS_X509_CERT.pem -u #{node[:rightimage][:aws_account_number]} -p #{image_name}  -v #{node[:rightimage][:mount_dir]} $kernel_opt $ramdisk_opt -B "ami=sda1,root=/dev/sda1,ephemeral0=sdb,swap=sda3" --exclude /tmp     #--generate-fstab
+    /home/ec2/bin/ec2-bundle-vol --no-inherit --arch #{node[:rightimage][:arch]} --destination "#{guest_root}"_temp --privatekey /tmp/AWS_X509_KEY.pem --cert /tmp/AWS_X509_CERT.pem --user #{node[:rightimage][:aws_account_number]} --prefix #{image_name}  --volume #{guest_root} $kernel_opt $ramdisk_opt -B "ami=sda1,root=/dev/sda1,ephemeral0=sdb,swap=sda3" --exclude /tmp     #--generate-fstab
     
     echo "Uploading..." 
-    echo y | /home/ec2/bin/ec2-upload-bundle -b #{node[:rightimage][:image_upload_bucket]} -m "#{node[:rightimage][:mount_dir]}"_temp/#{image_name}.manifest.xml -a #{node[:rightimage][:aws_access_key_id]} -s #{node[:rightimage][:aws_secret_access_key]} --retry --batch
+    echo y | /home/ec2/bin/ec2-upload-bundle -b #{node[:rightimage][:image_upload_bucket]} -m "#{guest_root}"_temp/#{image_name}.manifest.xml -a #{node[:rightimage][:aws_access_key_id]} -s #{node[:rightimage][:aws_secret_access_key]} --retry --batch
     
     echo registering... 
     image_out_s3=`/home/ec2/bin/ec2-register #{node[:rightimage][:image_upload_bucket]}/#{image_name}.manifest.xml -K  /tmp/AWS_X509_KEY.pem -C  /tmp/AWS_X509_CERT.pem -n "#{image_name}" --url #{node[:rightimage][:ec2_endpoint]} `

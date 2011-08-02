@@ -14,22 +14,23 @@ reposdir=/dev/null
 metadata_expire=1800
 <% end -%>
 
-
 [base]
 name = none
 baseurl = http://<%= node[:rightimage][:install_mirror] %>/centos/<%= node[:rightimage][:release] %>/os/<%= node[:rightimage][:arch] %>/archive/<%= node[:rightimage][:install_mirror_date] %>/
 failovermethod=priority
 gpgcheck=1
 enabled=1
-gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-5
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-<%= node[:rightimage][:release][0].chr %>
 
+<% if node[:rightimage][:release].to_i < 6 -%>
 [addons]
 name = none
 baseurl = http://<%= node[:rightimage][:install_mirror] %>/centos/<%= node[:rightimage][:release] %>/addons/<%= node[:rightimage][:arch] %>/archive/<%= node[:rightimage][:install_mirror_date] %>/
 failovermethod=priority
 gpgcheck=1
 enabled=1
-gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-5
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-<%= node[:rightimage][:release][0].chr %>
+<% end -%>
 
 [centosplus]
 name = none
@@ -37,7 +38,7 @@ baseurl = http://<%= node[:rightimage][:install_mirror] %>/centos/<%= node[:righ
 failovermethod=priority
 gpgcheck=1
 enabled=1
-gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-5
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-<%= node[:rightimage][:release][0].chr %>
 
 [extras]
 name = none
@@ -45,7 +46,7 @@ baseurl = http://<%= node[:rightimage][:install_mirror] %>/centos/<%= node[:righ
 failovermethod=priority
 gpgcheck=1
 enabled=1
-gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-5
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-<%= node[:rightimage][:release][0].chr %>
 
 [updates]
 name = none
@@ -53,7 +54,7 @@ baseurl = http://<%= node[:rightimage][:install_mirror] %>/centos/<%= node[:righ
 failovermethod=priority
 gpgcheck=1
 enabled=1
-gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-5
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-<%= node[:rightimage][:release][0].chr %>
 
 [epel]
 name = none

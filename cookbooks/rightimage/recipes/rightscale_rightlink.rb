@@ -51,7 +51,7 @@ CHROOT_SCRIPT
 end
 
 bash "install_rightlink" do 
-  not_if "test -e #{node[:rightimage][:mount_dir]}/etc/init.d/rightimage"
+#  not_if "test -e #{node[:rightimage][:mount_dir]}/etc/init.d/rightimage"
   code <<-EOC
     set -e
     rm -rf #{node[:rightimage][:mount_dir]}/opt/rightscale/

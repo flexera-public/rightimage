@@ -41,6 +41,8 @@ when "centos"
 
   rightimage[:guest_packages] << " iscsi-initiator-utils" if rightimage[:cloud] == "vmops" 
 
+  rightimage[:guest_packages] << " grub kmod-xfs-xen" if rightimage[:cloud] == "ec2" 
+
   set[:rightimage][:host_packages] = "swig"
   set[:rightimage][:package_type] = "rpm"
 when "suse"
@@ -129,12 +131,12 @@ set_unless[:rightimage][:aws_secret_access_key] = nil
 # generate command to install getsshkey init script 
 case rightimage[:platform]
   when "ubuntu" 
-    set[:rightimage][:getsshkey_cmd] = "chroot #{rightimage[:mount_dir]} update-rc.d getsshkey start 20 2 3 4 5 . stop 1 0 1 6 ."
+    set[:rightimage][:getsshkey_cmd] = "chroot $GUEST_ROOT update-rc.d getsshkey start 20 2 3 4 5 . stop 1 0 1 6 ."
     set[:rightimage][:mirror_file] = "sources.list.erb"
     set[:rightimage][:mirror_file_path] = "/etc/apt/sources.list"
   when "centos"
-    set[:rightimage][:getsshkey_cmd] = "chroot #{rightimage[:mount_dir]} chkconfig --add getsshkey && \
-               chroot #{rightimage[:mount_dir]} chkconfig --level 4 getsshkey on"
+    set[:rightimage][:getsshkey_cmd] = "chroot $GUEST_ROOT chkconfig --add getsshkey && \
+               chroot $GUEST_ROOT chkconfig --level 4 getsshkey on"
     set[:rightimage][:mirror_file] = "CentOS.repo.erb"
     set[:rightimage][:mirror_file_path] = "/etc/yum.repos.d/CentOS.repo"
   when UNKNOWN
@@ -334,55 +336,55 @@ case rightimage[:cloud]
           set[:rightimage][:ramdisk_id] = nil
         end
       end
-    when "maverick"
+    when "maverick", "5.6"
       case rightimage[:region]
       when "us-east"
         case rightimage[:arch]
         when "i386" 
-          set[:rightimage][:kernel_id] = "aki-407d9529"
+          set[:rightimage][:kernel_id] = "aki-805ea7e9"
           set[:rightimage][:ramdisk_id] = nil
         when "x86_64"
-          set[:rightimage][:kernel_id] = "aki-427d952b"
+          set[:rightimage][:kernel_id] = "aki-825ea7eb"
           set[:rightimage][:ramdisk_id] = nil
         end
       when "us-west"
         case rightimage[:arch]
         when "i386" 
-          set[:rightimage][:kernel_id] = "aki-99a0f1dc"
+          set[:rightimage][:kernel_id] = "aki-83396bc6"
           set[:rightimage][:ramdisk_id] = nil
         when "x86_64"
-          set[:rightimage][:kernel_id] = "aki-9ba0f1de"
+          set[:rightimage][:kernel_id] = "aki-8d396bc8"
           set[:rightimage][:ramdisk_id] = nil
         end
       when "eu-west" 
         case rightimage[:arch]
         when "i386" 
-          set[:rightimage][:kernel_id] = "aki-4deec439"
+          set[:rightimage][:kernel_id] = "aki-64695810"
           set[:rightimage][:ramdisk_id] = nil
         when "x86_64"
-          set[:rightimage][:kernel_id] = "aki-4feec43b"
+          set[:rightimage][:kernel_id] = "aki-62695816"
           set[:rightimage][:ramdisk_id] = nil
         end
       when "ap-southeast"
         case rightimage[:arch]
         when "i386" 
-          set[:rightimage][:kernel_id] = "aki-13d5aa41"
+          set[:rightimage][:kernel_id] = "aki-a4225af6"
           set[:rightimage][:ramdisk_id] = nil
         when "x86_64"
-          set[:rightimage][:kernel_id] = "aki-11d5aa43"
+          set[:rightimage][:kernel_id] = "aki-aa225af8"
           set[:rightimage][:ramdisk_id] = nil
         end
       when "ap-northeast"
         case rightimage[:arch]
         when "i386" 
-          set[:rightimage][:kernel_id] = "aki-d209a2d3"
+          set[:rightimage][:kernel_id] = "aki-ec5df7ed"
           set[:rightimage][:ramdisk_id] = nil
         when "x86_64"
-          set[:rightimage][:kernel_id] = "aki-d409a2d5"
+          set[:rightimage][:kernel_id] = "aki-ee5df7ef"
           set[:rightimage][:ramdisk_id] = nil
         end
       end
-    when "5.6", "5.4", "5.2"
+    when "5.4", "5.2"
       case rightimage[:region]
       when "us-east"
         case rightimage[:arch]
