@@ -185,252 +185,64 @@ end
 
 # Select kernel to use based on cloud
 case rightimage[:cloud]
-  when "vmops", "euca", "openstack"
-    case rightimage[:release]
-    when "5.2" 
-      set[:rightimage][:kernel_id] = "2.6.18-92.1.22.el5.centos.plus"
-      rightimage[:kernel_id] << "xen" if rightimage[:virtual_environment] == "xen"
-    when "5.4" 
-      set[:rightimage][:kernel_id] = "2.6.18-164.15.1.el5.centos.plus"
-      rightimage[:kernel_id] << "xen" if rightimage[:virtual_environment] == "xen"
-    when "5.6"
-      set[:rightimage][:kernel_id] = "2.6.18-238.12.1.el5.centos.plus"
-      rightimage[:kernel_id] << "xen" if rightimage[:virtual_environment] == "xen"
+when "vmops", "euca", "openstack"
+  case rightimage[:release]
+  when "5.2" 
+    set[:rightimage][:kernel_id] = "2.6.18-92.1.22.el5.centos.plus"
+    rightimage[:kernel_id] << "xen" if rightimage[:virtual_environment] == "xen"
+  when "5.4" 
+    set[:rightimage][:kernel_id] = "2.6.18-164.15.1.el5.centos.plus"
+    rightimage[:kernel_id] << "xen" if rightimage[:virtual_environment] == "xen"
+  when "5.6"
+    set[:rightimage][:kernel_id] = "2.6.18-238.12.1.el5.centos.plus"
+    rightimage[:kernel_id] << "xen" if rightimage[:virtual_environment] == "xen"
+  end
+when "ec2"
+  case rightimage[:region]
+  when "us-east"
+    case rightimage[:arch]
+    when "i386" 
+      set[:rightimage][:kernel_id] = "aki-805ea7e9"
+      set[:rightimage][:ramdisk_id] = nil
+    when "x86_64"
+      set[:rightimage][:kernel_id] = "aki-825ea7eb"
+      set[:rightimage][:ramdisk_id] = nil
     end
-  when "ec2"
-    case rightimage[:release]
-    when "hardy"
-      case rightimage[:region]
-      when "us-east"
-        case rightimage[:arch]
-        when "i386" 
-          set[:rightimage][:kernel_id] = "aki-a71cf9ce"
-          set[:rightimage][:ramdisk_id] = "ari-a51cf9cc"
-        when "x86_64"
-          set[:rightimage][:kernel_id] = "aki-b51cf9dc"
-          set[:rightimage][:ramdisk_id] = "ari-b31cf9da"
-        end
-      when "us-west"
-        case rightimage[:arch]
-        when "i386" 
-          set[:rightimage][:kernel_id] = "aki-873667c2"
-          set[:rightimage][:ramdisk_id] = "ari-853667c0"
-        when "x86_64"
-          set[:rightimage][:kernel_id] = "aki-813667c4"
-          set[:rightimage][:ramdisk_id] = "ari-833667c6"
-        end
-      when "eu-west" 
-        case rightimage[:arch]
-        when "i386" 
-          set[:rightimage][:kernel_id] = "aki-7e0d250a"
-          set[:rightimage][:ramdisk_id] = "ari-7d0d2509"
-        when "x86_64"
-          set[:rightimage][:kernel_id] = "aki-780d250c"
-          set[:rightimage][:ramdisk_id] = "ari-7f0d250b"
-        end
-      when "ap-southeast"
-        case rightimage[:arch]
-        when "i386" 
-          set[:rightimage][:kernel_id] = "aki-15f58a47"
-          set[:rightimage][:ramdisk_id] = "ari-37f58a65"
-        when "x86_64"
-          set[:rightimage][:kernel_id] = "aki-1df58a4f"
-          set[:rightimage][:ramdisk_id] = "ari-35f58a67"
-        end
-      end
-    when "karmic", "lucid"
-      case rightimage[:region]
-      when "us-east"
-        case rightimage[:arch]
-        when "i386" 
-          set[:rightimage][:kernel_id] = "aki-5f15f636"
-          set[:rightimage][:ramdisk_id] = "ari-d5709dbc"
-        when "x86_64"
-          set[:rightimage][:kernel_id] = "aki-fd15f694"
-          set[:rightimage][:ramdisk_id] = "ari-c515f6ac"
-        end
-      when "us-west"
-        case rightimage[:arch]
-        when "i386" 
-          set[:rightimage][:kernel_id] = "aki-733c6d36"
-          set[:rightimage][:ramdisk_id] = "ari-632e7f26"
-        when "x86_64"
-          set[:rightimage][:kernel_id] = "aki-033c6d46"
-          set[:rightimage][:ramdisk_id] = "ari-793c6d3c"
-        end
-      when "eu-west" 
-        case rightimage[:arch]
-        when "i386" 
-          set[:rightimage][:kernel_id] = "aki-0c5e7578"
-          set[:rightimage][:ramdisk_id] = "ari-39c2e94d"
-        when "x86_64"
-          set[:rightimage][:kernel_id] = "aki-a22a01d6"
-          set[:rightimage][:ramdisk_id] = "ari-ac2a01d8"
-        end
-      when "ap-southeast"
-        case rightimage[:arch]
-        when "i386" 
-          set[:rightimage][:kernel_id] = "aki-87f38cd5"
-          set[:rightimage][:ramdisk_id] = "ari-85f38cd7"
-        when "x86_64"
-          set[:rightimage][:kernel_id] = "aki-83f38cd1"
-          set[:rightimage][:ramdisk_id] = "ari-81f38cd3"
-        end
-      when "ap-northeast"
-        case rightimage[:arch]
-        when "i386" 
-          set[:rightimage][:kernel_id] = "aki-540fa455"
-          set[:rightimage][:ramdisk_id] = "ari-560fa457"
-        when "x86_64"
-          set[:rightimage][:kernel_id] = "aki-620fa463"
-          set[:rightimage][:ramdisk_id] = "ari-640fa465"
-        end
-      end
-    when "lucid-DISABLED-DUE-TO-KERNEL-BUGS-LOL"
-      case rightimage[:region]
-      when "us-east"
-        case rightimage[:arch]
-        when "i386" 
-          set[:rightimage][:kernel_id] = "aki-c43cd6ad"
-          set[:rightimage][:ramdisk_id] = "ari-d23cd6bb"
-        when "x86_64"
-          set[:rightimage][:kernel_id] = "aki-1c3dd775"
-          set[:rightimage][:ramdisk_id] = "ari-143dd77d" 
-        end
-      when "us-west"
-        case rightimage[:arch]
-        when "i386" 
-          #set[:rightimage][:kernel_id] = "aki-99a0f1dc"
-          set[:rightimage][:kernel_id] = "aki-a13667e4"
-          set[:rightimage][:ramdisk_id] = nil
-        when "x86_64"
-          #set[:rightimage][:kernel_id] = "aki-9ba0f1de"
-          set[:rightimage][:kernel_id] = "aki-ad3667e8"
-          set[:rightimage][:ramdisk_id] = nil
-        end
-      when "eu-west" 
-        case rightimage[:arch]
-        when "i386" 
-          set[:rightimage][:kernel_id] = "aki-4deec439"
-          set[:rightimage][:ramdisk_id] = nil
-        when "x86_64"
-          set[:rightimage][:kernel_id] = "aki-4feec43b"
-          set[:rightimage][:ramdisk_id] = nil
-        end
-      when "ap-southeast"
-        case rightimage[:arch]
-        when "i386" 
-          set[:rightimage][:kernel_id] = "aki-13d5aa41"
-          set[:rightimage][:ramdisk_id] = nil
-        when "x86_64"
-          set[:rightimage][:kernel_id] = "aki-11d5aa43"
-          set[:rightimage][:ramdisk_id] = nil
-        end
-      when "ap-northeast"
-        case rightimage[:arch]
-        when "i386" 
-          set[:rightimage][:kernel_id] = "aki-d209a2d3"
-          set[:rightimage][:ramdisk_id] = nil
-        when "x86_64"
-          set[:rightimage][:kernel_id] = "aki-d409a2d5"
-          set[:rightimage][:ramdisk_id] = nil
-        end
-      end
-    when "maverick", "5.6"
-      case rightimage[:region]
-      when "us-east"
-        case rightimage[:arch]
-        when "i386" 
-          set[:rightimage][:kernel_id] = "aki-805ea7e9"
-          set[:rightimage][:ramdisk_id] = nil
-        when "x86_64"
-          set[:rightimage][:kernel_id] = "aki-825ea7eb"
-          set[:rightimage][:ramdisk_id] = nil
-        end
-      when "us-west"
-        case rightimage[:arch]
-        when "i386" 
-          set[:rightimage][:kernel_id] = "aki-83396bc6"
-          set[:rightimage][:ramdisk_id] = nil
-        when "x86_64"
-          set[:rightimage][:kernel_id] = "aki-8d396bc8"
-          set[:rightimage][:ramdisk_id] = nil
-        end
-      when "eu-west" 
-        case rightimage[:arch]
-        when "i386" 
-          set[:rightimage][:kernel_id] = "aki-64695810"
-          set[:rightimage][:ramdisk_id] = nil
-        when "x86_64"
-          set[:rightimage][:kernel_id] = "aki-62695816"
-          set[:rightimage][:ramdisk_id] = nil
-        end
-      when "ap-southeast"
-        case rightimage[:arch]
-        when "i386" 
-          set[:rightimage][:kernel_id] = "aki-a4225af6"
-          set[:rightimage][:ramdisk_id] = nil
-        when "x86_64"
-          set[:rightimage][:kernel_id] = "aki-aa225af8"
-          set[:rightimage][:ramdisk_id] = nil
-        end
-      when "ap-northeast"
-        case rightimage[:arch]
-        when "i386" 
-          set[:rightimage][:kernel_id] = "aki-ec5df7ed"
-          set[:rightimage][:ramdisk_id] = nil
-        when "x86_64"
-          set[:rightimage][:kernel_id] = "aki-ee5df7ef"
-          set[:rightimage][:ramdisk_id] = nil
-        end
-      end
-    when "5.4", "5.2"
-      case rightimage[:region]
-      when "us-east"
-        case rightimage[:arch]
-        when "i386" 
-          set[:rightimage][:kernel_id] = "aki-a71cf9ce"
-          set[:rightimage][:ramdisk_id] = "ari-a51cf9cc"
-        when "x86_64"
-          set[:rightimage][:kernel_id] = "aki-b51cf9dc"
-          set[:rightimage][:ramdisk_id] = "ari-b31cf9da"
-        end
-      when "us-west"
-        case rightimage[:arch]
-        when "i386" 
-          set[:rightimage][:kernel_id] = "aki-873667c2"
-          set[:rightimage][:ramdisk_id] = "ari-853667c0"
-        when "x86_64"
-          set[:rightimage][:kernel_id] = "aki-813667c4"
-          set[:rightimage][:ramdisk_id] = "ari-833667c6"
-        end
-      when "eu-west"
-        case rightimage[:arch]
-        when "i386" 
-          set[:rightimage][:kernel_id] = "aki-7e0d250a"
-          set[:rightimage][:ramdisk_id] = "ari-7d0d2509"
-        when "x86_64"
-          set[:rightimage][:kernel_id] = "aki-780d250c"
-          set[:rightimage][:ramdisk_id] = "ari-7f0d250b"
-        end
-      when "ap-southeast"
-        case rightimage[:arch]
-        when "i386" 
-          set[:rightimage][:kernel_id] = "aki-15f58a47"
-          set[:rightimage][:ramdisk_id] = "ari-37f58a65"
-        when "x86_64"
-          set[:rightimage][:kernel_id] = "aki-1df58a4f"
-          set[:rightimage][:ramdisk_id] = "ari-35f58a67"
-        end
-      when "ap-northeast"
-        case rightimage[:arch]
-        when "i386" 
-          set[:rightimage][:kernel_id] = "aki-a209a2a3"
-          set[:rightimage][:ramdisk_id] = "ari-9e09a29f"
-        when "x86_64"
-          set[:rightimage][:kernel_id] = "aki-a409a2a5"
-          set[:rightimage][:ramdisk_id] = "ari-a009a2a1"
-        end
-      end
-    end 
+  when "us-west"
+    case rightimage[:arch]
+    when "i386" 
+      set[:rightimage][:kernel_id] = "aki-83396bc6"
+      set[:rightimage][:ramdisk_id] = nil
+    when "x86_64"
+      set[:rightimage][:kernel_id] = "aki-8d396bc8"
+      set[:rightimage][:ramdisk_id] = nil
+    end
+  when "eu-west" 
+    case rightimage[:arch]
+    when "i386" 
+      set[:rightimage][:kernel_id] = "aki-64695810"
+      set[:rightimage][:ramdisk_id] = nil
+    when "x86_64"
+      set[:rightimage][:kernel_id] = "aki-62695816"
+      set[:rightimage][:ramdisk_id] = nil
+    end
+  when "ap-southeast"
+    case rightimage[:arch]
+    when "i386" 
+      set[:rightimage][:kernel_id] = "aki-a4225af6"
+      set[:rightimage][:ramdisk_id] = nil
+    when "x86_64"
+      set[:rightimage][:kernel_id] = "aki-aa225af8"
+      set[:rightimage][:ramdisk_id] = nil
+    end
+  when "ap-northeast"
+    case rightimage[:arch]
+    when "i386" 
+      set[:rightimage][:kernel_id] = "aki-ec5df7ed"
+      set[:rightimage][:ramdisk_id] = nil
+    when "x86_64"
+      set[:rightimage][:kernel_id] = "aki-ee5df7ef"
+      set[:rightimage][:ramdisk_id] = nil
+    end
+  end
 end # case rightimage[:cloud]
