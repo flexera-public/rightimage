@@ -5,8 +5,11 @@ class Chef::Resource::RubyBlock
   include RightScale::RightImage::Helper
 end
 
+build_root = "/mnt"
+guest_root = "#{build_root}/#{node[:rightimage][:cloud]}"
+
 # Clean up guest image
-rightimage node[:rightimage][:mount_dir] do
+rightimage guest_root do
   action :sanitize
 end
 
@@ -24,7 +27,7 @@ bash "bundle_upload_ebs" do
     export PATH=$PATH:/usr/local/bin:/home/ec2/bin
     export EC2_HOME=/home/ec2
 
-    umount "#{node[:rightimage][:mount_dir]}/proc" || true
+    umount "#{guest_root}/proc" || true
     
     kernel_opt=""
     if [ -n "#{node[:rightimage][:kernel_id]}" ]; then
@@ -49,8 +52,8 @@ bash "bundle_upload_ebs" do
     cd $random_dir
     ebs_mount=${random_dir}/ebs_mount
     mkdir -p $ebs_mount
-# This /mnt/image is where the image creator creates the image
-    image_mount=/mnt/image
+# /mnt/ec2 is where the image creator creates the image
+    image_mount=#{guest_root}
 
 ## calculate ec2 region
     length=`echo -n #{node[:ec2][:placement_availability_zone]} | wc -c`
