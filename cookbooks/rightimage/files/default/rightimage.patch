@@ -1,0 +1,15 @@
+--- rightimage  2011-04-29 18:15:56.000000000 +0000
++++ rightimage.new  2011-04-29 20:21:47.000000000 +0000
+@@ -199,7 +199,11 @@
+         exit 1
+       fi
+ 
+-      server_ip=$(grep dhcp-server-identifier $leases_file | tail -1 | awk '{print $NF}' | tr '\;' ' ')
++      while [ -z "$server_ip" ]; do
++        server_ip=$(grep dhcp-server-identifier $leases_file | tail -1 | awk '{print $NF}' | tr '\;' ' ')
++        sleep 1
++      done
++
+       false
+       while [ $? -ne 0 ]; do
+         logger -st RightScale "Querying metadata server $server_ip ..."

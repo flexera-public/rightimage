@@ -22,8 +22,9 @@ set_unless[:rightimage][:install_mirror_date] = "latest"
 # set base os packages
 case rightimage[:platform]
 when "ubuntu"   
-  set[:rightimage][:guest_packages] = "ubuntu-standard binutils ruby1.8 curl unzip openssh-server ruby1.8-dev build-essential autoconf automake libtool logrotate rsync openssl openssh-server ca-certificates libopenssl-ruby1.8 subversion vim libreadline-ruby1.8 irb rdoc1.8 git-core liberror-perl libdigest-sha1-perl dmsetup emacs rake screen mailutils nscd bison ncurses-dev zlib1g-dev libreadline5-dev readline-common libxslt1-dev sqlite3 libxml2 flex libshadow-ruby1.8 postfix sysstat iptraf cloud-init"
-
+  set[:rightimage][:guest_packages] = "ubuntu-standard binutils ruby1.8 curl unzip openssh-server ruby1.8-dev build-essential autoconf automake libtool logrotate rsync openssl openssh-server ca-certificates libopenssl-ruby1.8 subversion vim libreadline-ruby1.8 irb rdoc1.8 git-core liberror-perl libdigest-sha1-perl dmsetup emacs rake screen mailutils nscd bison ncurses-dev zlib1g-dev libreadline5-dev readline-common libxslt1-dev sqlite3 libxml2 flex libshadow-ruby1.8 postfix sysstat iptraf"
+ 
+  node[:rightimage][:guest_packages] << " cloud-init" if node[:rightimage][:virtual_environment] == "ec2"
   set[:rightimage][:host_packages] = "openjdk-6-jre openssl ca-certificates"
 
   case node[:lsb][:codename]
@@ -80,6 +81,7 @@ case rightimage[:cloud]
     set[:rightimage][:root_mount][:dev] = "/dev/sda1"
     set[:rightimage][:root_mount][:dump] = "0" 
     set[:rightimage][:root_mount][:fsck] = "0" 
+    set[:rightimage][:fstab][:ephemeral] = true
     set[:rightimage][:ephemeral_mount] = "/dev/sdb" 
     set[:rightimage][:swap_mount] = "/dev/sda3"  unless rightimage[:arch]  == "x86_64"
     case rightimage[:platform]
@@ -93,33 +95,53 @@ case rightimage[:cloud]
   when "vmops", "openstack"
     case rightimage[:virtual_environment]
     when "xen"
+      set[:rightimage][:fstab][:ephemeral_mount_opts] = "defaults"
+      set[:rightimage][:fstab][:ephemeral] = false
       set[:rightimage][:root_mount][:dev] = "/dev/xvda"
       set[:rightimage][:root_mount][:dump] = "1" 
       set[:rightimage][:root_mount][:fsck] = "1" 
       set[:rightimage][:ephemeral_mount] = nil
       set[:rightimage][:fstab][:ephemeral_mount_opts] = nil
     when "kvm"
-      # rightimage[:host_packages] << " qemu grub"
-      # rightimage[:guest_packages] << " grub"
-      set[:rightimage][:ephemeral_mount] = nil
-      set[:rightimage][:fstab][:ephemeral_mount_opts] = nil
+      rightimage[:host_packages] << " qemu grub"
+      rightimage[:guest_packages] << " grub"
+      set[:rightimage][:fstab][:ephemeral] = false
+      set[:rightimage][:ephemeral_mount] = "/dev/vdb"
+      set[:rightimage][:fstab][:ephemeral_mount_opts] = "defaults"
       set[:rightimage][:grub][:root_device] = "/dev/vda"
       set[:rightimage][:root_mount][:dev] = "/dev/vda1"
       set[:rightimage][:root_mount][:dump] = "1" 
       set[:rightimage][:root_mount][:fsck] = "1" 
-    when "esx"
+    when "esxi"
       rightimage[:host_packages] << " qemu grub"
       rightimage[:guest_packages] << " grub"
       set[:rightimage][:ephemeral_mount] = nil
       set[:rightimage][:fstab][:ephemeral_mount_opts] = nil
+      set[:rightimage][:fstab][:ephemeral] = false
       set[:rightimage][:grub][:root_device] = "/dev/sda"
       set[:rightimage][:root_mount][:uuid] = `uuidgen`.strip
       set[:rightimage][:root_mount][:dev] = "UUID=#{rightimage[:root_mount][:uuid]}"
       set[:rightimage][:root_mount][:dump] = "1" 
       set[:rightimage][:root_mount][:fsck] = "1" 
     else
-      raise "ERROR: unsupported virtual_environment for cloudstack"
+      raise "ERROR: unsupported virtual_environment #{node[:rightimage][:virtual_environment]} for cloudstack"
     end
+    ## set kernel to use for vmops
+    case rightimage[:release]
+    when "5.2" 
+      set[:rightimage][:kernel_id] = "2.6.18-92.1.22.el5.centos.plus"
+      rightimage[:kernel_id] << "xen" if rightimage[:virtual_environment] == "xen"
+    when "5.4" 
+      set[:rightimage][:kernel_id] = "2.6.18-164.15.1.el5.centos.plus"
+      rightimage[:kernel_id] << "xen" if rightimage[:virtual_environment] == "xen"
+    when "lucid"
+      # TODO: Determine proper kernel id
+      # set[:rightimage][:kernel_id] = "<NEED_TO_SET_THIS"
+      set[:rightimage][:kernel_id] = "2.6.32-31-server"
+      rightimage[:kernel_id] << "kvm" if rightimage[:virtual_environment] == "kvm"
+      #rightimage[:kernel_id] << "esxi" if rightimage[:virtual_environment] == "esxi"
+    end
+  
 end
 
 

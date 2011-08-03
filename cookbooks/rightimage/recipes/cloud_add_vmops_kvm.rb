@@ -39,6 +39,12 @@ bash "create cloudstack-kvm loopback fs" do
     
     loopdev=#{loop_dev}
     loopmap=#{loop_map}
+
+    set +e    
+    [ -e "/dev/mapper/#{loop_name}p1" ] && kpartx -d #{loop_dev}
+    losetup -a | grep #{loop_dev}
+    [ "$?" == "0" ] && losetup -d #{loop_dev}
+    set -e
     losetup $loopdev $target_raw_path
     
     sfdisk $loopdev << EOF
@@ -96,8 +102,12 @@ bash "setup grub" do
     target_mnt="#{target_mnt}"
     
     chroot $target_mnt mkdir -p /boot/grub
-    chroot $target_mnt cp -p /usr/share/grub/x86_64-redhat/* /boot/grub
-    chroot $target_mnt ln -s /boot/grub/grub.conf /boot/grub/menu.lst
+
+    if [ "#{node.rightimage.platform}" == "centos" ]; then 
+      chroot $target_mnt cp -p /usr/share/grub/x86_64-redhat/* /boot/grub
+    fi
+
+    chroot $target_mnt ln -sf /boot/grub/grub.conf /boot/grub/menu.lst
     
     echo "(hd0) #{node[:rightimage][:grub][:root_device]}" > $target_mnt/boot/grub/device.map
     echo "" >> $target_mnt/boot/grub/device.map
@@ -105,7 +115,14 @@ bash "setup grub" do
     cat > device.map <<EOF
 (hd0) #{target_raw_path}
 EOF
-    /sbin/grub --batch --device-map=device.map <<EOF
+
+    if [ "#{node.rightimage.platform}" == "ubuntu" ]; then
+      sbin_command="/usr/sbin/grub"
+    else
+      sbin_command="/sbin/grub"
+    fi
+
+    ${sbin_command} --batch --device-map=device.map <<EOF
 root (hd0,0)
 setup (hd0)
 quit
@@ -120,10 +137,21 @@ bash "install kvm kernel" do
     set -e 
     set -x
     target_mnt=#{target_mnt}
-    yum -c /tmp/yum.conf --installroot=$target_mnt -y install kmod-kvm
-    rm -f $target_mnt/boot/initrd*
-    chroot $target_mnt mkinitrd --with=ata_piix --with=virtio_blk --with=ext3 --with=virtio_pci --with=dm_mirror --with=dm_snapshot --with=dm_zero -v initrd-#{node[:rightimage][:kernel_id]} #{node[:rightimage][:kernel_id]}
-    mv $target_mnt/initrd-#{node[:rightimage][:kernel_id]}  $target_mnt/boot/.
+
+
+  case "#{node.rightimage.platform}" in 
+    "centos" )
+      # The following should be needed when using ubuntu vmbuilder
+      yum -c /tmp/yum.conf --installroot=$target_mnt -y install kmod-kvm
+      rm -f $target_mnt/boot/initrd*
+      chroot $target_mnt mkinitrd --with=ata_piix --with=virtio_blk --with=ext3 --with=virtio_pci --with=dm_mirror --with=dm_snapshot --with=dm_zero -v initrd-#{node[:rightimage][:kernel_id]} #{node[:rightimage][:kernel_id]}
+      mv $target_mnt/initrd-#{node[:rightimage][:kernel_id]}  $target_mnt/boot/.
+      ;;
+    "ubuntu" )
+      # Anything need to be done?
+      ;;
+  esac
+      
   EOH
 end
 
@@ -134,15 +162,29 @@ bash "configure for cloudstack" do
     set -x
     target_mnt=#{target_mnt}
 
-    # clean out packages
-    yum -c /tmp/yum.conf --installroot=$target_mnt -y clean all
+    case "#{node.rightimage.platform}" in
+    "centos")
 
-    # enable console access
-    #echo "2:2345:respawn:/sbin/mingetty tty2" >> $target_mnt/etc/inittab
-    #echo "tty2" >> $target_mnt/etc/securetty
+      # clean out packages
+      yum -c /tmp/yum.conf --installroot=$target_mnt -y clean all
 
-    # configure dns timeout 
-    echo 'timeout 300;' > $target_mnt/etc/dhclient.conf
+      # clean centos RPM data
+      rm ${target_mnt}/var/lib/rpm/__*
+      chroot $target_mnt rpm --rebuilddb
+
+      # enable console access
+      echo "2:2345:respawn:/sbin/mingetty tty2" >> $target_mnt/etc/inittab
+      echo "tty2" >> $target_mnt/etc/securetty
+
+      # configure dns timeout 
+      echo 'timeout 300;' > $target_mnt/etc/dhclient.conf
+      ;;
+
+    "ubuntu")
+      # More to do for Ubuntu?
+      echo 'timeout 300;' > $target_mnt/etc/dhcp3/dhclient.conf      
+      ;;
+    esac
 
     mkdir -p $target_mnt/etc/rightscale.d
     echo "vmops" > $target_mnt/etc/rightscale.d/cloud

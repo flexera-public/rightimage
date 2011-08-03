@@ -18,3 +18,4 @@ ruby_block "delete image id list" do
     id_list.clear
   end
 end
+
