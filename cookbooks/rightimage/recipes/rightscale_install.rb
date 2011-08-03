@@ -34,7 +34,7 @@ gem install rake
 updatedb
 CHROOT_SCRIPT
 chmod +x $ROOT/tmp/rubygems_install.sh
-chroot $ROOT /tmp/rubygems_install.sh
+chroot $ROOT /tmp/rubygems_install.sh > /dev/null 
 EOC
 end
 

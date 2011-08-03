@@ -18,6 +18,7 @@ recipe "rightimage::cloud_add_ec2", "migrates the created image to ec2"
 recipe "rightimage::cloud_add_euca", "migrates the created image to eucalyptus" 
 recipe "rightimage::cloud_add_vmops", "adds requirements for cloudstack based on hypervisor choice"
 recipe "rightimage::cloud_add_openstack", "adds requirements for openstack based on hypervisor choice"
+recipe "rightimage::cloud_add_esxi", "applies esxi transformations on an existing disk image"
 recipe "rightimage::cloud_add_raw", "migrates the create image to a raw file -- useful for new cloud development"
 recipe "rightimage::install_vhd-util", "install the vhd-util tool"
 recipe "rightimage::do_tag_images", "adds rightscale tags to images"
@@ -175,7 +176,7 @@ attribute "rightimage/install_mirror_date",
 attribute "rightimage/virtual_environment",
   :display_name => "Hypervisor",
   :description => "Which hypervisor is this image for?",
-  :choice => [ "xen", "kvm", "esx" ],
+  :choice => [ "xen", "kvm", "esxi" ],
   :required => "required"
 
 ## euca inputs  
