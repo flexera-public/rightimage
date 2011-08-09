@@ -8,7 +8,6 @@ chkconfig --level 3 postfix on
 chkconfig --level 3 psacct on
 chkconfig --level 3 smartd off
 chkconfig --level 3 anacron off
-chkconfig --level 3 acpid off
 chkconfig --level 3 auditd off
 chkconfig --level 3 irqbalance off
 chkconfig --level 3 mdmpd off
@@ -30,7 +29,6 @@ chkconfig --level 4 postfix on
 chkconfig --level 4 psacct on
 chkconfig --level 4 smartd off
 chkconfig --level 4 anacron off
-chkconfig --level 4 acpid off
 chkconfig --level 4 auditd off
 chkconfig --level 4 irqbalance off
 chkconfig --level 4 mdmpd off
@@ -48,7 +46,6 @@ chkconfig --level 4 hidd off
 chkconfig --level 4 yum-updatesd off
 
 # Delete services
-chkconfig --del acpid
 chkconfig --del auditd
 chkconfig --del irqbalance
 chkconfig --del mdmpd
