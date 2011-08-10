@@ -183,7 +183,7 @@ chmod +x #{node[:rightimage][:mount_dir]}/etc/profile.d/java.sh
 #Disable FSCK on the image
 touch #{node[:rightimage][:mount_dir]}/fastboot
 
-if ( node[:rightimage][:virtual_environment] == "kvm" )
+if [ "#{node[:rightimage][:virtual_environment]}" == "kvm" ] ; then
   # following found on functioning CDC test image Centos 64bit using KVM hypervisor
   echo "alias scsi_hostadapter ata_piix"     > #{node[:rightimage][:mount_dir]}/etc/modprobe.conf
   echo "alias scsi_hostadapter1 virtio_blk" >> #{node[:rightimage][:mount_dir]}/etc/modprobe.conf
@@ -191,7 +191,7 @@ if ( node[:rightimage][:virtual_environment] == "kvm" )
 
   # modprobe acpiphp at startup - required for CDC KVM hypervisor to detect attaching/detaching volumes
   echo "/sbin/modprobe acpiphp" >> #{node[:rightimage][:mount_dir]}/etc/rc.local
-end
+fi
 
 # disable loading pata_acpi module - currently breaks acpid from discovering volumes attached to CDC KVM hypervisor
 echo "blacklist pata_acpi"          > #{node[:rightimage][:mount_dir]}/etc/modprobe.d/disable-pata_acpi.conf
