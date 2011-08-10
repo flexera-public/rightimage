@@ -42,8 +42,6 @@ when "centos"
 
   rightimage[:guest_packages] << " iscsi-initiator-utils" if rightimage[:cloud] == "vmops" 
 
-  rightimage[:guest_packages] << " grub kmod-xfs-xen" if rightimage[:cloud] == "ec2" 
-
   set[:rightimage][:host_packages] = "swig"
   set[:rightimage][:package_type] = "rpm"
 when "suse"

@@ -68,6 +68,13 @@ rightimage_kernel "xen" do
   action :install
 end
 
+directory "#{guest_root}/boot/grub" do
+  owner "root"
+  group "root"
+  mode "0750"
+  action :create
+end 
+
 template "#{guest_root}/boot/grub/menu.lst" do
   source "menu.lst.erb"
 end

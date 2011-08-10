@@ -26,7 +26,7 @@ action :install do
       
       # Install to guest. 
       GUEST_ROOT=#{new_resource.guest_root}
-      yum -c /tmp/yum.conf --installroot=$GUEST_ROOT -y install kernel-xen 
+      yum -c /tmp/yum.conf --installroot=$GUEST_ROOT -y install kernel-xen kmod-xfs-xen 
       chroot $GUEST_ROOT yum -y remove kernel
 #      arch=#{node[:rightimage][:arch]}
 #      [ $arch == "i386" ] && arch="i686"
