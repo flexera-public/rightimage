@@ -202,6 +202,9 @@ if [ "#{node[:rightimage][:virtual_environment]}" == "xen" ] ; then
   echo "" >> #{node[:rightimage][:mount_dir]}/etc/sysctl.conf
   echo "# set independent wall clock time" >> #{node[:rightimage][:mount_dir]}/etc/sysctl.conf
   echo "xen.independent_wallclock = 1" >> #{node[:rightimage][:mount_dir]}/etc/sysctl.conf
+
+  # update clock
+  echo "/usr/bin/rdate -s -t 10 3.pool.ntp.org 2.pool.ntp.org 1.pool.ntp.org 0.pool.ntp.org time.ucsb.edu time.ucla.edu" >> #{node[:rightimage][:mount_dir]}/etc/rc.local
 fi
 
 # disable IPV6
