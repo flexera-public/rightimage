@@ -1,10 +1,12 @@
+<% ec2 = true if node[:rightimage][:cloud] == "ec2" %>
 default         0
-timeout         0
+timeout         <%= ((ec2)?"0":"5") %>
 hiddenmenu
 
-<% kern = ::File.basename(Dir.glob("/mnt/#{node[:rightimage][:cloud]}/boot/vmlinuz*").sort.last) %>
-<% initrd = ::File.basename(Dir.glob("/mnt/#{node[:rightimage][:cloud]}/boot/initrd*").sort.last) %>
-title           <%= node[:rightimage][:platform] %> (<%= kern %>)
-root            (hd0)
-kernel          /boot/<%= kern %> root=/dev/sda1 ro console=hvc0
+<% cloud = "#{node[:rightimage][:cloud]}_#{node[:rightimage][:virtual_environment]}" %>
+<% kern = ::File.basename(Dir.glob("/mnt/#{cloud}/boot/vmlinuz*").sort.last) %>
+<% initrd = ::File.basename(Dir.glob("/mnt/#{cloud}/boot/initrd*").sort.last) %>
+title           <%= node[:rightimage][:platform] %> <%= node[:rightimage][:release] %> (<%= kern %>) (<%= node[:rightimage][:virtual_environment] %>) 
+root            (hd0<%= ((ec2)?"":",0") %>)
+kernel          /boot/<%= kern %> root=<%= node[:rightimage][:root_mount][:dev] %> ro <%= ((ec2)?"console=hvc0":"") %>
 initrd          /boot/<%= initrd %>

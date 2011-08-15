@@ -17,7 +17,7 @@ source_image = node[:rightimage][:mount_dir]
 
 build_root = "/mnt"
 
-guest_root = "#{build_root}/#{node[:rightimage][:cloud]}"
+guest_root = "#{build_root}/#{node[:rightimage][:cloud]}_#{node[:rightimage][:virtual_environment]}"
 
 package_root = "#{build_root}/pkg"
 cloud_package_root = "#{package_root}/#{node[:rightimage][:cloud]}"

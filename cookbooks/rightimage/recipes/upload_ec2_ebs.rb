@@ -6,7 +6,7 @@ class Chef::Resource::RubyBlock
 end
 
 build_root = "/mnt"
-guest_root = "#{build_root}/#{node[:rightimage][:cloud]}"
+guest_root = "#{build_root}/#{node[:rightimage][:cloud]}_#{node[:rightimage][:virtual_environment]}"
 
 # Clean up guest image
 rightimage guest_root do
