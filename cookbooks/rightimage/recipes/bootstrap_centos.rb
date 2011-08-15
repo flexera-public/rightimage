@@ -197,16 +197,6 @@ fi
 echo "blacklist pata_acpi"          > #{node[:rightimage][:mount_dir]}/etc/modprobe.d/disable-pata_acpi.conf
 echo "install pata_acpi /bin/true" >> #{node[:rightimage][:mount_dir]}/etc/modprobe.d/disable-pata_acpi.conf
   
-if [ "#{node[:rightimage][:virtual_environment]}" == "xen" ] ; then
-  # allow instances on xen hypervisors to set clock independent of host
-  echo "" >> #{node[:rightimage][:mount_dir]}/etc/sysctl.conf
-  echo "# set independent wall clock time" >> #{node[:rightimage][:mount_dir]}/etc/sysctl.conf
-  echo "xen.independent_wallclock = 1" >> #{node[:rightimage][:mount_dir]}/etc/sysctl.conf
-
-  # update clock
-  echo "/usr/bin/rdate -s -t 10 3.pool.ntp.org 2.pool.ntp.org 1.pool.ntp.org 0.pool.ntp.org time.ucsb.edu time.ucla.edu" >> #{node[:rightimage][:mount_dir]}/etc/rc.local
-fi
-
 # disable IPV6
 echo "NETWORKING_IPV6=no" >> #{node[:rightimage][:mount_dir]}/etc/sysconfig/network
 echo "install ipv6 /bin/true" > #{node[:rightimage][:mount_dir]}/etc/modprobe.d/disable-ipv6.conf
