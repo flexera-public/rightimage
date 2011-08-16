@@ -4,10 +4,6 @@ Builds a RightImage on a loopback filesystem.  Creates base OS install plus the 
 Then adds the cloud specific settings. Also has the ability to upload and register the RightImage with corresponding 
 cloud.
 
-= USAGE:
-From a RightScale managed host:
-
-rs_run_recipe -n rightimage::build_image
 
 = CONVENTIONS:
 "base" recipes clean, bootstrap and install rightscale on the specified os this gives us a base
@@ -18,3 +14,95 @@ guest image in /mnt/image.
 "cloud" recipes add cloud specific settings to the guest image
 
 "upload" recipes convert the raw guest image and upload off host instance. 
+
+
+= USAGE:
+
+Building a RightLink package and RightImages:
+
+ 1. Create server from right_image_creator [rev14] ST
+ 2. Select image the matches the target guest platform
+      Centos 5.6 x64 builds x64 guest
+      Centos 5.6 i386 builds i386 guest
+      Ubuntu x64 builds both x64 and i386 guests
+ 3. Set inputs
+  manual mode::
+    true: do nothing on boot; Allows for running recipes by hand.
+    false: build image but don't upload.
+  sanbox_repo_tag::
+    tag (i.e. "rightlink_package_5.N.N")
+    or branch name
+    or sha
+  debug::*
+    true - enables random root passwd login on image. 
+    password is appended to end of image name.
+    false - no password login enabled.  ssh key auth only.
+  Image Name::*
+    image name (must contain "Dev" if debug == true)
+    don't care for packages
+  Hypervisor*:: xen/kvm/esx
+
+* affects image only (not package)
+
+== Building packages:
+
+  1. Set manual mode to false
+  2. launch server
+  3. once operational package can be found /mnt/image/root/.rightscale/*
+
+== Building rightimage (automode):
+
+Automatic mode is useful when building an image on boot
+
+  1. Set ‘manual mode’ to false
+  2. launch server
+  3. once operational run "rightimage::upload_cloud_<cloud>" recipe
+  4. run "rightimage::do_create_mci" to add image to MCI
+  5. launch image_tester template with newly created image
+  6. launch rightlink_tester template with newly created image
+
+== Building a RightImage (manual-mode):
+
+Manual-mode is useful when developing of the rightimage cookbooks
+
+  1. Set ‘manual mode’ input to true
+  2. launch server
+  3. once operational start the build using "rightimage::build_image" recipe
+  4. After the build is complete run "rightimage::upload_cloud_<cloud>" recipe
+  5. run "rightimage::do_create_mci" to add image to MCI
+  6. launch image_tester template with newly created image
+  7. launch rightlink_tester template with newly created image
+
+= Future Improvements
+
+Stories to implement to for faster, simpler, lower cost MCI builds...
+
+  As a RightImage creator
+  I want to upload and register and EC2 S3 image from any region
+  So I can build and bundle once and
+  upload to all regions from a single VM
+  instead of launching a VM, building and bundling in every region
+
+  As a RightImage creator
+  I want to package and install on all clouds from a single VM
+  So I can build a given guest platform from a single VM
+  instead of launching a VM for every cloud permutation
+
+  As a RightImage Developer
+  I want to create a base image on a EBS volume and snapshot
+  So every I can attach a snapshot for every hypervisor/cloud image
+  instead of performing a 20min dd and rsync of the base image
+
+  As a RightImage Developer
+  I want to create install RightLink packages from the rightscale mirrors
+  So I can build with a tested and QA approvd package
+  instead of taking 20 min to build an untested package
+
+  As a RightImage cookbook maintainer
+  I want to refactor all cloud_add recipes
+  So I can consolidate duplicate code into a single chef resource
+  instead of every cloud_add recipe being slightly different
+  
+== Maintainer
+
+email: cary@rightscale.com
