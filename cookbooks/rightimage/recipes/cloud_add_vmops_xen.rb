@@ -88,7 +88,7 @@ bash "configure for cloudstack" do
     echo 'timeout 300;' > $mount_dir/etc/dhclient.conf
 
     mkdir -p $mount_dir/etc/rightscale.d
-    echo "vmops" > $mount_dir/etc/rightscale.d/cloud
+    echo "cloudstack" > $mount_dir/etc/rightscale.d/cloud
 
     rm ${mount_dir}/var/lib/rpm/__*
     chroot $mount_dir rpm --rebuilddb

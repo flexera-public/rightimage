@@ -242,7 +242,7 @@ bash "configure for cloudstack" do
   esac 
 
     mkdir -p $target_mnt/etc/rightscale.d
-    echo "vmops" > $target_mnt/etc/rightscale.d/cloud
+    echo "cloudstack" > $target_mnt/etc/rightscale.d/cloud
   EOH
 end
 

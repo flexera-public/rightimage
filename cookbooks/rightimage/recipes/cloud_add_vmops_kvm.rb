@@ -175,7 +175,7 @@ bash "configure for cloudstack" do
     esac
 
     mkdir -p $guest_root/etc/rightscale.d
-    echo "vmops" > $guest_root/etc/rightscale.d/cloud
+    echo "cloudstack" > $guest_root/etc/rightscale.d/cloud
 
     [ -f $guest_root/var/lib/rpm/__* ] && rm ${guest_root}/var/lib/rpm/__*
     chroot $guest_root rpm --rebuilddb
