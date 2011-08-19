@@ -2,14 +2,23 @@ class Chef::Resource::Bash
   include RightScale::RightImage::Helper
 end
 
-raise "ERROR: you must set your virtual_environment to xen!"  if node[:rightimage][:virtual_environment] != "xen"
+cloud = node[:rightimage][:cloud]
+hypervisor = node[:rightimage][:virtual_environment]
 
-include_recipe "rightimage::install_vhd-util" if node[:rightimage][:virtual_environment] == "xen"  
+
+raise "ERROR: you must set your cloud to vmops!"  if cloud != "vmops"
+raise "ERROR: you must set your virtual_environment to xen!"  if hypervisor != "xen"
+
+include_recipe "rightimage::install_vhd-util" if hypervisor == "xen"  
+
 
 source_image = node[:rightimage][:mount_dir] 
-destination_image = "/mnt/vmops_image"
-destination_image_mount = "/mnt/vmops_image_mount"
-vhd_image = destination_image + '.vhd'
+
+target_root = "/mnt"
+target_raw = "#{cloud}-#{hypervisor}.img"
+target_raw_path = "#{target_root}/#{target_raw}"
+
+guest_root = "#{target_root}/#{cloud}"
 
 bash "create_vmops_image" do 
   code <<-EOH
@@ -17,38 +26,38 @@ bash "create_vmops_image" do
     set -x
 
     source_image="#{source_image}" 
-    destination_image="#{destination_image}"
-    destination_image_mount="#{destination_image_mount}"
+    target_raw_path="#{target_raw_path}"
+    guest_root="#{guest_root}"
 
     umount -lf #{source_image}/proc || true 
-    umount -lf #{destination_image_mount}/proc || true 
-    umount -lf #{destination_image_mount}/sys || true 
-    umount -lf #{destination_image_mount} || true
+    umount -lf #{guest_root}/proc || true 
+    umount -lf #{guest_root}/sys || true 
+    umount -lf #{guest_root} || true
 
     DISK_SIZE_GB=#{node[:rightimage][:root_size_gb]}  
     BYTES_PER_MB=1024
     DISK_SIZE_MB=$(($DISK_SIZE_GB * $BYTES_PER_MB))
 
-    rm -rf $destination_image $destination_image_mount
-    dd if=/dev/zero of=$destination_image bs=1M count=$DISK_SIZE_MB    
-    mke2fs -F -j $destination_image
-    mkdir $destination_image_mount
-    mount -o loop $destination_image $destination_image_mount
-    rsync -a $source_image/ $destination_image_mount/
-    mkdir -p $destination_image_mount/boot/grub
+    rm -rf $target_raw_path $guest_root
+    dd if=/dev/zero of=$target_raw_path bs=1M count=$DISK_SIZE_MB    
+    mke2fs -F -j $target_raw_path
+    mkdir $guest_root
+    mount -o loop $target_raw_path $guest_root
+    rsync -a $source_image/ $guest_root/
+    mkdir -p $guest_root/boot/grub
 
   EOH
 end
 
 # insert grub conf
-template "#{destination_image_mount}/boot/grub/grub.conf" do 
+template "#{guest_root}/boot/grub/grub.conf" do 
   source "grub.conf"
   backup false 
 end
 
 
 # add fstab
-template "#{destination_image_mount}/etc/fstab" do
+template "#{guest_root}/etc/fstab" do
   source "fstab.erb"
   backup false
 end
@@ -58,13 +67,13 @@ bash "mount proc" do
 #!/bin/bash -ex
     set -e 
     set -x
-    mount_dir=#{destination_image_mount}
+    mount_dir=#{guest_root}
     mount -t proc none $mount_dir/proc
   EOH
 end
 
 rightimage_kernel "Install PV Kernel for Hypervisor" do
-  provider "rightimage_kernel_#{node[:rightimage][:virtual_environment]}"
+  provider "rightimage_kernel_#{hypervisor}"
   guest_root guest_root
   version node[:rightimage][:kernel_id]
   action :install
@@ -75,7 +84,7 @@ bash "configure for cloudstack" do
 #!/bin/bash -ex
     set -e 
     set -x
-    mount_dir=#{destination_image_mount}
+    mount_dir=#{guest_root}
 
     # clean out packages
     yum -c /tmp/yum.conf --installroot=$mount_dir -y clean all
@@ -100,13 +109,13 @@ bash "unmount proc" do
 #!/bin/bash -ex
     set -e 
     set -x
-    target_mnt=#{destination_image_mount}
+    target_mnt=#{guest_root}
     umount -lf $target_mnt/proc || true
   EOH
 end
 
 # Clean up guest image
-rightimage destination_image_mount do
+rightimage guest_root do
   action :sanitize
 end
 
@@ -115,25 +124,25 @@ bash "unmount target filesystem" do
 #!/bin/bash -ex
     set -e 
     set -x
-    target_mnt=#{destination_image_mount}    
+    target_mnt=#{guest_root}    
     umount -lf $target_mnt
   EOH
 end
 
 bash "backup raw image" do 
-  cwd File.dirname destination_image
+  cwd File.dirname target_raw_path
   code <<-EOH
-    raw_image=$(basename #{destination_image})
+    raw_image=$(basename #{target_raw_path})
     cp -v $raw_image $raw_image.bak 
   EOH
 end
 
 bash "xen convert" do 
-  cwd File.dirname destination_image
+  cwd File.dirname target_raw_path
   code <<-EOH
     set -e
     set -x
-    raw_image=$(basename #{destination_image})
+    raw_image=$(basename #{target_raw_path})
     vhd_image=${raw_image}.vhd
     vhd-util convert -s 0 -t 1 -i $raw_image -o $vhd_image
     vhd-util convert -s 1 -t 2 -i $vhd_image -o #{image_name}.vhd
