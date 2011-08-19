@@ -35,10 +35,8 @@ bash "cleanup" do
   code <<-EOH
     set -x
     GUEST_ROOT=#{guest_root}
-    source_image="#{source_image}"
-    target_raw_path="#{target_raw_path}"
+    source_image="#{source_image}" 
     loopdev=#{loop_dev}  
-
     umount -lf $source_image/proc || true 
     umount -lf $GUEST_ROOT/proc || true 
     umount -lf $GUEST_ROOT/dev || true
@@ -188,18 +186,16 @@ bash "package guest image" do
     set -e 
     set -x
     GUEST_ROOT=#{guest_root}
-#    KERNEL_VERSION=#{node[:rightimage][:kernel_id]}
+    KERNEL_VERSION=#{node[:rightimage][:kernel_id]}
     image_name=#{image_name}
     cloud_package_root=#{cloud_package_root}
     package_dir=$cloud_package_root/$image_name
-    kernel_version=$(ls -t $GUEST_ROOT/lib/modules|awk '{ printf "%s ", $0 }'|cut -d ' ' -f1-1)
-
     rm -rf $package_dir
     mkdir -p $package_dir
     cd $cloud_package_root
     mkdir $package_dir/xen-kernel
-    cp $GUEST_ROOT/boot/vmlinuz-$kernel_version $package_dir/xen-kernel
-    cp $GUEST_ROOT/boot/initrd-$kernel_version $package_dir/xen-kernel
+    cp $GUEST_ROOT/boot/vmlinuz-$KERNEL_VERSION $package_dir/xen-kernel
+    cp $GUEST_ROOT/boot/initrd-$KERNEL_VERSION $package_dir/xen-kernel
     cp #{target_raw_path} $package_dir/$image_name.img
     tar czvf $image_name.tar.gz $image_name 
   EOH

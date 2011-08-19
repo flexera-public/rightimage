@@ -4,14 +4,11 @@ end
 
 raise "ERROR: you must set your virtual_environment to kvm!"  if node[:rightimage][:virtual_environment] != "kvm"
 
-source_image = node[:rightimage][:mount_dir] 
+source_image = "#{node.rightimage.mount_dir}" 
 
-build_root = "/mnt"
-
-target_type = "#{node[:rightimage][:cloud]}_#{node[:rightimage][:virtual_environment]}"
-target_raw = "#{target_type}.raw"
-target_raw_path = "#{build_root}/#{target_raw}"
-guest_root = "#{build_root}/#{target_type}"
+target_raw = "target.raw"
+target_raw_path = "/mnt/#{target_raw}"
+target_mnt = "/mnt/target"
 
 loop_name="loop0"
 loop_dev="/dev/#{loop_name}"
@@ -29,25 +26,19 @@ bash "create openstack-kvm loopback fs" do
     BYTES_PER_MB=1024
     DISK_SIZE_MB=$(($DISK_SIZE_GB * $BYTES_PER_MB))
 
-    GUEST_ROOT="#{guest_root}"
-    source_image="#{source_image}" 
+    source_image="#{node.rightimage.mount_dir}" 
     target_raw_path="#{target_raw_path}"
+    target_mnt="#{target_mnt}"
 
-    umount -lf $source_image/proc || true 
-    umount -lf $GUEST_ROOT/proc || true 
-    umount -lf $GUEST_ROOT || true
-    rm -rf $target_raw_path $GUEST_ROOT
+    umount -lf #{source_image}/proc || true 
+    umount -lf #{target_mnt}/proc || true 
+    umount -lf #{target_mnt} || true
+    rm -rf $target_raw_path $target_mnt
     
     dd if=/dev/zero of=$target_raw_path bs=1M count=$DISK_SIZE_MB    
     
     loopdev=#{loop_dev}
     loopmap=#{loop_map}
-
-    set +e    
-    [ -e "$loopmap" ] && kpartx -d #{loop_dev}
-    losetup -a | grep #{loop_dev}
-    [ "$?" == "0" ] && losetup -d #{loop_dev}
-    set -e
     losetup $loopdev $target_raw_path
     
     sfdisk $loopdev << EOF
@@ -56,10 +47,10 @@ EOF
     
     kpartx -a $loopdev
     mke2fs -F -j $loopmap
-    mkdir $GUEST_ROOT
-    mount $loopmap $GUEST_ROOT
+    mkdir $target_mnt
+    mount $loopmap $target_mnt
     
-    rsync -a $source_image/ $GUEST_ROOT/
+    rsync -a $source_image/ $target_mnt/
 
   EOH
 end
@@ -69,9 +60,9 @@ bash "mount proc & dev" do
 #!/bin/bash -ex
     set -e 
     set -x
-    GUEST_ROOT=#{guest_root}
-    mount -t proc none $GUEST_ROOT/proc
-    mount --bind /dev $GUEST_ROOT/dev
+    target_mnt=#{target_mnt}
+    mount -t proc none $target_mnt/proc
+    mount --bind /dev $target_mnt/dev
   EOH
 end
 
@@ -79,19 +70,19 @@ bash "install grub" do
   code <<-EOH
     set -e 
     set -x
-    GUEST_ROOT=#{guest_root}
-    yum -c /tmp/yum.conf --installroot=$GUEST_ROOT -y install grub
+    target_mnt="#{target_mnt}"
+    yum -c /tmp/yum.conf --installroot=$target_mnt -y install grub
   EOH
 end
 
 # add fstab
-template "#{guest_root}/etc/fstab" do
+template "#{target_mnt}/etc/fstab" do
   source "fstab.erb"
   backup false
 end
 
 # insert grub conf
-template "#{guest_root}/boot/grub/grub.conf" do 
+template "#{target_mnt}/boot/grub/grub.conf" do 
   source "grub.conf"
   backup false 
 end
@@ -102,14 +93,14 @@ bash "setup grub" do
     set -x
     
     target_raw_path="#{target_raw_path}"
-    GUEST_ROOT="#{guest_root}"
+    target_mnt="#{target_mnt}"
     
-    chroot $GUEST_ROOT mkdir -p /boot/grub
-    chroot $GUEST_ROOT cp -p /usr/share/grub/x86_64-redhat/* /boot/grub
-    chroot $GUEST_ROOT ln -s /boot/grub/grub.conf /boot/grub/menu.lst
+    chroot $target_mnt mkdir -p /boot/grub
+    chroot $target_mnt cp -p /usr/share/grub/x86_64-redhat/* /boot/grub
+    chroot $target_mnt ln -s /boot/grub/grub.conf /boot/grub/menu.lst
     
-    echo "(hd0) #{node[:rightimage][:grub][:root_device]}" > $GUEST_ROOT/boot/grub/device.map
-    echo "" >> $GUEST_ROOT/boot/grub/device.map
+    echo "(hd0) #{node[:rightimage][:grub][:root_device]}" > $target_mnt/boot/grub/device.map
+    echo "" >> $target_mnt/boot/grub/device.map
 
     cat > device.map <<EOF
 (hd0) #{target_raw_path}
@@ -123,9 +114,17 @@ EOF
   EOH
 end
 
-rightimage_kernel "kvm" do
-  guest_root guest_root 
-  action :install
+bash "install kvm kernel" do 
+  code <<-EOH
+#!/bin/bash -ex
+    set -e 
+    set -x
+    target_mnt=#{target_mnt}
+    yum -c /tmp/yum.conf --installroot=$target_mnt -y install kmod-kvm
+    rm -f $target_mnt/boot/initrd*
+    chroot $target_mnt mkinitrd --with=ata_piix --with=virtio_blk --with=ext3 --with=virtio_pci --with=dm_mirror --with=dm_snapshot --with=dm_zero -v initrd-#{node[:rightimage][:kernel_id]} #{node[:rightimage][:kernel_id]}
+    mv $target_mnt/initrd-#{node[:rightimage][:kernel_id]}  $target_mnt/boot/.
+  EOH
 end
 
 bash "configure for openstack" do
@@ -133,26 +132,26 @@ bash "configure for openstack" do
 #!/bin/bash -ex
     set -e 
     set -x
-    GUEST_ROOT=#{guest_root}
+    target_mnt=#{target_mnt}
 
     # clean out packages
-    yum -c /tmp/yum.conf --installroot=$GUEST_ROOT -y clean all
+    yum -c /tmp/yum.conf --installroot=$target_mnt -y clean all
 
     # enable console access
-    #echo "2:2345:respawn:/sbin/mingetty tty2" >> $GUEST_ROOT/etc/inittab
-    #echo "tty2" >> $GUEST_ROOT/etc/securetty
+    #echo "2:2345:respawn:/sbin/mingetty tty2" >> $target_mnt/etc/inittab
+    #echo "tty2" >> $target_mnt/etc/securetty
 
     # configure dns timeout 
-    echo 'timeout 300;' > $GUEST_ROOT/etc/dhclient.conf
+    echo 'timeout 300;' > $target_mnt/etc/dhclient.conf
 
-    mkdir -p $GUEST_ROOT/etc/rightscale.d
-    echo "openstack" > $GUEST_ROOT/etc/rightscale.d/cloud
+    mkdir -p $target_mnt/etc/rightscale.d
+    echo "openstack" > $target_mnt/etc/rightscale.d/cloud
 
-    rm ${GUEST_ROOT}/var/lib/rpm/__*
-    chroot $GUEST_ROOT rpm --rebuilddb
+    rm ${target_mnt}/var/lib/rpm/__*
+    chroot $target_mnt rpm --rebuilddb
     
     # set hwclock to UTC
-    echo "UTC" >> $GUEST_ROOT/etc/adjtime
+    echo "UTC" >> $target_mnt/etc/adjtime
 
   EOH
 end
@@ -162,14 +161,14 @@ bash "unmount proc & dev" do
 #!/bin/bash -ex
     set -e 
     set -x
-    GUEST_ROOT=#{guest_root}
-    umount -lf $GUEST_ROOT/proc
-    umount -lf $GUEST_ROOT/dev
+    target_mnt=#{target_mnt}
+    umount -lf $target_mnt/proc
+    umount -lf $target_mnt/dev
   EOH
 end
 
 # Clean up guest image
-rightimage guest_root do
+rightimage target_mnt do
   action :sanitize
 end
 
@@ -178,7 +177,7 @@ bash "unmount target filesystem" do
 #!/bin/bash -ex
     set -e 
     set -x
-    GUEST_ROOT=#{guest_root}
+    target_mnt=#{target_mnt}
     loopdev=#{loop_dev}
     loopmap=#{loop_map}
     

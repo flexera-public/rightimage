@@ -6,7 +6,7 @@ raise "ERROR: you must set your virtual_environment to xen!"  if node[:rightimag
 
 include_recipe "rightimage::install_vhd-util" if node[:rightimage][:virtual_environment] == "xen"  
 
-source_image = node[:rightimage][:mount_dir] 
+source_image = "#{node.rightimage.mount_dir}" 
 destination_image = "/mnt/vmops_image"
 destination_image_mount = "/mnt/vmops_image_mount"
 vhd_image = destination_image + '.vhd'
@@ -16,7 +16,7 @@ bash "create_vmops_image" do
     set -e 
     set -x
 
-    source_image="#{source_image}" 
+    source_image="#{node.rightimage.mount_dir}" 
     destination_image="#{destination_image}"
     destination_image_mount="#{destination_image_mount}"
 
@@ -25,12 +25,9 @@ bash "create_vmops_image" do
     umount -lf #{destination_image_mount}/sys || true 
     umount -lf #{destination_image_mount} || true
 
-    DISK_SIZE_GB=#{node[:rightimage][:root_size_gb]}  
-    BYTES_PER_MB=1024
-    DISK_SIZE_MB=$(($DISK_SIZE_GB * $BYTES_PER_MB))
-
     rm -rf $destination_image $destination_image_mount
-    dd if=/dev/zero of=$destination_image bs=1M count=$DISK_SIZE_MB    
+#    dd if=/dev/zero of=$destination_image bs=1M count=10240    
+    dd if=/dev/zero of=$destination_image bs=1M count=4096    
     mke2fs -F -j $destination_image
     mkdir $destination_image_mount
     mount -o loop $destination_image $destination_image_mount
