@@ -102,7 +102,8 @@ bash "mount proc & dev" do
   EOH
 end
 
-rightimage_kernel "xen" do
+rightimage_kernel "Install PV Kernel for Hypervisor" do
+  provider "rightimage_kernel_#{node[:rightimage][:virtual_environment]}"
   guest_root guest_root
   version node[:rightimage][:kernel_id]
   action :install
@@ -188,18 +189,18 @@ bash "package guest image" do
     set -e 
     set -x
     GUEST_ROOT=#{guest_root}
-#    KERNEL_VERSION=#{node[:rightimage][:kernel_id]}
+    KERNEL_VERSION=#{node[:rightimage][:kernel_id]}
     image_name=#{image_name}
     cloud_package_root=#{cloud_package_root}
     package_dir=$cloud_package_root/$image_name
-    kernel_version=$(ls -t $GUEST_ROOT/lib/modules|awk '{ printf "%s ", $0 }'|cut -d ' ' -f1-1)
+#    KERNEL_VERSION=$(ls -t $GUEST_ROOT/lib/modules|awk '{ printf "%s ", $0 }'|cut -d ' ' -f1-1)
 
     rm -rf $package_dir
     mkdir -p $package_dir
     cd $cloud_package_root
     mkdir $package_dir/xen-kernel
-    cp $GUEST_ROOT/boot/vmlinuz-$kernel_version $package_dir/xen-kernel
-    cp $GUEST_ROOT/boot/initrd-$kernel_version $package_dir/xen-kernel
+    cp $GUEST_ROOT/boot/vmlinuz-$KERNEL_VERSION $package_dir/xen-kernel
+    cp $GUEST_ROOT/boot/initrd-$KERNEL_VERSION $package_dir/xen-kernel
     cp #{target_raw_path} $package_dir/$image_name.img
     tar czvf $image_name.tar.gz $image_name 
   EOH
