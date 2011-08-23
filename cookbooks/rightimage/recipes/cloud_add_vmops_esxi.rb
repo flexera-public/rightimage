@@ -99,7 +99,7 @@ end
 
 # insert grub conf
 template "#{target_mnt}/boot/grub/grub.conf" do 
-  source "grub.conf.erb"
+  source "grub.conf"
   backup false 
 end
 
