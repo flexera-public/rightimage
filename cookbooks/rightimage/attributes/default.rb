@@ -188,69 +188,71 @@ case rightimage[:release]
 end
 
 # Select kernel to use based on cloud
+#case rightimage[:cloud]
+#when "vmops", "euca", "openstack"
+case rightimage[:release]
+when "5.2" 
+  set[:rightimage][:kernel_id] = "2.6.18-92.1.22.el5.centos.plus"
+  rightimage[:kernel_id] << "xen" if rightimage[:virtual_environment] == "xen"
+when "5.4" 
+  set[:rightimage][:kernel_id] = "2.6.18-164.15.1.el5.centos.plus"
+  rightimage[:kernel_id] << "xen" if rightimage[:virtual_environment] == "xen"
+when "5.6"
+  set[:rightimage][:kernel_id] = "2.6.18-238.19.1.el5.centos.plus"
+  rightimage[:kernel_id] << "xen" if rightimage[:virtual_environment] == "xen"
+when "lucid"
+  set[:rightimage][:kernel_id] = "2.6.32-31-server"
+  rightimage[:kernel_id] << "kvm" if rightimage[:virtual_environment] == "kvm"
+  #rightimage[:kernel_id] << "esxi" if rightimage[:virtual_environment] == "esxi"
+end
+
 case rightimage[:cloud]
-when "vmops", "euca", "openstack"
-  case rightimage[:release]
-  when "5.2" 
-    set[:rightimage][:kernel_id] = "2.6.18-92.1.22.el5.centos.plus"
-    rightimage[:kernel_id] << "xen" if rightimage[:virtual_environment] == "xen"
-  when "5.4" 
-    set[:rightimage][:kernel_id] = "2.6.18-164.15.1.el5.centos.plus"
-    rightimage[:kernel_id] << "xen" if rightimage[:virtual_environment] == "xen"
-  when "5.6"
-    set[:rightimage][:kernel_id] = "2.6.18-238.19.1.el5.centos.plus"
-    rightimage[:kernel_id] << "xen" if rightimage[:virtual_environment] == "xen"
-  when "lucid"
-    set[:rightimage][:kernel_id] = "2.6.32-31-server"
-    rightimage[:kernel_id] << "kvm" if rightimage[:virtual_environment] == "kvm"
-    #rightimage[:kernel_id] << "esxi" if rightimage[:virtual_environment] == "esxi"
-  end
 when "ec2"
   # Using pvgrub kernels
   case rightimage[:region]
   when "us-east"
     case rightimage[:arch]
     when "i386" 
-      set[:rightimage][:kernel_id] = "aki-805ea7e9"
+      set[:rightimage][:aki_id] = "aki-805ea7e9"
       set[:rightimage][:ramdisk_id] = nil
     when "x86_64"
-      set[:rightimage][:kernel_id] = "aki-825ea7eb"
+      set[:rightimage][:aki_id] = "aki-825ea7eb"
       set[:rightimage][:ramdisk_id] = nil
     end
   when "us-west"
     case rightimage[:arch]
     when "i386" 
-      set[:rightimage][:kernel_id] = "aki-83396bc6"
+      set[:rightimage][:aki_id] = "aki-83396bc6"
       set[:rightimage][:ramdisk_id] = nil
     when "x86_64"
-      set[:rightimage][:kernel_id] = "aki-8d396bc8"
+      set[:rightimage][:aki_id] = "aki-8d396bc8"
       set[:rightimage][:ramdisk_id] = nil
     end
   when "eu-west" 
     case rightimage[:arch]
     when "i386" 
-      set[:rightimage][:kernel_id] = "aki-64695810"
+      set[:rightimage][:aki_id] = "aki-64695810"
       set[:rightimage][:ramdisk_id] = nil
     when "x86_64"
-      set[:rightimage][:kernel_id] = "aki-62695816"
+      set[:rightimage][:aki_id] = "aki-62695816"
       set[:rightimage][:ramdisk_id] = nil
     end
   when "ap-southeast"
     case rightimage[:arch]
     when "i386" 
-      set[:rightimage][:kernel_id] = "aki-a4225af6"
+      set[:rightimage][:aki_id] = "aki-a4225af6"
       set[:rightimage][:ramdisk_id] = nil
     when "x86_64"
-      set[:rightimage][:kernel_id] = "aki-aa225af8"
+      set[:rightimage][:aki_id] = "aki-aa225af8"
       set[:rightimage][:ramdisk_id] = nil
     end
   when "ap-northeast"
     case rightimage[:arch]
     when "i386" 
-      set[:rightimage][:kernel_id] = "aki-ec5df7ed"
+      set[:rightimage][:aki_id] = "aki-ec5df7ed"
       set[:rightimage][:ramdisk_id] = nil
     when "x86_64"
-      set[:rightimage][:kernel_id] = "aki-ee5df7ef"
+      set[:rightimage][:aki_id] = "aki-ee5df7ef"
       set[:rightimage][:ramdisk_id] = nil
     end
   end
