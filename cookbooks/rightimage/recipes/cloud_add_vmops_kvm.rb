@@ -237,6 +237,7 @@ bash "package image" do
     BUNDLED_IMAGE_PATH="/mnt/$BUNDLED_IMAGE"
     
     qemu-img convert -O qcow2 #{target_raw_path} $BUNDLED_IMAGE_PATH
+    [ -f $BUNDLED_IMAGE_PATH ] && rm -f $BUNDLED_IMAGE_PATH
     bzip2 $BUNDLED_IMAGE_PATH
 
   EOH
