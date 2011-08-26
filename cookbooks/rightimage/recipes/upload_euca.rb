@@ -112,10 +112,11 @@ bash "copy_image" do
   # Upload image. 
   #
   image_bucket=$image_name
+  image_name="`md5sum $image_path | awk '{ print $1 }'`-$image_name"
 
-  echo `euca-bundle-image -i $image_path --kernel $EKI --ramdisk $ERI`
-  echo `euca-upload-bundle -b $image_bucket -m /tmp/$image_name.img.manifest.xml`
-  image_out=`euca-register $image_bucket/$image_name.img.manifest.xml`
+  echo `euca-bundle-image -i $image_path -p $image_name --kernel $EKI --ramdisk $ERI`
+  echo `euca-upload-bundle -b $image_bucket -m /tmp/$image_name.manifest.xml`
+  image_out=`euca-register $image_bucket/$image_name.manifest.xml`
   echo $image_out
 
   # parse out image id to tmp file
