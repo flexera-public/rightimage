@@ -35,6 +35,7 @@ bash "create openstack-kvm loopback fs" do
 
     umount -lf $source_image/proc || true 
     umount -lf $GUEST_ROOT/proc || true 
+    umount -lf $GUEST_ROOT/sys || true 
     umount -lf $GUEST_ROOT || true
     rm -rf $target_raw_path $GUEST_ROOT
     
@@ -72,6 +73,7 @@ bash "mount proc & dev" do
     GUEST_ROOT=#{guest_root}
     mount -t proc none $GUEST_ROOT/proc
     mount --bind /dev $GUEST_ROOT/dev
+    mount --bind /sys $GUEST_ROOT/sys
   EOH
 end
 
@@ -174,6 +176,13 @@ end
 # Clean up guest image
 rightimage guest_root do
   action :sanitize
+end
+
+bash "sync fs" do 
+  code <<-EOH
+    set -x
+    sync
+  EOH
 end
 
 bash "unmount target filesystem" do 

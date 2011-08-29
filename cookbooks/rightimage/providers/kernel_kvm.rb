@@ -6,6 +6,7 @@ action :install do
 #!/bin/bash -ex
     set -e 
     set -x
+    kernel_version=#{new_resource.version}
     guest_root=#{new_resource.guest_root}
 
 
@@ -17,7 +18,7 @@ action :install do
       #kernel_version=$(ls -t $guest_root/lib/modules|awk '{ printf "%s ", $0 }'|cut -d ' ' -f1-1)
 
       rm -f $guest_root/boot/initrd* $guest_root/initrd*
-      chroot $guest_root mkinitrd --with=ata_piix --with=virtio_blk --with=ext3 --with=virtio_pci --with=dm_mirror --with=dm_snapshot --with=dm_zero -v initrd-$kernel_version $kernel_version
+      chroot $guest_root mkinitrd --with=ata_piix --with=virtio_ring --with=virtio_net --with=virtio_balloon --with=virtio --with=virtio_blk --with=ext3 --with=virtio_pci --with=dm_mirror --with=dm_snapshot --with=dm_zero -v initrd-$kernel_version $kernel_version
       mv $guest_root/initrd-$kernel_version $guest_root/boot/.
       ;;
     "ubuntu" )
