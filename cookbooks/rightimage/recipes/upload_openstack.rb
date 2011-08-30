@@ -5,7 +5,7 @@ end
 bash "install python modules" do
   code <<-EOH
     set -ex
-    easy_install-2.6 sqlalchemy eventlet routes webob paste pastedeploy glance
+    easy_install-2.6 sqlalchemy eventlet routes webob paste pastedeploy glance argparse xattr
   EOH
 end
 
@@ -23,7 +23,7 @@ ruby_block "upload to cloud" do
       id_list = RightImage::IdList.new(Chef::Log)
       id_list.add(image_id)
     else
-      raise "ERROR: could not upload image to cloud at #{node[:rightimage][:openstack][:hostname]} due to #{result}"
+      raise "ERROR: could not upload image to cloud at #{node[:rightimage][:openstack][:hostname]} due to #{result.inspect}"
     end
   end
 end
