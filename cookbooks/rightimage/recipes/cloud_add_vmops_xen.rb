@@ -49,19 +49,6 @@ bash "create_vmops_image" do
   EOH
 end
 
-# insert grub conf
-template "#{guest_root}/boot/grub/grub.conf" do 
-  source "grub.conf"
-  backup false 
-end
-
-
-# add fstab
-template "#{guest_root}/etc/fstab" do
-  source "fstab.erb"
-  backup false
-end
-
 bash "mount proc" do 
   code <<-EOH
 #!/bin/bash -ex
@@ -77,6 +64,18 @@ rightimage_kernel "Install PV Kernel for Hypervisor" do
   guest_root guest_root
   version node[:rightimage][:kernel_id]
   action :install
+end
+
+# insert grub conf
+template "#{guest_root}/boot/grub/grub.conf" do 
+  source "grub.conf"
+  backup false 
+end
+
+# add fstab
+template "#{guest_root}/etc/fstab" do
+  source "fstab.erb"
+  backup false
 end
 
 bash "configure for cloudstack" do 
