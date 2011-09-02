@@ -29,19 +29,37 @@ ruby_block "trigger download to test cloud" do
     local_ip = node[:cloud][:public_ips][0]
     image_url = "http://#{local_ip}/#{image_name}.vhd.bz2"
     encoded_image_url = URI.escape(image_url, Regexp.new("[^#{URI::PATTERN::UNRESERVED}]"))  
-    
+   
+    name = image_name.gsub(/RightImage/,"RI")
+    # remove random passwd from name
+    if name =~ /Dev/i
+      n = name.split("_")
+      n.pop
+      name = n.join("_")
+    end
+ 
     cmd = "/?command=registerTemplate"
-    cmd << "&name=#{image_name.gsub(/RightImage/,"RI")}&displayText=#{image_name}"
+    cmd << "&name=#{name}&displayText=#{image_name}"
     cmd << "&url=#{encoded_image_url}"
     cmd << "&format=VHD"
-    cmd << "&osTypeId=14" # CentOS 5.4 x86
+
+#    case node[:rightimage][:platform]
+#    when "centos"
+#      case node[:rightimage][:release]
+#      when "5.4"
+        cmd << "&osTypeId=14" # CentOS 5.4 x86
+#      else
+#        cmd << "&osTypeId=76"
+#      end
+#    end
+
     cmd << "&zoneId=1"
     cmd << "&isPublic=true"
     cmd << "&isFeatured=true"
 
-    puts "============"
-    puts "#{api_url}#{cmd}"
-    puts "============"
+    Chef::Log.info("============")
+    Chef::Log.info("#{api_url}#{cmd}")
+    Chef::Log.info("============")
     result = `curl -S -s -o - -f '#{api_url}#{cmd}'`
 
     if result =~ /created/ 

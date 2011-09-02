@@ -4,11 +4,14 @@ end
 
 raise "ERROR: you must set your virtual_environment to kvm!"  if node[:rightimage][:virtual_environment] != "kvm"
 
-source_image = "#{node.rightimage.mount_dir}" 
+source_image = node[:rightimage][:mount_dir] 
 
-target_raw = "target.raw"
-target_raw_path = "/mnt/#{target_raw}"
-target_mnt = "/mnt/target"
+build_root = "/mnt"
+
+target_type = "#{node[:rightimage][:cloud]}_#{node[:rightimage][:virtual_environment]}"
+target_raw = "#{target_type}.raw"
+target_raw_path = "#{build_root}/#{target_raw}"
+guest_root = "#{build_root}/#{target_type}"
 
 loop_name="loop0"
 loop_dev="/dev/#{loop_name}"
@@ -26,14 +29,15 @@ bash "create cloudstack-kvm loopback fs" do
     BYTES_PER_MB=1024
     DISK_SIZE_MB=$(($DISK_SIZE_GB * $BYTES_PER_MB))
 
-    source_image="#{node.rightimage.mount_dir}" 
+    guest_root="#{guest_root}"
+    source_image="#{source_image}" 
     target_raw_path="#{target_raw_path}"
-    target_mnt="#{target_mnt}"
 
-    umount -lf #{source_image}/proc || true 
-    umount -lf #{target_mnt}/proc || true 
-    umount -lf #{target_mnt} || true
-    rm -rf $target_raw_path $target_mnt
+    umount -lf $source_image/proc || true 
+    umount -lf $guest_root/proc || true 
+    umount -lf $guest_root/sys || true
+    umount -lf $guest_root || true
+    rm -rf $target_raw_path $guest_root
     
     dd if=/dev/zero of=$target_raw_path bs=1M count=$DISK_SIZE_MB    
     
@@ -41,7 +45,7 @@ bash "create cloudstack-kvm loopback fs" do
     loopmap=#{loop_map}
 
     set +e    
-    [ -e "/dev/mapper/#{loop_name}p1" ] && kpartx -d #{loop_dev}
+    [ -e "$loopmap" ] && kpartx -d #{loop_dev}
     losetup -a | grep #{loop_dev}
     [ "$?" == "0" ] && losetup -d #{loop_dev}
     set -e
@@ -53,10 +57,10 @@ EOF
     
     kpartx -a $loopdev
     mke2fs -F -j $loopmap
-    mkdir $target_mnt
-    mount $loopmap $target_mnt
+    mkdir $guest_root
+    mount $loopmap $guest_root
     
-    rsync -a $source_image/ $target_mnt/
+    rsync -a $source_image/ $guest_root/
 
   EOH
 end
@@ -66,9 +70,10 @@ bash "mount proc & dev" do
 #!/bin/bash -ex
     set -e 
     set -x
-    target_mnt=#{target_mnt}
-    mount -t proc none $target_mnt/proc
-    mount --bind /dev $target_mnt/dev
+    guest_root=#{guest_root}
+    mount -t proc none $guest_root/proc
+    mount --bind /dev $guest_root/dev
+    mount --bind /sys $guest_root/sys
   EOH
 end
 
@@ -76,20 +81,20 @@ bash "install grub" do
   code <<-EOH
     set -e 
     set -x
-    target_mnt="#{target_mnt}"
-    yum -c /tmp/yum.conf --installroot=$target_mnt -y install grub
+    guest_root="#{guest_root}"
+    yum -c /tmp/yum.conf --installroot=$guest_root -y install grub
   EOH
 end
 
 # add fstab
-template "#{target_mnt}/etc/fstab" do
+template "#{guest_root}/etc/fstab" do
   source "fstab.erb"
   backup false
 end
 
 # insert grub conf
-template "#{target_mnt}/boot/grub/grub.conf" do 
-  source "grub.conf"
+template "#{guest_root}/boot/grub/grub.conf" do 
+  source "menu.lst.erb"
   backup false 
 end
 
@@ -99,24 +104,24 @@ bash "setup grub" do
     set -x
     
     target_raw_path="#{target_raw_path}"
-    target_mnt="#{target_mnt}"
+    guest_root="#{guest_root}"
     
-    chroot $target_mnt mkdir -p /boot/grub
+    chroot $guest_root mkdir -p /boot/grub
 
-    if [ "#{node.rightimage.platform}" == "centos" ]; then 
-      chroot $target_mnt cp -p /usr/share/grub/x86_64-redhat/* /boot/grub
+    if [ "#{node[:rightimage][:platform]}" == "centos" ]; then 
+      chroot $guest_root cp -p /usr/share/grub/x86_64-redhat/* /boot/grub
     fi
 
-    chroot $target_mnt ln -sf /boot/grub/grub.conf /boot/grub/menu.lst
+    chroot $guest_root ln -sf /boot/grub/grub.conf /boot/grub/menu.lst
     
-    echo "(hd0) #{node[:rightimage][:grub][:root_device]}" > $target_mnt/boot/grub/device.map
-    echo "" >> $target_mnt/boot/grub/device.map
+    echo "(hd0) #{node[:rightimage][:grub][:root_device]}" > $guest_root/boot/grub/device.map
+    echo "" >> $guest_root/boot/grub/device.map
 
     cat > device.map <<EOF
 (hd0) #{target_raw_path}
 EOF
 
-    if [ "#{node.rightimage.platform}" == "ubuntu" ]; then
+    if [ "#{node[:rightimage][:platform]}" == "ubuntu" ]; then
       sbin_command="/usr/sbin/grub"
     else
       sbin_command="/sbin/grub"
@@ -131,28 +136,11 @@ EOF
   EOH
 end
 
-bash "install kvm kernel" do 
-  code <<-EOH
-#!/bin/bash -ex
-    set -e 
-    set -x
-    target_mnt=#{target_mnt}
-
-
-  case "#{node.rightimage.platform}" in 
-    "centos" )
-      # The following should be needed when using ubuntu vmbuilder
-      yum -c /tmp/yum.conf --installroot=$target_mnt -y install kmod-kvm
-      rm -f $target_mnt/boot/initrd*
-      chroot $target_mnt mkinitrd --with=ata_piix --with=virtio_blk --with=ext3 --with=virtio_pci --with=dm_mirror --with=dm_snapshot --with=dm_zero -v initrd-#{node[:rightimage][:kernel_id]} #{node[:rightimage][:kernel_id]}
-      mv $target_mnt/initrd-#{node[:rightimage][:kernel_id]}  $target_mnt/boot/.
-      ;;
-    "ubuntu" )
-      # Anything need to be done?
-      ;;
-  esac
-      
-  EOH
+rightimage_kernel "Install PV Kernel for Hypervisor" do
+  provider "rightimage_kernel_#{node[:rightimage][:virtual_environment]}"
+  guest_root guest_root
+  version node[:rightimage][:kernel_id]
+  action :install
 end
 
 bash "configure for cloudstack" do 
@@ -160,40 +148,40 @@ bash "configure for cloudstack" do
 #!/bin/bash -ex
     set -e 
     set -x
-    target_mnt=#{target_mnt}
+    guest_root=#{guest_root}
 
-    case "#{node.rightimage.platform}" in
+    case "#{node[:rightimage][:platform]}" in
     "centos")
 
       # clean out packages
-      yum -c /tmp/yum.conf --installroot=$target_mnt -y clean all
+      yum -c /tmp/yum.conf --installroot=$guest_root -y clean all
 
       # clean centos RPM data
-      rm ${target_mnt}/var/lib/rpm/__*
-      chroot $target_mnt rpm --rebuilddb
+      rm ${guest_root}/var/lib/rpm/__*
+      chroot $guest_root rpm --rebuilddb
 
       # enable console access
-      echo "2:2345:respawn:/sbin/mingetty tty2" >> $target_mnt/etc/inittab
-      echo "tty2" >> $target_mnt/etc/securetty
+      echo "2:2345:respawn:/sbin/mingetty tty2" >> $guest_root/etc/inittab
+      echo "tty2" >> $guest_root/etc/securetty
 
       # configure dns timeout 
-      echo 'timeout 300;' > $target_mnt/etc/dhclient.conf
+      echo 'timeout 300;' > $guest_root/etc/dhclient.conf
       ;;
 
     "ubuntu")
       # More to do for Ubuntu?
-      echo 'timeout 300;' > $target_mnt/etc/dhcp3/dhclient.conf      
+      echo 'timeout 300;' > $guest_root/etc/dhcp3/dhclient.conf      
       ;;
     esac
 
-    mkdir -p $target_mnt/etc/rightscale.d
-    echo "vmops" > $target_mnt/etc/rightscale.d/cloud
+    mkdir -p $guest_root/etc/rightscale.d
+    echo "cloudstack" > $guest_root/etc/rightscale.d/cloud
 
-    rm ${target_mnt}/var/lib/rpm/__*
-    chroot $target_mnt rpm --rebuilddb
+    [ -f $guest_root/var/lib/rpm/__* ] && rm ${guest_root}/var/lib/rpm/__*
+    chroot $guest_root rpm --rebuilddb
     
     # set hwclock to UTC
-    echo "UTC" >> $target_mnt/etc/adjtime
+    echo "UTC" >> $guest_root/etc/adjtime
 
   EOH
 end
@@ -203,14 +191,15 @@ bash "unmount proc & dev" do
 #!/bin/bash -ex
     set -e 
     set -x
-    target_mnt=#{target_mnt}
-    umount -lf $target_mnt/proc
-    umount -lf $target_mnt/dev
+    guest_root=#{guest_root}
+    umount -lf $guest_root/proc
+    umount -lf $guest_root/dev
+    umount -lf $guest_root/sys
   EOH
 end
 
 # Clean up guest image
-rightimage target_mnt do
+rightimage guest_root do
   action :sanitize
 end
 
@@ -219,7 +208,7 @@ bash "unmount target filesystem" do
 #!/bin/bash -ex
     set -e 
     set -x
-    target_mnt=#{target_mnt}
+    guest_root=#{guest_root}
     loopdev=#{loop_dev}
     loopmap=#{loop_map}
     
@@ -248,6 +237,7 @@ bash "package image" do
     BUNDLED_IMAGE_PATH="/mnt/$BUNDLED_IMAGE"
     
     qemu-img convert -O qcow2 #{target_raw_path} $BUNDLED_IMAGE_PATH
+    [ -f $BUNDLED_IMAGE_PATH.bz2 ] && rm -f $BUNDLED_IMAGE_PATH.bz2
     bzip2 $BUNDLED_IMAGE_PATH
 
   EOH

@@ -151,29 +151,15 @@ else
   java_arch="i586"
 fi
 
-chroot #{node[:rightimage][:mount_dir]} mkdir -p /tmp/updates
-
-#get java RPM
-chroot #{node[:rightimage][:mount_dir]} curl -o /tmp/updates/jdk-6u14-linux-$java_arch.rpm https://s3.amazonaws.com/rightscale_software/java/jdk-6u14-linux-$java_arch.rpm
-
-#get JavaDB (always use i386 RPM's, even for 64 bit)
-chroot #{node[:rightimage][:mount_dir]} curl -o /tmp/updates/sun-javadb-common-10.4.2-1.1.i386.rpm https://s3.amazonaws.com/rightscale_software/java/sun-javadb-common-10.4.2-1.1.i386.rpm
-chroot #{node[:rightimage][:mount_dir]} curl -o /tmp/updates/sun-javadb-client-10.4.2-1.1.i386.rpm https://s3.amazonaws.com/rightscale_software/java/sun-javadb-client-10.4.2-1.1.i386.rpm
-chroot #{node[:rightimage][:mount_dir]} curl -o /tmp/updates/sun-javadb-core-10.4.2-1.1.i386.rpm https://s3.amazonaws.com/rightscale_software/java/sun-javadb-core-10.4.2-1.1.i386.rpm
-chroot #{node[:rightimage][:mount_dir]} curl -o /tmp/updates/sun-javadb-demo-10.4.2-1.1.i386.rpm https://s3.amazonaws.com/rightscale_software/java/sun-javadb-demo-10.4.2-1.1.i386.rpm
-chroot #{node[:rightimage][:mount_dir]} curl -o /tmp/updates/sun-javadb-docs-10.4.2-1.1.i386.rpm https://s3.amazonaws.com/rightscale_software/java/sun-javadb-docs-10.4.2-1.1.i386.rpm
-chroot #{node[:rightimage][:mount_dir]} curl -o /tmp/updates/sun-javadb-javadoc-10.4.2-1.1.i386.rpm https://s3.amazonaws.com/rightscale_software/java/sun-javadb-javadoc-10.4.2-1.1.i386.rpm
-
-#Install RPM's
-chroot #{node[:rightimage][:mount_dir]} rpm -Uvh /tmp/updates/jdk-6u14-linux-$java_arch.rpm
-
-chroot #{node[:rightimage][:mount_dir]} rpm -Uvh /tmp/updates/sun-javadb-common-10.4.2-1.1.i386.rpm
-chroot #{node[:rightimage][:mount_dir]} rpm -Uvh /tmp/updates/sun-javadb-client-10.4.2-1.1.i386.rpm
-chroot #{node[:rightimage][:mount_dir]} rpm -Uvh /tmp/updates/sun-javadb-core-10.4.2-1.1.i386.rpm
-chroot #{node[:rightimage][:mount_dir]} rpm -Uvh /tmp/updates/sun-javadb-demo-10.4.2-1.1.i386.rpm
-chroot #{node[:rightimage][:mount_dir]} rpm -Uvh /tmp/updates/sun-javadb-docs-10.4.2-1.1.i386.rpm
-chroot #{node[:rightimage][:mount_dir]} rpm -Uvh /tmp/updates/sun-javadb-javadoc-10.4.2-1.1.i386.rpm
-
+array=( jdk-6u27-linux-$java_arch.rpm sun-javadb-common-10.4.2-1.1.i386.rpm sun-javadb-client-10.4.2-1.1.i386.rpm sun-javadb-core-10.4.2-1.1.i386.rpm sun-javadb-demo-10.4.2-1.1.i386.rpm )
+set +e
+for i in "${array[@]}"; do
+  ret=$(rpm --root #{node[:rightimage][:mount_dir]} -Uvh http://s3.amazonaws.com/rightscale_software/java/$i 2>&1)
+  [ "$?" == "0" ] && continue
+  echo "$ret" | grep "already installed"
+  [ "$?" != "0" ] && exit 1
+done
+set -e
 
 #Add JAVA_HOME to the system profile
 echo "Configuring Java Home" 

@@ -35,8 +35,10 @@ bash "cleanup" do
   code <<-EOH
     set -x
     GUEST_ROOT=#{guest_root}
-    source_image="#{source_image}" 
+    source_image="#{source_image}"
+    target_raw_path="#{target_raw_path}"
     loopdev=#{loop_dev}  
+
     umount -lf $source_image/proc || true 
     umount -lf $GUEST_ROOT/proc || true 
     umount -lf $GUEST_ROOT/dev || true
@@ -100,7 +102,8 @@ bash "mount proc & dev" do
   EOH
 end
 
-rightimage_kernel "xen" do
+rightimage_kernel "Install PV Kernel for Hypervisor" do
+  provider "rightimage_kernel_#{node[:rightimage][:virtual_environment]}"
   guest_root guest_root
   version node[:rightimage][:kernel_id]
   action :install
@@ -190,6 +193,8 @@ bash "package guest image" do
     image_name=#{image_name}
     cloud_package_root=#{cloud_package_root}
     package_dir=$cloud_package_root/$image_name
+#    KERNEL_VERSION=$(ls -t $GUEST_ROOT/lib/modules|awk '{ printf "%s ", $0 }'|cut -d ' ' -f1-1)
+
     rm -rf $package_dir
     mkdir -p $package_dir
     cd $cloud_package_root

@@ -1,3 +1,10 @@
+
+ruby_block("reload-yum-cache") do
+  block do
+    Chef::Provider::Package::Yum::YumCache.instance.reload
+  end
+end
+
 case node[:rightimage][:platform]
   when "centos" 
     vhd_util_deps=%w{mercurial git ncurses-devel dev86 iasl SDL python-devel libgcrypt-devel uuid-devel openssl-devel} 

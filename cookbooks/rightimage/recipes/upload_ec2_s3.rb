@@ -31,8 +31,8 @@ bash "bundle_upload_s3_image" do
     umount "#{guest_root}/proc" || true
     
     kernel_opt=""
-    if [ -n "#{node[:rightimage][:kernel_id]}" ]; then
-      kernel_opt="--kernel #{node[:rightimage][:kernel_id]}"
+    if [ -n "#{node[:rightimage][:aki_id]}" ]; then
+      kernel_opt="--kernel #{node[:rightimage][:aki_id]}"
     fi 
 
     ramdisk_opt=""

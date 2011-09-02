@@ -27,6 +27,7 @@ recipe "rightimage::upload_ec2_s3", "bundle and upload s3 image (ec2 only)"
 recipe "rightimage::upload_ec2_ebs", "create EBS image snapshot (ec2 only)"
 recipe "rightimage::upload_vmops", "setup http server for download to test cloud"
 recipe "rightimage::upload_euca", "bundle and upload euca kernel, ramdisk and image"
+recipe "rightimage::upload_openstack", "bundle and upload openstack kernel, ramdisk and image"
 recipe "rightimage::upload_file_to_s3", "upload specified file to s3"
 
 attribute "rest_connection/user",
@@ -221,4 +222,11 @@ attribute "rightimage/euca/euca_cert",
   :description => "The contents of the file pointed to by the EUCALYPTUS_CERT value defined in your eucarc credentials file.",
   :required => "required",
   :recipes => [ "rightimage::upload_euca" ]
+
+attribute "rightimage/openstack/hostname",
+  :display_name => "Openstack Hostname",
+  :description => "Hostname of Openstack Cloud Controller.",
+  :required => "required",
+  :recipes => [ "rightimage::upload_openstack" ]
+
 
