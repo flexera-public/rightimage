@@ -4,6 +4,7 @@
 
 UNKNOWN = :unknown.to_s
 
+set_unless[:rightimage][:tempdir] = "/tmp"
 set_unless[:rightimage][:debug] = false
 set[:rightimage][:lang] = "en_US.UTF-8"
 set_unless[:rightimage][:root_size_gb] = "10"

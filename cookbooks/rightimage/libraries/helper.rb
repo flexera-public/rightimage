@@ -12,6 +12,14 @@ module RightScale
       	name
       end   
       
+      def kernel_version_file
+        "#{[:rightimage][:tempdir]}/kernel_version"
+      end
+      
+      def detect_kernel_version(guest_root)
+        `ls -t #{guest_root}/lib/modules|awk '{ printf "%s ", $0 }'|cut -d ' ' -f1-1`
+      end
+      
       def generate_persisted_passwd
         length = 14
         pw = nil
