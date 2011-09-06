@@ -1,14 +1,16 @@
 class Chef::Resource::Bash
   include RightScale::RightImage::Helper
 end
+class Chef::Recipe
+  include RightScale::RightImage::Helper
+end
 
-build_root = "/mnt"
+#target_mnt = "#{build_root}/euca"
+#tmp_creds_dir = "#{build_root}/euca_upload_creds"
+tmp_creds_dir = "#{base_root}/temp/euca_upload_creds"
 
-target_mnt = "#{build_root}/euca"
-tmp_creds_dir = "#{build_root}/euca_upload_creds"
-
-package_root = "#{build_root}/pkg"
-package_dir = "#{package_root}/euca"
+#package_root = "#{build_root}/pkg"
+#package_dir = "#{package_root}/euca"
 
 
 ## copy the generic image 
@@ -18,14 +20,13 @@ bash "copy_image" do
   set -x
   set -e
   image_name=#{image_name}
-  target_mnt=#{target_mnt}
   tmp_creds_dir=#{tmp_creds_dir}
   
   
   # 
   # Get paths to deliverables
   #
-  package_dir=#{package_dir}
+  package_dir=#{target_raw_root}
 
   image_path=$package_dir/$image_name/$image_name.img
   if [ -a $image_path ]; then 

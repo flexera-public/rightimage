@@ -4,7 +4,6 @@ module RightScale
   
       # NOTE: this code is basically duplicated code with the right_image_builder project
       # albeit out of date duplicated code.  We should share code someday!
-      
       def image_name
       	raise "ERROR: you must specify an image_name!" unless node[:rightimage][:image_name]
       	name = node[:rightimage][:image_name].dup
@@ -59,7 +58,37 @@ EOF
         require 'rubygems'
         require 'rest_connection'
       end
-      
+
+      def source_image
+        node[:rightimage][:mount_dir]
+      end
+
+      def build_root
+        "/mnt"
+      end
+
+      def target_type
+        type = "#{node[:rightimage][:cloud]}_#{node[:rightimage][:virtual_environment]}"
+        type << "_dev" if node[:rightimage][:debug] == "true"
+        type
+      end
+
+      def base_root
+        "#{build_root}/#{target_type}"
+      end
+
+      def guest_root
+        "#{base_root}/build"
+      end
+
+      def target_raw_root
+        "#{base_root}/image"
+      end
+
+      def target_raw_path
+        "#{target_raw_root}/#{target_type}.raw" 
+      end
+ 
     end
   end
 end

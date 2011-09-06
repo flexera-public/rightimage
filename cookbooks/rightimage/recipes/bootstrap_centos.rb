@@ -196,8 +196,6 @@ EOF
 
 end
 
-include_recipe "rightimage::bootstrap_common"
-
 remote_file "#{node[:rightimage][:mount_dir]}/root/.bash_profile" do 
   source "bash_profile" 
   backup false

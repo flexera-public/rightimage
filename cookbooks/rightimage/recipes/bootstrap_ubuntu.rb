@@ -271,6 +271,3 @@ EOS
     EOH
   end
 end
-
-include_recipe "rightimage::bootstrap_common"
-
