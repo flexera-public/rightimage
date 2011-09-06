@@ -1,4 +1,5 @@
 rightlink_file="rightscale_#{node[:rightimage][:rightlink_version]}-#{node[:rightimage][:platform]}_#{node[:rightimage][:release]}-#{node[:rightimage][:arch]}." + (node[:rightimage][:platform] == "centos" ? "rpm" : "deb")
+tag=(node[:rightimage][:sandbox_repo_tag] != "" ? node[:rightimage][:sandbox_repo_tag] : "rightlink_package_#{node[:rightimage][:rightlink_version]}")
 
 execute "insert_rightlink_version" do 
   command  "echo -n " + node[:rightimage][:rightlink_version] + " > " + node[:rightimage][:mount_dir] + "/etc/rightscale.d/rightscale-release"
@@ -12,7 +13,7 @@ bash "checkout_repo" do
     if [ -d sandbox_builds ]; then mv sandbox_builds sandbox_builds.$RANDOM; fi
     git clone git@github.com:rightscale/sandbox_builds.git 
     cd sandbox_builds 
-    git checkout #{node[:rightimage][:sandbox_repo_tag]} --force
+    git checkout #{tag} --force
     git submodule init 
     git submodule update
     cd repos/right_net
