@@ -23,6 +23,14 @@ bash "checkout_repo" do
   EOC
 end
 
+directory "#{node[:rightimage][:mount_dir]}/root/.rightscale" do
+  owner "root"
+  group "root"
+  mode "0440"
+  action :create
+  recursive true
+end
+
 bash "download_rightlink" do
   not_if "test -f #{node[:rightimage][:mount_dir]}/root/.rightscale/#{rightlink_file}"
   code <<-EOC
@@ -38,8 +46,9 @@ bash "download_rightlink" do
       for location in ${locations[@]}
       do
         code=$(curl -o #{node[:rightimage][:mount_dir]}/root/.rightscale/#{rightlink_file} --connect-timeout 10 --fail --silent --write-out %{http_code} http://s3.amazonaws.com/$bucket/$location/#{rightlink_file})
-        echo "BUCKET: $bucket LOCATION: $location RETURN: $? CODE: $code"
-        [[ "$?" -eq "0" && "$code" -eq "200" ]] && break 2
+        return=$?
+        echo "BUCKET: $bucket LOCATION: $location RETURN: $return CODE: $code"
+        [[ "$return" -eq "0" && "$code" -eq "200" ]] && break 2
       done
     done
   EOC
