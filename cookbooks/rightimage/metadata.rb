@@ -95,7 +95,7 @@ attribute "rightimage/region",
 attribute "rightimage/sandbox_repo_tag",
   :display_name => "Sandbox Repository Tag",
   :description => "The tag on the sandbox_builds repo from which to build rightscale package.",
-  :required => true
+  :required => "optional"
   
 attribute "rightimage/rightlink_version",
   :display_name => "RightLink Version",

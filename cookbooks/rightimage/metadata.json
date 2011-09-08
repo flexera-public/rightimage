@@ -214,7 +214,7 @@
       "description": "aws_secret_access_key"
     },
     "rightimage/sandbox_repo_tag": {
-      "required": "required",
+      "required": "optional",
       "calculated": false,
       "choice": [
 
