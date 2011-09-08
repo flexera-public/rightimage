@@ -58,6 +58,8 @@ mkdir -p #{node[:rightimage][:mount_dir]}/sys
 umount #{node[:rightimage][:mount_dir]}/sys || true
 mount --bind /sys #{node[:rightimage][:mount_dir]}/sys
 
+umount #{node[:rightimage][:mount_dir]}/dev/pts || true
+
 ## bootstrap base OS
 yum -c /tmp/yum.conf --installroot=#{node[:rightimage][:mount_dir]} -y groupinstall Base 
 
@@ -240,6 +242,7 @@ bash "cleanup" do
   code <<-EOH
     umount -lf #{node[:rightimage][:mount_dir]}/proc || true
     umount -lf #{node[:rightimage][:mount_dir]}/sys || true
+    umount -lf #{node[:rightimage][:mount_dir]}/dev/pts || true
   EOH
 end    
 
