@@ -22,7 +22,6 @@
     "rightimage::do_tag_images": "adds rightscale tags to images",
     "rightimage::bootstrap_common": "common configuration for linux base images",
     "rightimage::base_centos": "coordinate a centos install",
-    "rightimage::cloud_add_esxi": "applies esxi transformations on an existing disk image",
     "rightimage::bootstrap_centos": "bootstraps a basic centos image",
     "rightimage::upload_vmops": "setup http server for download to test cloud",
     "rightimage::clean": "cleans everything"
@@ -138,7 +137,16 @@
         "rightimage::build_image",
         "rightimage::bootstrap_centos",
         "rightimage::bootstrap_sles",
-        "rightimage::bootstrap_ubuntu"
+        "rightimage::bootstrap_ubuntu",
+        "rightimage::cloud_add_euca",
+        "rightimage::cloud_add_vmops",
+        "rightimage::cloud_add_openstack",
+        "rightimage::cloud_add_ec2",
+        "rightimage::upload_euca",
+        "rightimage::upload_vmops",
+        "rightimage::upload_openstack",
+        "rightimage::upload_ec2_s3",
+        "rightimage::upload_ec2_ebs"
       ],
       "display_name": "Development Image?",
       "description": "If set, a random root password will be set for debugging purposes. NOTE: you must include 'Dev' in the image name or the build with fail."
@@ -322,11 +330,10 @@
       "recipes": [
         "rightimage::default",
         "rightimage::build_image",
+        "rightimage::cloud_add_euca",
         "rightimage::cloud_add_vmops",
         "rightimage::cloud_add_openstack",
-        "rightimage::cloud_add_euca",
-        "rightimage::cloud_add_ec2",
-        "rightimage::cloud_add_raw"
+        "rightimage::cloud_add_ec2"
       ],
       "display_name": "Root Size GB",
       "description": "Sets the size of the virtual image. Units are in GB."
@@ -508,10 +515,7 @@
       ],
       "type": "string",
       "recipes": [
-        "rightimage::upload_euca",
         "rightimage::cloud_add_ec2",
-        "rightimage::upload_ec2_s3",
-        "rightimage::upload_ec2_ebs",
         "rightimage::do_tag_images",
         "rightimage::do_create_mci",
         "rightimage::base_centos",
@@ -519,8 +523,12 @@
         "rightimage::base_sles",
         "rightimage::default",
         "rightimage::build_image",
+        "rightimage::upload_file_to_s3",
+        "rightimage::upload_euca",
         "rightimage::upload_vmops",
-        "rightimage::upload_file_to_s3"
+        "rightimage::upload_openstack",
+        "rightimage::upload_ec2_s3",
+        "rightimage::upload_ec2_ebs"
       ],
       "display_name": "Image Upload Bucket",
       "description": "The bucket to upload the image to."
