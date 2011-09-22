@@ -10,6 +10,9 @@ bash "checkout_repo" do
     if [ -d sandbox_builds ]; then mv sandbox_builds sandbox_builds.$RANDOM; fi
     git clone git@github.com:rightscale/sandbox_builds.git 
     cd sandbox_builds 
+    export sha=$(git log --pretty=format:%H -1)
+    touch SHA-$sha.txt
+    mv SHA-$sha.txt #{node[:rightimage][:mount_dir]}/..
     git checkout #{node[:rightimage][:sandbox_repo_tag]} --force
     git submodule init 
     git submodule update
