@@ -272,7 +272,7 @@ end
 bash "cleanup" do
   code <<-EOH
     set -ex
-    apt-get update
-    apt-get clean
+    chroot #{source_image} apt-get update
+    chroot #{source_image} apt-get clean
   EOH
 end
