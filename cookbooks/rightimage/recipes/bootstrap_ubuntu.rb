@@ -263,6 +263,11 @@ EOS
   end
 end
 
+# Modified version of syslog-ng.conf that will properly route recipe output to /var/log/messages
+remote_file "#{source_image}/etc/syslog-ng/syslog-ng.conf" do
+  source "syslog-ng.conf"
+end
+
 # TODO: Add cleanup
 bash "cleanup" do
   code <<-EOH
