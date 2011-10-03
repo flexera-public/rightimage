@@ -50,8 +50,8 @@ end
 bash "setup_motd" do
   only_if { ::File.directory? "#{node[:rightimage][:mount_dir]}/etc/update-motd.d" } 
   code <<-EOC
-      rm #{node[:rightimage][:mount_dir]}/etc/update-motd.d/10-help-text || true
-      mv #{node[:rightimage][:mount_dir]}/etc/update-motd.d/99-footer #{node[:rightimage][:mount_dir]}/etc/update-motd.d/10-rightscale-message
+    rm #{node[:rightimage][:mount_dir]}/etc/update-motd.d/10-help-text || true
+    mv #{node[:rightimage][:mount_dir]}/etc/update-motd.d/99-footer #{node[:rightimage][:mount_dir]}/etc/update-motd.d/10-rightscale-message || true
   EOC
 end
 

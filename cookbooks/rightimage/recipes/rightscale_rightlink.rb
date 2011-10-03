@@ -103,10 +103,13 @@ bash "install_rightlink" do
         chroot #{node[:rightimage][:mount_dir]} chkconfig --add rightimage
         ;;
     esac
-
-    # remove sandbox repo
-    rm -rf #{node[:rightimage][:mount_dir]}/tmp/sandbox_builds
   EOC
+end
+
+# remove sandbox repo
+directory "#{node[:rightimage][:mount_dir]}/tmp/sandbox_builds" do
+  recursive true
+  action :delete
 end
 
 bash "upload_rightlink" do
