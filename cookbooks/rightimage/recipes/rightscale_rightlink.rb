@@ -6,7 +6,7 @@
       else
         release = node[:rightimage][:release]
       end
-rightlink_file="rightscale_#{node[:rightimage][:rightlink_version]}-#{node[:rightimage][:platform]}_#{release}-#{node[:rightimage][:arch]}." + (node[:rightimage][:platform] == "centos" ? "rpm" : "deb")
+rightlink_file="rightscale_#{node[:rightimage][:rightlink_version]}-#{node[:rightimage][:platform]}_#{release}-" + (node[:rightimage][:platform] == "ubuntu" ? "amd64" : node[:rightimage][:arch]) + "." + (node[:rightimage][:platform] == "centos" ? "rpm" : "deb")
 tag=(node[:rightimage][:sandbox_repo_tag] != "" ? node[:rightimage][:sandbox_repo_tag] : "rightlink_package_#{node[:rightimage][:rightlink_version]}")
 
 execute "insert_rightlink_version" do 
