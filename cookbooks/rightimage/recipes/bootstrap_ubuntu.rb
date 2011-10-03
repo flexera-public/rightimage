@@ -200,10 +200,6 @@ end
 
 
 if node[:rightimage][:release] == "maverick" || node[:rightimage][:release] == "lucid"
-  template "#{source_image}/boot/grub/menu.lst" do
-    source "menu.lst.erb"
-  end
-
   # Fix apt config so it does not install all recommended packages
   log "Fixing apt.conf APT::Install-Recommends setting prior to installing Java"
   log "Installing Sun Java for Lucid..."
