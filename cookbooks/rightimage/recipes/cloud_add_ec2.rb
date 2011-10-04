@@ -38,7 +38,7 @@ end
 bash "cleanup" do
   code <<-EOH
     set -x
-    rm -rf #{guest_root}
+    rm -rf #{guest_root} #{guest_root}_temp
     mkdir -p #{guest_root}
     rsync -a #{source_image}/ #{guest_root}/
   EOH

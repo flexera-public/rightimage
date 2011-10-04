@@ -27,7 +27,7 @@ module RightScale
       def cloud_ids
         cloud_names = { 
           "us-east" => { "id" => "1", "amazon" => true }, 
-          "eu-west" => { "id" => "2", "amazon" => true },
+          "eu-west" => { "id" => "2", "amazon" => true, "alias" => "eu" },
           "us-west" => { "id" => "3", "amazon" => true },
           "ap-southeast" => { "id" => "4", "amazon" => true },
           "ap-northeast" => { "id" => "5", "amazon" => true },
@@ -45,6 +45,22 @@ module RightScale
           ids
         else
           cloud_id
+        end
+      end
+
+      def cloud_ids_ec2_bash
+        cloud_names = ""
+        cloud_ids_ec2.each_key do | key |
+          cloud_names << key + " "
+        end
+        cloud_names
+      end
+
+      def cloud_alias(cloud)
+        if cloud_names[cloud].has_value("alias")
+          cloud_names[cloud]["alias"]
+        else
+          cloud
         end
       end
 
@@ -100,8 +116,15 @@ EOF
       def target_raw_path
         "#{target_raw_root}/#{target_type}.raw" 
       end
- 
+
+      def image_upload_bucket
+        region = node[:rightimage][:region]
+        region = "eu" if region == "eu-west"
+
+        # TODO: Rename input
+        bucket = node[:rightimage][:image_upload_bucket] + "-#{region}"
+        bucket << "-dev" if node[:rightimage][:debug]
+      end 
     end
   end
 end
-

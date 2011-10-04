@@ -48,39 +48,47 @@ bash "bundle_upload_s3_image" do
     echo "#{node[:rightimage][:aws_509_cert]}" > /tmp/AWS_X509_CERT.pem
 
     echo "Doing S3 bundle"
-  
-    rm -rf "#{guest_root}"_temp
-    mkdir -p "#{guest_root}"_temp
-
     ## so it looks like the ec2 tools are borken as they are bundling /tmp even if --exclude is set, so:
     rm -rf #{guest_root}/tmp/*
 
     ## it looks like /tmp perms are not getting set correctly, so do:
     chroot #{guest_root} chmod 1777 /tmp
 
-    echo bundling...
-    /home/ec2/bin/ec2-bundle-vol --no-inherit --arch #{node[:rightimage][:arch]} --destination "#{guest_root}"_temp --privatekey /tmp/AWS_X509_KEY.pem --cert /tmp/AWS_X509_CERT.pem --user #{node[:rightimage][:aws_account_number]} --prefix #{image_name}  --volume #{guest_root} $kernel_opt $ramdisk_opt -B "ami=sda1,root=/dev/sda1,ephemeral0=sdb,swap=sda3" --exclude /tmp     #--generate-fstab
-    
-    echo "DEBUG: #{cloud_ids_ec2.keys}"
+    if [ -f #{guest_root}_temp/#{image_name}.manifest.xml ]; then
+      echo "Skipping bundle..."
+    else
+      mkdir -p "#{guest_root}"_temp
 
-    for cloud in #{cloud_ids_ec2.keys}; do
-      echo $cloud
+      echo "Bundling..."
+      /home/ec2/bin/ec2-bundle-vol --no-inherit --arch #{node[:rightimage][:arch]} --destination "#{guest_root}"_temp --privatekey /tmp/AWS_X509_KEY.pem --cert /tmp/AWS_X509_CERT.pem --user #{node[:rightimage][:aws_account_number]} --prefix #{image_name}  --volume #{guest_root} $kernel_opt $ramdisk_opt -B "ami=sda1,root=/dev/sda1,ephemeral0=sdb,swap=sda3" --exclude /tmp     #--generate-fstab
+    fi 
+
+    echo "DEBUG: #{cloud_ids_ec2_bash}"
+
+    for cloud in #{cloud_ids_ec2_bash}; do
+      cloud_alias=$cloud
+      if [ "$cloud" == "eu-west" ]; then
+        cloud_alias="eu"
+      fi
+
+      bucket="#{node[:rightimage][:image_upload_bucket]}-${cloud_alias}"
+      [ "#{node[:rightimage][:debug]}" == "true" ] && bucket="${bucket}-dev" 
+
+      echo "Uploading to $cloud..." 
+      echo y | /home/ec2/bin/ec2-upload-bundle -b $bucket -m "#{guest_root}"_temp/#{image_name}.manifest.xml -a #{node[:rightimage][:aws_access_key_id]} -s #{node[:rightimage][:aws_secret_access_key]} --retry --batch
+      
+      echo "Registering to $cloud..."
+      image_out_s3=`/home/ec2/bin/ec2-register $bucket/#{image_name}.manifest.xml -K /tmp/AWS_X509_KEY.pem -C /tmp/AWS_X509_CERT.pem -n "#{image_name}" --url https://ec2.${cloud}-1.amazonaws.com`
+  
+      ## parse out image id
+      image_id_s3=`echo -n $image_out_s3 | awk '{ print $2 }'`
+      # TODO: Fix
+      echo "$image_id_s3" > /var/tmp/image_id_s3
     done
-    exit 1
-
-    echo "Uploading..." 
-    echo y | /home/ec2/bin/ec2-upload-bundle -b #{node[:rightimage][:image_upload_bucket]} -m "#{guest_root}"_temp/#{image_name}.manifest.xml -a #{node[:rightimage][:aws_access_key_id]} -s #{node[:rightimage][:aws_secret_access_key]} --retry --batch
-    
-    echo registering... 
-    image_out_s3=`/home/ec2/bin/ec2-register #{node[:rightimage][:image_upload_bucket]}/#{image_name}.manifest.xml -K  /tmp/AWS_X509_KEY.pem -C  /tmp/AWS_X509_CERT.pem -n "#{image_name}" --url #{node[:rightimage][:ec2_endpoint]} `
-
-    ## parse out image id
-    image_id_s3=`echo -n $image_out_s3 | awk '{ print $2 }'`
-    echo "$image_id_s3" > /var/tmp/image_id_s3
-
+  
     #remove keys
     rm -f /tmp/AWS_X509_KEY.pem
-    rm -f  /tmp/AWS_X509_CERT.pem
+    rm -f /tmp/AWS_X509_CERT.pem
 
     EOH
 end 
