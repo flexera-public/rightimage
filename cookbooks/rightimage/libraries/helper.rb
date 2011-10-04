@@ -24,22 +24,34 @@ module RightScale
         pw
       end
 
-      def cloud_id
+      def cloud_ids
         cloud_names = { 
-          "us-east" => "1", 
-          "eu-west" => "2", 
-          "us-west" => "3",
-          "ap-southeast" => "4",
-          "ap-northeast" => "5", 
-          "cloudstack-xen" => "850"
+          "us-east" => { "id" => "1", "amazon" => true }, 
+          "eu-west" => { "id" => "2", "amazon" => true },
+          "us-west" => { "id" => "3", "amazon" => true },
+          "ap-southeast" => { "id" => "4", "amazon" => true },
+          "ap-northeast" => { "id" => "5", "amazon" => true },
+          "cloudstack-xen" => { "id" => "850" }
         }
-        id = nil
-        cloud_names.each do |cloud_name, cloud_id|
-          id = cloud_id if node[:rightimage][:region].include?(cloud_name)
-        end
-        id
+        cloud_names
       end
-      
+
+      def cloud_ids_ec2
+        if node[:rightimage][:region] == "all"
+          ids = {}
+          cloud_ids.each do |key, value|
+            ids[key] = value["id"] if value["amazon"] == true
+          end
+          ids
+        else
+          cloud_id
+        end
+      end
+
+      def cloud_id
+        cloud_ids[node[:rightimage][:region]]["id"]
+      end
+
       def config_rest_connection
         restcondir = ::File.join(::File.expand_path("~"), ".rest_connection")
         require 'fileutils'

@@ -565,6 +565,7 @@
       "required": "required",
       "calculated": false,
       "choice": [
+        "all",
         "us-east",
         "us-west",
         "eu-west",

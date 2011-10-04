@@ -149,27 +149,8 @@ case rightimage[:platform]
 
 end
 
-# set default mirrors and EC2 endpoint
-case rightimage[:region]
-  when "us-east"
-    set[:rightimage][:mirror] = "http://ec2-us-east-mirror.rightscale.com"
-    set[:rightimage][:ec2_endpoint] = "https://ec2.us-east-1.amazonaws.com"
-  when "us-west"
-    set[:rightimage][:mirror] = "http://ec2-us-west-mirror.rightscale.com"
-    set[:rightimage][:ec2_endpoint] = "https://ec2.us-west-1.amazonaws.com"
-  when "eu-west"
-    set[:rightimage][:mirror] = "http://ec2-eu-west-mirror.rightscale.com"
-    set[:rightimage][:ec2_endpoint] = "https://ec2.eu-west-1.amazonaws.com"
-  when "ap-southeast"
-    set[:rightimage][:mirror] = "http://ec2-ap-southeast-mirror.rightscale.com"
-    set[:rightimage][:ec2_endpoint] = "https://ec2.ap-southeast-1.amazonaws.com"
-  when "ap-northeast"
-    set[:rightimage][:mirror] = "http://ec2-ap-northeast-mirror.rightscale.com"
-    set[:rightimage][:ec2_endpoint] = "https://ec2.ap-northeast-1.amazonaws.com"
-  else
-    set[:rightimage][:mirror] = "http://mirror.rightscale.com"
-    set[:rightimage][:ec2_endpoint] = "https://ec2.us-east-1.amazonaws.com"
-end #if rightimage[:cloud] == "ec2" 
+# set default mirror
+set[:rightimage][:mirror] = "http://mirror.rightscale.com"
 
 # if ubuntu then figure out the numbered name
 case rightimage[:release]
