@@ -111,8 +111,9 @@ bash "upload_rightlink" do
     rightlink_ver="#{node[:rightimage][:rightlink_version]}"
     rightlink_os="#{node[:rightimage][:platform]}"
     rightlink_path=$rightlink_ver/$rightlink_os/#{rightlink_file}
- 
-    curl --output /dev/null --head --silent --fail --connect-timeout 10 http://s3.amazonaws.com/$bucket/$rightlink_path
+    check="curl --output /dev/null --head --silent --fail --connect-timeout 10 http://s3.amazonaws.com/$bucket/$rightlink_path"
+
+    `$check`
     if [ "$?" -ne "0" ]; then
       export AWS_ACCESS_KEY_ID=#{node[:rightimage][:aws_access_key_id_for_upload]}
       echo AAKI: #{node[:rightimage][:aws_access_key_id_for_upload]}
@@ -120,9 +121,13 @@ bash "upload_rightlink" do
       echo ASAK: #{node[:rightimage][:aws_secret_access_key_for_upload]}
       export AWS_CALLING_FORMAT=SUBDOMAIN 
       
-      echo "Uploading RightLink $rightlink_ver to $bucket"
       set -ex
+      echo "Uploading RightLink $rightlink_ver to $bucket"
       s3cmd put $bucket:$rightlink_path #{node[:rightimage][:mount_dir]}/root/.rightscale/#{rightlink_file} x-amz-acl:public-read
+
+      # Verify upload (s3sync gem always returns 0.  TODO: In future, replace with s3tools: w-4004)
+      echo "Verifying upload"
+      `$check`
     fi
   EOC
 end
