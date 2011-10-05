@@ -59,7 +59,7 @@ bash "bundle_upload_s3_image" do
     chroot #{guest_root} chmod 1777 /tmp
 
     echo bundling...
-    /home/ec2/bin/ec2-bundle-vol --no-inherit --arch #{node[:rightimage][:arch]} --destination "#{guest_root}"_temp --privatekey /tmp/AWS_X509_KEY.pem --cert /tmp/AWS_X509_CERT.pem --user #{node[:rightimage][:aws_account_number]} --prefix #{image_name}  --volume #{guest_root} $kernel_opt $ramdisk_opt -B "ami=sda1,root=/dev/sda1,ephemeral0=sdb,swap=sda3" --exclude /tmp     #--generate-fstab
+    /home/ec2/bin/ec2-bundle-vol --no-inherit --arch #{node[:rightimage][:arch]} --destination "#{guest_root}"_temp --privatekey /tmp/AWS_X509_KEY.pem --cert /tmp/AWS_X509_CERT.pem --user #{node[:rightimage][:aws_account_number]} --prefix #{image_name}  --volume #{guest_root} $kernel_opt $ramdisk_opt -B "ami=sda1,root=/dev/sda1,ephemeral0=sdb,swap=sda3" --include /tmp     #--generate-fstab
     
     echo "Uploading..." 
     echo y | /home/ec2/bin/ec2-upload-bundle -b #{node[:rightimage][:image_upload_bucket]} -m "#{guest_root}"_temp/#{image_name}.manifest.xml -a #{node[:rightimage][:aws_access_key_id]} -s #{node[:rightimage][:aws_secret_access_key]} --retry --batch
