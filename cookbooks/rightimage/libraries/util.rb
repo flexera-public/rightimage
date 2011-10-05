@@ -28,6 +28,8 @@ module RightImage
           FileUtils.rm_rf f         
         end
       end
+      @log.info("Synching filesystem.")
+      @log.info `sync`
       @log.info("Sanitize complete.")       
     end
    
