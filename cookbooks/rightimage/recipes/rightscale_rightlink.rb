@@ -14,11 +14,6 @@ bash "checkout_repo" do
     touch SHA-$sha.txt
     mv SHA-$sha.txt #{node[:rightimage][:mount_dir]}/..
     git checkout #{node[:rightimage][:sandbox_repo_tag]} --force
-    git submodule init 
-    git submodule update
-    cd repos/right_net
-    git submodule init 
-    git submodule update
     cd ../..
 
   EOC
@@ -34,7 +29,7 @@ bash "build_rightlink" do
 #!/bin/bash -ex
 cd /tmp/sandbox_builds
 export RS_VERSION=#{node[:rightimage][:rightlink_version]}
-rake submodules:sandbox:create   
+rake submodules:sandbox:create
 rake right_link:#{node[:rightimage][:package_type]}:build
 export AWS_ACCESS_KEY_ID=#{node[:rightimage][:aws_access_key_id_for_upload]}
 echo AAKI: #{node[:rightimage][:aws_access_key_id_for_upload]}
