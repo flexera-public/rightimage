@@ -20,25 +20,29 @@ bash "checkout_repo" do
 end
 
 bash "build_rightlink" do 
-  not_if "ls #{node[:rightimage][:mount_dir]}/tmp/sandbox_builds/dist/ | grep rightscale" 
+  not_if "ls #{node[:rightimage][:mount_dir]}/tmp/sandbox_builds/dist/ | grep rightscale"
+
   code <<-EOC
     set -e
     set -x
+    export RS_VERSION=#{node[:rightimage][:rightlink_version]}
+    export ARCH=#{node[:rightimage][:arch]}
+    # have to git outside chroot
+    rake submodules:sandbox:create
     cat <<-CHROOT_SCRIPT > #{node[:rightimage][:mount_dir]}/tmp/build_rightlink.sh
 #!/bin/bash -ex
 cd /tmp/sandbox_builds
 export RS_VERSION=#{node[:rightimage][:rightlink_version]}
 export ARCH=#{node[:rightimage][:arch]}
-rake submodules:sandbox:create
 rake right_link:#{node[:rightimage][:package_type]}:build
 export AWS_ACCESS_KEY_ID=#{node[:rightimage][:aws_access_key_id_for_upload]}
 echo AAKI: #{node[:rightimage][:aws_access_key_id_for_upload]}
 export AWS_SECRET_ACCESS_KEY=#{node[:rightimage][:aws_secret_access_key_for_upload]}
 echo ASAK: #{node[:rightimage][:aws_secret_access_key_for_upload]}
-export AWS_CALLING_FORMAT=SUBDOMAIN 
+export AWS_CALLING_FORMAT=SUBDOMAIN
 
-# echo rake right_link:#{node[:rightimage][:package_type]}:upload 
-# rake right_link:#{node[:rightimage][:package_type]}:upload 
+# echo rake right_link:#{node[:rightimage][:package_type]}:upload
+# rake right_link:#{node[:rightimage][:package_type]}:upload
 
 CHROOT_SCRIPT
     chmod +x #{node[:rightimage][:mount_dir]}/tmp/build_rightlink.sh
