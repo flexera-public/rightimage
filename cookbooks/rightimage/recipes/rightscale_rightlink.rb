@@ -24,11 +24,11 @@ bash "build_rightlink" do
   code <<-EOC
     set -e
     set -x
-    export ARCH=#{node[:rightimage][:arch]}
     cat <<-CHROOT_SCRIPT > #{node[:rightimage][:mount_dir]}/tmp/build_rightlink.sh
 #!/bin/bash -ex
 cd /tmp/sandbox_builds
 export RS_VERSION=#{node[:rightimage][:rightlink_version]}
+export ARCH=#{node[:rightimage][:arch]}
 rake submodules:sandbox:create
 rake right_link:#{node[:rightimage][:package_type]}:build
 export AWS_ACCESS_KEY_ID=#{node[:rightimage][:aws_access_key_id_for_upload]}
