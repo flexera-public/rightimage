@@ -14,6 +14,9 @@ bash "checkout_repo" do
     touch SHA-$sha.txt
     mv SHA-$sha.txt #{node[:rightimage][:mount_dir]}/..
     git checkout #{node[:rightimage][:sandbox_repo_tag]} --force
+    export RS_VERSION=#{node[:rightimage][:rightlink_version]}
+    export ARCH=#{node[:rightimage][:arch]}
+    rake submodules:sandbox:create
     cd ../..
 
   EOC
@@ -25,10 +28,6 @@ bash "build_rightlink" do
   code <<-EOC
     set -e
     set -x
-    export RS_VERSION=#{node[:rightimage][:rightlink_version]}
-    export ARCH=#{node[:rightimage][:arch]}
-    # have to git outside chroot
-    rake submodules:sandbox:create
     cat <<-CHROOT_SCRIPT > #{node[:rightimage][:mount_dir]}/tmp/build_rightlink.sh
 #!/bin/bash -ex
 cd /tmp/sandbox_builds
