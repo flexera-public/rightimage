@@ -131,7 +131,7 @@ case "#{node.rightimage.virtual_environment}" in
       if ( [ "#{node[:rightimage][:release]}" == "lucid" ] || [ "#{node[:rightimage][:release]}" == "maverick" ] ) ; then
         image_name=`cat /mnt/vmbuilder/xen.conf  | grep xvda1 | grep -v root  | cut -c 25- | cut -c -9`
       else 
-        kvm=image=$image_name
+        kvm_image=$image_name
       fi
       ;;
 esac
