@@ -18,7 +18,6 @@ recipe "rightimage::cloud_add_ec2", "migrates the created image to ec2"
 recipe "rightimage::cloud_add_euca", "migrates the created image to eucalyptus" 
 recipe "rightimage::cloud_add_vmops", "adds requirements for cloudstack based on hypervisor choice"
 recipe "rightimage::cloud_add_openstack", "adds requirements for openstack based on hypervisor choice"
-recipe "rightimage::cloud_add_esxi", "applies esxi transformations on an existing disk image"
 recipe "rightimage::cloud_add_raw", "migrates the create image to a raw file -- useful for new cloud development"
 recipe "rightimage::install_vhd-util", "install the vhd-util tool"
 recipe "rightimage::do_tag_images", "adds rightscale tags to images"
@@ -29,6 +28,19 @@ recipe "rightimage::upload_vmops", "setup http server for download to test cloud
 recipe "rightimage::upload_euca", "bundle and upload euca kernel, ramdisk and image"
 recipe "rightimage::upload_openstack", "bundle and upload openstack kernel, ramdisk and image"
 recipe "rightimage::upload_file_to_s3", "upload specified file to s3"
+
+# Add each cloud name to an array to use for common inputs on each cloud.
+cloud_add = []
+cloud_upload = []
+
+['euca', 'vmops', 'openstack'].each do |cloud|
+  cloud_add << "rightimage::cloud_add_#{cloud}"
+  cloud_upload << "rightimage::upload_#{cloud}"
+end
+
+cloud_add << "rightimage::cloud_add_ec2"
+cloud_upload << "rightimage::upload_ec2_s3"
+cloud_upload << "rightimage::upload_ec2_ebs"
 
 attribute "rest_connection/user",
   :display_name => "API User",
@@ -53,7 +65,7 @@ attribute "rightimage/root_size_gb",
   :description => "Sets the size of the virtual image. Units are in GB.",
   :choice => [ "10", "4", "2" ],
   :default => "10",
-  :recipes => [ "rightimage::default", "rightimage::build_image", "rightimage::cloud_add_vmops", "rightimage::cloud_add_openstack", "rightimage::cloud_add_euca", "rightimage::cloud_add_ec2", "rightimage::cloud_add_raw" ]
+  :recipes => [ "rightimage::default", "rightimage::build_image" ] + cloud_add
 
 attribute "rightimage/manual_mode",
   :display_name => "Manual Mode",
@@ -95,7 +107,7 @@ attribute "rightimage/region",
 attribute "rightimage/sandbox_repo_tag",
   :display_name => "Sandbox Repository Tag",
   :description => "The tag on the sandbox_builds repo from which to build rightscale package.",
-  :required => true
+  :required => "optional"
   
 attribute "rightimage/rightlink_version",
   :display_name => "RightLink Version",
@@ -106,7 +118,7 @@ attribute "rightimage/image_upload_bucket",
   :display_name => "Image Upload Bucket",
   :description => "The bucket to upload the image to.",
   :required => "required",
-  :recipes => [ "rightimage::upload_euca" ,"rightimage::cloud_add_ec2", "rightimage::upload_ec2_s3", "rightimage::upload_ec2_ebs", "rightimage::do_tag_images" , "rightimage::do_create_mci" , "rightimage::base_centos" , "rightimage::base_ubuntu" , "rightimage::base_sles" , "rightimage::default", "rightimage::build_image" , "rightimage::upload_vmops", "rightimage::upload_file_to_s3" ]
+  :recipes => [ "rightimage::cloud_add_ec2", "rightimage::do_tag_images" , "rightimage::do_create_mci" , "rightimage::base_centos" , "rightimage::base_ubuntu" , "rightimage::base_sles" , "rightimage::default", "rightimage::build_image" , "rightimage::upload_file_to_s3" ] + cloud_upload
 
 attribute "rightimage/file_to_upload",
   :display_name => "File To Upload",
@@ -166,7 +178,7 @@ attribute "rightimage/debug",
   :description => "If set, a random root password will be set for debugging purposes. NOTE: you must include 'Dev' in the image name or the build with fail.",
   :choice => [ "true", "false" ],
   :required => "optional",
-  :recipes => [ "rightimage::base_centos" , "rightimage::base_sles" , "rightimage::base_ubuntu" , "rightimage::default", "rightimage::build_image" , "rightimage::bootstrap_centos" , "rightimage::bootstrap_sles" , "rightimage::bootstrap_ubuntu" ]
+  :recipes => [ "rightimage::base_centos" , "rightimage::base_sles" , "rightimage::base_ubuntu" , "rightimage::default", "rightimage::build_image" , "rightimage::bootstrap_centos" , "rightimage::bootstrap_sles" , "rightimage::bootstrap_ubuntu"] + cloud_add + cloud_upload
 
 attribute "rightimage/install_mirror_date",
   :display_name => "Mirror Freeze Date",
