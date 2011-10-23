@@ -99,10 +99,13 @@ bash "install_rightlink" do
 end
 
 bash "upload_rightlink" do
+  flags "-e"
   code <<-EOC
     bucket="rightscale_rightlink"
     [ #{node[:rightimage][:debug]} == "true" ] && bucket="${bucket}_dev"
 
+    export RS_VERSION=#{node[:rightimage][:rightlink_version]}
+    export ARCH=#{node[:rightimage][:arch]}
     export AWS_ACCESS_KEY_ID=#{node[:rightimage][:aws_access_key_id_for_upload]}
     export AWS_SECRET_ACCESS_KEY=#{node[:rightimage][:aws_secret_access_key_for_upload]}
 
