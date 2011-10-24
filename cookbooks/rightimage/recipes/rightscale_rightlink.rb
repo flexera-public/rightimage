@@ -110,7 +110,7 @@ bash "upload_rightlink" do
     export AWS_SECRET_ACCESS_KEY=#{node[:rightimage][:aws_secret_access_key_for_upload]}
 
     pushd #{node[:rightimage][:mount_dir]}/tmp/sandbox_builds
-    rake right_link:#{node[:rightimage][:package_type]}:upload[$bucket]
+    #{node[:rightimage][:mount_dir]}/opt/rightscale/sandbox/bin/rake right_link:#{node[:rightimage][:package_type]}:upload[$bucket]
     popd
   EOC
 end
