@@ -16,8 +16,11 @@ function get_rubygems {
 ruby_ver=`chroot $ROOT ruby --version`
 if [[ $ruby_ver == *1.8.5* ]] ; then
   get_rubygems 1.3.3 http://rubyforge.org/frs/download.php/56227/rubygems-1.3.3.tgz
+  # Newer versions of rake will not work with older versions of Ruby
+  rake_ver="-v 0.9.2";
 else
   get_rubygems 1.3.7 http://rubyforge.org/frs/download.php/70696/rubygems-1.3.7.tgz
+  rake_ver="";
 fi
 
 cat <<-CHROOT_SCRIPT > $ROOT/tmp/rubygems_install.sh
@@ -30,7 +33,7 @@ fi
 gem source -a #{node[:rightimage][:mirror]}/rubygems/archive/latest/
 gem source -r http://mirror.rightscale.com
 gem install xml-simple net-ssh net-sftp 
-gem install rake
+gem install rake $rake_ver
 updatedb
 CHROOT_SCRIPT
 chmod +x $ROOT/tmp/rubygems_install.sh
