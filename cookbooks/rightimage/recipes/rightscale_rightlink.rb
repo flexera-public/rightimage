@@ -98,6 +98,12 @@ bash "install_rightlink" do
   EOC
 end
 
+r = gem_package "right_aws" do
+  gem_binary "/opt/rightscale/sandbox/bin/gem"
+  action :nothing
+end
+r.run_action(:install)
+
 bash "upload_rightlink" do
   flags "-e"
   code <<-EOC
