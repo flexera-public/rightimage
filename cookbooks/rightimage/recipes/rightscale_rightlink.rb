@@ -33,7 +33,7 @@ directory "#{node[:rightimage][:mount_dir]}/root/.rightscale" do
 end
 
 bash "download_rightlink" do
-  not_if "test -f #{node[:rightimage][:mount_dir]}/root/.rightscale/#{rightlink_file}"
+  only_if "test *#{node[:rightimage][:download_rightlink]}* == *yes*"
   code <<-EOC
     set -x
     rightlink_ver="#{node[:rightimage][:rightlink_version]}"
@@ -53,7 +53,12 @@ bash "download_rightlink" do
       done
     done
 
-    exit 0
+    if test -f #{node[:rightimage][:mount_dir]}/root/.rightscale/#{rightlink_file}; then
+      exit 0
+    else
+      echo "Failed to download RightLink.  Place the #{rightlink_file} in the S3 bucket and re-run"
+      exit 1
+    fi
   EOC
 end
 
@@ -98,17 +103,12 @@ bash "install_rightlink" do
   EOC
 end
 
-r = gem_package "right_aws" do
-  gem_binary "/opt/rightscale/sandbox/bin/gem"
-  action :nothing
-end
-r.run_action(:install)
-
 bash "upload_rightlink" do
   flags "-e"
   code <<-EOC
-    bucket="rightscale_rightlink"
-    [ #{node[:rightimage][:debug]} == "true" ] && bucket="${bucket}_dev"
+    gem install right_aws
+
+    bucket="rightscale_rightlink_dev"
 
     export RS_VERSION=#{node[:rightimage][:rightlink_version]}
     export ARCH=#{node[:rightimage][:arch]}

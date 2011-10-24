@@ -130,7 +130,14 @@ attribute "rightimage/image_name",
    :display_name => "Image Name",
    :description => "The name you want to give this new image.",
    :required => "required"
-  
+
+attribute "rightimage/download_rightlink",
+  :display_name => "Should RightLink be downloaded?",
+  :description => "Set to true to download RighLink form S3.  This recipe will fail if the expected version of RightLink is not in either of the dev or production buckets.",
+  :choice => [ "yes", "no" ],
+  :required => "required",
+  :recipes => [ "rightimage::rightscale_install" ]
+
 attribute "rightimage/aws_account_number",
   :display_name => "aws_account_number",
   :description => "aws_account_number",
