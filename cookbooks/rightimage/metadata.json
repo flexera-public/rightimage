@@ -543,7 +543,8 @@
       "choice": [
         "centos",
         "ubuntu",
-        "suse"
+        "suse",
+        "rhel"
       ],
       "type": "string",
       "recipes": [
