@@ -8,7 +8,8 @@ recipe "rightimage::build_image", "build image based on host platform"
 recipe "rightimage::clean", "cleans everything" 
 recipe "rightimage::base_ubuntu", "coordinate an ubuntu install" 
 recipe "rightimage::base_centos", "coordinate a centos install" 
-recipe "rightimage::base_sles", "coordinate a sles install" 
+recipe "rightimage::base_sles", "coordinate a sles install"
+recipe "rightimage::base_rhel", "coordinate a rhel install"
 recipe "rightimage::bootstrap_ubuntu", "bootstraps a basic ubuntu image" 
 recipe "rightimage::bootstrap_centos", "bootstraps a basic centos image" 
 recipe "rightimage::bootstrap_sles", "bootstraps a basic sles image" 
@@ -95,7 +96,7 @@ attribute "rightimage/arch",
 attribute "rightimage/cloud",
   :display_name => "Target Cloud",
   :description => "The supported cloud for the virtual image.",
-  :choice => [ "ec2", "vmops", "euca", "openstack" ],
+  :choice => [ "ec2", "vmops", "euca", "openstack", "rackspace" ],
   :required => true
   
 attribute "rightimage/region",
@@ -138,6 +139,12 @@ attribute "rightimage/download_rightlink",
   :required => "required",
   :recipes => [ "rightimage::rightscale_install" ]
 
+attribute "rightimage/rebundle_base_image_id",
+  :display_name => "Starting Image Id",
+  :description => "Cloud specific ID for the image to start with when building a rebundle image",
+  :required => "required",
+  :recipes => [ "rightimage::base_rhel" ]
+
 attribute "rightimage/aws_account_number",
   :display_name => "aws_account_number",
   :description => "aws_account_number",
@@ -172,20 +179,20 @@ attribute "rightimage/aws_access_key_id_for_upload",
   :display_name => "aws_access_key_id_for_upload",
   :description => "aws_access_key_id for the uplaod bucket",
   :required => "required",
-  :recipes => [ "rightimage::cloud_add_ec2", "rightimage::upload_ec2_s3", "rightimage::upload_ec2_ebs", "rightimage::do_tag_images" , "rightimage::do_create_mci" , "rightimage::base_centos" , "rightimage::base_sles" , "rightimage::base_ubuntu" , "rightimage::default", "rightimage::build_image" , "rightimage::upload_vmops", "rightimage::upload_file_to_s3" ]
+  :recipes => [ "rightimage::cloud_add_ec2", "rightimage::upload_ec2_s3", "rightimage::upload_ec2_ebs", "rightimage::do_tag_images" , "rightimage::do_create_mci" , "rightimage::base_centos" , "rightimage::base_sles" , "rightimage::base_ubuntu", "rightimage::base_rhel" , "rightimage::default", "rightimage::build_image" , "rightimage::upload_vmops", "rightimage::upload_file_to_s3" ]
   
 attribute "rightimage/aws_secret_access_key_for_upload",
   :display_name => "aws_secret_access_key_for_upload",
   :description => "aws_secret_access_key_for_upload",
   :required => "required",
-  :recipes => [ "rightimage::cloud_add_ec2", "rightimage::upload_ec2_s3", "rightimage::upload_ec2_ebs", "rightimage::do_tag_images" , "rightimage::do_create_mci" , "rightimage::base_centos" , "rightimage::base_sles" , "rightimage::base_ubuntu" , "rightimage::default", "rightimage::build_image" , "rightimage::upload_vmops", "rightimage::upload_file_to_s3" ]
+  :recipes => [ "rightimage::cloud_add_ec2", "rightimage::upload_ec2_s3", "rightimage::upload_ec2_ebs", "rightimage::do_tag_images" , "rightimage::do_create_mci" , "rightimage::base_centos" , "rightimage::base_sles" , "rightimage::base_ubuntu", "rightimage::base_rhel" , "rightimage::default", "rightimage::build_image" , "rightimage::upload_vmops", "rightimage::upload_file_to_s3" ]
 
 attribute "rightimage/debug",
   :display_name => "Development Image?",
   :description => "If set, a random root password will be set for debugging purposes. NOTE: you must include 'Dev' in the image name or the build with fail.",
   :choice => [ "true", "false" ],
   :required => "optional",
-  :recipes => [ "rightimage::base_centos" , "rightimage::base_sles" , "rightimage::base_ubuntu" , "rightimage::default", "rightimage::build_image" , "rightimage::bootstrap_centos" , "rightimage::bootstrap_sles" , "rightimage::bootstrap_ubuntu"] + cloud_add + cloud_upload
+  :recipes => [ "rightimage::base_centos" , "rightimage::base_sles" , "rightimage::base_ubuntu", "rightimage::base_rhel" , "rightimage::default", "rightimage::build_image" , "rightimage::bootstrap_centos" , "rightimage::bootstrap_sles" , "rightimage::bootstrap_ubuntu"] + cloud_add + cloud_upload
 
 attribute "rightimage/install_mirror_date",
   :display_name => "Mirror Freeze Date",
