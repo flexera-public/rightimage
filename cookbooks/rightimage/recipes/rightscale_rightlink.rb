@@ -7,7 +7,7 @@ end
 bash "checkout_repo" do 
   not_if "test -e #{node[:rightimage][:mount_dir]}/tmp/sandbox_builds"
   code <<-EOC
-    set -e
+    set -ex
     cd #{node[:rightimage][:mount_dir]}/tmp
     if [ -d sandbox_builds ]; then mv sandbox_builds sandbox_builds.$RANDOM; fi
     git clone git@github.com:rightscale/sandbox_builds.git 
