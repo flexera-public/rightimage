@@ -78,7 +78,7 @@ attribute "rightimage/manual_mode",
 attribute "rightimage/platform",
   :display_name => "Guest OS Platform",
   :description => "The operating system for the virtual image.",
-  :choice => [ "centos", "ubuntu", "suse" ],
+  :choice => [ "centos", "ubuntu", "suse", "rhel" ],
   :required => true
   
 attribute "rightimage/release",
