@@ -179,6 +179,7 @@ gpgcheck=1
 EOF
    yum -c /tmp/yum.conf --installroot=$guest_root -y clean all
    yum -c $guest_root/etc/yum.conf --installroot=$guest_root -y install vmware-tools-esx-nox
+   rm -f $guest_root/etc/yum.repos.d/vmware-tools.repo
     ;;
 
   "ubuntu" )
