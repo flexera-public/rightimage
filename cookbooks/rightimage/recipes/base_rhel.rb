@@ -17,14 +17,19 @@
 # limitations under the License.
 #
 
-directory "/tmp/rightscale/rackspace_rebundle" do
+module BaseRhelConstants
+  REBUNDLE_SOURCE_PATH  = "/tmp/rightscale/rightimage_rebundle"
+  LOCAL_PACKAGE_PATH    = "/tmp/rightscale/dist"
+end
+
+directory BaseRhelConstants::REBUNDLE_SOURCE_PATH do
   action :create
   recursive true
 end
 
-git "/tmp/rightscale/rackspace_rebundle" do
+git BaseRhelConstants::REBUNDLE_SOURCE_PATH do
   repository "git@github.com:rightscale/rightimage_rebundle.git"
-  revision "master"
+  revision "jes_add_sandbox_option"
   action :sync
 end
 
@@ -36,28 +41,28 @@ end
 bash "install bundled gems" do
   flags "-ex"
   code "bundle install"
-  cwd "/tmp/rightscale/rackspace_rebundle"
+  cwd BaseRhelConstants::REBUNDLE_SOURCE_PATH
 end
 
 bash "upload code to the instance" do
   flags "-e +x"
+  environment({'AWS_ACCESS_KEY_ID'    => node[:rightimage][:aws_access_key_id],
+               'AWS_SECRET_ACCESS_KEY'=> node[:rightimage][:aws_secret_access_key]})
   code <<-EOH
-  export AWS_ACCESS_KEY_ID=#{node[:rightimage][:aws_access_key_id]}
-  export AWS_SECRET_ACCESS_KEY=#{node[:rightimage][:aws_secrete_access_key]}
-  bundle exec bin/launch --provider #{node[:rightimage][:cloud]} --rightlink #{node[:rightimage][:sandbox_repo_tag]} --image-id #{node[:rightimage][:rebundle_base_image_id]}
+  bundle exec bin/launch --provider #{node[:rightimage][:cloud]} --rightlink #{node[:rightimage][:rightlink_version]} --image-id #{node[:rightimage][:rebundle_base_image_id]} --sandbox-revision #{node[:rightimage][:sandbox_repo_tag]} --flavor-id c1.medium
   EOH
-  cwd "/tmp/rightscale/rackspace_rebundle"
+  cwd BaseRhelConstants::REBUNDLE_SOURCE_PATH
 end
 
-directory "/tmp/rightscale/dist" do
+directory BaseRhelConstants::LOCAL_PACKAGE_PATH do
   action :create
   recursive true
 end
 
 bash "get the build package from remote" do
   flags "-ex"
-  code "scp -i config/private_key root@`cat config/hostname`:/root/.rightscale/*.rpm ."
-  cwd "/tmp/rightscale/dist"
+  code "scp -i config/private_key root@`cat config/hostname`:/root/.rightscale/*.rpm #{BaseRhelConstants::LOCAL_PACKAGE_PATH}"
+  cwd BaseRhelConstants::REBUNDLE_SOURCE_PATH
 end
 
 # TODO - upload package to s3
