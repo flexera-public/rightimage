@@ -173,6 +173,7 @@ bash "unmount proc & dev" do
     guest_root=#{guest_root}
     umount -lf $guest_root/proc
     umount -lf $guest_root/dev
+    umount -lf $guest_root/sys
   EOH
 end
 
