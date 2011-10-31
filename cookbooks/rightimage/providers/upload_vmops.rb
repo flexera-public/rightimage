@@ -46,7 +46,17 @@ action :upload do
       cmd = "/?command=registerTemplate"
       cmd << "&name=#{name}&displayText=#{image_name}_#{node[:rightimage][:virtual_environment].upcase}"
       cmd << "&url=#{encoded_image_url}"
-      cmd << "&format=VHD"
+
+      case new_resource.file_ext
+      when "vmdk"
+        format = "OVA"
+      when "qcow2.bz2"
+        format = "QCOW"
+      when "vhd"
+        format = "VHD"
+      end
+
+      cmd << "&format=#{format}"
   
   #    case node[:rightimage][:platform]
   #    when "centos"
