@@ -79,17 +79,17 @@ bash "mount proc & dev" do
   EOH
 end
 
+# add fstab
+template "#{guest_root}/etc/fstab" do
+  source "fstab.erb"
+  backup false
+end
+
 rightimage_kernel "Install PV Kernel for Hypervisor" do
   provider "rightimage_kernel_#{node[:rightimage][:virtual_environment]}"
 #  guest_root guest_root
 #  version node[:rightimage][:kernel_id]
   action :install
-end
-
-# add fstab
-template "#{guest_root}/etc/fstab" do
-  source "fstab.erb"
-  backup false
 end
 
 bash "install grub" do
