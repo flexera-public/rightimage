@@ -5,7 +5,7 @@ end
 bash "install python modules" do
   code <<-EOH
     set -ex
-    easy_install-2.6 sqlalchemy eventlet routes webob paste pastedeploy glance argparse xattr
+    easy_install-2.6 sqlalchemy eventlet routes webob paste pastedeploy glance argparse xattr httplib2 kombu
   EOH
 end
 
