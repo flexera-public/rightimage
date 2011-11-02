@@ -19,7 +19,7 @@ bash "create loopback fs" do
     set -e 
     set -x
   
-    DISK_SIZE_GB=10  
+    DISK_SIZE_GB=#{node[:rightimage][:root_size_gb]}  
     BYTES_PER_MB=1024
     DISK_SIZE_MB=$(($DISK_SIZE_GB * $BYTES_PER_MB))
 
