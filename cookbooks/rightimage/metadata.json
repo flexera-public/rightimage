@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "block_device": ">= 0.0.0"
   },
   "name": "rightimage",
   "maintainer_email": "support@rightscale.com",
