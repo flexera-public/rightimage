@@ -5,8 +5,6 @@ class Chef::Recipe
   include RightScale::RightImage::Helper
 end
 
-node.set['rightimage']['cloud'] = "raw"
-
 loop_name="loop0"
 loop_dev="/dev/#{loop_name}"
 
