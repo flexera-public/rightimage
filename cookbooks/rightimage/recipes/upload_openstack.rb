@@ -5,14 +5,14 @@ end
 bash "install python modules" do
   code <<-EOH
     set -ex
-    easy_install-2.6 sqlalchemy eventlet routes webob paste pastedeploy glance argparse xattr
+    easy_install-2.6 sqlalchemy eventlet routes webob paste pastedeploy glance argparse xattr httplib2 kombu
   EOH
 end
 
 ruby_block "upload to cloud" do
   block do
     filename = "#{image_name}.qcow2"
-    local_file = "/mnt/#{filename}"
+    local_file = "#{target_raw_root}/#{filename}"
     result = `glance-upload --host #{node[:rightimage][:openstack][:hostname]} --disk-format qcow2 --container-format ovf #{local_file} #{image_name}`
 
     if result =~ /Stored image/ 

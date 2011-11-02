@@ -4,9 +4,12 @@ end
 class Chef::Resource::RubyBlock
   include RightScale::RightImage::Helper
 end
-
-build_root = "/mnt"
-guest_root = "#{build_root}/#{node[:rightimage][:cloud]}_#{node[:rightimage][:virtual_environment]}"
+class Chef::Recipe
+  include RightScale::RightImage::Helper
+end
+class Chef::Resource::Execute
+  include RightScale::RightImage::Helper
+end
 
 # Clean up guest image
 rightimage guest_root do

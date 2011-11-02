@@ -4,6 +4,17 @@ end
 class Chef::Resource::RubyBlock
   include RightScale::RightImage::Helper
 end
+class Chef::Recipe
+  include RightScale::RightImage::Helper
+end
+class Erubis::Context
+  include RightScale::RightImage::Helper
+end
+class Chef::Resource::Execute
+  include RightScale::RightImage::Helper
+end
+
+
 
 # configure an image for a particular cloud. 
 # we need to:
@@ -12,15 +23,6 @@ end
 
 # TODO: add uuca tools for centos 
 #  - create /etc/rightscale.d/cloud
-
-source_image = node[:rightimage][:mount_dir]
-
-build_root = "/mnt"
-
-guest_root = "#{build_root}/#{node[:rightimage][:cloud]}_#{node[:rightimage][:virtual_environment]}"
-
-package_root = "#{build_root}/pkg"
-cloud_package_root = "#{package_root}/#{node[:rightimage][:cloud]}"
 
 bash "unmount proc & dev" do 
   code <<-EOH
@@ -37,7 +39,7 @@ bash "cleanup" do
   code <<-EOH
     set -x
     rm -rf #{guest_root}
-    mkdir #{guest_root}
+    mkdir -p #{guest_root}
     rsync -a #{source_image}/ #{guest_root}/
   EOH
 end
@@ -65,8 +67,6 @@ end
 
 rightimage_kernel "Install PV Kernel for Hypervisor" do
   provider "rightimage_kernel_#{node[:rightimage][:virtual_environment]}"
-  guest_root guest_root
-  version node[:rightimage][:kernel_id]
   action :install
 end
 
@@ -80,6 +80,8 @@ end
 template "#{guest_root}/boot/grub/menu.lst" do
   source "menu.lst.erb"
 end
+
+include_recipe "rightimage::bootstrap_common"
 
 #  - add get_ssh_key script
 template "#{guest_root}/etc/init.d/getsshkey" do 

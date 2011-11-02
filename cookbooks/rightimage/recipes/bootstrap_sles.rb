@@ -84,5 +84,3 @@ kiwi --force-new-root  --prepare #{kiwi_dir} --root #{node.rightimage.mount_dir}
 
 EOS
 end
-
-include_recipe "rightimage::bootstrap_common"

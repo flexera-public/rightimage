@@ -1,17 +1,15 @@
 class Chef::Resource::Bash
   include RightScale::RightImage::Helper
 end
+class Chef::Recipe
+  include RightScale::RightImage::Helper
+end
+class Erubis::Context
+  include RightScale::RightImage::Helper
+end
+
 
 raise "ERROR: you must set your virtual_environment to kvm!"  if node[:rightimage][:virtual_environment] != "kvm"
-
-source_image = node[:rightimage][:mount_dir] 
-
-build_root = "/mnt"
-
-target_type = "#{node[:rightimage][:cloud]}_#{node[:rightimage][:virtual_environment]}"
-target_raw = "#{target_type}.raw"
-target_raw_path = "#{build_root}/#{target_raw}"
-guest_root = "#{build_root}/#{target_type}"
 
 loop_name="loop0"
 loop_dev="/dev/#{loop_name}"
@@ -25,19 +23,23 @@ bash "create openstack-kvm loopback fs" do
     set -e 
     set -x
   
-    DISK_SIZE_GB=10  
+    DISK_SIZE_GB=#{node[:rightimage][:root_size_gb]}
     BYTES_PER_MB=1024
     DISK_SIZE_MB=$(($DISK_SIZE_GB * $BYTES_PER_MB))
 
-    GUEST_ROOT="#{guest_root}"
+    base_root="#{base_root}"
+    guest_root="#{guest_root}"
     source_image="#{source_image}" 
+    target_raw_root="#{target_raw_root}"
     target_raw_path="#{target_raw_path}"
 
     umount -lf $source_image/proc || true 
-    umount -lf $GUEST_ROOT/proc || true 
-    umount -lf $GUEST_ROOT/sys || true 
-    umount -lf $GUEST_ROOT || true
-    rm -rf $target_raw_path $GUEST_ROOT
+    umount -lf $guest_root/proc || true 
+    umount -lf $guest_root/sys || true 
+    umount -lf $guest_root || true
+    rm -rf $base_root
+
+    mkdir -p $target_raw_root
     
     dd if=/dev/zero of=$target_raw_path bs=1M count=$DISK_SIZE_MB    
     
@@ -57,10 +59,10 @@ EOF
     
     kpartx -a $loopdev
     mke2fs -F -j $loopmap
-    mkdir $GUEST_ROOT
-    mount $loopmap $GUEST_ROOT
+    mkdir -p $guest_root
+    mount $loopmap $guest_root
     
-    rsync -a $source_image/ $GUEST_ROOT/
+    rsync -a $source_image/ $guest_root/
 
   EOH
 end
@@ -70,19 +72,10 @@ bash "mount proc & dev" do
 #!/bin/bash -ex
     set -e 
     set -x
-    GUEST_ROOT=#{guest_root}
-    mount -t proc none $GUEST_ROOT/proc
-    mount --bind /dev $GUEST_ROOT/dev
-    mount --bind /sys $GUEST_ROOT/sys
-  EOH
-end
-
-bash "install grub" do
-  code <<-EOH
-    set -e 
-    set -x
-    GUEST_ROOT=#{guest_root}
-    yum -c /tmp/yum.conf --installroot=$GUEST_ROOT -y install grub
+    guest_root=#{guest_root}
+    mount -t proc none $guest_root/proc
+    mount --bind /dev $guest_root/dev
+    mount --bind /sys $guest_root/sys
   EOH
 end
 
@@ -92,9 +85,25 @@ template "#{guest_root}/etc/fstab" do
   backup false
 end
 
+rightimage_kernel "Install PV Kernel for Hypervisor" do
+  provider "rightimage_kernel_#{node[:rightimage][:virtual_environment]}"
+#  guest_root guest_root
+#  version node[:rightimage][:kernel_id]
+  action :install
+end
+
+bash "install grub" do
+  code <<-EOH
+    set -e 
+    set -x
+    guest_root=#{guest_root}
+    yum -c /tmp/yum.conf --installroot=$guest_root -y install grub
+  EOH
+end
+
 # insert grub conf
 template "#{guest_root}/boot/grub/grub.conf" do 
-  source "grub.conf"
+  source "menu.lst.erb"
   backup false 
 end
 
@@ -104,14 +113,14 @@ bash "setup grub" do
     set -x
     
     target_raw_path="#{target_raw_path}"
-    GUEST_ROOT="#{guest_root}"
+    guest_root="#{guest_root}"
     
-    chroot $GUEST_ROOT mkdir -p /boot/grub
-    chroot $GUEST_ROOT cp -p /usr/share/grub/x86_64-redhat/* /boot/grub
-    chroot $GUEST_ROOT ln -s /boot/grub/grub.conf /boot/grub/menu.lst
+    chroot $guest_root mkdir -p /boot/grub
+    chroot $guest_root cp -p /usr/share/grub/x86_64-redhat/* /boot/grub
+    chroot $guest_root ln -s /boot/grub/grub.conf /boot/grub/menu.lst
     
-    echo "(hd0) #{node[:rightimage][:grub][:root_device]}" > $GUEST_ROOT/boot/grub/device.map
-    echo "" >> $GUEST_ROOT/boot/grub/device.map
+    echo "(hd0) #{node[:rightimage][:grub][:root_device]}" > $guest_root/boot/grub/device.map
+    echo "" >> $guest_root/boot/grub/device.map
 
     cat > device.map <<EOF
 (hd0) #{target_raw_path}
@@ -125,39 +134,33 @@ EOF
   EOH
 end
 
-rightimage_kernel "Install PV Kernel for Hypervisor" do
-  provider "rightimage_kernel_#{node[:rightimage][:virtual_environment]}"
-  guest_root guest_root
-  version node[:rightimage][:kernel_id]
-  action :install
-end
-
+include_recipe "rightimage::bootstrap_common"
 
 bash "configure for openstack" do
   code <<-EOH
 #!/bin/bash -ex
     set -e 
     set -x
-    GUEST_ROOT=#{guest_root}
+    guest_root=#{guest_root}
 
     # clean out packages
-    yum -c /tmp/yum.conf --installroot=$GUEST_ROOT -y clean all
+    yum -c /tmp/yum.conf --installroot=$guest_root -y clean all
 
     # enable console access
-    #echo "2:2345:respawn:/sbin/mingetty tty2" >> $GUEST_ROOT/etc/inittab
-    #echo "tty2" >> $GUEST_ROOT/etc/securetty
+    #echo "2:2345:respawn:/sbin/mingetty tty2" >> $guest_root/etc/inittab
+    #echo "tty2" >> $guest_root/etc/securetty
 
     # configure dns timeout 
-    echo 'timeout 300;' > $GUEST_ROOT/etc/dhclient.conf
+    echo 'timeout 300;' > $guest_root/etc/dhclient.conf
 
-    mkdir -p $GUEST_ROOT/etc/rightscale.d
-    echo "openstack" > $GUEST_ROOT/etc/rightscale.d/cloud
+    mkdir -p $guest_root/etc/rightscale.d
+    echo "openstack" > $guest_root/etc/rightscale.d/cloud
 
-    rm ${GUEST_ROOT}/var/lib/rpm/__*
-    chroot $GUEST_ROOT rpm --rebuilddb
+    rm ${guest_root}/var/lib/rpm/__*
+    chroot $guest_root rpm --rebuilddb
     
     # set hwclock to UTC
-    echo "UTC" >> $GUEST_ROOT/etc/adjtime
+    echo "UTC" >> $guest_root/etc/adjtime
 
   EOH
 end
@@ -167,9 +170,10 @@ bash "unmount proc & dev" do
 #!/bin/bash -ex
     set -e 
     set -x
-    GUEST_ROOT=#{guest_root}
-    umount -lf $GUEST_ROOT/proc
-    umount -lf $GUEST_ROOT/dev
+    guest_root=#{guest_root}
+    umount -lf $guest_root/proc
+    umount -lf $guest_root/dev
+    umount -lf $guest_root/sys
   EOH
 end
 
@@ -190,7 +194,7 @@ bash "unmount target filesystem" do
 #!/bin/bash -ex
     set -e 
     set -x
-    GUEST_ROOT=#{guest_root}
+    guest_root=#{guest_root}
     loopdev=#{loop_dev}
     loopmap=#{loop_map}
     
@@ -202,7 +206,7 @@ end
 
 
 bash "backup raw image" do 
-  cwd File.dirname target_raw_path
+  cwd target_raw_root
   code <<-EOH
     raw_image=$(basename #{target_raw_path})
     cp -v $raw_image $raw_image.bak 
@@ -210,13 +214,13 @@ bash "backup raw image" do
 end
 
 bash "package image" do 
-  cwd File.dirname target_raw_path
+  cwd target_raw_root
   code <<-EOH
     set -e
     set -x
     
     BUNDLED_IMAGE="#{image_name}.qcow2"
-    BUNDLED_IMAGE_PATH="/mnt/$BUNDLED_IMAGE"
+    BUNDLED_IMAGE_PATH="#{target_raw_root}/$BUNDLED_IMAGE"
     
     qemu-img convert -O qcow2 #{target_raw_path} $BUNDLED_IMAGE_PATH
   EOH
