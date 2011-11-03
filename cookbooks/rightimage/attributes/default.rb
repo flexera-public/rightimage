@@ -13,6 +13,7 @@ set_unless[:rightimage][:virtual_environment] = "xen"
 set[:rightimage][:install_mirror] = "mirror.rightscale.com"
 set_unless[:rightimage][:sandbox_repo_tag] = "rightlink_package_#{rightimage[:rightlink_version]}"
 set_unless[:rightimage][:cloud] = "raw"
+set[:rightimage][:ebs_mount_dir] = "/mnt/storage"
 
 if rightimage[:platform] == "ubuntu"
 # for using apt-proxy

@@ -64,7 +64,11 @@ EOF
       end
 
       def build_root
-        "/mnt"
+        if node[:rightimage][:cloud] == "raw"
+          node[:rightimage][:ebs_mount_dir]
+        else
+          "/mnt"
+        end
       end
 
       def target_type
