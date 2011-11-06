@@ -58,8 +58,21 @@ bash "bundle_upload_s3_image" do
     ## it looks like /tmp perms are not getting set correctly, so do:
     chroot #{guest_root} chmod 1777 /tmp
 
+    ## On Ubuntu, include GPG keys
+    include_files="--include /tmp"
+    if [ "#{node[:rightimage][:platform]}" == "ubuntu" ]; then
+      for file in #{guest_root}/etc/apt/*.gpg*; do 
+        include_files="$include_files,$(echo $file|awk -F"#{guest_root}" '{print $2}')";
+      done
+
+      # if there is anything in trusted.gpg.d, include these too
+      for file in $(find #{guest_root}/etc/apt/trusted.gpg.d -type f); do
+        include_files="$include_files,$(echo $file|awk -F"#{guest_root}" '{print $2}')";
+      done
+    fi
+
     echo bundling...
-    /home/ec2/bin/ec2-bundle-vol --no-inherit --arch #{node[:rightimage][:arch]} --destination "#{guest_root}"_temp --privatekey /tmp/AWS_X509_KEY.pem --cert /tmp/AWS_X509_CERT.pem --user #{node[:rightimage][:aws_account_number]} --prefix #{image_name}  --volume #{guest_root} $kernel_opt $ramdisk_opt -B "ami=sda1,root=/dev/sda1,ephemeral0=sdb,swap=sda3" --include /tmp     #--generate-fstab
+    /home/ec2/bin/ec2-bundle-vol --no-inherit --arch #{node[:rightimage][:arch]} --destination "#{guest_root}"_temp --privatekey /tmp/AWS_X509_KEY.pem --cert /tmp/AWS_X509_CERT.pem --user #{node[:rightimage][:aws_account_number]} --prefix #{image_name} --volume #{guest_root} $kernel_opt $ramdisk_opt -B "ami=sda1,root=/dev/sda1,ephemeral0=sdb,swap=sda3" $include_files 
     
     echo "Uploading..." 
     echo y | /home/ec2/bin/ec2-upload-bundle -b #{node[:rightimage][:image_upload_bucket]} -m "#{guest_root}"_temp/#{image_name}.manifest.xml -a #{node[:rightimage][:aws_access_key_id]} -s #{node[:rightimage][:aws_secret_access_key]} --retry --batch
