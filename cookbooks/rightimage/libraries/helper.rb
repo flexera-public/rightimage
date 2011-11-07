@@ -92,7 +92,18 @@ EOF
       def target_raw_path
         "#{target_raw_root}/#{target_type}.raw" 
       end
- 
+
+      def lineage_name
+        filename = "/tmp/rightimage_lineage"
+        if ::File.exists?(filename)
+          lineage = File.open(filename, 'rb') { |f| f.read }
+        else
+          time = Time.new
+          lineage = "#{node[:rightimage][:platform]}_#{node[:rightimage][:release]}_#{time.strftime("%Y%m%d%H%M")}"
+          File.open(filename, 'w') {|f| f.write(lineage) }
+        end
+        lineage
+      end
     end
   end
 end
