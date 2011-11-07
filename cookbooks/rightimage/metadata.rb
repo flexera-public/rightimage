@@ -30,7 +30,9 @@ recipe "rightimage::upload_vmops", "setup http server for download to test cloud
 recipe "rightimage::upload_euca", "bundle and upload euca kernel, ramdisk and image"
 recipe "rightimage::upload_openstack", "bundle and upload openstack kernel, ramdisk and image"
 recipe "rightimage::upload_file_to_s3", "upload specified file to s3"
-
+recipe "rightimage::setup_block_device", "Creates, formats and mounts a brand new block_device volume stripe on the instance."
+recipe "rightimage::do_force_reset", "Unmounts and deletes the attached block_device and volumes that were attached to the instance for this lineage."
+ 
 # Add each cloud name to an array to use for common inputs on each cloud.
 cloud_add = []
 cloud_upload = []
