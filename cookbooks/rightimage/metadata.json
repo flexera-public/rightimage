@@ -1,36 +1,8 @@
 {
-  "recipes": {
-    "rightimage::upload_file_to_s3": "upload specified file to s3",
-    "rightimage::upload_openstack": "bundle and upload openstack kernel, ramdisk and image",
-    "rightimage::cloud_add_vmops": "adds requirements for cloudstack based on hypervisor choice",
-    "rightimage::rightscale_install": "installs rightscale",
-    "rightimage::base_sles": "coordinate a sles install",
-    "rightimage::cloud_add_raw": "migrates the create image to a raw file -- useful for new cloud development",
-    "rightimage::cloud_add_openstack": "adds requirements for openstack based on hypervisor choice",
-    "rightimage::cloud_add_euca": "migrates the created image to eucalyptus",
-    "rightimage::cloud_add_ec2": "migrates the created image to ec2",
-    "rightimage::default": "starts builds image automatically at boot. See 'manual_mode' input to enable.",
-    "rightimage::upload_ec2_ebs": "create EBS image snapshot (ec2 only)",
-    "rightimage::upload_ec2_s3": "bundle and upload s3 image (ec2 only)",
-    "rightimage::bootstrap_sles": "bootstraps a basic sles image",
-    "rightimage::bootstrap_ubuntu": "bootstraps a basic ubuntu image",
-    "rightimage::base_ubuntu": "coordinate an ubuntu install",
-    "rightimage::do_create_mci": "creates MCI for image(s) (only ec2 currently supported)",
-    "rightimage::upload_euca": "bundle and upload euca kernel, ramdisk and image",
-    "rightimage::install_vhd-util": "install the vhd-util tool",
-    "rightimage::build_image": "build image based on host platform",
-    "rightimage::do_tag_images": "adds rightscale tags to images",
-    "rightimage::bootstrap_common": "common configuration for linux base images",
-    "rightimage::base_centos": "coordinate a centos install",
-    "rightimage::cloud_add_esxi": "applies esxi transformations on an existing disk image",
-    "rightimage::bootstrap_centos": "bootstraps a basic centos image",
-    "rightimage::upload_vmops": "setup http server for download to test cloud",
-    "rightimage::clean": "cleans everything"
+  "dependencies": {
   },
-  "suggestions": {
-  },
-  "conflicting": {
-  },
+  "name": "rightimage",
+  "maintainer_email": "support@rightscale.com",
   "attributes": {
     "rightimage/image_name": {
       "required": "required",
@@ -93,6 +65,19 @@
       "display_name": "aws_509_cert",
       "description": "aws_509_cert"
     },
+    "rightimage/rebundle_base_image_id": {
+      "required": "required",
+      "calculated": false,
+      "choice": [
+
+      ],
+      "type": "string",
+      "recipes": [
+        "rightimage::base_rhel"
+      ],
+      "display_name": "Starting Image Id",
+      "description": "Cloud specific ID for the image to start with when building a rebundle image"
+    },
     "rightimage/release": {
       "required": "required",
       "calculated": false,
@@ -134,11 +119,21 @@
         "rightimage::base_centos",
         "rightimage::base_sles",
         "rightimage::base_ubuntu",
+        "rightimage::base_rhel",
         "rightimage::default",
         "rightimage::build_image",
         "rightimage::bootstrap_centos",
         "rightimage::bootstrap_sles",
-        "rightimage::bootstrap_ubuntu"
+        "rightimage::bootstrap_ubuntu",
+        "rightimage::cloud_add_euca",
+        "rightimage::cloud_add_vmops",
+        "rightimage::cloud_add_openstack",
+        "rightimage::cloud_add_ec2",
+        "rightimage::upload_euca",
+        "rightimage::upload_vmops",
+        "rightimage::upload_openstack",
+        "rightimage::upload_ec2_s3",
+        "rightimage::upload_ec2_ebs"
       ],
       "display_name": "Development Image?",
       "description": "If set, a random root password will be set for debugging purposes. NOTE: you must include 'Dev' in the image name or the build with fail."
@@ -159,6 +154,7 @@
         "rightimage::base_centos",
         "rightimage::base_sles",
         "rightimage::base_ubuntu",
+        "rightimage::base_rhel",
         "rightimage::default",
         "rightimage::build_image",
         "rightimage::upload_vmops",
@@ -205,6 +201,7 @@
         "rightimage::base_centos",
         "rightimage::base_sles",
         "rightimage::base_ubuntu",
+        "rightimage::base_rhel",
         "rightimage::default",
         "rightimage::build_image",
         "rightimage::cloud_add_vmops",
@@ -214,7 +211,7 @@
       "description": "aws_secret_access_key"
     },
     "rightimage/sandbox_repo_tag": {
-      "required": "required",
+      "required": "optional",
       "calculated": false,
       "choice": [
 
@@ -300,7 +297,8 @@
         "ec2",
         "vmops",
         "euca",
-        "openstack"
+        "openstack",
+        "rackspace"
       ],
       "type": "string",
       "recipes": [
@@ -322,11 +320,10 @@
       "recipes": [
         "rightimage::default",
         "rightimage::build_image",
+        "rightimage::cloud_add_euca",
         "rightimage::cloud_add_vmops",
         "rightimage::cloud_add_openstack",
-        "rightimage::cloud_add_euca",
-        "rightimage::cloud_add_ec2",
-        "rightimage::cloud_add_raw"
+        "rightimage::cloud_add_ec2"
       ],
       "display_name": "Root Size GB",
       "description": "Sets the size of the virtual image. Units are in GB."
@@ -402,6 +399,7 @@
         "rightimage::base_centos",
         "rightimage::base_sles",
         "rightimage::base_ubuntu",
+        "rightimage::base_rhel",
         "rightimage::default",
         "rightimage::build_image",
         "rightimage::upload_vmops",
@@ -439,6 +437,7 @@
         "rightimage::base_centos",
         "rightimage::base_ubuntu",
         "rightimage::base_sles",
+        "rightimage::base_rhel",
         "rightimage::default",
         "rightimage::build_image",
         "rightimage::cloud_add_vmops",
@@ -446,6 +445,20 @@
       ],
       "display_name": "aws_access_key_id",
       "description": "aws_access_key_id"
+    },
+    "rightimage/download_rightlink": {
+      "required": "required",
+      "calculated": false,
+      "choice": [
+        "yes",
+        "no"
+      ],
+      "type": "string",
+      "recipes": [
+        "rightimage::rightscale_install"
+      ],
+      "display_name": "Should RightLink be downloaded?",
+      "description": "Set to true to download RighLink form S3.  This recipe will fail if the expected version of RightLink is not in either of the dev or production buckets."
     },
     "rightimage/arch": {
       "required": "required",
@@ -508,10 +521,7 @@
       ],
       "type": "string",
       "recipes": [
-        "rightimage::upload_euca",
         "rightimage::cloud_add_ec2",
-        "rightimage::upload_ec2_s3",
-        "rightimage::upload_ec2_ebs",
         "rightimage::do_tag_images",
         "rightimage::do_create_mci",
         "rightimage::base_centos",
@@ -519,8 +529,12 @@
         "rightimage::base_sles",
         "rightimage::default",
         "rightimage::build_image",
+        "rightimage::upload_file_to_s3",
+        "rightimage::upload_euca",
         "rightimage::upload_vmops",
-        "rightimage::upload_file_to_s3"
+        "rightimage::upload_openstack",
+        "rightimage::upload_ec2_s3",
+        "rightimage::upload_ec2_ebs"
       ],
       "display_name": "Image Upload Bucket",
       "description": "The bucket to upload the image to."
@@ -531,7 +545,8 @@
       "choice": [
         "centos",
         "ubuntu",
-        "suse"
+        "suse",
+        "rhel"
       ],
       "type": "string",
       "recipes": [
@@ -584,23 +599,51 @@
       "description": "RightScale API username. Ex. you@rightscale.com"
     }
   },
-  "description": "image building tools",
-  "providing": {
-  },
-  "dependencies": {
-  },
-  "maintainer": "RightScale, Inc.",
-  "replacing": {
-  },
-  "maintainer_email": "support@rightscale.com",
-  "version": "0.0.1",
-  "groupings": {
-  },
-  "long_description": "",
-  "name": "rightimage",
-  "recommendations": {
+  "license": "Apache v2.0",
+  "suggestions": {
   },
   "platforms": {
   },
-  "license": "Apache v2.0"
+  "maintainer": "RightScale, Inc.",
+  "long_description": "",
+  "version": "0.0.1",
+  "recommendations": {
+  },
+  "recipes": {
+    "rightimage::upload_file_to_s3": "upload specified file to s3",
+    "rightimage::upload_openstack": "bundle and upload openstack kernel, ramdisk and image",
+    "rightimage::cloud_add_vmops": "adds requirements for cloudstack based on hypervisor choice",
+    "rightimage::rightscale_install": "installs rightscale",
+    "rightimage::base_sles": "coordinate a sles install",
+    "rightimage::cloud_add_raw": "migrates the create image to a raw file -- useful for new cloud development",
+    "rightimage::cloud_add_openstack": "adds requirements for openstack based on hypervisor choice",
+    "rightimage::cloud_add_euca": "migrates the created image to eucalyptus",
+    "rightimage::cloud_add_ec2": "migrates the created image to ec2",
+    "rightimage::default": "starts builds image automatically at boot. See 'manual_mode' input to enable.",
+    "rightimage::upload_ec2_ebs": "create EBS image snapshot (ec2 only)",
+    "rightimage::upload_ec2_s3": "bundle and upload s3 image (ec2 only)",
+    "rightimage::bootstrap_sles": "bootstraps a basic sles image",
+    "rightimage::bootstrap_ubuntu": "bootstraps a basic ubuntu image",
+    "rightimage::base_ubuntu": "coordinate an ubuntu install",
+    "rightimage::do_create_mci": "creates MCI for image(s) (only ec2 currently supported)",
+    "rightimage::base_rhel": "coordinate a rhel install",
+    "rightimage::upload_euca": "bundle and upload euca kernel, ramdisk and image",
+    "rightimage::install_vhd-util": "install the vhd-util tool",
+    "rightimage::build_image": "build image based on host platform",
+    "rightimage::do_tag_images": "adds rightscale tags to images",
+    "rightimage::bootstrap_common": "common configuration for linux base images",
+    "rightimage::base_centos": "coordinate a centos install",
+    "rightimage::bootstrap_centos": "bootstraps a basic centos image",
+    "rightimage::upload_vmops": "setup http server for download to test cloud",
+    "rightimage::clean": "cleans everything"
+  },
+  "groupings": {
+  },
+  "conflicting": {
+  },
+  "replacing": {
+  },
+  "description": "image building tools",
+  "providing": {
+  }
 }

@@ -5,6 +5,21 @@
 #
 # When this is finished running, you should have a basic image ready in /mnt
 #
+class Chef::Resource::Bash
+  include RightScale::RightImage::Helper
+end
+class Erubis::Context
+  include RightScale::RightImage::Helper
+end
+class Chef::Resource::Execute
+  include RightScale::RightImage::Helper
+end
+class Chef::Resource::RubyBlock
+  include RightScale::RightImage::Helper
+end
+class Chef::Recipe
+  include RightScale::RightImage::Helper
+end
 
 mount_dir = node[:rightimage][:mount_dir]
 
@@ -12,53 +27,43 @@ mount_dir = node[:rightimage][:mount_dir]
 node[:rightimage][:host_packages].split.each { |p| package p} 
 
 #create bootstrap command
-case node[:rightimage][:platform]
-  when "ubuntu"
-    # install specialty kernel for testing
-    
-    if node[:lsb][:codename] == "maverick" || node[:lsb][:codename] == "lucid"
-      # install vmbuilder from deb files
-      remote_file "/tmp/python-vm-builder.deb" do
-        source "python-vm-builder.deb"
-      end
-      if node[:rightimage][:virtual_environment] == "ec2" 
-        remote_file "/tmp/python-vm-builder-ec2.deb" do
-          source "python-vm-builder-ec2.deb"
-        end 
-      end
-      ruby_block "install python-vm-builder debs with dependencies" do
-        block do
-          Chef::Log.info(`dpkg -i /tmp/python-vm-builder.deb`)
-          Chef::Log.info(`dpkg -i /tmp/python-vm-builder-ec2.deb`) if node[:rightimage][:virtual_environment] == 'ec2'
-          Chef::Log.info(`apt-get -fy install`)
-        end
-      end
+if node[:lsb][:codename] == "maverick" || node[:lsb][:codename] == "lucid"
+  # install vmbuilder from deb files
+  remote_file "/tmp/python-vm-builder.deb" do
+    source "python-vm-builder.deb"
+  end
+  if node[:rightimage][:virtual_environment] == "ec2" 
+    remote_file "/tmp/python-vm-builder-ec2.deb" do
+      source "python-vm-builder-ec2.deb"
+    end 
+  end
+  ruby_block "install python-vm-builder debs with dependencies" do
+    block do
+      Chef::Log.info(`dpkg -i /tmp/python-vm-builder.deb`)
+      Chef::Log.info(`dpkg -i /tmp/python-vm-builder-ec2.deb`) if node[:rightimage][:virtual_environment] == 'ec2'
+      Chef::Log.info(`apt-get -fy install`)
     end
-
-    bootstrap_cmd = "/usr/bin/vmbuilder  #{node[:rightimage][:virtual_environment]} ubuntu -o \
-        --suite=#{node[:rightimage][:release]} \
-        -d #{node[:rightimage][:build_dir]} \
-        --rootsize=2048 \
-        --install-mirror=http://mirror.rightscale.com/ubuntu \
-        --install-security-mirror=http://mirror.rightscale.com/ubuntu \
-        --components=main,restricted,universe,multiverse \
-        --lang=#{node[:rightimage][:lang]} "
-    if node[:rightimage][:arch] == "i386"
-      bootstrap_cmd << " --arch i386"
-      bootstrap_cmd << " --addpkg libc6-xen"
-    else
-      bootstrap_cmd << " --arch amd64"
-    end
-    node[:rightimage][:guest_packages].split.each { |p| bootstrap_cmd << " --addpkg " + p} 
-
-    Chef::Log.info "vmbuilder bootstrap command is: " + bootstrap_cmd
-  else 
-
-    template "/tmp/yum.conf" do
-      source "yum.conf.erb"
-      backup false
-    end
+  end
 end
+
+# TODO: Need this to be hypervisor unspecific.  debootstrap?
+bootstrap_cmd = "/usr/bin/vmbuilder  #{node[:rightimage][:virtual_environment]} ubuntu -o \
+    --suite=#{node[:rightimage][:release]} \
+    -d #{node[:rightimage][:build_dir]} \
+    --rootsize=2048 \
+    --install-mirror=http://mirror.rightscale.com/ubuntu \
+    --install-security-mirror=http://mirror.rightscale.com/ubuntu \
+    --components=main,restricted,universe,multiverse \
+    --lang=#{node[:rightimage][:lang]} --verbose "
+if node[:rightimage][:arch] == "i386"
+  bootstrap_cmd << " --arch i386"
+  bootstrap_cmd << " --addpkg libc6-xen"
+else
+  bootstrap_cmd << " --arch amd64"
+end
+node[:rightimage][:guest_packages].split.each { |p| bootstrap_cmd << " --addpkg " + p} 
+
+Chef::Log.info "vmbuilder bootstrap command is: " + bootstrap_cmd
 
 log "Configuring Image..."
 
@@ -72,12 +77,15 @@ bash "Comment out ext4 in /etc/mke2fs.conf" do
   EOH
 end
 
+# TODO: Split this step up.
 bash "configure_image"  do
   user "root"
   cwd "/tmp"
   code <<-EOH
     set -e
     set -x
+
+    image_name=#{image_name}
   
     modprobe dm-mod
 
@@ -114,7 +122,7 @@ fi
 
 EOS
     chmod +x /tmp/configure_script
-    #{bootstrap_cmd} --exec=/tmp/configure_script > /dev/null 2>&1
+    #{bootstrap_cmd} --exec=/tmp/configure_script
 
 
 case "#{node.rightimage.virtual_environment}" in
@@ -129,36 +137,56 @@ case "#{node.rightimage.virtual_environment}" in
 
   "ec2"|* )
       if ( [ "#{node[:rightimage][:release]}" == "lucid" ] || [ "#{node[:rightimage][:release]}" == "maverick" ] ) ; then
-        image_name=`cat /mnt/vmbuilder/xen.conf  | grep xvda1 | grep -v root  | cut -c 25- | cut -c -9`
+        kvm_image=`cat /mnt/vmbuilder/xen.conf  | grep xvda1 | grep -v root  | cut -c 25- | cut -c -9`
       else 
-        kvm=image=$image_name
+        kvm_image=$image_name
       fi
       ;;
 esac
 
-    set +e
-    loopback_device=/mnt/vmbuilder/$image_name
-    [ -e "/dev/mapper/loop5p1" ] && kpartx -d /dev/loop5
-    losetup -a | grep loop5
-    [ "$?" == "0" ] && losetup -d /dev/loop5
-    set -e
-    qemu-img convert -O raw /mnt/vmbuilder/$kvm_image /mnt/vmbuilder/root.img
-    losetup /dev/loop5 /mnt/vmbuilder/root.img
-    kpartx -a /dev/loop5
-    loopback_device=/dev/mapper/loop5p1
+
+loop_name="loop0"
+loop_dev="/dev/$loop_name"
+loop_map="/dev/mapper/${loop_name}p1"
+
+base_raw_path="/mnt/vmbuilder/root.img"
+
+# Cleanup loopback stuff
+set +e
+[ -e $loop_map ] && kpartx -d $loop_dev
+losetup -a | grep $loop_name
+[ "$?" == "0" ] && losetup -d $loop_dev
+set -e
+
+qemu-img convert -O raw /mnt/vmbuilder/$kvm_image $base_raw_path
+losetup $loop_dev $base_raw_path
+
+# Setup loopback device
+case "#{node.rightimage.virtual_environment}" in 
+  "kvm"|"esxi" )
+    kpartx -a $loop_dev
+    loopback_device=$loop_map
+   ;;
+  "ec2"|*)
+    loopback_device=$loop_dev
+   ;;
+esac
+
+    guest_root=#{source_image}
 
     random_dir=/tmp/rightimage-$RANDOM
     mkdir $random_dir
     mount -o loop $loopback_device  $random_dir
-    umount #{node[:rightimage][:mount_dir]}/proc || true
-    rm -rf #{node[:rightimage][:mount_dir]}
-    mkdir -p #{node[:rightimage][:mount_dir]}
-    rsync -a $random_dir/ #{node[:rightimage][:mount_dir]}/
+    umount $guest_root/proc || true
+    rm -rf $guest_root
+    mkdir -p $guest_root 
+    rsync -a $random_dir/ $guest_root/
     umount $random_dir
     rm -rf  $random_dir
-    mkdir -p #{node[:rightimage][:mount_dir]}/var/man
-    chroot #{node[:rightimage][:mount_dir]}  chown -R man:root /var/man
+    mkdir -p $guest_root/var/man
+    chroot $guest_root chown -R man:root /var/man
 EOH
+  # TODO: Fix this
   not_if "test -e /mnt/vmbuilder/root.img"
 end
 
@@ -172,53 +200,12 @@ end
 
 
 if node[:rightimage][:release] == "maverick" || node[:rightimage][:release] == "lucid"
-  template "/mnt/image/boot/grub/menu.lst" do
-    source "menu.lst.erb"
-  end
-end
-
-if node[:rightimage][:release] == "lucid"
-  remote_file "/mnt/image/tmp/linux-headers-2.6.31-302_2.6.31-302.7_all.deb" do
-    source "linux-headers-2.6.31-302_2.6.31-302.7_all.deb"
-  end
-  if node[:rightimage][:arch] == "i386"
-    remote_file "/mnt/image/tmp/linux-headers-2.6.31-302-ec2_2.6.31-302.7_i386.deb" do
-      source "linux-headers-2.6.31-302-ec2_2.6.31-302.7_i386.deb"
-    end
-    remote_file "/mnt/image/tmp/linux-image-2.6.31-302-ec2_2.6.31-302.7_i386.deb" do
-      source "linux-image-2.6.31-302-ec2_2.6.31-302.7_i386.deb"
-    end
-  else
-    remote_file "/mnt/image/tmp/linux-headers-2.6.31-302-ec2_2.6.31-302.7_amd64.deb" do
-      source "linux-headers-2.6.31-302-ec2_2.6.31-302.7_amd64.deb"
-    end
-    remote_file "/mnt/image/tmp/linux-image-2.6.31-302-ec2_2.6.31-302.7_amd64.deb" do
-      source "linux-image-2.6.31-302-ec2_2.6.31-302.7_amd64.deb"
-    end
-  end
-  bash "install custom lucid kernel" do
-    code <<-EOH
-cat <<-EOS > #{node[:rightimage][:mount_dir]}/tmp/install_custom_kernel.sh
-#!/bin/bash
-dpkg -i /tmp/linux-headers*.deb
-dpkg -i /tmp/linux-image*.deb
-EOS
-chmod +x #{node[:rightimage][:mount_dir]}/tmp/install_custom_kernel.sh
-
-# Temp disable - it was causing my build to hang. 
-#chroot #{node[:rightimage][:mount_dir]} /tmp/install_custom_kernel.sh  
-EOH
-  end
-end
-
-if node[:rightimage][:release] == "lucid" || node[:rightimage][:release] == "maverick"
-
   # Fix apt config so it does not install all recommended packages
   log "Fixing apt.conf APT::Install-Recommends setting prior to installing Java"
   log "Installing Sun Java for Lucid..."
 
   guest_java_install = "/tmp/java_install"
-  host_java_install = "#{mount_dir}#{guest_java_install}"
+  host_java_install = "#{source_image}#{guest_java_install}"
   
   bash "install sun java" do
     user "root"
@@ -265,12 +252,23 @@ apt-get update
 EOS
 
     chmod +x #{host_java_install}
-    chroot #{mount_dir} #{guest_java_install}    
+    chroot #{source_image} #{guest_java_install}    
     rm -f #{host_java_install}
 
     EOH
   end
 end
 
-include_recipe "rightimage::bootstrap_common"
+# Modified version of syslog-ng.conf that will properly route recipe output to /var/log/messages
+remote_file "#{source_image}/etc/syslog-ng/syslog-ng.conf" do
+  source "syslog-ng.conf"
+end
 
+# TODO: Add cleanup
+bash "cleanup" do
+  code <<-EOH
+    set -ex
+    chroot #{source_image} apt-get update
+    chroot #{source_image} apt-get clean
+  EOH
+end
