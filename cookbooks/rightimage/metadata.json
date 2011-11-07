@@ -577,7 +577,6 @@
   "recommendations": {
   },
   "recipes": {
-    "block_device::setup_block_device": "Creates, formats and mounts a brand new block_device volume stripe on the instance.",
     "rightimage::upload_file_to_s3": "upload specified file to s3",
     "rightimage::upload_openstack": "bundle and upload openstack kernel, ramdisk and image",
     "rightimage::cloud_add_vmops": "adds requirements for cloudstack based on hypervisor choice",
@@ -593,9 +592,7 @@
     "rightimage::bootstrap_sles": "bootstraps a basic sles image",
     "rightimage::bootstrap_ubuntu": "bootstraps a basic ubuntu image",
     "rightimage::base_ubuntu": "coordinate an ubuntu install",
-    "block_device::default": "Installs gem for rightscale_tools.",
     "rightimage::do_create_mci": "creates MCI for image(s) (only ec2 currently supported)",
-    "block_device::do_force_reset": "Unmounts and deletes the attached block_device and volumes that were attached to the instance for this lineage.",
     "rightimage::upload_euca": "bundle and upload euca kernel, ramdisk and image",
     "rightimage::install_vhd-util": "install the vhd-util tool",
     "rightimage::build_image": "build image based on host platform",
