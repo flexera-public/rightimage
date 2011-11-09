@@ -20,6 +20,14 @@ action :install do
       rm -f $guest_root/boot/initrd* $guest_root/initrd*
       chroot $guest_root mkinitrd --with=ata_piix --with=virtio_ring --with=virtio_net --with=virtio_balloon --with=virtio --with=virtio_blk --with=ext3 --with=virtio_pci --with=dm_mirror --with=dm_snapshot --with=dm_zero -v initrd-$kernel_version $kernel_version
       mv $guest_root/initrd-$kernel_version $guest_root/boot/.
+
+      echo 'modules acpiphp' > $guest_root/etc/rc.modules
+      chmod 755 $guest_root/etc/rc.modules
+ 
+      set +e
+      grep "acpiphp" $guest_root/etc/rc.local
+      [ "$?" == "1" ] && echo "/sbin/modprobe acpiphp" >> $guest_root/etc/rc.local
+      set -e
       ;;
     "ubuntu" )
       # Anything need to be done?
