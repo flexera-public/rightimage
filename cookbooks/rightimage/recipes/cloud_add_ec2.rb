@@ -24,23 +24,32 @@ end
 # TODO: add uuca tools for centos 
 #  - create /etc/rightscale.d/cloud
 
-bash "unmount proc & dev" do 
+bash "create loopback" do 
+  flags "-ex"
   code <<-EOH
-    set -e 
-    set -x
-    GUEST_ROOT=#{guest_root}
-    umount -lf $GUEST_ROOT/proc || true
-#    umount -lf $GUEST_ROOT/dev || true
-    umount -lf $GUEST_ROOT/sys || true
-  EOH
-end
+    base_root="#{base_root}"
+    source_image="#{source_image}" 
+    target_raw_root="#{target_raw_root}"
+    target_raw_path="#{target_raw_path}"
+    guest_root="#{guest_root}"
 
-bash "cleanup" do
-  code <<-EOH
-    set -x
-    rm -rf #{guest_root}
-    mkdir -p #{guest_root}
-    rsync -a #{source_image}/ #{guest_root}/
+    umount -lf #{source_image}/proc || true 
+    umount -lf #{guest_root}/proc || true 
+    umount -lf #{guest_root}/sys || true 
+    umount -lf #{guest_root} || true
+
+    DISK_SIZE_GB=#{node[:rightimage][:root_size_gb]}  
+    BYTES_PER_MB=1024
+    DISK_SIZE_MB=$(($DISK_SIZE_GB * $BYTES_PER_MB))
+
+    rm -rf $base_root
+    mkdir -p $target_raw_root
+    dd if=/dev/zero of=$target_raw_path bs=1M count=$DISK_SIZE_MB    
+    mke2fs -F -j $target_raw_path
+    mkdir $guest_root
+    mount -o loop $target_raw_path $guest_root
+    rsync -a $source_image/ $guest_root/
+    mkdir -p $guest_root/boot/grub
   EOH
 end
 
@@ -151,5 +160,13 @@ bash "sync fs" do
   code <<-EOH
     set -x
     sync
+  EOH
+end
+
+bash "unmount target filesystem" do
+  flags "-ex" 
+  code <<-EOH
+    target_mnt=#{guest_root}    
+    umount -lf $target_mnt
   EOH
 end
