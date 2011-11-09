@@ -49,13 +49,15 @@ bash "bundle_upload_ebs" do
 
     echo "Doing EBS"
 
+# mount loopback
+    mount -o loop #{target_raw_path} #{guest_root}
+
 # switch to a random directory for the build
     random_dir="/mnt/$RANDOM"
     mkdir $random_dir
     cd $random_dir
     ebs_mount=${random_dir}/ebs_mount
     mkdir -p $ebs_mount
-# /mnt/ec2 is where the image creator creates the image
     image_mount=#{guest_root}
 
 ## calculate ec2 region
@@ -156,10 +158,13 @@ bash "bundle_upload_ebs" do
       --cert /tmp/AWS_X509_CERT.pem \
       --url #{node[:rightimage][:ec2_endpoint]} \
       --region $region 
-   
+
+# unmount loopback
+    umount -lf #{guest_root}
+
     #remove keys
     rm -f /tmp/AWS_X509_KEY.pem
-    rm -f  /tmp/AWS_X509_CERT.pem
+    rm -f /tmp/AWS_X509_CERT.pem
     
     EOH
 end 
