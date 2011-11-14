@@ -179,6 +179,7 @@ gpgcheck=1
 EOF
    yum -c /tmp/yum.conf --installroot=$guest_root -y clean all
    yum -c $guest_root/etc/yum.conf --installroot=$guest_root -y install vmware-tools-esx-nox
+   rm -f $guest_root/etc/yum.repos.d/vmware-tools.repo
     ;;
 
   "ubuntu" )
@@ -322,8 +323,8 @@ end
 ovf_filename = bundled_image
 ovf_image_name = bundled_image
 ovf_vmdk_size = `ls -l1 #{target_raw_root}/#{bundled_image} | awk '{ print $5; }'`.chomp
-ovf_capacity = node[:platform][:root_size_gb] 
-ovf_ostype = "#{node[:rightimage][:platform]} #{node[:rightimage][:release]} (" + (node[:rightimage][:arch] == "i386" ? "32" : "64") + "-bit)"
+ovf_capacity = node[:rightimage][:root_size_gb] 
+ovf_ostype = "other26xLinux64Guest"
 
 template "#{target_raw_root}/temp.ovf" do
   source "ovf.erb"

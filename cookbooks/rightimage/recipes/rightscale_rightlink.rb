@@ -1,5 +1,4 @@
 rightlink_file="rightscale_#{node[:rightimage][:rightlink_version]}-#{node[:rightimage][:platform]}_#{node[:rightimage][:release_number]}-" + ((node[:rightimage][:platform] == "ubuntu") && (node[:rightimage][:arch] == "x86_64") ? "amd64" : node[:rightimage][:arch]) + "." + (node[:rightimage][:platform] == "centos" ? "rpm" : "deb")
-tag=(node[:rightimage][:sandbox_repo_tag] != "" ? node[:rightimage][:sandbox_repo_tag] : "rightlink_package_#{node[:rightimage][:rightlink_version]}")
 
 execute "insert_rightlink_version" do 
   command  "echo -n " + node[:rightimage][:rightlink_version] + " > " + node[:rightimage][:mount_dir] + "/etc/rightscale.d/rightscale-release"
@@ -8,7 +7,7 @@ end
 bash "checkout_repo" do 
   not_if "test -e #{node[:rightimage][:mount_dir]}/tmp/sandbox_builds"
   code <<-EOC
-    set -e
+    set -ex
     cd #{node[:rightimage][:mount_dir]}/tmp
     if [ -d sandbox_builds ]; then mv sandbox_builds sandbox_builds.$RANDOM; fi
     git clone git@github.com:rightscale/sandbox_builds.git 

@@ -11,6 +11,7 @@ set[:rightimage][:build_dir] = "/mnt/vmbuilder"
 set[:rightimage][:mount_dir] = "/mnt/image"
 set_unless[:rightimage][:virtual_environment] = "xen"
 set[:rightimage][:install_mirror] = "mirror.rightscale.com"
+set_unless[:rightimage][:sandbox_repo_tag] = "rightlink_package_#{rightimage[:rightlink_version]}"
 
 if rightimage[:platform] == "ubuntu"
 # for using apt-proxy
