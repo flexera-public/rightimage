@@ -15,7 +15,7 @@ bash "checkout_repo" do
     export sha=$(git log --pretty=format:%H -1)
     touch SHA-$sha.txt
     mv SHA-$sha.txt #{node[:rightimage][:mount_dir]}/..
-    git checkout #{tag} --force
+    git checkout #{node[:rightimage][:sandbox_repo_tag]} --force
     export RS_VERSION=#{node[:rightimage][:rightlink_version]}
     export ARCH=#{node[:rightimage][:arch]}
     rake submodules:sandbox:create
