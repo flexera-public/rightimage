@@ -104,6 +104,7 @@ end
 
 bash "upload_rightlink" do
   flags "-e"
+  only_if "[ -f #{node[:rightimage][:mount_dir]}/tmp/sandbox_builds/dist/#{rightlink_file} ] && [ *#{node[:rightimage][:download_rightlink]}* == *no* ]"
   code <<-EOC
     /opt/rightscale/sandbox/bin/gem install right_aws
 
