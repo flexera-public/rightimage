@@ -80,7 +80,7 @@ EOF
       end
 
       def target_raw_root
-        node[:block_device][:mount_dir]        
+        "#{node[:block_device][:mount_dir]}"
       end
 
       def target_raw_path

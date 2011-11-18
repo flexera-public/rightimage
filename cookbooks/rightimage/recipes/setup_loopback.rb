@@ -14,6 +14,7 @@ bash "create loopback fs" do
 
     loop_name="loop0"
     loop_dev="/dev/$loop_name"
+    loop_map="/dev/mapper/${loop_name}p1"
     source_image="#{source_image}" 
     target_raw_path="#{target_raw_path}"
 
@@ -34,7 +35,7 @@ bash "create loopback fs" do
 0,1304,L
 EOF
     kpartx -a $loop_dev
-    mke2fs -F -j $loop_dev
-    mount /dev/mapper/${loop_name}p1 $source_image
+    mke2fs -F -j $loop_map
+    mount $loop_map $source_image
   EOH
 end
