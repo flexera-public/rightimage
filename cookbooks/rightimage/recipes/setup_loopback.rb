@@ -36,6 +36,7 @@ bash "create loopback fs" do
 EOF
     kpartx -a $loop_dev
     mke2fs -F -j $loop_map
+    mkdir -p $source_image
     mount $loop_map $source_image
   EOH
 end
