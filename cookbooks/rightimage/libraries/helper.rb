@@ -68,9 +68,7 @@ EOF
       end
 
       def target_type
-        type = "#{node[:rightimage][:cloud]}_#{node[:rightimage][:virtual_environment]}"
-        type << "_dev" if node[:rightimage][:debug] == "true"
-        type
+        "#{node[:rightimage][:platform]}_#{node[:rightimage][:release]}_#{node[:rightimage][:arch]}_hd00"
       end
 
       def base_root
@@ -78,11 +76,11 @@ EOF
       end
 
       def guest_root
-        "#{base_root}/build"
+        source_image
       end
 
       def target_raw_root
-        "#{base_root}/image"
+        node[:block_device][:mount_dir]        
       end
 
       def target_raw_path

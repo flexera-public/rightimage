@@ -14,8 +14,8 @@
       "recipes": [
 
       ],
-      "display_name": "Image Name",
-      "description": "The name you want to give this new image."
+      "description": "The name you want to give this new image.",
+      "display_name": "Image Name"
     },
     "rightimage/rightlink_version": {
       "required": "required",
@@ -27,8 +27,8 @@
       "recipes": [
 
       ],
-      "display_name": "RightLink Version",
-      "description": "The RightLink version we are building into our image"
+      "description": "The RightLink version we are building into our image",
+      "display_name": "RightLink Version"
     },
     "rightimage/euca/x509_cert": {
       "required": "required",
@@ -40,8 +40,8 @@
       "recipes": [
         "rightimage::upload_euca"
       ],
-      "display_name": "Eucalyptus x509 Certificate",
-      "description": "The contents of the file pointed to by the EC2_CERT value defined in your eucarc credentials file."
+      "description": "The contents of the file pointed to by the EC2_CERT value defined in your eucarc credentials file.",
+      "display_name": "Eucalyptus x509 Certificate"
     },
     "rightimage/aws_509_cert": {
       "required": "required",
@@ -62,8 +62,8 @@
         "rightimage::default",
         "rightimage::build_image"
       ],
-      "display_name": "aws_509_cert",
-      "description": "aws_509_cert"
+      "description": "aws_509_cert",
+      "display_name": "aws_509_cert"
     },
     "rightimage/rebundle_base_image_id": {
       "required": "required",
@@ -75,8 +75,8 @@
       "recipes": [
         "rightimage::base_rhel"
       ],
-      "display_name": "Starting Image Id",
-      "description": "Cloud specific ID for the image to start with when building a rebundle image"
+      "description": "Cloud specific ID for the image to start with when building a rebundle image",
+      "display_name": "Starting Image Id"
     },
     "rightimage/release": {
       "required": "required",
@@ -91,8 +91,8 @@
       "recipes": [
 
       ],
-      "display_name": "Guest OS Release",
-      "description": "The OS release/version to build into the virtual image."
+      "description": "The OS release/version to build into the virtual image.",
+      "display_name": "Guest OS Release"
     },
     "rightimage/euca/x509_key": {
       "required": "required",
@@ -104,8 +104,8 @@
       "recipes": [
         "rightimage::upload_euca"
       ],
-      "display_name": "Eucalyptus x509 Private Key",
-      "description": "The contents of the file pointed to by the EC2_PRIVATE_KEY value defined in your eucarc credentials file."
+      "description": "The contents of the file pointed to by the EC2_PRIVATE_KEY value defined in your eucarc credentials file.",
+      "display_name": "Eucalyptus x509 Private Key"
     },
     "rightimage/debug": {
       "required": "optional",
@@ -135,8 +135,8 @@
         "rightimage::upload_ec2_s3",
         "rightimage::upload_ec2_ebs"
       ],
-      "display_name": "Development Image?",
-      "description": "If set, a random root password will be set for debugging purposes. NOTE: you must include 'Dev' in the image name or the build with fail."
+      "description": "If set, a random root password will be set for debugging purposes. NOTE: you must include 'Dev' in the image name or the build with fail.",
+      "display_name": "Development Image?"
     },
     "rightimage/aws_secret_access_key_for_upload": {
       "required": "required",
@@ -160,8 +160,8 @@
         "rightimage::upload_vmops",
         "rightimage::upload_file_to_s3"
       ],
-      "display_name": "aws_secret_access_key_for_upload",
-      "description": "aws_secret_access_key_for_upload"
+      "description": "aws_secret_access_key_for_upload",
+      "display_name": "aws_secret_access_key_for_upload"
     },
     "rightimage/aws_509_key": {
       "required": "required",
@@ -182,8 +182,8 @@
         "rightimage::default",
         "rightimage::build_image"
       ],
-      "display_name": "aws_509_key",
-      "description": "aws_509_key"
+      "description": "aws_509_key",
+      "display_name": "aws_509_key"
     },
     "rightimage/aws_secret_access_key": {
       "required": "required",
@@ -207,8 +207,8 @@
         "rightimage::cloud_add_vmops",
         "rightimage::cloud_add_openstack"
       ],
-      "display_name": "aws_secret_access_key",
-      "description": "aws_secret_access_key"
+      "description": "aws_secret_access_key",
+      "display_name": "aws_secret_access_key"
     },
     "rightimage/sandbox_repo_tag": {
       "required": "optional",
@@ -220,8 +220,8 @@
       "recipes": [
 
       ],
-      "display_name": "Sandbox Repository Tag",
-      "description": "The tag on the sandbox_builds repo from which to build rightscale package."
+      "description": "The tag on the sandbox_builds repo from which to build rightscale package.",
+      "display_name": "Sandbox Repository Tag"
     },
     "rightimage/manual_mode": {
       "required": "optional",
@@ -235,8 +235,8 @@
       "recipes": [
         "rightimage::default"
       ],
-      "display_name": "Manual Mode",
-      "description": "Sets the template's operation mode. Ex. 'true' = don't build at boot time."
+      "description": "Sets the template's operation mode. Ex. 'true' = don't build at boot time.",
+      "display_name": "Manual Mode"
     },
     "rightimage/virtual_environment": {
       "required": "required",
@@ -250,8 +250,8 @@
       "recipes": [
 
       ],
-      "display_name": "Hypervisor",
-      "description": "Which hypervisor is this image for?"
+      "description": "Which hypervisor is this image for?",
+      "display_name": "Hypervisor"
     },
     "rightimage/aws_account_number": {
       "required": "required",
@@ -274,8 +274,8 @@
         "rightimage::cloud_add_vmops",
         "rightimage::cloud_add_openstack"
       ],
-      "display_name": "aws_account_number",
-      "description": "aws_account_number"
+      "description": "aws_account_number",
+      "display_name": "aws_account_number"
     },
     "rightimage/euca/access_key_id": {
       "required": "required",
@@ -287,8 +287,8 @@
       "recipes": [
         "rightimage::upload_euca"
       ],
-      "display_name": "Eucalyptus Access Key",
-      "description": "The EC2_ACCESS_KEY value defined in your eucarc credentials file. User must have admin privileges."
+      "description": "The EC2_ACCESS_KEY value defined in your eucarc credentials file. User must have admin privileges.",
+      "display_name": "Eucalyptus Access Key"
     },
     "rightimage/cloud": {
       "required": "required",
@@ -304,8 +304,8 @@
       "recipes": [
 
       ],
-      "display_name": "Target Cloud",
-      "description": "The supported cloud for the virtual image."
+      "description": "The supported cloud for the virtual image.",
+      "display_name": "Target Cloud"
     },
     "rightimage/root_size_gb": {
       "required": "optional",
@@ -325,8 +325,8 @@
         "rightimage::cloud_add_openstack",
         "rightimage::cloud_add_ec2"
       ],
-      "display_name": "Root Size GB",
-      "description": "Sets the size of the virtual image. Units are in GB."
+      "description": "Sets the size of the virtual image. Units are in GB.",
+      "display_name": "Root Size GB"
     },
     "rest_connection/pass": {
       "required": "required",
@@ -338,8 +338,8 @@
       "recipes": [
 
       ],
-      "display_name": "API Password",
-      "description": "Rightscale API password."
+      "description": "Rightscale API password.",
+      "display_name": "API Password"
     },
     "rightimage/euca/euca_cert": {
       "required": "required",
@@ -351,8 +351,8 @@
       "recipes": [
         "rightimage::upload_euca"
       ],
-      "display_name": "Eucalyptus Cloud Certificate",
-      "description": "The contents of the file pointed to by the EUCALYPTUS_CERT value defined in your eucarc credentials file."
+      "description": "The contents of the file pointed to by the EUCALYPTUS_CERT value defined in your eucarc credentials file.",
+      "display_name": "Eucalyptus Cloud Certificate"
     },
     "rightimage/euca/secret_access_key": {
       "required": "required",
@@ -364,8 +364,8 @@
       "recipes": [
         "rightimage::upload_euca"
       ],
-      "display_name": "Eucalyptus Secret Access Key",
-      "description": "The EC2_SECRET_KEY value defined in your eucarc credentials file. User must have admin privileges."
+      "description": "The EC2_SECRET_KEY value defined in your eucarc credentials file. User must have admin privileges.",
+      "display_name": "Eucalyptus Secret Access Key"
     },
     "rightimage/install_mirror_date": {
       "required": "optional",
@@ -380,8 +380,8 @@
         "rightimage::build_image",
         "rightimage::bootstrap_centos"
       ],
-      "display_name": "Mirror Freeze Date",
-      "description": "Repository archive date from which to pull packages. Default: latest"
+      "description": "Repository archive date from which to pull packages. Default: latest",
+      "display_name": "Mirror Freeze Date"
     },
     "rightimage/aws_access_key_id_for_upload": {
       "required": "required",
@@ -405,8 +405,8 @@
         "rightimage::upload_vmops",
         "rightimage::upload_file_to_s3"
       ],
-      "display_name": "aws_access_key_id_for_upload",
-      "description": "aws_access_key_id for the uplaod bucket"
+      "description": "aws_access_key_id for the uplaod bucket",
+      "display_name": "aws_access_key_id_for_upload"
     },
     "rightimage/euca/euca_url": {
       "required": "required",
@@ -418,8 +418,8 @@
       "recipes": [
         "rightimage::upload_euca"
       ],
-      "display_name": "Eucalyptus URL",
-      "description": "Base URL to your Eucalyptus Cloud Controller. Don't include port. (Ex. http://<server_ip>)"
+      "description": "Base URL to your Eucalyptus Cloud Controller. Don't include port. (Ex. http://<server_ip>)",
+      "display_name": "Eucalyptus URL"
     },
     "rightimage/aws_access_key_id": {
       "required": "required",
@@ -443,8 +443,8 @@
         "rightimage::cloud_add_vmops",
         "rightimage::cloud_add_openstack"
       ],
-      "display_name": "aws_access_key_id",
-      "description": "aws_access_key_id"
+      "description": "aws_access_key_id",
+      "display_name": "aws_access_key_id"
     },
     "rightimage/download_rightlink": {
       "required": "required",
@@ -457,8 +457,8 @@
       "recipes": [
         "rightimage::rightscale_install"
       ],
-      "display_name": "Should RightLink be downloaded?",
-      "description": "Set to true to download RighLink form S3.  This recipe will fail if the expected version of RightLink is not in either of the dev or production buckets."
+      "description": "Set to true to download RighLink form S3.  This recipe will fail if the expected version of RightLink is not in either of the dev or production buckets.",
+      "display_name": "Should RightLink be downloaded?"
     },
     "rightimage/arch": {
       "required": "required",
@@ -471,8 +471,8 @@
       "recipes": [
 
       ],
-      "display_name": "Guest OS Architecture",
-      "description": "The architecture for the virtual image."
+      "description": "The architecture for the virtual image.",
+      "display_name": "Guest OS Architecture"
     },
     "rest_connection/api_url": {
       "required": "required",
@@ -484,8 +484,8 @@
       "recipes": [
 
       ],
-      "display_name": "API URL",
-      "description": "The rightscale account specific api url to use.  Ex. https://my.rightscale.com/api/acct/1234 (where 1234 is your account id)"
+      "description": "The rightscale account specific api url to use.  Ex. https://my.rightscale.com/api/acct/1234 (where 1234 is your account id)",
+      "display_name": "API URL"
     },
     "rightimage/openstack/hostname": {
       "required": "required",
@@ -497,8 +497,8 @@
       "recipes": [
         "rightimage::upload_openstack"
       ],
-      "display_name": "Openstack Hostname",
-      "description": "Hostname of Openstack Cloud Controller."
+      "description": "Hostname of Openstack Cloud Controller.",
+      "display_name": "Openstack Hostname"
     },
     "rightimage/file_to_upload": {
       "required": "required",
@@ -510,8 +510,8 @@
       "recipes": [
         "rightimage::upload_file_to_s3"
       ],
-      "display_name": "File To Upload",
-      "description": "The absolute pathname of the file to upload to S3."
+      "description": "The absolute pathname of the file to upload to S3.",
+      "display_name": "File To Upload"
     },
     "rightimage/image_upload_bucket": {
       "required": "required",
@@ -536,8 +536,8 @@
         "rightimage::upload_ec2_s3",
         "rightimage::upload_ec2_ebs"
       ],
-      "display_name": "Image Upload Bucket",
-      "description": "The bucket to upload the image to."
+      "description": "The bucket to upload the image to.",
+      "display_name": "Image Upload Bucket"
     },
     "rightimage/platform": {
       "required": "required",
@@ -552,8 +552,8 @@
       "recipes": [
 
       ],
-      "display_name": "Guest OS Platform",
-      "description": "The operating system for the virtual image."
+      "description": "The operating system for the virtual image.",
+      "display_name": "Guest OS Platform"
     },
     "rightimage/euca/user_id": {
       "required": "required",
@@ -565,8 +565,8 @@
       "recipes": [
         "rightimage::upload_euca"
       ],
-      "display_name": "Eucalyptus User ID",
-      "description": "The EC2_USER_ID value defined in your eucarc credentials file. User must have admin privileges."
+      "description": "The EC2_USER_ID value defined in your eucarc credentials file. User must have admin privileges.",
+      "display_name": "Eucalyptus User ID"
     },
     "rightimage/region": {
       "required": "required",
@@ -582,8 +582,8 @@
       "recipes": [
 
       ],
-      "display_name": "EC2 Region",
-      "description": "The EC2 region in which the image will reside"
+      "description": "The EC2 region in which the image will reside",
+      "display_name": "EC2 Region"
     },
     "rest_connection/user": {
       "required": "required",
@@ -595,8 +595,8 @@
       "recipes": [
 
       ],
-      "display_name": "API User",
-      "description": "RightScale API username. Ex. you@rightscale.com"
+      "description": "RightScale API username. Ex. you@rightscale.com",
+      "display_name": "API User"
     }
   },
   "license": "Apache v2.0",
@@ -615,13 +615,13 @@
     "rightimage::cloud_add_vmops": "adds requirements for cloudstack based on hypervisor choice",
     "rightimage::rightscale_install": "installs rightscale",
     "rightimage::base_sles": "coordinate a sles install",
-    "rightimage::cloud_add_raw": "migrates the create image to a raw file -- useful for new cloud development",
     "rightimage::cloud_add_openstack": "adds requirements for openstack based on hypervisor choice",
     "rightimage::cloud_add_euca": "migrates the created image to eucalyptus",
     "rightimage::cloud_add_ec2": "migrates the created image to ec2",
     "rightimage::default": "starts builds image automatically at boot. See 'manual_mode' input to enable.",
     "rightimage::upload_ec2_ebs": "create EBS image snapshot (ec2 only)",
     "rightimage::upload_ec2_s3": "bundle and upload s3 image (ec2 only)",
+    "rightimage::setup_loopback": "creates loopback file",
     "rightimage::bootstrap_sles": "bootstraps a basic sles image",
     "rightimage::bootstrap_ubuntu": "bootstraps a basic ubuntu image",
     "rightimage::base_ubuntu": "coordinate an ubuntu install",
