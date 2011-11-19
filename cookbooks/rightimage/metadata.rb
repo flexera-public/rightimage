@@ -5,6 +5,7 @@ version          "0.0.1"
 
 recipe "rightimage::default", "starts builds image automatically at boot. See 'manual_mode' input to enable." 
 recipe "rightimage::build_image", "build image based on host platform"
+recipe "rightimage::build_base", "build base image based on host platform"
 recipe "rightimage::clean", "cleans everything" 
 recipe "rightimage::base_ubuntu", "coordinate an ubuntu install" 
 recipe "rightimage::base_centos", "coordinate a centos install" 
