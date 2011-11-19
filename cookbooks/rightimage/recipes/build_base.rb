@@ -17,4 +17,6 @@
 # limitations under the License.
 #
 
+include_recipe "rightimage::setup_loopback"
 include_recipe "rightimage::bootstrap_#{node[:platform].downcase}"
+include_recipe "rightimage::do_destroy_loopback"

@@ -5,6 +5,8 @@ class Chef::Recipe
   include RightScale::RightImage::Helper
 end
 
+include_recipe "rightimage::do_destroy_loopback"
+
 bash "create loopback fs" do 
   flags "-ex"
   code <<-EOH
@@ -12,22 +14,10 @@ bash "create loopback fs" do
     BYTES_PER_MB=1024
     DISK_SIZE_MB=$(($DISK_SIZE_GB * $BYTES_PER_MB))
 
-    loop_name="loop0"
-    loop_dev="/dev/$loop_name"
-    loop_map="/dev/mapper/${loop_name}p1"
+    loop_dev="#{loop_dev}"
+    loop_map="#{loop_map}"
     source_image="#{source_image}" 
     target_raw_path="#{target_raw_path}"
-
-    umount -lf $source_image/dev || true
-    umount -lf $source_image/proc || true
-    umount -lf $source_image/sys || true
-    umount -lf $source_image || true
-
-    set +e
-    [ -e "$loop_map" ] && kpartx -d $loop_dev
-    losetup -a | grep $loop_dev
-    [ "$?" == "0" ] && losetup -d $loop_dev
-    set -e
 
     dd if=/dev/zero of=$target_raw_path bs=1M count=$DISK_SIZE_MB    
     losetup $loop_dev $target_raw_path
