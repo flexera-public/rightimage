@@ -23,12 +23,13 @@ bash "create loopback fs" do
     umount -lf $source_image/sys || true
     umount -lf $source_image || true
 
-    dd if=/dev/zero of=$target_raw_path bs=1M count=$DISK_SIZE_MB    
-
     set +e
+    [ -e "$loop_map" ] && kpartx -d $loop_dev
     losetup -a | grep $loop_dev
     [ "$?" == "0" ] && losetup -d $loop_dev
     set -e
+
+    dd if=/dev/zero of=$target_raw_path bs=1M count=$DISK_SIZE_MB    
     losetup $loop_dev $target_raw_path
 
     sfdisk $loop_dev << EOF
