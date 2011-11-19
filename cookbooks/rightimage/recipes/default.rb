@@ -18,5 +18,9 @@
 #
 
 unless node[:rightimage][:manual_mode] == "true"
-  include_recipe "rightimage::build_image"
+  if node[:rightimage][:install_mirror_date]
+    include_recipe "rightimage::build_image"
+  else
+    include_recipe "rightimage::build_base"
+  end
 end
