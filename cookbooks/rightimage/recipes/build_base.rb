@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: rightimage
-# Recipe:: default
+# Recipe:: build_base
 #
 # Copyright 2011, RightScale, Inc.
 #
@@ -17,10 +17,6 @@
 # limitations under the License.
 #
 
-unless node[:rightimage][:manual_mode] == "true"
-  if node[:rightimage][:install_mirror_date]
-    include_recipe "rightimage::build_image"
-  else
-    include_recipe "rightimage::build_base"
-  end
-end
+include_recipe "rightimage::setup_loopback"
+include_recipe "rightimage::bootstrap_#{node[:platform].downcase}"
+include_recipe "rightimage::do_destroy_loopback"

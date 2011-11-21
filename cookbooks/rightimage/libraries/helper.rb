@@ -80,13 +80,24 @@ EOF
       end
 
       def target_raw_root
-        node[:block_device][:mount_dir]        
+        "#{node[:block_device][:mount_dir]}"
       end
 
       def target_raw_path
         "#{target_raw_root}/#{target_type}.raw" 
       end
- 
+
+      def loop_name
+        "loop0"
+      end
+
+      def loop_dev
+        "/dev/#{loop_name}"
+      end 
+
+      def loop_map
+        "/dev/mapper/#{loop_name}p1"
+      end
     end
   end
 end

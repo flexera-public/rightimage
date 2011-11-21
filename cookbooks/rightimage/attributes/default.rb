@@ -18,8 +18,6 @@ if rightimage[:platform] == "ubuntu"
   set[:rightimage][:install_mirror] = "localhost:9999"
 end
 
-set_unless[:rightimage][:install_mirror_date] = "latest" 
-
 # set base os packages
 case rightimage[:platform]
 when "ubuntu"   
