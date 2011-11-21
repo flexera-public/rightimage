@@ -46,7 +46,6 @@ bash "install_rightlink" do
     install /tmp/rightimage  #{node[:rightimage][:mount_dir]}/etc/init.d/rightimage --mode=0755
 
     mkdir -p #{node[:rightimage][:mount_dir]}/root/.rightscale
-    [ -f #{node[:rightimage][:mount_dir]}/tmp/sandbox_builds/dist/* ] && cp #{node[:rightimage][:mount_dir]}/tmp/sandbox_builds/dist/* #{node[:rightimage][:mount_dir]}/root/.rightscale
     chmod 0770 #{node[:rightimage][:mount_dir]}/root/.rightscale
     chmod 0440 #{node[:rightimage][:mount_dir]}/root/.rightscale/*
 
