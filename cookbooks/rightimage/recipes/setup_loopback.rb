@@ -5,7 +5,9 @@ class Chef::Recipe
   include RightScale::RightImage::Helper
 end
 
-include_recipe "rightimage::do_destroy_loopback"
+rightimage "" do
+  action :destroy_loopback
+end
 
 bash "create loopback fs" do 
   flags "-ex"
