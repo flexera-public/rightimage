@@ -17,8 +17,13 @@ action :destroy_loopback do
       umount -lf $source_image || true      
 
       [ -e "$loop_map" ] && kpartx -d $loop_dev
+      set +e
       losetup -a | grep $loop_dev
-      [ "$?" == "0" ] && losetup -d $loop_dev
+      if [ "$?" == "0" ]; then
+        set -e
+        losetup -d $loop_dev
+      fi
+      set -e
     EOH
   end
 
