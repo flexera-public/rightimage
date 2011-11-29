@@ -379,6 +379,7 @@
         "rightimage::base_centos",
         "rightimage::default",
         "rightimage::build_image",
+        "rightimage::build_base",
         "rightimage::bootstrap_centos"
       ],
       "description": "Repository archive date from which to pull packages. Default: latest",

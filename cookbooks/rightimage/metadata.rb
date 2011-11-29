@@ -202,7 +202,7 @@ attribute "rightimage/install_mirror_date",
   :display_name => "Mirror Freeze Date",
   :description => "Repository archive date from which to pull packages. Default: latest",
   :required => "optional",
-  :recipes => [ "rightimage::base_centos" , "rightimage::default", "rightimage::build_image" , "rightimage::bootstrap_centos" ]
+  :recipes => [ "rightimage::base_centos" , "rightimage::default", "rightimage::build_image", "rightimage::build_base", "rightimage::bootstrap_centos" ]
 
 attribute "rightimage/virtual_environment",
   :display_name => "Hypervisor",
