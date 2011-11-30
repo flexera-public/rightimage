@@ -59,6 +59,10 @@ EOF
         require 'rest_connection'
       end
 
+      def os_string
+        "#{node[:rightimage][:platform]}_#{node[:rightimage][:release]}_#{node[:rightimage][:arch]}_#{node[:rightimage][:timestamp]}_#{node[:rightimage][:build]}"
+      end
+
       def source_image
         node[:rightimage][:mount_dir]
       end
@@ -68,7 +72,7 @@ EOF
       end
 
       def target_type
-        "#{node[:rightimage][:platform]}_#{node[:rightimage][:release]}_#{node[:rightimage][:arch]}_hd00"
+        "#{os_string}_hd00"
       end
 
       def base_root
