@@ -206,7 +206,8 @@
         "rightimage::default",
         "rightimage::build_image",
         "rightimage::cloud_add_vmops",
-        "rightimage::cloud_add_openstack"
+        "rightimage::cloud_add_openstack",
+        "rightimage::base_upload"
       ],
       "description": "aws_secret_access_key",
       "display_name": "aws_secret_access_key"
@@ -443,7 +444,8 @@
         "rightimage::default",
         "rightimage::build_image",
         "rightimage::cloud_add_vmops",
-        "rightimage::cloud_add_openstack"
+        "rightimage::cloud_add_openstack",
+        "rightimage::base_upload"
       ],
       "description": "aws_access_key_id",
       "display_name": "aws_access_key_id"

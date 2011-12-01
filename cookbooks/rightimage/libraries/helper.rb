@@ -87,8 +87,24 @@ EOF
         "#{node[:block_device][:mount_dir]}"
       end
 
+      def target_raw_file
+       "#{target_type}.raw"
+      end
+
       def target_raw_path
-        "#{target_raw_root}/#{target_type}.raw" 
+        "#{target_raw_root}/#{target_raw_file}" 
+      end
+
+      def target_raw_zip
+        "#{target_type}.tgz"
+      end
+
+      def target_raw_zip_path
+        "#{build_root}/#{target_raw_zip}"
+      end
+
+      def s3_path
+        "#{node[:rightimage][:platform]}/#{node[:rightimage][:release]}/#{node[:rightimage][:arch]}/#{node[:rightimage][:timestamp][0..3]}/#{target_raw_zip}"
       end
 
       def loop_name
