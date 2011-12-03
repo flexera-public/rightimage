@@ -279,6 +279,20 @@
       "description": "aws_account_number",
       "display_name": "aws_account_number"
     },
+    "rightimage/build_mode": {
+      "required": "required",
+      "calculated": false,
+      "choice": [
+        "base",
+        "full"
+      ],
+      "type": "string",
+      "recipes": [
+
+      ],
+      "description": "Build base or full image.",
+      "display_name": "Build Mode"
+    },
     "rightimage/euca/access_key_id": {
       "required": "required",
       "calculated": false,

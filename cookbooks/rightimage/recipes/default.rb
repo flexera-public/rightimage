@@ -18,10 +18,9 @@
 #
 
 unless node[:rightimage][:manual_mode] == "true"
-  if node[:rightimage][:install_mirror_date]
+  if node[:rightimage][:build_mode] == "full"
     include_recipe "rightimage::build_image"
   else
-    node[:rightimage][:install_mirror_date] = node[:rightimage][:timestamp]
     include_recipe "rightimage::build_base"
   end
 end

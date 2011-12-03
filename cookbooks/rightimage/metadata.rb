@@ -79,6 +79,12 @@ attribute "rightimage/manual_mode",
   :default => "true",
   :recipes => [ "rightimage::default" ]
 
+attribute "rightimage/build_mode",
+  :display_name => "Build Mode",
+  :description => "Build base or full image.",
+  :required => true,
+  :choice => [ "base", "full" ]
+
 attribute "rightimage/platform",
   :display_name => "Guest OS Platform",
   :description => "The operating system for the virtual image.",
@@ -258,5 +264,3 @@ attribute "rightimage/openstack/hostname",
   :description => "Hostname of Openstack Cloud Controller.",
   :required => "required",
   :recipes => [ "rightimage::upload_openstack" ]
-
-
