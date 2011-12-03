@@ -17,13 +17,6 @@
 # limitations under the License.
 #
 
-lineage_split = node[:block_device][:lineage].split("_")
-node[:rightimage][:platform] = lineage_split[0]
-node[:rightimage][:release] = lineage_split[1]
-node[:rightimage][:arch] = lineage_split[2]
-node[:rightimage][:timestamp] = lineage_split[3]
-node[:rightimage][:build] = lineage_split[4] if lineage_split[4]
-
 unless node[:rightimage][:manual_mode] == "true"
   if node[:rightimage][:install_mirror_date]
     include_recipe "rightimage::build_image"

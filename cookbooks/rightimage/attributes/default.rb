@@ -13,6 +13,14 @@ set_unless[:rightimage][:virtual_environment] = "xen"
 set[:rightimage][:install_mirror] = "mirror.rightscale.com"
 set_unless[:rightimage][:sandbox_repo_tag] = "rightlink_package_#{rightimage[:rightlink_version]}"
 
+lineage_split = node[:block_device][:lineage].split("_")
+set[:rightimage][:platform] = lineage_split[0]
+set[:rightimage][:release] = lineage_split[1]
+set[:rightimage][:arch] = lineage_split[2]
+set[:rightimage][:timestamp] = lineage_split[3]
+set[:rightimage][:build] = lineage_split[4] if lineage_split[4]
+set[:rightimage][:install_mirror_date] = node[:rightimage][:timestamp][0..7]
+
 if rightimage[:platform] == "ubuntu"
 # for using apt-proxy
   set[:rightimage][:install_mirror] = "localhost:9999"
