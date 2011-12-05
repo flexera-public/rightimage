@@ -16,7 +16,13 @@ set_unless[:rightimage][:sandbox_repo_tag] = "rightlink_package_#{rightimage[:ri
 lineage_split = node[:block_device][:lineage].split("_")
 set[:rightimage][:platform] = lineage_split[0]
 set[:rightimage][:release] = lineage_split[1]
-set[:rightimage][:arch] = lineage_split[2]
+
+if lineage_split[2] == "x64"
+  set[:rightimage][:arch] = "x86_64"
+else
+  set[:rightimage][:arch] = lineage_split[2]
+end
+
 set[:rightimage][:timestamp] = lineage_split[3]
 set[:rightimage][:build] = lineage_split[4] if lineage_split[4]
 set[:rightimage][:install_mirror_date] = node[:rightimage][:timestamp][0..7]
