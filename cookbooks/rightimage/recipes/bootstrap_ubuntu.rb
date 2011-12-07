@@ -145,7 +145,7 @@ case "#{node.rightimage.virtual_environment}" in
 esac
 
 
-loop_name="loop0"
+loop_name="loop1"
 loop_dev="/dev/$loop_name"
 loop_map="/dev/mapper/${loop_name}p1"
 
