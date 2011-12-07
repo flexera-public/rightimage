@@ -15,7 +15,17 @@ set_unless[:rightimage][:sandbox_repo_tag] = "rightlink_package_#{rightimage[:ri
 
 lineage_split = node[:block_device][:lineage].split("_")
 set[:rightimage][:platform] = lineage_split[0]
-set[:rightimage][:release] = lineage_split[1]
+
+if node[:rightimage][:platform] == "ubuntu"
+  case lineage_split[1]
+  when "10.04"
+    set[:rightimage][:release] = "lucid"
+  when "11.10"
+    set[:rightimage][:release] = "maverick"
+  else
+    raise "Unknown release"
+  end
+end 
 
 if lineage_split[2] == "x64"
   set[:rightimage][:arch] = "x86_64"
