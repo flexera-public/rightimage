@@ -9,6 +9,10 @@ rightimage "" do
   action :destroy_loopback
 end
 
+package "kpartx" do
+  action :install
+end if node[:rightimage][:platform] == "ubuntu"
+
 bash "create loopback fs" do 
   flags "-ex"
   code <<-EOH
