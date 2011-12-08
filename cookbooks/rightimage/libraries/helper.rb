@@ -31,6 +31,7 @@ module RightScale
           "us-west" => "3",
           "ap-southeast" => "4",
           "ap-northeast" => "5", 
+          "us-west-2" => "6",
           "cloudstack-xen" => "850"
         }
         id = nil
