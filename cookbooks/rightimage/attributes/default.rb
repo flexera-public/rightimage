@@ -25,7 +25,9 @@ if node[:rightimage][:platform] == "ubuntu"
   else
     raise "Unknown release"
   end
-end 
+end
+
+set[:rightimage][:release_number] = lineage_split[1]
 
 if lineage_split[2] == "x64"
   set[:rightimage][:arch] = "x86_64"
@@ -35,11 +37,11 @@ end
 
 set[:rightimage][:timestamp] = lineage_split[3]
 set[:rightimage][:build] = lineage_split[4] if lineage_split[4]
-set[:rightimage][:install_mirror_date] = node[:rightimage][:timestamp][0..7]
 
 if rightimage[:platform] == "ubuntu"
-# for using apt-proxy
-  set[:rightimage][:install_mirror] = "localhost:9999"
+  set[:rightimage][:install_mirror_date] = "#{node[:rightimage][:timestamp][0..3]}/#{node[:rightimage][:timestamp][4..5]}/#{node[:rightimage][:timestamp][6..7]}"
+else
+  set[:rightimage][:install_mirror_date] = node[:rightimage][:timestamp][0..7]
 end
 
 # set base os packages

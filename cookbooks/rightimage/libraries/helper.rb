@@ -60,7 +60,7 @@ EOF
       end
 
       def os_string
-        "#{node[:rightimage][:platform]}_#{node[:rightimage][:release]}_#{node[:rightimage][:arch]}_#{node[:rightimage][:timestamp]}_#{node[:rightimage][:build]}"
+        "#{node[:rightimage][:platform]}_#{node[:rightimage][:release_number]}_#{node[:rightimage][:arch]}_#{node[:rightimage][:timestamp]}_#{node[:rightimage][:build]}"
       end
 
       def source_image

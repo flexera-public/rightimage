@@ -46,13 +46,15 @@ if node[:lsb][:codename] == "maverick" || node[:lsb][:codename] == "lucid"
   end
 end
 
+mirror_url = "http://#{node[:rightimage][:install_mirror]}/ubuntu_daily/#{node[:rightimage][:install_mirror_date]}"
+
 # TODO: Need this to be hypervisor unspecific.  debootstrap?
 bootstrap_cmd = "/usr/bin/vmbuilder  #{node[:rightimage][:virtual_environment]} ubuntu -o \
     --suite=#{node[:rightimage][:release]} \
     -d #{node[:rightimage][:build_dir]} \
     --rootsize=2048 \
-    --install-mirror=http://mirror.rightscale.com/ubuntu \
-    --install-security-mirror=http://mirror.rightscale.com/ubuntu \
+    --install-mirror=#{mirror_url} \
+    --install-security-mirror=#{mirror_url} \
     --components=main,restricted,universe,multiverse \
     --lang=#{node[:rightimage][:lang]} --verbose "
 if node[:rightimage][:arch] == "i386"
