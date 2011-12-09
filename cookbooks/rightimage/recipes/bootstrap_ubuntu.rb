@@ -178,11 +178,11 @@ esac
     mkdir $random_dir
     mount -o loop $loopback_device  $random_dir
     umount $guest_root/proc || true
-    rm -rf $guest_root
-    mkdir -p $guest_root 
+    rm -rf $guest_root/*
     rsync -a $random_dir/ $guest_root/
     umount $random_dir
-    rm -rf  $random_dir
+    losetup -d $loopback_device
+    rm -rf $random_dir
     mkdir -p $guest_root/var/man
     chroot $guest_root chown -R man:root /var/man
 EOH
