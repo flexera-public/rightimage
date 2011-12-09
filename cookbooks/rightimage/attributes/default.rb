@@ -261,5 +261,14 @@ when "ec2"
       set[:rightimage][:aki_id] = "aki-ee5df7ef"
       set[:rightimage][:ramdisk_id] = nil
     end
+  when "us-west-2"
+    case rightimage[:arch]
+    when "i386" 
+      set[:rightimage][:aki_id] = "aki-c2e26ff2"
+      set[:rightimage][:ramdisk_id] = nil
+    when "x86_64"
+      set[:rightimage][:aki_id] = "aki-98e26fa8"
+      set[:rightimage][:ramdisk_id] = nil
+    end
   end
 end # case rightimage[:cloud]

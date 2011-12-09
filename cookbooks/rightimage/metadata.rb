@@ -102,7 +102,7 @@ attribute "rightimage/cloud",
 attribute "rightimage/region",
   :display_name => "EC2 Region",
   :description => "The EC2 region in which the image will reside",
-  :choice => [ "us-east", "us-west", "eu-west", "ap-southeast", "ap-northeast" ],
+  :choice => [ "us-east", "us-west", "us-west-2", "eu-west", "ap-southeast", "ap-northeast" ],
   :required => true
   
 attribute "rightimage/sandbox_repo_tag",
