@@ -46,15 +46,13 @@ if node[:lsb][:codename] == "maverick" || node[:lsb][:codename] == "lucid"
   end
 end
 
-mirror_url = "http://#{node[:rightimage][:install_mirror]}/ubuntu_daily/#{node[:rightimage][:install_mirror_date]}"
-
 # TODO: Need this to be hypervisor unspecific.  debootstrap?
 bootstrap_cmd = "/usr/bin/vmbuilder  #{node[:rightimage][:virtual_environment]} ubuntu -o \
     --suite=#{node[:rightimage][:release]} \
     -d #{node[:rightimage][:build_dir]} \
     --rootsize=2048 \
-    --install-mirror=#{mirror_url} \
-    --install-security-mirror=#{mirror_url} \
+    --install-mirror=#{node[:rightimage][:mirror_url]} \
+    --install-security-mirror=#{node[:rightimage][:mirror_url]} \
     --components=main,restricted,universe,multiverse \
     --lang=#{node[:rightimage][:lang]} --verbose "
 if node[:rightimage][:arch] == "i386"
@@ -191,6 +189,12 @@ EOH
   # TODO: Fix this
   not_if "test -e /mnt/vmbuilder/root.img"
 end
+
+#  - configure mirrors
+template "#{guest_root}/#{node[:rightimage][:mirror_file_path]}" do 
+  source node[:rightimage][:mirror_file] 
+  backup false
+end 
 
 bash "Restore original ext4 in /etc/mke2fs.conf" do
   code <<-EOH

@@ -40,6 +40,7 @@ set[:rightimage][:build] = lineage_split[4] if lineage_split[4]
 
 if rightimage[:platform] == "ubuntu"
   set[:rightimage][:install_mirror_date] = "#{node[:rightimage][:timestamp][0..3]}/#{node[:rightimage][:timestamp][4..5]}/#{node[:rightimage][:timestamp][6..7]}"
+  set[:rightimage][:mirror_url] = "#{node[:rightimage][:mirror]}/ubuntu_daily/#{node[:rightimage][:install_mirror_date]}"
 else
   set[:rightimage][:install_mirror_date] = node[:rightimage][:timestamp][0..7]
 end
