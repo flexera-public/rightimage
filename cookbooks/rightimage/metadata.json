@@ -654,6 +654,7 @@
     "rightimage::bootstrap_common": "common configuration for linux base images",
     "rightimage::base_centos": "coordinate a centos install",
     "rightimage::bootstrap_centos": "bootstraps a basic centos image",
+    "rightimage::base_upload": "compresses and uploads base image to s3",
     "rightimage::upload_vmops": "setup http server for download to test cloud",
     "rightimage::clean": "cleans everything"
   },

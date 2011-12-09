@@ -33,6 +33,7 @@ recipe "rightimage::upload_vmops", "setup http server for download to test cloud
 recipe "rightimage::upload_euca", "bundle and upload euca kernel, ramdisk and image"
 recipe "rightimage::upload_openstack", "bundle and upload openstack kernel, ramdisk and image"
 recipe "rightimage::upload_file_to_s3", "upload specified file to s3"
+recipe "rightimage::base_upload", "compresses and uploads base image to s3"
 
 # Add each cloud name to an array to use for common inputs on each cloud.
 cloud_add = []
