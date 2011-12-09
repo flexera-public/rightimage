@@ -10,7 +10,7 @@ set_unless[:rightimage][:root_size_gb] = "10"
 set[:rightimage][:build_dir] = "/mnt/vmbuilder"
 set[:rightimage][:mount_dir] = "/mnt/image"
 set_unless[:rightimage][:virtual_environment] = "xen"
-set[:rightimage][:install_mirror] = "mirror.rightscale.com"
+set[:rightimage][:mirror] = "cf-mirror.rightscale.com"
 set_unless[:rightimage][:sandbox_repo_tag] = "rightlink_package_#{rightimage[:rightlink_version]}"
 
 lineage_split = node[:block_device][:lineage].split("_")
@@ -39,10 +39,10 @@ set[:rightimage][:timestamp] = lineage_split[3]
 set[:rightimage][:build] = lineage_split[4] if lineage_split[4]
 
 if rightimage[:platform] == "ubuntu"
-  set[:rightimage][:install_mirror_date] = "#{node[:rightimage][:timestamp][0..3]}/#{node[:rightimage][:timestamp][4..5]}/#{node[:rightimage][:timestamp][6..7]}"
-  set[:rightimage][:mirror_url] = "#{node[:rightimage][:mirror]}/ubuntu_daily/#{node[:rightimage][:install_mirror_date]}"
+  set[:rightimage][:mirror_date] = "#{node[:rightimage][:timestamp][0..3]}/#{node[:rightimage][:timestamp][4..5]}/#{node[:rightimage][:timestamp][6..7]}"
+  set[:rightimage][:mirror_url] = "http://#{node[:rightimage][:mirror]}/ubuntu_daily/#{node[:rightimage][:mirror_date]}"
 else
-  set[:rightimage][:install_mirror_date] = node[:rightimage][:timestamp][0..7]
+  set[:rightimage][:mirror_date] = node[:rightimage][:timestamp][0..7]
 end
 
 # set base os packages
@@ -175,25 +175,19 @@ case rightimage[:platform]
 
 end
 
-# set default mirrors and EC2 endpoint
+# set default EC2 endpoint
 case rightimage[:region]
   when "us-east"
-    set[:rightimage][:mirror] = "http://ec2-us-east-mirror.rightscale.com"
     set[:rightimage][:ec2_endpoint] = "https://ec2.us-east-1.amazonaws.com"
   when "us-west"
-    set[:rightimage][:mirror] = "http://ec2-us-west-mirror.rightscale.com"
     set[:rightimage][:ec2_endpoint] = "https://ec2.us-west-1.amazonaws.com"
   when "eu-west"
-    set[:rightimage][:mirror] = "http://ec2-eu-west-mirror.rightscale.com"
     set[:rightimage][:ec2_endpoint] = "https://ec2.eu-west-1.amazonaws.com"
   when "ap-southeast"
-    set[:rightimage][:mirror] = "http://ec2-ap-southeast-mirror.rightscale.com"
     set[:rightimage][:ec2_endpoint] = "https://ec2.ap-southeast-1.amazonaws.com"
   when "ap-northeast"
-    set[:rightimage][:mirror] = "http://ec2-ap-northeast-mirror.rightscale.com"
     set[:rightimage][:ec2_endpoint] = "https://ec2.ap-northeast-1.amazonaws.com"
   else
-    set[:rightimage][:mirror] = "http://mirror.rightscale.com"
     set[:rightimage][:ec2_endpoint] = "https://ec2.us-east-1.amazonaws.com"
 end #if rightimage[:cloud] == "ec2" 
 

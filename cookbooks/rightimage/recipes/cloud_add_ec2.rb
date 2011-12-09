@@ -134,12 +134,6 @@ bash "do_depmod" do
   EOH
 end if node[:rightimage][:platform] == "centos"
 
-#  - configure mirrors
-template "#{guest_root}/#{node[:rightimage][:mirror_file_path]}" do 
-  source node[:rightimage][:mirror_file] 
-  backup false
-end unless node[:rightimage][:platform] == "centos"
-
 bash "unmount proc & dev" do 
   code <<-EOH
     set -e 
