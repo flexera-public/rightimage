@@ -30,8 +30,6 @@ ruby setup.rb
 if [ "#{node[:rightimage][:platform]}" == "ubuntu" ]; then
   ln -sf /usr/bin/gem1.8 /usr/bin/gem
 fi
-gem source -a #{node[:rightimage][:mirror]}/rubygems/archive/latest/
-gem source -r http://mirror.rightscale.com
 
 gem install xml-simple net-ssh net-sftp  --no-ri --no-rdoc
 gem install rake $rake_ver --no-ri --no-rdoc

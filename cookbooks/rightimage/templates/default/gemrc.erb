@@ -5,4 +5,4 @@
 :backtrace: false
 :bulk_threshold: 1000
 :sources:
-- http://mirror.rightscale.com
+- http://<%= node[:rightimage][:mirror] %>/archive/<%= node[:rightimage][:timestamp][0..7] %>/
