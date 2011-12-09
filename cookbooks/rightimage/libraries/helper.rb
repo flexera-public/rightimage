@@ -36,7 +36,7 @@ module RightScale
         }
         id = nil
         cloud_names.each do |cloud_name, cloud_id|
-          id = cloud_id if node[:rightimage][:region].include?(cloud_name)
+          id = cloud_id if node[:rightimage][:region] == (cloud_name)
         end
         id
       end
