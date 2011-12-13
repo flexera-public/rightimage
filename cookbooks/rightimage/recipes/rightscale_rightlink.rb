@@ -1,17 +1,11 @@
 rightlink_file="rightscale_#{node[:rightimage][:rightlink_version]}-#{node[:rightimage][:platform]}_#{node[:rightimage][:release_number]}-" + ((node[:rightimage][:platform] == "ubuntu") && (node[:rightimage][:arch] == "x86_64") ? "amd64" : node[:rightimage][:arch]) + "." + (node[:rightimage][:platform] == "centos" ? "rpm" : "deb")
 
-def get_last_release
-  # lets just hard code this for now, fix it later
-  # http://s3.amazonaws.com/rightscale_rightlink_dev/5.7.17/centos/2011-11-17-0900/rightscale_5.7.17-ubuntu_10.04-i386.deb
-  "5.7.17/#{node[:rightimage][:platform]}/2011-11-17-0900/#{rightlink_file}"
-end
-
 bash "download_rightlink" do
   code <<-EOC
     set -x
-    s3_file="#{get_last_release}
+    s3_file="#{node[:rightimage][:rightlink_version]}/#{node[:rightimage][:platform]}/#{rightlink_file}"
     
-    buckets=( rightscale_rightlink_dev )
+    buckets=( rightscale_rightlink rightscale_rightlink_dev )
     locations=( #{rightlink_file} )
     
     for bucket in ${buckets[@]}
@@ -38,15 +32,15 @@ execute "insert_rightlink_version" do
   command  "echo -n " + node[:rightimage][:rightlink_version] + " > " + node[:rightimage][:mount_dir] + "/etc/rightscale.d/rightscale-release"
 end
 
-remote_file "/tmp/rightimage" do
+cookbook_file "#{node[:rightimage][:mount_dir]}/etc/init.d/rightimage" do
   source "rightimage"
+  mode "0755"
 end
 
 bash "install_rightlink" do 
   code <<-EOC
     set -ex
     rm -rf #{node[:rightimage][:mount_dir]}/opt/rightscale/
-    install /tmp/rightimage  #{node[:rightimage][:mount_dir]}/etc/init.d/rightimage --mode=0755
 
     mkdir -p #{node[:rightimage][:mount_dir]}/root/.rightscale
     chmod 0770 #{node[:rightimage][:mount_dir]}/root/.rightscale
