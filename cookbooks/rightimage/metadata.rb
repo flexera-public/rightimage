@@ -34,6 +34,7 @@ recipe "rightimage::upload_euca", "bundle and upload euca kernel, ramdisk and im
 recipe "rightimage::upload_openstack", "bundle and upload openstack kernel, ramdisk and image"
 recipe "rightimage::upload_file_to_s3", "upload specified file to s3"
 recipe "rightimage::base_upload", "compresses and uploads base image to s3"
+recipe "rightimage::setup_or_restore", "setup block device (on base mode) or restore volume (on full mode)"
 
 # Add each cloud name to an array to use for common inputs on each cloud.
 cloud_add = []
