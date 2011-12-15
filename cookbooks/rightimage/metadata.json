@@ -628,6 +628,7 @@
   "recommendations": {
   },
   "recipes": {
+    "rightimage::setup_block_device": "Creates, formats and mounts a brand new block_device volume stripe on the instance.",
     "rightimage::upload_file_to_s3": "upload specified file to s3",
     "rightimage::upload_openstack": "bundle and upload openstack kernel, ramdisk and image",
     "rightimage::cloud_add_vmops": "adds requirements for cloudstack based on hypervisor choice",
@@ -651,9 +652,11 @@
     "rightimage::upload_euca": "bundle and upload euca kernel, ramdisk and image",
     "rightimage::install_vhd-util": "install the vhd-util tool",
     "rightimage::build_image": "build image based on host platform",
+    "rightimage::do_restore": "Restores image snapshot.",
     "rightimage::do_tag_images": "adds rightscale tags to images",
     "rightimage::bootstrap_common": "common configuration for linux base images",
     "rightimage::base_centos": "coordinate a centos install",
+    "rightimage::do_force_reset": "Unmounts and deletes the attached block_device and volumes that were attached to the instance for this lineage.",
     "rightimage::bootstrap_centos": "bootstraps a basic centos image",
     "rightimage::base_upload": "compresses and uploads base image to s3",
     "rightimage::upload_vmops": "setup http server for download to test cloud",

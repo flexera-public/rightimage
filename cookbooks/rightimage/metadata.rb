@@ -35,6 +35,9 @@ recipe "rightimage::upload_openstack", "bundle and upload openstack kernel, ramd
 recipe "rightimage::upload_file_to_s3", "upload specified file to s3"
 recipe "rightimage::base_upload", "compresses and uploads base image to s3"
 recipe "rightimage::setup_or_restore", "setup block device (on base mode) or restore volume (on full mode)"
+recipe "rightimage::setup_block_device", "Creates, formats and mounts a brand new block_device volume stripe on the instance."
+recipe "rightimage::do_restore", "Restores image snapshot."
+recipe "rightimage::do_force_reset", "Unmounts and deletes the attached block_device and volumes that were attached to the instance for this lineage."
 
 # Add each cloud name to an array to use for common inputs on each cloud.
 cloud_add = []
