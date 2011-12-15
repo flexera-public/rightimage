@@ -80,7 +80,7 @@
       "display_name": "Starting Image Id"
     },
     "rightimage/release": {
-      "required": "required",
+      "required": "optional",
       "calculated": false,
       "choice": [
         "5.4",
@@ -479,7 +479,7 @@
       "display_name": "Should RightLink be downloaded?"
     },
     "rightimage/arch": {
-      "required": "required",
+      "required": "optional",
       "calculated": false,
       "choice": [
         "i386",
@@ -558,7 +558,7 @@
       "display_name": "Image Upload Bucket"
     },
     "rightimage/platform": {
-      "required": "required",
+      "required": "optional",
       "calculated": false,
       "choice": [
         "centos",

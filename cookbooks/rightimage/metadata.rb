@@ -90,20 +90,17 @@ attribute "rightimage/build_mode",
 attribute "rightimage/platform",
   :display_name => "Guest OS Platform",
   :description => "The operating system for the virtual image.",
-  :choice => [ "centos", "ubuntu", "suse", "rhel" ],
-  :required => true
+  :choice => [ "centos", "ubuntu", "suse", "rhel" ]
   
 attribute "rightimage/release",
   :display_name => "Guest OS Release",
   :description => "The OS release/version to build into the virtual image.",
-  :choice => [ "5.4", "5.6", "lucid", "maverick" ],
-  :required => true
+  :choice => [ "5.4", "5.6", "lucid", "maverick" ]
   
 attribute "rightimage/arch",
   :display_name => "Guest OS Architecture",
   :description => "The architecture for the virtual image.",
-  :choice => [ "i386", "x86_64" ],
-  :required => true
+  :choice => [ "i386", "x86_64" ]
   
 attribute "rightimage/cloud",
   :display_name => "Target Cloud",
