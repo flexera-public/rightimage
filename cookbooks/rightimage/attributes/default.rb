@@ -170,6 +170,9 @@ case rightimage[:region]
   when "ap-northeast"
     set[:rightimage][:mirror] = "http://ec2-ap-northeast-mirror.rightscale.com"
     set[:rightimage][:ec2_endpoint] = "https://ec2.ap-northeast-1.amazonaws.com"
+  when "sa-east"
+    set[:rightimage][:mirror] = "http://mirror.rightscale.com"
+    set[:rightimage][:ec2_endpoint] = "https://ec2.sa-east-1.amazonaws.com"
   else
     set[:rightimage][:mirror] = "http://mirror.rightscale.com"
     set[:rightimage][:ec2_endpoint] = "https://ec2.us-east-1.amazonaws.com"
@@ -268,6 +271,15 @@ when "ec2"
       set[:rightimage][:ramdisk_id] = nil
     when "x86_64"
       set[:rightimage][:aki_id] = "aki-98e26fa8"
+      set[:rightimage][:ramdisk_id] = nil
+    end
+  when "sa-east"
+    case rightimage[:arch]
+    when "i386" 
+      set[:rightimage][:aki_id] = "aki-bc3ce3a1"
+      set[:rightimage][:ramdisk_id] = nil
+    when "x86_64"
+      set[:rightimage][:aki_id] = "aki-cc3ce3d1"
       set[:rightimage][:ramdisk_id] = nil
     end
   end

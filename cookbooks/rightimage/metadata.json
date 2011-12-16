@@ -577,7 +577,8 @@
         "us-west-2",
         "eu-west",
         "ap-southeast",
-        "ap-northeast"
+        "ap-northeast",
+        "sa-east"
       ],
       "type": "string",
       "recipes": [
