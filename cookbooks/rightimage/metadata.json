@@ -650,6 +650,7 @@
     "rightimage::build_base": "build base image based on host platform",
     "rightimage::cloud_add_ec2": "migrates the created image to ec2",
     "rightimage::default": "starts builds image automatically at boot. See 'manual_mode' input to enable.",
+    "rightimage::do_backup": "Backup image snapshot.",
     "rightimage::upload_ec2_ebs": "create EBS image snapshot (ec2 only)",
     "rightimage::upload_ec2_s3": "bundle and upload s3 image (ec2 only)",
     "rightimage::setup_loopback": "creates loopback file",

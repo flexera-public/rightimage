@@ -20,5 +20,5 @@
 include_recipe "rightimage::setup_loopback"
 include_recipe "rightimage::bootstrap_#{node[:platform].downcase}"
 include_recipe "rightimage::do_destroy_loopback"
-include_recipe "block_device::do_backup"
+include_recipe "rightimage::do_backup"
 include_recipe "rightimage::base_upload"
