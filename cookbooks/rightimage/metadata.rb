@@ -206,11 +206,16 @@ attribute "rightimage/debug",
   :required => "optional",
   :recipes => [ "rightimage::base_centos" , "rightimage::base_sles" , "rightimage::base_ubuntu", "rightimage::base_rhel" , "rightimage::default", "rightimage::build_image" , "rightimage::bootstrap_centos" , "rightimage::bootstrap_sles" , "rightimage::bootstrap_ubuntu"] + cloud_add + cloud_upload
 
-attribute "rightimage/install_mirror_date",
-  :display_name => "Mirror Freeze Date",
-  :description => "Repository archive date from which to pull packages. Default: latest",
-  :required => "optional",
-  :recipes => [ "rightimage::base_centos" , "rightimage::default", "rightimage::build_image", "rightimage::build_base", "rightimage::bootstrap_centos" ]
+attribute "rightimage/timestamp",
+  :display_name => "Build timestamp and mirror freeze date",
+  :description => "Initial build date of this image.  Also doubles as the archive date from which to pull packages. Expected format is YYYYMMDDHHMM",
+  :required => "optional"
+
+attribute "rightimage/build_number",
+  :display_name => "Build number",
+  :description => "Build number of this image.  Defaults to 0",
+  :default => "0",
+  :required => "optional"
 
 attribute "rightimage/virtual_environment",
   :display_name => "Hypervisor",

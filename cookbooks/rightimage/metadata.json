@@ -44,6 +44,20 @@
       "description": "The contents of the file pointed to by the EC2_CERT value defined in your eucarc credentials file.",
       "display_name": "Eucalyptus x509 Certificate"
     },
+    "rightimage/build_number": {
+      "required": "optional",
+      "calculated": false,
+      "choice": [
+
+      ],
+      "default": "0",
+      "type": "string",
+      "recipes": [
+
+      ],
+      "description": "Build number of this image.  Defaults to 0",
+      "display_name": "Build number"
+    },
     "rightimage/aws_509_cert": {
       "required": "required",
       "calculated": false,
@@ -383,23 +397,6 @@
       "description": "The EC2_SECRET_KEY value defined in your eucarc credentials file. User must have admin privileges.",
       "display_name": "Eucalyptus Secret Access Key"
     },
-    "rightimage/install_mirror_date": {
-      "required": "optional",
-      "calculated": false,
-      "choice": [
-
-      ],
-      "type": "string",
-      "recipes": [
-        "rightimage::base_centos",
-        "rightimage::default",
-        "rightimage::build_image",
-        "rightimage::build_base",
-        "rightimage::bootstrap_centos"
-      ],
-      "description": "Repository archive date from which to pull packages. Default: latest",
-      "display_name": "Mirror Freeze Date"
-    },
     "rightimage/aws_access_key_id_for_upload": {
       "required": "required",
       "calculated": false,
@@ -437,6 +434,19 @@
       ],
       "description": "Base URL to your Eucalyptus Cloud Controller. Don't include port. (Ex. http://<server_ip>)",
       "display_name": "Eucalyptus URL"
+    },
+    "rightimage/timestamp": {
+      "required": "optional",
+      "calculated": false,
+      "choice": [
+
+      ],
+      "type": "string",
+      "recipes": [
+
+      ],
+      "description": "Initial build date of this image.  Also doubles as the archive date from which to pull packages. Expected format is YYYYMMDDHHMM",
+      "display_name": "Build timestamp and mirror freeze date"
     },
     "rightimage/aws_access_key_id": {
       "required": "required",
