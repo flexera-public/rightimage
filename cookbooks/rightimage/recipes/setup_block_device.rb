@@ -7,6 +7,6 @@ block_device target_raw_root do
   cloud "ec2"
   volume_size "21"
   stripe_count "1"
-  lineage lineage
+  lineage ri_lineage
   action :create
 end
