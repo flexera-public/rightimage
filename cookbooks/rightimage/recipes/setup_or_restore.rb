@@ -16,12 +16,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+class Chef::Recipe
+  include RightScale::RightImage::Helper
+end
 
-# TODO: Have to hard-code for now because block_device inputs aren't available.
-unless File.exists?("/mnt/storage")
+unless `mount`.grep(/#{target_raw_root}/).any?
   if node[:rightimage][:build_mode] == "full"
-    include_recipe "block_device::do_restore"
+    include_recipe "rightimage::do_restore"
   else
-    include_recipe "block_device::setup_block_device"
+    include_recipe "rightimage::setup_block_device"
   end
 end
