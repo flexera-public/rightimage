@@ -112,7 +112,11 @@ EOF
       end
 
       def build_number
-        node[:rightimage][:build_number]
+        if node[:rightimage][:build_number] =~ /./
+          node[:rightimage][:build_number]
+        else
+          "0"
+        end
       end
 
       def os_string
