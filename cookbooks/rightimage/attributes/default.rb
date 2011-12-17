@@ -1,7 +1,9 @@
 ## when pasting a key into a json file, make sure to use the following command: 
 ## sed -e :a -e '$!N;s/\n/\\n/;ta' /path/to/key
 ## this seems not to work on os x
-
+class Chef::Node
+ include RightScale::RightImage::Helper
+end
 UNKNOWN = :unknown.to_s
 
 set_unless[:rightimage][:debug] = false
@@ -13,36 +15,20 @@ set_unless[:rightimage][:virtual_environment] = "xen"
 set[:rightimage][:mirror] = "cf-mirror.rightscale.com"
 set_unless[:rightimage][:sandbox_repo_tag] = "rightlink_package_#{rightimage[:rightlink_version]}"
 
-lineage_split = node[:block_device][:lineage].split("_")
-set[:rightimage][:platform] = lineage_split[0]
 
-if node[:rightimage][:platform] == "ubuntu"
-  case lineage_split[1]
-  when "10.04"
-    set[:rightimage][:release] = "lucid"
-  when "11.10"
-    set[:rightimage][:release] = "maverick"
-  else
-    raise "Unknown release"
-  end
-end
+#set[:rightimage][:platform] = platform
+#set[:rightimage][:release_number] = release_number
+#set[:rightimage][:release] = release
+#set[:rightimage][:arch] = arch
 
-set[:rightimage][:release_number] = lineage_split[1]
-
-if lineage_split[2] == "x64"
-  set[:rightimage][:arch] = "x86_64"
-else
-  set[:rightimage][:arch] = lineage_split[2]
-end
-
-set[:rightimage][:timestamp] = lineage_split[3]
-set[:rightimage][:build] = lineage_split[4] if lineage_split[4]
+#set[:rightimage][:timestamp] = timestamp
+#set[:rightimage][:build] = build_number
 
 if rightimage[:platform] == "ubuntu"
-  set[:rightimage][:mirror_date] = "#{node[:rightimage][:timestamp][0..3]}/#{node[:rightimage][:timestamp][4..5]}/#{node[:rightimage][:timestamp][6..7]}"
-  set[:rightimage][:mirror_url] = "http://#{node[:rightimage][:mirror]}/ubuntu_daily/#{node[:rightimage][:mirror_date]}"
+  set[:rightimage][:mirror_date] = "#{timestamp[0..3]}/#{timestamp[4..5]}/#{timestamp[6..7]}"
+  set[:rightimage][:mirror_url] = "http://#{node[:rightimage][:mirror]}/ubuntu_daily/#{[:rightimage][:mirror_date]}"
 else
-  set[:rightimage][:mirror_date] = node[:rightimage][:timestamp][0..7]
+  set[:rightimage][:mirror_date] = timestamp[0..7]
 end
 
 # set base os packages
@@ -192,22 +178,8 @@ case rightimage[:region]
 end #if rightimage[:cloud] == "ec2" 
 
 # if ubuntu then figure out the numbered name
-case rightimage[:release]
-  when "hardy" 
-    set[:rightimage][:release_number] = "8.04"
-  when "intrepid" 
-    set[:rightimage][:release_number] = "8.10"
-  when "jaunty" 
-    set[:rightimage][:release_number] = "9.04"
-  when "karmic" 
-    set[:rightimage][:release_number] = "9.10"
-  when "lucid" 
-    set[:rightimage][:release_number] = "10.04"
-  when "maverick" 
-    set[:rightimage][:release_number] = "10.10" 
-  else 
-    set[:rightimage][:release_number] = rightimage[:release]
-end
+set[:rightimage][:release_number] = release_number
+
 
 # Select kernel to use based on cloud
 #case rightimage[:cloud]

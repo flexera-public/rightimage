@@ -59,8 +59,64 @@ EOF
         require 'rest_connection'
       end
 
+      def ri_lineage
+        [platform,release,arch,timestamp,build_number].join("_")
+
+      end
+
+      def platform
+        node[:rightimage][:platform]
+      end
+
+      def release_number
+        if platform == "ubuntu"
+          case release
+          when "hardy" 
+            "8.04"
+          when "intrepid" 
+            "8.10"
+          when "jaunty" 
+            "9.04"
+          when "karmic" 
+            "9.10"
+          when "lucid" 
+            "10.04"
+          when "maverick" 
+            "10.10" 
+          else 
+            raise "Unknown release"
+          end
+        else 
+          release
+        end
+      end
+
+      def release
+        node[:rightimage][:release]
+      end
+
+      def arch
+        if node[:rightimage][:arch] == "x64"
+          "x86_64"
+        else
+          node[:rightimage][:arch]
+        end
+      end
+
+      def timestamp
+        node[:rightimage][:timestamp]
+      end
+
+      def install_mirror_date
+        timestamp[0..7]
+      end
+
+      def build_number
+        node[:rightimage][:build_number]
+      end
+
       def os_string
-        "#{node[:rightimage][:platform]}_#{node[:rightimage][:release_number]}_#{node[:rightimage][:arch]}_#{node[:rightimage][:timestamp]}_#{node[:rightimage][:build]}"
+        platform + "_" + release_number + "_" + arch + "_" + timestamp + "_" + build_number
       end
 
       def source_image
@@ -84,7 +140,7 @@ EOF
       end
 
       def target_raw_root
-        "#{node[:block_device][:mount_dir]}"
+        "/mnt/storage"
       end
 
       def target_raw_file
@@ -104,7 +160,7 @@ EOF
       end
 
       def s3_path
-        "#{node[:rightimage][:platform]}/#{node[:rightimage][:release]}/#{node[:rightimage][:arch]}/#{node[:rightimage][:timestamp][0..3]}/#{target_raw_zip}"
+        platform + "/" + release + "/" + arch + "/" + timestamp[0..3] + "/" + target_raw_zip 
       end
 
       def loop_name
@@ -121,4 +177,3 @@ EOF
     end
   end
 end
-

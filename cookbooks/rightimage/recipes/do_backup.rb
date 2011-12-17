@@ -1,3 +1,7 @@
+class Chef::Recipe
+  include RightScale::RightImage::Helper
+end
+
 class Chef::Resource::BlockDevice
   include RightScale::RightImage::Helper
 end
