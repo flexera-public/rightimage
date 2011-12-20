@@ -60,7 +60,7 @@ EOF
       end
 
       def ri_lineage
-        [platform,release,arch,timestamp,build_number].join("_")
+        [platform,release_number,arch,timestamp,build_number].join("_")
 
       end
 
@@ -164,7 +164,7 @@ EOF
       end
 
       def s3_path
-        platform + "/" + release + "/" + arch + "/" + timestamp[0..3] + "/" + target_raw_zip 
+        platform + "/" + release_number + "/" + arch + "/" + timestamp[0..3] + "/" + target_raw_zip 
       end
 
       def loop_name
