@@ -31,11 +31,13 @@ module RightScale
           "us-west" => "3",
           "ap-southeast" => "4",
           "ap-northeast" => "5", 
+          "us-west-2" => "6",
+          "sa-east" => "7",
           "cloudstack-xen" => "850"
         }
         id = nil
         cloud_names.each do |cloud_name, cloud_id|
-          id = cloud_id if node[:rightimage][:region].include?(cloud_name)
+          id = cloud_id if node[:rightimage][:region] == (cloud_name)
         end
         id
       end
