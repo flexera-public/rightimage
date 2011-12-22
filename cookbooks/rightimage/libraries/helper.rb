@@ -133,8 +133,27 @@ EOF
         "/mnt"
       end
 
+      def partitioned?
+        case node[:rightimage][:cloud]
+        when "ec2", "euca"
+          return FALSE
+        when "vmops"
+          case node[:rightimage][:virtual_environment]
+          when "xen"
+            return TRUE
+          else
+            return FALSE
+          end
+        else
+          return TRUE
+        end
+      end
+
       def target_type
-        "#{os_string}_hd00"
+        ret = "#{os_string}_hd0"
+        ret << "0" if node[:rightimage][:build_mode] == "full" && partitioned?
+
+        ret
       end
 
       def base_root

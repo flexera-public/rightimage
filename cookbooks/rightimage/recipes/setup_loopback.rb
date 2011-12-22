@@ -23,7 +23,7 @@ bash "create loopback fs" do
     loop_dev="#{loop_dev}"
     loop_map="#{loop_map}"
     source_image="#{source_image}" 
-    target_raw_path="#{target_raw_path}"
+    target_raw_path="#{target_raw_root}/#{target_type}0.raw"
 
     dd if=/dev/zero of=$target_raw_path bs=1M count=$DISK_SIZE_MB    
     losetup $loop_dev $target_raw_path

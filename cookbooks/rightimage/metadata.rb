@@ -39,6 +39,7 @@ recipe "rightimage::setup_block_device", "Creates, formats and mounts a brand ne
 recipe "rightimage::do_backup", "Backup image snapshot."
 recipe "rightimage::do_restore", "Restores image snapshot."
 recipe "rightimage::do_force_reset", "Unmounts and deletes the attached block_device and volumes that were attached to the instance for this lineage."
+recipe "rightimage::copy_image","Creates non-partitioned image."
 
 # Add each cloud name to an array to use for common inputs on each cloud.
 cloud_add = []
