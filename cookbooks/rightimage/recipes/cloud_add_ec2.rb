@@ -71,7 +71,7 @@ template "#{guest_root}/boot/grub/menu.lst" do
   source "menu.lst.erb"
 end
 
-include_recipe "rightimage::bootstrap_common"
+include_recipe "rightimage::bootstrap_common_debug"
 
 #  - add get_ssh_key script
 template "#{guest_root}/etc/init.d/getsshkey" do 

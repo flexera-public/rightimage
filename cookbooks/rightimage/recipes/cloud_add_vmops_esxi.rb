@@ -152,7 +152,7 @@ EOF
   EOH
 end
 
-include_recipe "rightimage::bootstrap_common"
+include_recipe "rightimage::bootstrap_common_debug"
 
 bash "install vmware tools" do 
   code <<-EOH

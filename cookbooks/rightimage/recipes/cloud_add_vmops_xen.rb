@@ -80,7 +80,7 @@ template "#{guest_root}/boot/grub/grub.conf" do
   backup false 
 end
 
-include_recipe "rightimage::bootstrap_common"
+include_recipe "rightimage::bootstrap_common_debug"
 
 bash "configure for cloudstack" do 
   code <<-EOH

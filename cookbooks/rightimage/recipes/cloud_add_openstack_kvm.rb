@@ -134,7 +134,7 @@ EOF
   EOH
 end
 
-include_recipe "rightimage::bootstrap_common"
+include_recipe "rightimage::bootstrap_common_debug"
 
 bash "configure for openstack" do
   code <<-EOH

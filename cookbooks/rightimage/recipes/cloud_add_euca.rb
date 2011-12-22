@@ -110,7 +110,7 @@ rightimage_kernel "Install PV Kernel for Hypervisor" do
   action :install
 end
 
-include_recipe "rightimage::bootstrap_common"
+include_recipe "rightimage::bootstrap_common_debug"
 
 package "euca2ools" do
   only_if { node[:rightimage][:platform] == "ubuntu" }

@@ -143,7 +143,7 @@ EOF
   EOH
 end
 
-include_recipe "rightimage::bootstrap_common"
+include_recipe "rightimage::bootstrap_common_debug"
 
 bash "configure for cloudstack" do 
   code <<-EOH
