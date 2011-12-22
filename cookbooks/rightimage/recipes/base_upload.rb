@@ -8,15 +8,19 @@ bash "sanity check" do
     code=$(curl -o /dev/null --head --connect-timeout 10 --fail --silent --write-out %{http_code} http://rightscale-rightimage-base-dev.s3.amazonaws.com/#{s3_path})
     ret=$?
 
-    if [ "$code" == "200" ]; then
+    case "$code" in
+    "200")
       echo "File already exists"
       exit 1
-    elif [ "$code" == "404" ]; then
+      ;;
+    "403"|"404")
       exit 0
-    else
+      ;;
+    *)
       echo "Curl returned: $ret; HTTP error code: $code"
       exit $ret
-    fi
+      ;;
+    esac
   EOH
 end
 
