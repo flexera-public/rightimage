@@ -6,11 +6,6 @@ directory node[:rightimage][:build_dir] do
   recursive true
 end
 
-directory node[:rightimage][:mount_dir] do 
-  action :delete
-  recursive true
-end
-
 ruby_block "delete image id list" do
   block do
     # add to global id store for use by other recipes
@@ -18,4 +13,3 @@ ruby_block "delete image id list" do
     id_list.clear
   end
 end
-

@@ -1,8 +1,9 @@
 rightlink_file="rightscale_#{node[:rightimage][:rightlink_version]}-#{node[:rightimage][:platform]}_#{node[:rightimage][:release_number]}-" + ((node[:rightimage][:platform] == "ubuntu") && (node[:rightimage][:arch] == "x86_64") ? "amd64" : node[:rightimage][:arch]) + "." + (node[:rightimage][:platform] == "centos" ? "rpm" : "deb")
 
 bash "download_rightlink" do
+  flags "-x"
   code <<-EOC
-    set -x
+    mkdir -p #{node[:rightimage][:mount_dir]}/root/.rightscale
     s3_file="#{node[:rightimage][:rightlink_version]}/#{node[:rightimage][:platform]}/#{rightlink_file}"
     
     buckets=( rightscale_rightlink rightscale_rightlink_dev )
@@ -38,11 +39,10 @@ cookbook_file "#{node[:rightimage][:mount_dir]}/etc/init.d/rightimage" do
 end
 
 bash "install_rightlink" do 
+  flags "-ex"
   code <<-EOC
-    set -ex
     rm -rf #{node[:rightimage][:mount_dir]}/opt/rightscale/
 
-    mkdir -p #{node[:rightimage][:mount_dir]}/root/.rightscale
     chmod 0770 #{node[:rightimage][:mount_dir]}/root/.rightscale
     chmod 0440 #{node[:rightimage][:mount_dir]}/root/.rightscale/*
 

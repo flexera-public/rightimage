@@ -20,5 +20,4 @@
 node[:rightimage][:host_packages].split.each { |p| package p }
 
 include_recipe "rightimage::clean"
-include_recipe "rightimage::bootstrap_centos"
 include_recipe "rightimage::rightscale_install"
