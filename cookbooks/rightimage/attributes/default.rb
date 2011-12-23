@@ -168,7 +168,6 @@ case rightimage[:region]
   when "us-west"
     set[:rightimage][:ec2_endpoint] = "https://ec2.us-west-1.amazonaws.com"
   when "us-west-2"
-    set[:rightimage][:mirror] = "http://ec2-us-west-mirror.rightscale.com"
     set[:rightimage][:ec2_endpoint] = "https://ec2.us-west-2.amazonaws.com"
   when "eu-west"
     set[:rightimage][:ec2_endpoint] = "https://ec2.eu-west-1.amazonaws.com"
@@ -177,7 +176,6 @@ case rightimage[:region]
   when "ap-northeast"
     set[:rightimage][:ec2_endpoint] = "https://ec2.ap-northeast-1.amazonaws.com"
   when "sa-east"
-    set[:rightimage][:mirror] = "http://mirror.rightscale.com"
     set[:rightimage][:ec2_endpoint] = "https://ec2.sa-east-1.amazonaws.com"
   else
     set[:rightimage][:ec2_endpoint] = "https://ec2.us-east-1.amazonaws.com"
