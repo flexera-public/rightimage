@@ -177,15 +177,19 @@ EOF
       end
 
       def target_raw_zip
-        "#{target_type}.tgz"
+        "#{target_type}.gz"
       end
 
       def target_raw_zip_path
         "#{build_root}/#{target_raw_zip}"
       end
 
-      def s3_path
-        platform + "/" + release_number + "/" + arch + "/" + timestamp[0..3] + "/" + target_raw_zip 
+      def s3_path_base
+        platform + "/" + release_number + "/" + arch + "/" + timestamp[0..3]
+      end
+
+      def base_image_upload_bucket
+        "rightscale-rightimage-base-dev"
       end
 
       def loop_name
