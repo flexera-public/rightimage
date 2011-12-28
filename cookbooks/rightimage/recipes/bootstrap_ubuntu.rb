@@ -151,6 +151,7 @@ loop_map="/dev/mapper/${loop_name}p1"
 
 base_raw_path="/mnt/vmbuilder/root.img"
 
+sync
 # Cleanup loopback stuff
 set +e
 [ -e $loop_map ] && kpartx -d $loop_dev
@@ -181,13 +182,12 @@ esac
     rm -rf $guest_root/*
     rsync -a $random_dir/ $guest_root/
     umount $random_dir
+    sync
     losetup -d $loopback_device
     rm -rf $random_dir
     mkdir -p $guest_root/var/man
     chroot $guest_root chown -R man:root /var/man
 EOH
-  # TODO: Fix this
-  not_if "test -e /mnt/vmbuilder/root.img"
 end
 
 #  - configure mirrors
