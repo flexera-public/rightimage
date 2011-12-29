@@ -16,7 +16,7 @@ metadata_expire=1800
 
 [base]
 name = none
-baseurl = http://<%= node[:rightimage][:mirror] %>/centos/<%= node[:rightimage][:release][0].chr %>/os/<%= node[:rightimage][:arch] %>/archive/<%= node[:rightimage][:mirror_date] %>/
+baseurl = http://<%= node[:rightimage][:mirror] %>/centos/<%= node[:rightimage][:release] %>/os/<%= node[:rightimage][:arch] %>/archive/<%= node[:rightimage][:mirror_date] %>/
 failovermethod=priority
 gpgcheck=1
 enabled=1
@@ -25,7 +25,7 @@ gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-<%= node[:rightimage][:release
 <% if node[:rightimage][:release].to_i < 6 -%>
 [addons]
 name = none
-baseurl = http://<%= node[:rightimage][:mirror] %>/centos/<%= node[:rightimage][:release][0].chr %>/addons/<%= node[:rightimage][:arch] %>/archive/<%= node[:rightimage][:mirror_date] %>/
+baseurl = http://<%= node[:rightimage][:mirror] %>/centos/<%= node[:rightimage][:release] %>/addons/<%= node[:rightimage][:arch] %>/archive/<%= node[:rightimage][:mirror_date] %>/
 failovermethod=priority
 gpgcheck=1
 enabled=1
@@ -34,7 +34,7 @@ gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-<%= node[:rightimage][:release
 
 [centosplus]
 name = none
-baseurl = http://<%= node[:rightimage][:mirror] %>/centos/<%= node[:rightimage][:release][0].chr %>/centosplus/<%= node[:rightimage][:arch] %>/archive/<%= node[:rightimage][:mirror_date] %>/
+baseurl = http://<%= node[:rightimage][:mirror] %>/centos/<%= node[:rightimage][:release] %>/centosplus/<%= node[:rightimage][:arch] %>/archive/<%= node[:rightimage][:mirror_date] %>/
 failovermethod=priority
 gpgcheck=1
 enabled=1
@@ -42,7 +42,7 @@ gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-<%= node[:rightimage][:release
 
 [extras]
 name = none
-baseurl = http://<%= node[:rightimage][:mirror] %>/centos/<%= node[:rightimage][:release][0].chr %>/extras/<%= node[:rightimage][:arch] %>/archive/<%= node[:rightimage][:mirror_date] %>/
+baseurl = http://<%= node[:rightimage][:mirror] %>/centos/<%= node[:rightimage][:release] %>/extras/<%= node[:rightimage][:arch] %>/archive/<%= node[:rightimage][:mirror_date] %>/
 failovermethod=priority
 gpgcheck=1
 enabled=1
@@ -50,7 +50,7 @@ gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-<%= node[:rightimage][:release
 
 [updates]
 name = none
-baseurl = http://<%= node[:rightimage][:mirror] %>/centos/<%= node[:rightimage][:release][0].chr %>/updates/<%= node[:rightimage][:arch] %>/archive/<%= node[:rightimage][:mirror_date] %>/
+baseurl = http://<%= node[:rightimage][:mirror] %>/centos/<%= node[:rightimage][:release] %>/updates/<%= node[:rightimage][:arch] %>/archive/<%= node[:rightimage][:mirror_date] %>/
 failovermethod=priority
 gpgcheck=1
 enabled=1
