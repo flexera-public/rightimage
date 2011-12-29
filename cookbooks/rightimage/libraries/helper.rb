@@ -140,9 +140,9 @@ EOF
         when "vmops"
           case node[:rightimage][:virtual_environment]
           when "xen"
-            return TRUE
-          else
             return FALSE
+          else
+            return TRUE
           end
         else
           return TRUE
