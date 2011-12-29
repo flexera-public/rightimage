@@ -17,6 +17,16 @@
 # limitations under the License.
 #
 
+class Chef::Recipe
+  include RightScale::RightImage::Helper
+end
+
+directory target_temp_path do
+  owner "root"
+  group "root"
+  recursive true
+end
+
 include_recipe "rightimage::base_#{node.platform.downcase}"
 include_recipe "rightimage::cloud_add_#{node.rightimage.cloud.downcase}" if node.rightimage.cloud
 include_recipe "rightimage::do_destroy_loopback"
