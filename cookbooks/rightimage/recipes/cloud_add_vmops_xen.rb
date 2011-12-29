@@ -64,7 +64,7 @@ bash "configure for cloudstack" do
     guest_root=#{guest_root}
 
     # clean out packages
-    yum -c /tmp/yum.conf --installroot=$guest_root -y clean all
+    chroot $guest_root yum -y clean all
 
     # enable console access
     echo "2:2345:respawn:/sbin/mingetty xvc0" >> $guest_root/etc/inittab

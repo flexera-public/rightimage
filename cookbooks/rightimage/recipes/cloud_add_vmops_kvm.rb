@@ -95,7 +95,7 @@ bash "install grub" do
     set -e 
     set -x
     guest_root="#{guest_root}"
-    yum -c /tmp/yum.conf --installroot=$guest_root -y install grub
+    chroot $guest_root yum -y install grub
   EOH
 end
 
@@ -156,7 +156,7 @@ bash "configure for cloudstack" do
     "centos")
 
       # clean out packages
-      yum -c /tmp/yum.conf --installroot=$guest_root -y clean all
+      chroot $guest_root yum -y clean all
 
       # clean centos RPM data
       rm ${guest_root}/var/lib/rpm/__*

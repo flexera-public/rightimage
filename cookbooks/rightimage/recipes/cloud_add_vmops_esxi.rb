@@ -177,8 +177,8 @@ baseurl=http://packages.vmware.com/tools/esx/5.0/rhel5/x86_64
 enabled=1 
 gpgcheck=1
 EOF
-   yum -c /tmp/yum.conf --installroot=$guest_root -y clean all
-   yum -c $guest_root/etc/yum.conf --installroot=$guest_root -y install vmware-tools-esx-nox
+   chroot $guest_root yum -y clean all
+   chroot $guest_root yum -y install vmware-tools-esx-nox
    rm -f $guest_root/etc/yum.repos.d/vmware-tools.repo
     ;;
 
@@ -205,7 +205,7 @@ bash "configure for cloudstack" do
   case "#{node.rightimage.platform}" in
     "centos" )
       # clean out packages
-      yum -c /tmp/yum.conf --installroot=$guest_root -y clean all
+      chroot $guest_root yum -y clean all
 
       # configure dns timeout 
       echo 'timeout 300;' > $guest_root/etc/dhclient.conf

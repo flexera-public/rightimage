@@ -154,7 +154,7 @@ bash "configure for eucalyptus" do
     echo -n "eucalyptus" > $guest_root/etc/rightscale.d/cloud
 
     # clean out packages
-    yum -c /tmp/yum.conf --installroot=$guest_root -y clean all
+    chroot $guest_root yum -y clean all
     
     rm ${guest_root}/var/lib/rpm/__*
     chroot $guest_root rpm --rebuilddb

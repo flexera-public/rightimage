@@ -4,16 +4,14 @@ end
 
 action :install do
  bash "install kvm kernel" do
+  flags "-ex"
   code <<-EOH
-#!/bin/bash -ex
-    set -e 
-    set -x
     guest_root=#{guest_root}
 
     case "#{node[:rightimage][:platform]}" in 
     "centos" )
       # The following should be needed when using ubuntu vmbuilder
-      yum -c /tmp/yum.conf --installroot=$guest_root -y install kmod-kvm
+      chroot $guest_root yum -y install kmod-kvm
 
       kernel_version=$(ls -t $guest_root/lib/modules|awk '{ printf "%s ", $0 }'|cut -d ' ' -f1-1)
 

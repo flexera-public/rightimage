@@ -5,17 +5,15 @@ end
 action :install do
  
   bash "install xen kernel" do
+    flags "-ex"
     code <<-EOH
-      set -e 
-      set -x
-      
       # Install to guest. 
       guest_root=#{guest_root}
 
       case #{node[:rightimage][:platform]} in
         "centos")
           chroot $guest_root yum -y remove kernel
-          yum -c /tmp/yum.conf --installroot=$guest_root -y install kernel-xen kmod-xfs-xen 
+          chroot $guest_root yum -y install kernel-xen kmod-xfs-xen 
     
           kernel_version=$(ls -t $guest_root/lib/modules|awk '{ printf "%s ", $0 }'|cut -d ' ' -f1-1)
      

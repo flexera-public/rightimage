@@ -97,7 +97,7 @@ bash "install grub" do
     set -e 
     set -x
     guest_root=#{guest_root}
-    yum -c /tmp/yum.conf --installroot=$guest_root -y install grub
+    chroot $guest_root yum -y install grub
   EOH
 end
 
@@ -144,7 +144,7 @@ bash "configure for openstack" do
     guest_root=#{guest_root}
 
     # clean out packages
-    yum -c /tmp/yum.conf --installroot=$guest_root -y clean all
+    chroot $guest_root yum -y clean all
 
     # enable console access
     #echo "2:2345:respawn:/sbin/mingetty tty2" >> $guest_root/etc/inittab
