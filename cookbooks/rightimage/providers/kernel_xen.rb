@@ -14,8 +14,8 @@ action :install do
 
       case #{node[:rightimage][:platform]} in
         "centos")
-          yum -c /tmp/yum.conf --installroot=$guest_root -y install kernel-xen kmod-xfs-xen 
           chroot $guest_root yum -y remove kernel
+          yum -c /tmp/yum.conf --installroot=$guest_root -y install kernel-xen kmod-xfs-xen 
     
           kernel_version=$(ls -t $guest_root/lib/modules|awk '{ printf "%s ", $0 }'|cut -d ' ' -f1-1)
      
