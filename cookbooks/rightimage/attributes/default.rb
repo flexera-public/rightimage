@@ -131,8 +131,7 @@ case rightimage[:cloud]
       set[:rightimage][:fstab][:ephemeral_mount_opts] = nil
       set[:rightimage][:fstab][:ephemeral] = false
       set[:rightimage][:grub][:root_device] = "/dev/sda"
-      set[:rightimage][:root_mount][:uuid] = `uuidgen`.strip
-      set[:rightimage][:root_mount][:dev] = "UUID=#{rightimage[:root_mount][:uuid]}"
+      set[:rightimage][:root_mount][:dev] = "/dev/hdb1"
       set[:rightimage][:root_mount][:dump] = "1" 
       set[:rightimage][:root_mount][:fsck] = "1" 
     else
