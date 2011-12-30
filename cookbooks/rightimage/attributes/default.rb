@@ -116,7 +116,6 @@ case rightimage[:cloud]
       set[:rightimage][:fstab][:ephemeral_mount_opts] = nil
     when "kvm"
       rightimage[:host_packages] << " qemu grub"
-      rightimage[:guest_packages] << " grub"
       set[:rightimage][:fstab][:ephemeral] = false
       set[:rightimage][:ephemeral_mount] = "/dev/vdb"
       set[:rightimage][:fstab][:ephemeral_mount_opts] = "defaults"
@@ -126,7 +125,6 @@ case rightimage[:cloud]
       set[:rightimage][:root_mount][:fsck] = "1" 
     when "esxi"
       rightimage[:host_packages] << " qemu grub"
-      rightimage[:guest_packages] << " grub"
       set[:rightimage][:ephemeral_mount] = nil
       set[:rightimage][:fstab][:ephemeral_mount_opts] = nil
       set[:rightimage][:fstab][:ephemeral] = false
