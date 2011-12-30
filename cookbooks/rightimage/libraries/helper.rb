@@ -184,7 +184,7 @@ EOF
         "#{build_root}/#{target_raw_zip}"
       end
 
-      def target_temp_path
+      def target_temp_root
         "#{build_root}/rightimage-temp"
       end
 

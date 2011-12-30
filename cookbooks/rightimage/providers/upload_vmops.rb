@@ -28,7 +28,7 @@ action :upload do
       #image_name = "RightImage_CentOS_5.4_x64_v5.6.11_Dev1"
       #local_ip = "50.18.23.10"
       filename = "#{image_name}.#{new_resource.file_ext}"
-      local_file = "#{target_temp_path}/#{filename}"
+      local_file = "#{target_temp_root}/#{filename}"
       md5sum = Digest::MD5.hexdigest(::File.read(local_file))
  
       local_ip = node[:cloud][:public_ips][0]
