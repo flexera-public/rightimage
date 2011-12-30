@@ -188,6 +188,10 @@ EOF
         "#{build_root}/rightimage-temp"
       end
 
+      def target_temp_path
+        "#{target_temp_root}/#{target_raw_file}"
+      end
+
       def s3_path_base
         platform + "/" + release_number + "/" + arch + "/" + timestamp[0..3]
       end
