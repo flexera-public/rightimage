@@ -29,65 +29,11 @@ raise "ERROR: you must set your virtual_environment to esxi!"  if node[:rightima
 
 bundled_image = "#{image_name}.vmdk"
 
-loop_name="loop0"
-loop_dev="/dev/#{loop_name}"
-loop_map="/dev/mapper/#{loop_name}p1"
-
 package "qemu"
 
-bash "create cloudstack-esxi loopback fs" do 
+bash "mount proc & dev" do
+  flags "-ex" 
   code <<-EOH
-    set -e 
-    set -x
-
-    DISK_SIZE_GB=#{node[:rightimage][:root_size_gb]}  
-    BYTES_PER_MB=1024
-    DISK_SIZE_MB=$(($DISK_SIZE_GB * $BYTES_PER_MB))
-
-    base_root="#{base_root}"
-    guest_root="#{guest_root}"
-    source_image="#{source_image}" 
-    target_raw_root="#{target_raw_root}"
-    target_raw_path="#{target_raw_path}"
-
-    umount -lf #{source_image}/proc || true 
-    umount -lf #{guest_root}/proc || true
-    umount -lf $guest_root/sys || true 
-    umount -lf #{guest_root} || true
-    rm -rf $base_root
-    mkdir -p $target_raw_root
-
-    dd if=/dev/zero of=$target_raw_path bs=1M count=$DISK_SIZE_MB    
-
-    umount -lf #{loop_map} || true
-    kpartx -d  #{loop_dev} || true
-    losetup -d #{loop_dev} || true
-
-    losetup #{loop_dev} $target_raw_path
-
-    sfdisk #{loop_dev} << EOF
-0,1304,L
-EOF
-   
-    kpartx -a #{loop_dev}
-    mke2fs -F -j #{loop_map}
-    
-    # setup uuid for our root partition
-    tune2fs -U #{node[:rightimage][:root_mount][:uuid]} #{loop_map}
-    
-    mkdir -p $guest_root
-    mount #{loop_map} $guest_root
-
-    rsync -a $source_image/ $guest_root/
-
-  EOH
-end
-
-bash "mount proc & dev" do 
-  code <<-EOH
-#!/bin/bash -ex
-    set -e 
-    set -x
     guest_root=#{guest_root}
     mount -t proc none $guest_root/proc
     mount --bind /dev $guest_root/dev
@@ -103,9 +49,15 @@ end
 
 rightimage_kernel "Install Ramdisk" do
   provider "rightimage_kernel_#{node[:rightimage][:virtual_environment]}"
-#  guest_root guest_root
-#  version node[:rightimage][:kernel_id]
   action :install
+end
+
+bash "install grub" do
+  flags "-ex"
+  code <<-EOH
+    guest_root="#{guest_root}"
+    chroot $guest_root yum -y install grub
+  EOH
 end
 
 # insert grub conf
@@ -114,17 +66,15 @@ template "#{guest_root}/boot/grub/grub.conf" do
   backup false 
 end
 
-bash "setup grub" do 
+bash "setup grub" do
+  flags "-ex" 
   code <<-EOH
-    set -e 
-    set -x
-
     target_raw_path="#{target_raw_path}"
     guest_root="#{guest_root}"
 
     chroot $guest_root mkdir -p /boot/grub
 
-    case "#{node.rightimage.platform}" in
+    case "#{node[:rightimage][:platform]}" in
       "ubuntu" )
         grub_command="/usr/sbin/grub"
         ;;
@@ -154,16 +104,14 @@ end
 
 include_recipe "rightimage::bootstrap_common_debug"
 
-bash "install vmware tools" do 
+bash "install vmware tools" do
+  flags "-ex"
   code <<-EOH
-#!/bin/bash -ex
-    set -e 
-    set -x
     guest_root=#{guest_root}
     TMP_DIR=/tmp/vmware_tools
 
 # TODO: THIS NEEDS TO BE CLEANED UP
-  case "#{node.rightimage.platform}" in 
+  case "#{node[:rightimage][:platform]}" in 
     "centos" )
       chroot $guest_root mkdir -p $TMP_DIR
       chroot $guest_root curl --fail http://packages.vmware.com/tools/keys/VMWARE-PACKAGING-GPG-DSA-KEY.pub -o $TMP_DIR/dsa.pub
@@ -195,14 +143,12 @@ end
 #
 # Add additional CloudStack specific configuration changes here
 #
-bash "configure for cloudstack" do 
+bash "configure for cloudstack" do
+  flags "-ex"
   code <<-EOH
-#!/bin/bash -ex
-    set -e 
-    set -x
     guest_root=#{guest_root}
 
-  case "#{node.rightimage.platform}" in
+  case "#{node[:rightimage][:platform]}" in
     "centos" )
       # clean out packages
       chroot $guest_root yum -y clean all
@@ -226,11 +172,9 @@ bash "configure for cloudstack" do
   EOH
 end
 
-bash "unmount proc & dev" do 
+bash "unmount proc & dev" do
+  flags "-ex"
   code <<-EOH
-#!/bin/bash -ex
-    set -e 
-    set -x
     guest_root=#{guest_root}
     umount -lf $guest_root/proc
     umount -lf $guest_root/dev
@@ -243,8 +187,20 @@ remote_file "/tmp/rightimage.patch" do
 end
 
 bash "Patch /etc/init.d/rightimage" do
+  flags "-x"
   code <<-EOH
-    patch #{guest_root}/etc/init.d/rightimage /tmp/rightimage.patch
+    output=`patch --forward #{guest_root}/etc/init.d/rightimage /tmp/rightimage.patch`
+    # Patch applied cleanly, first time
+    if [ "$?" == "0" ]; then
+      exit 0
+    fi
+
+    # Patch already applied from a previous run
+    [[ $output =~ 'previously applied' ]]
+    res=$?
+    echo "OUTPUT: $output"
+
+    exit $res
   EOH
 end
 
@@ -255,31 +211,12 @@ rightimage guest_root do
   action :sanitize
 end
 
-bash "sync fs" do 
-  code <<-EOH
-    set -x
-    sync
-  EOH
-end
-
-bash "unmount target filesystem" do 
-  code <<-EOH
-#!/bin/bash -ex
-    set -e 
-    set -x
-    guest_root=#{guest_root}
-
-    umount -lf #{loop_map}
-    kpartx -d  #{loop_dev}
-    losetup -d #{loop_dev}
-  EOH
-end
+include_recipe "rightimage::do_destroy_loopback"
 
 # TODO: Need to fix this up.
-bash "cleanup working directories" do 
+bash "cleanup working directories" do
+  flags "-ex" 
   code <<-EOH
-    set -e
-    set -x
       [ -e "/tmp/ovftool.sh" ] && rm -f "/tmp/ovftool.sh"
       [ -d "/tmp/ovftool" ] && rm -rf /tmp/ovftool
       [ -d "/mnt/ova/" ] && rm -rf /mnt/ova
@@ -288,14 +225,12 @@ bash "cleanup working directories" do
   EOH
 end
 
-bash "convert raw image to VMDK flat file" do 
-  cwd target_raw_root
+bash "convert raw image to VMDK flat file" do
+  flags "-ex" 
+  cwd target_temp_root
   code <<-EOH
-    set -e
-    set -x
-
     BUNDLED_IMAGE="#{bundled_image}"
-    BUNDLED_IMAGE_PATH="#{target_raw_root}/$BUNDLED_IMAGE"
+    BUNDLED_IMAGE_PATH="#{target_temp_root}/$BUNDLED_IMAGE"
 
     qemu-img convert -O vmdk #{target_raw_path} $BUNDLED_IMAGE_PATH
   EOH
@@ -307,26 +242,25 @@ remote_file "/tmp/ovftool.sh" do
 end
 
 bash "Install ovftools" do
+  flags "-ex"
   cwd "/tmp"
   code <<-EOH
-    set -e
-    set -x
     mkdir -p /tmp/ovftool
     ./ovftool.sh --silent /tmp/ovftool AGREE_TO_EULA 
   EOH
 end
 
-directory "#{target_raw_root}/ova" do
+directory "#{target_temp_root}/ova" do
   action :create
 end
 
 ovf_filename = bundled_image
 ovf_image_name = bundled_image
-ovf_vmdk_size = `ls -l1 #{target_raw_root}/#{bundled_image} | awk '{ print $5; }'`.chomp
+ovf_vmdk_size = `ls -l1 #{target_temp_root}/#{bundled_image} | awk '{ print $5; }'`.chomp
 ovf_capacity = node[:rightimage][:root_size_gb] 
 ovf_ostype = "other26xLinux64Guest"
 
-template "#{target_raw_root}/temp.ovf" do
+template "#{target_temp_root}/temp.ovf" do
   source "ovf.erb"
   variables({
     :ovf_filename => ovf_filename,
@@ -339,11 +273,10 @@ end
 
 bash "Create create vmdk and create ovf/ova files" do
   cwd "/tmp/ovftool"
-
+  flags "-ex"
   code <<-EOH
-    set -ex
-    ./ovftool #{target_raw_root}/temp.ovf #{target_raw_root}/ova/#{bundled_image}.ovf  > /dev/null 2>&1
-    cd #{target_raw_root}/ova
+    ./ovftool #{target_temp_root}/temp.ovf #{target_temp_root}/ova/#{bundled_image}.ovf  > /dev/null 2>&1
+    cd #{target_temp_root}/ova
     tar -cf #{bundled_image}.ova #{bundled_image}.ovf #{bundled_image}.mf *.vmdk
   EOH
 end
