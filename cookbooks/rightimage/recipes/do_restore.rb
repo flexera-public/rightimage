@@ -16,6 +16,18 @@ block_device target_raw_root do
   action :restore
 end
 
+bash "resize fs" do
+  flags "-x"
+  only_if node[:rightimage][:root_size_gb] != "10"
+  code <<-EOH
+    calc_mb="#{calc_mb}"
+    target_raw_path="#{target_raw_path}"
+
+    e2fsck -cn -f $target_raw_path
+    resize2fs $target_raw_path ${calc_mb}M
+  EOH
+end
+
 bash "mount image" do
   flags "-ex"
   code <<-EOH
