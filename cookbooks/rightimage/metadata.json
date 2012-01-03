@@ -348,12 +348,9 @@
       "default": "10",
       "type": "string",
       "recipes": [
-        "rightimage::default",
-        "rightimage::build_image",
-        "rightimage::cloud_add_euca",
-        "rightimage::cloud_add_vmops",
-        "rightimage::cloud_add_openstack",
-        "rightimage::cloud_add_ec2"
+        "rightimage::copy_image",
+        "rightimage::do_restore",
+        "rightimage::setup_loopback"
       ],
       "description": "Sets the size of the virtual image. Units are in GB.",
       "display_name": "Root Size GB"

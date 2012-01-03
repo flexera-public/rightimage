@@ -78,7 +78,7 @@ attribute "rightimage/root_size_gb",
   :description => "Sets the size of the virtual image. Units are in GB.",
   :choice => [ "10", "4", "2" ],
   :default => "10",
-  :recipes => [ "rightimage::default", "rightimage::build_image" ] + cloud_add
+  :recipes => [ "rightimage::copy_image", "rightimage::do_restore", "rightimage::setup_loopback" ]
 
 attribute "rightimage/manual_mode",
   :display_name => "Manual Mode",
