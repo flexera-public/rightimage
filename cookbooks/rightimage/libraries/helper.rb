@@ -211,6 +211,10 @@ EOF
       def loop_map
         "/dev/mapper/#{loop_name}p1"
       end
+
+      def calc_mb
+        node[:rightimage][:root_size_gb].to_i * 1024 
+      end
     end
   end
 end

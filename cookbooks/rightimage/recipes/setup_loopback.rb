@@ -16,16 +16,13 @@ end if node[:rightimage][:platform] == "ubuntu"
 bash "create loopback fs" do 
   flags "-ex"
   code <<-EOH
-    DISK_SIZE_GB=#{node[:rightimage][:root_size_gb]} 
-    BYTES_PER_MB=1024
-    DISK_SIZE_MB=$(($DISK_SIZE_GB * $BYTES_PER_MB))
-
+    calc_mb="#{calc_mb}"
     loop_dev="#{loop_dev}"
     loop_map="#{loop_map}"
     source_image="#{source_image}" 
     target_raw_path="#{target_raw_root}/#{os_string}_hd00.raw"
 
-    dd if=/dev/zero of=$target_raw_path bs=1M count=$DISK_SIZE_MB    
+    dd if=/dev/zero of=$target_raw_path bs=1M count=$calc_mb
     losetup $loop_dev $target_raw_path
 
     sfdisk $loop_dev << EOF
