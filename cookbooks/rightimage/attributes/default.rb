@@ -14,7 +14,8 @@ set[:rightimage][:mount_dir] = "/mnt/image"
 set_unless[:rightimage][:virtual_environment] = "xen"
 set[:rightimage][:mirror] = "cf-mirror.rightscale.com"
 set_unless[:rightimage][:sandbox_repo_tag] = "rightlink_package_#{rightimage[:rightlink_version]}"
-set[:rightimage][:root_mount][:dev] = "ROOT"
+set[:rightimage][:root_mount][:label_dev] = "ROOT"
+set[:rightimage][:root_mount][:dev] = "LABEL=#{rightimage[:root_mount][:label_dev]}"
 
 #set[:rightimage][:platform] = platform
 #set[:rightimage][:release_number] = release_number

@@ -8,7 +8,7 @@ bash "create nonpartitioned image" do
   code <<-EOH
     calc_mb="#{calc_mb}"
     loop_dev="/dev/loop1"
-    root_label="#{node[:rightimage][:root_mount][:dev]}"
+    root_label="#{node[:rightimage][:root_mount][:label_dev]}"
     source_image="#{source_image}"
     source_image2="/mnt/image2"
     target_raw_path="#{target_raw_path}"

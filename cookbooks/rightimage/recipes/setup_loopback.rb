@@ -20,7 +20,7 @@ bash "create loopback fs" do
     calc_mb="#{calc_mb}"
     loop_dev="#{loop_dev}"
     loop_map="#{loop_map}"
-    root_label="#{node[:rightimage][:root_mount][:dev]}"
+    root_label="#{node[:rightimage][:root_mount][:label_dev]}"
     source_image="#{source_image}" 
     target_raw_path="#{target_raw_root}/#{os_string}_hd00.raw"
 
