@@ -3,14 +3,6 @@ class Chef::Resource::RubyBlock
 end
 
 action :upload do
-  r = gem_package "nokogiri" do
-    gem_binary "/opt/rightscale/sandbox/bin/gem"
-    version "1.4.3.1"
-    action :nothing
-  end
-  r.run_action(:install)
-  Gem.clear_paths
-  
   ruby_block "trigger download to test cloud" do
     block do
       require "rubygems"
@@ -23,16 +15,19 @@ action :upload do
       # The private API URL allows full, unsecured access to the entire API.  This URL is intended to be 
       # secured behind a firewall.
       # http://173.227.0.170:8096/
-      api_url = new_resource.api_url
-      
-      #image_name = "RightImage_CentOS_5.4_x64_v5.6.11_Dev1"
-      #local_ip = "50.18.23.10"
+      api_url = "http://72.52.126.24:8096"
+      if new_resource.hypervisor == "xen"
+        api_url = "http://173.227.0.170:8096"
+      end
+
       filename = "#{image_name}.#{new_resource.file_ext}"
       local_file = "#{target_temp_root}/#{filename}"
       md5sum = Digest::MD5.hexdigest(::File.read(local_file))
- 
-      local_ip = node[:cloud][:public_ips][0]
-      image_url = "http://#{local_ip}/#{filename}"
+
+      aws_url  = "rightscale-cloudstack-dev.s3.amazonaws.com"
+      aws_path = s3_path_full
+      image_url = "http://#{aws_url}/#{aws_path}/#{filename}"
+      Chef::Log::info("aws url #{image_url}")
       encoded_image_url = URI.escape(image_url, Regexp.new("[^#{URI::PATTERN::UNRESERVED}]"))  
      
       name = image_name.gsub(/RightImage/,"RI")
@@ -44,15 +39,14 @@ action :upload do
       end
    
       cmd = "/?command=registerTemplate"
-      cmd << "&name=#{name}&displayText=#{image_name}_#{node[:rightimage][:virtual_environment].upcase}"
+      cmd << "&name=#{name}&displayText=#{image_name}_#{new_resource.hypervisor.upcase}"
       cmd << "&url=#{encoded_image_url}"
 
-      case new_resource.file_ext
-      when "vmdk"
+      if new_resource.file_ext =~ /vmdk|ova/
         format = "OVA"
-      when "qcow2.bz2"
+      elsif new_resource.file_ext =~ /qcow/
         format = "QCOW"
-      when "vhd"
+      elsif new_resource.file_ext =~ /vhd/
         format = "VHD"
       end
 

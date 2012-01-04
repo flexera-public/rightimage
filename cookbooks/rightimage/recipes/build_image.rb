@@ -30,3 +30,4 @@ end
 include_recipe "rightimage::base_#{node.platform.downcase}"
 include_recipe "rightimage::cloud_add_#{node.rightimage.cloud.downcase}" if node.rightimage.cloud
 include_recipe "rightimage::do_destroy_loopback"
+include_recipe "rightimage::upload_file_to_s3"

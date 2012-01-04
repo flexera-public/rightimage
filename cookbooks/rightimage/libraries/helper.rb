@@ -10,7 +10,7 @@ module RightScale
       	name << "_#{generate_persisted_passwd}" if node[:rightimage][:debug] == "true"
       	name
       end   
-      
+
       def generate_persisted_passwd
         length = 14
         pw = nil
@@ -22,6 +22,17 @@ module RightScale
           File.open(filename, 'w') {|f| f.write(pw) }
         end
         pw
+      end
+
+      def image_file_ext
+        case node[:rightimage][:virtual_environment]
+        when "xen"
+          "vhd.bz2"
+        when "kvm"
+          "qcow2.bz2"
+        when "esxi"
+          "vmdk.ova"
+        end
       end
 
       def cloud_id
@@ -192,12 +203,36 @@ EOF
         "#{target_temp_root}/#{target_raw_file}"
       end
 
+      def full_image_path
+        target_temp_root+"/"+image_name+"."+image_file_ext
+      end
+
       def s3_path_base
-        platform + "/" + release_number + "/" + arch + "/" + timestamp[0..3]
+        [platform,release_number,arch,timestamp[0..3]].join("/")
+      end
+
+      def s3_path_full
+        hypervisor = node[:rightimage][:virtual_environment]
+        [hypervisor,platform,release_number].join("/")
       end
 
       def base_image_upload_bucket
         "rightscale-rightimage-base-dev"
+      end
+
+      def full_image_upload_bucket
+        case node[:rightimage][:cloud]
+        when "vmops"
+          "rightscale-cloudstack-dev"
+        when "euca"
+          "rightscale-eucalyptus-dev"
+        when "openstack"
+          "rightscale-openstack-dev"
+        when "rackspace"
+          "rightscale-rackspace-dev"
+        when "ec2"
+          "rightscale-"+node[:rightimage][:region]
+        end
       end
 
       def loop_name
