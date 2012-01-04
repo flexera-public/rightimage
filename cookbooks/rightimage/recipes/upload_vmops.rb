@@ -1,3 +1,4 @@
+rs_utils_marker :begin
 class Chef::Resource::RubyBlock
   include RightScale::RightImage::Helper
 end
@@ -124,4 +125,5 @@ ruby_block "upload and index s3" do
   end
 end
 
-include_recipe "rightimage::upload_vmops_#{node[:rightimage][:virtual_environment]}" 
+include_recipe "rightimage::upload_vmops_#{node[:rightimage][:virtual_environment]}"
+rs_utils_marker :end

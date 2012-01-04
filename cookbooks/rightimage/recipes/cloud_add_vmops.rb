@@ -1,3 +1,4 @@
+rs_utils_marker :begin
 #
 # Cookbook Name:: rightimage
 # Recipe:: cloud_add_vmops
@@ -18,3 +19,4 @@
 #
 
 include_recipe "rightimage::cloud_add_vmops_#{node[:rightimage][:virtual_environment]}" 
+rs_utils_marker :end

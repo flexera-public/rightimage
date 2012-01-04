@@ -1,3 +1,4 @@
+rs_utils_marker :begin
 class Chef::Resource::Template
   include RightScale::RightImage::Helper
 end
@@ -37,3 +38,4 @@ if node[:rightimage][:debug] == "true"
   end
 
 end
+rs_utils_marker :end

@@ -1,3 +1,4 @@
+rs_utils_marker :begin
 class Chef::Resource::BlockDevice
   include RightScale::RightImage::Helper
 end
@@ -16,3 +17,4 @@ block_device target_raw_root do
   action :create
   persist true
 end
+rs_utils_marker :end

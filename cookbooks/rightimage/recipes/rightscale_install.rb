@@ -1,3 +1,4 @@
+rs_utils_marker :begin
 directory "#{node[:rightimage][:mount_dir]}/etc/rightscale.d" 
 
 # Install rightscale package based on revision number
@@ -43,3 +44,4 @@ BASHRC
     fi
   EOS
 end
+rs_utils_marker :end

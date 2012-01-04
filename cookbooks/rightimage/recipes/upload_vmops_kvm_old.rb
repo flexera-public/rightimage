@@ -1,3 +1,4 @@
+rs_utils_marker :begin
 class Chef::Resource::RubyBlock
   include RightScale::RightImage::Helper
 end
@@ -63,3 +64,4 @@ ruby_block "trigger download to test cloud" do
     end
   end
 end
+rs_utils_marker :end

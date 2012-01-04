@@ -1,3 +1,4 @@
+rs_utils_marker :begin
 #
 # Cookbook Name:: rightimage
 # Recipe:: default
@@ -21,3 +22,4 @@ node[:rightimage][:host_packages].each { |p| package p }
 
 include_recipe "rightimage::clean"
 include_recipe "rightimage::rightscale_install"
+rs_utils_marker :end

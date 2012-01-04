@@ -1,3 +1,4 @@
+rs_utils_marker :begin
 class Chef::Resource::Template
   include RightScale::RightImage::Helper
 end
@@ -61,3 +62,4 @@ chmod +x $ROOT/tmp/rubygems_install.sh
 chroot $ROOT /tmp/rubygems_install.sh > /dev/null 
 EOC
 end
+rs_utils_marker :end

@@ -1,3 +1,4 @@
+rs_utils_marker :begin
 #
 # Cookbook Name:: rightimage
 # Recipe:: build_base
@@ -24,3 +25,4 @@ include_recipe "rightimage::copy_image"
 include_recipe "rightimage::do_destroy_loopback"
 include_recipe "rightimage::do_backup"
 include_recipe "rightimage::base_upload"
+rs_utils_marker :end

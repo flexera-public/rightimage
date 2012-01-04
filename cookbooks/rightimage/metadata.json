@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "rs_utils": ">= 0.0.0",
     "block_device": ">= 0.0.0"
   },
   "name": "rightimage",

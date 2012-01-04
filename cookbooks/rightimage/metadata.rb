@@ -4,6 +4,7 @@ description      "image building tools"
 version          "0.0.1"
 
 depends "block_device"
+depends "rs_utils"
 
 recipe "rightimage::default", "starts builds image automatically at boot. See 'manual_mode' input to enable." 
 recipe "rightimage::build_image", "build image based on host platform"

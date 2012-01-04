@@ -1,3 +1,4 @@
+rs_utils_marker :begin
 class Chef::Recipe
   include RightScale::RightImage::Helper
 end
@@ -15,3 +16,4 @@ block_device target_raw_root do
 
   action :reset
 end
+rs_utils_marker :end

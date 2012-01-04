@@ -1,3 +1,4 @@
+rs_utils_marker :begin
 
 ruby_block("reload-yum-cache") do
   block do
@@ -38,3 +39,4 @@ bash "install_vhd-util" do
     make install
   EOF
 end
+rs_utils_marker :end

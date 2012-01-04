@@ -1,3 +1,4 @@
+rs_utils_marker :begin
 class Chef::Recipe
   include RightScale::RightImage::Helper
 end
@@ -48,3 +49,4 @@ bash "mount image" do
     mount $loop_map $source_image
   EOH
 end
+rs_utils_marker :end

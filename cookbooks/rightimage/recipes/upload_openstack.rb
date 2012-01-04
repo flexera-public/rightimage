@@ -1,3 +1,4 @@
+rs_utils_marker :begin
 class Chef::Resource::RubyBlock
   include RightScale::RightImage::Helper
 end
@@ -27,3 +28,4 @@ ruby_block "upload to cloud" do
     end
   end
 end
+rs_utils_marker :end

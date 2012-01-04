@@ -1,3 +1,4 @@
+rs_utils_marker :begin
 class Chef::Resource::Bash
   include RightScale::RightImage::Helper
 end
@@ -24,3 +25,4 @@ bash "create nonpartitioned image" do
     losetup -d $loop_dev
   EOH
 end
+rs_utils_marker :end
