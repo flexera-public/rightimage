@@ -14,7 +14,7 @@ set[:rightimage][:mount_dir] = "/mnt/image"
 set_unless[:rightimage][:virtual_environment] = "xen"
 set[:rightimage][:mirror] = "cf-mirror.rightscale.com"
 set_unless[:rightimage][:sandbox_repo_tag] = "rightlink_package_#{rightimage[:rightlink_version]}"
-
+set[:rightimage][:root_mount][:dev] = "ROOT"
 
 #set[:rightimage][:platform] = platform
 #set[:rightimage][:release_number] = release_number
@@ -88,7 +88,6 @@ end if rightimage[:platform] == "ubuntu"
 # set cloud stuff
 case rightimage[:cloud]
   when "ec2", "euca" 
-    set[:rightimage][:root_mount][:dev] = "/dev/sda1"
     set[:rightimage][:root_mount][:dump] = "0" 
     set[:rightimage][:root_mount][:fsck] = "0" 
     set[:rightimage][:fstab][:ephemeral] = true
@@ -109,7 +108,6 @@ case rightimage[:cloud]
     when "xen"
       set[:rightimage][:fstab][:ephemeral_mount_opts] = "defaults"
       set[:rightimage][:fstab][:ephemeral] = false
-      set[:rightimage][:root_mount][:dev] = "/dev/xvda"
       set[:rightimage][:root_mount][:dump] = "1" 
       set[:rightimage][:root_mount][:fsck] = "1" 
       set[:rightimage][:ephemeral_mount] = nil
@@ -120,7 +118,6 @@ case rightimage[:cloud]
       set[:rightimage][:ephemeral_mount] = "/dev/vdb"
       set[:rightimage][:fstab][:ephemeral_mount_opts] = "defaults"
       set[:rightimage][:grub][:root_device] = "/dev/vda"
-      set[:rightimage][:root_mount][:dev] = "/dev/vda1"
       set[:rightimage][:root_mount][:dump] = "1" 
       set[:rightimage][:root_mount][:fsck] = "1" 
     when "esxi"
@@ -129,7 +126,6 @@ case rightimage[:cloud]
       set[:rightimage][:fstab][:ephemeral_mount_opts] = nil
       set[:rightimage][:fstab][:ephemeral] = false
       set[:rightimage][:grub][:root_device] = "/dev/sda"
-      set[:rightimage][:root_mount][:dev] = "/dev/hdb1"
       set[:rightimage][:root_mount][:dump] = "1" 
       set[:rightimage][:root_mount][:fsck] = "1" 
     else

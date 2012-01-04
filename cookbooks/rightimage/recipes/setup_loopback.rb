@@ -19,6 +19,7 @@ bash "create loopback fs" do
     calc_mb="#{calc_mb}"
     loop_dev="#{loop_dev}"
     loop_map="#{loop_map}"
+    root_label="#{node[:rightimage][:root_mount][:dev]}"
     source_image="#{source_image}" 
     target_raw_path="#{target_raw_root}/#{os_string}_hd00.raw"
 
@@ -30,6 +31,7 @@ bash "create loopback fs" do
 EOF
     kpartx -a $loop_dev
     mke2fs -F -j $loop_map
+    tune2fs -L $root_label $loop_map
     mkdir -p $source_image
     mount $loop_map $source_image
   EOH
