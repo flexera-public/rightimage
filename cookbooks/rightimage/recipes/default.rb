@@ -1,3 +1,4 @@
+rs_utils_marker :begin
 #
 # Cookbook Name:: rightimage
 # Recipe:: default
@@ -24,3 +25,4 @@ unless node[:rightimage][:manual_mode] == "true"
     include_recipe "rightimage::build_base"
   end
 end
+rs_utils_marker :end

@@ -1,3 +1,4 @@
+rs_utils_marker :begin
 class Chef::Resource::Bash
   include RightScale::RightImage::Helper
 end
@@ -125,3 +126,4 @@ bash "xen convert" do
     bzip2 #{image_name}.vhd
   EOH
 end
+rs_utils_marker :end

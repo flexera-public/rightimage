@@ -1,3 +1,4 @@
+rs_utils_marker :begin
 rightlink_file="rightscale_#{node[:rightimage][:rightlink_version]}-#{node[:rightimage][:platform]}_#{node[:rightimage][:release_number]}-" + ((node[:rightimage][:platform] == "ubuntu") && (node[:rightimage][:arch] == "x86_64") ? "amd64" : node[:rightimage][:arch]) + "." + (node[:rightimage][:platform] == "centos" ? "rpm" : "deb")
 
 bash "download_rightlink" do
@@ -56,3 +57,4 @@ bash "install_rightlink" do
     esac
   EOC
 end
+rs_utils_marker :end

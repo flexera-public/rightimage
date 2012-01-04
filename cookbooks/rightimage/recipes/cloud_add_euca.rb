@@ -1,3 +1,4 @@
+rs_utils_marker :begin
 class Chef::Resource::Bash
   include RightScale::RightImage::Helper
 end
@@ -151,3 +152,4 @@ bash "unmount" do
     losetup -d $loopdev
   EOH
 end
+rs_utils_marker :end

@@ -1,3 +1,4 @@
+rs_utils_marker :begin
 #
 # Cookbook Name:: rightimage
 # Recipe:: setup_or_restore
@@ -27,3 +28,4 @@ unless `mount`.grep(/#{target_raw_root}/).any?
     include_recipe "rightimage::setup_block_device"
   end
 end
+rs_utils_marker :end

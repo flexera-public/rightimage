@@ -1,3 +1,4 @@
+rs_utils_marker :begin
 class Chef::Resource::Bash
   include RightScale::RightImage::Helper
 end
@@ -232,3 +233,4 @@ bash "cleanup" do
     umount -lf #{node[:rightimage][:mount_dir]}/dev/pts || true
   EOH
 end    
+rs_utils_marker :end

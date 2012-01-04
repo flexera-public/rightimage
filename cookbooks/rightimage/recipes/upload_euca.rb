@@ -1,3 +1,4 @@
+rs_utils_marker :begin
 class Chef::Resource::Bash
   include RightScale::RightImage::Helper
 end
@@ -144,3 +145,4 @@ ruby_block "store image id" do
     id_list.add(image_id)
   end
 end
+rs_utils_marker :end

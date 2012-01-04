@@ -1,3 +1,4 @@
+rs_utils_marker :begin
 #
 # Cookbook Name:: rightimage
 # Recipe:: default
@@ -68,3 +69,4 @@ end
 # TODO - upload package to s3
 # TODO - bundle instance
 # TODO - kill running instance
+rs_utils_marker :end

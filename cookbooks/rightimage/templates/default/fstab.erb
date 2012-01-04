@@ -1,4 +1,4 @@
-<%= node[:rightimage][:root_mount][:dev] %>  /         ext3    defaults        <%= node[:rightimage][:root_mount][:dump] %> <%= node[:rightimage][:root_mount][:fsck] %>
+LABEL=<% node[:rightimage][:root_mount][:dev] %> /         ext3    defaults        <%= node[:rightimage][:root_mount][:dump] %> <%= node[:rightimage][:root_mount][:fsck] %>
 <% unless node[:rightimage][:fstab][:ephemeral] == false %>
 <% unless node[:rightimage][:fstab][:ephemeral_mount_opts] == nil -%>
 <%= node[:rightimage][:ephemeral_mount] %>   /mnt      ext3    <%= node[:rightimage][:fstab][:ephemeral_mount_opts] %>        0 0

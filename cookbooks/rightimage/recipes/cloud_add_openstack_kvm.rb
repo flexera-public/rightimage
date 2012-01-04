@@ -1,3 +1,4 @@
+rs_utils_marker :begin
 class Chef::Resource::Bash
   include RightScale::RightImage::Helper
 end
@@ -140,3 +141,4 @@ bash "package image" do
     qemu-img convert -O qcow2 #{target_temp_path} $BUNDLED_IMAGE_PATH
   EOH
 end
+rs_utils_marker :end

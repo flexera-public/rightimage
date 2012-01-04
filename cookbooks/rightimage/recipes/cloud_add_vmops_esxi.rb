@@ -1,3 +1,4 @@
+rs_utils_marker :begin
 # cloud_add_vmops_esxi.rb
 #
 # Converts a previously generated and mounted disk image and converts it to a stream optimized vmdk in an OVA package
@@ -280,3 +281,4 @@ bash "Create create vmdk and create ovf/ova files" do
     tar -cf #{bundled_image}.ova #{bundled_image}.ovf #{bundled_image}.mf *.vmdk
   EOH
 end
+rs_utils_marker :end

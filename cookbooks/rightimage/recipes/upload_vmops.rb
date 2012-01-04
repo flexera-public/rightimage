@@ -1,3 +1,4 @@
+rs_utils_marker :begin
 class Chef::Resource::RightimageUpload
   include RightScale::RightImage::Helper
 end
@@ -29,3 +30,4 @@ rightimage_upload "Upload cloudstack image" do
   action :upload
 end
 
+rs_utils_marker :end

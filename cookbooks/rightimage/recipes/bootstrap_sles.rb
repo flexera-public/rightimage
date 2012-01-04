@@ -1,3 +1,4 @@
+rs_utils_marker :begin
 
 
 
@@ -84,3 +85,4 @@ kiwi --force-new-root  --prepare #{kiwi_dir} --root #{node.rightimage.mount_dir}
 
 EOS
 end
+rs_utils_marker :end

@@ -1,3 +1,4 @@
+rs_utils_marker :begin
 # bootstrap_ubuntu.rb
 # 
 # Use vmbuilder to generate a base virtual image.  We will use the image generated here for other recipes to add
@@ -278,3 +279,4 @@ bash "cleanup" do
     chroot #{source_image} apt-get clean
   EOH
 end
+rs_utils_marker :end

@@ -1,3 +1,4 @@
+rs_utils_marker :begin
 #
 # Cookbook Name:: rightimage
 # Recipe:: default
@@ -20,3 +21,4 @@
 
 include_recipe "rightimage::clean"
 include_recipe "rightimage::rightscale_install"
+rs_utils_marker :end

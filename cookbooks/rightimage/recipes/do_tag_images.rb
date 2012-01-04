@@ -1,3 +1,4 @@
+rs_utils_marker :begin
 class Chef::Resource::RubyBlock
   include RightScale::RightImage::Helper
 end
@@ -48,3 +49,4 @@ ruby_block "tag EC2 images" do
 end
 
 
+rs_utils_marker :end

@@ -1,3 +1,4 @@
+rs_utils_marker :begin
 class Chef::Resource::Bash
   include RightScale::RightImage::Helper
 end
@@ -39,3 +40,4 @@ bash "upload partitioned base image" do
     s3cmd put #{base_image_upload_bucket}:#{s3_path_base}/#{target_type}0.raw.gz #{target_type}0.raw.gz x-amz-acl:public-read
   EOH
 end
+rs_utils_marker :end

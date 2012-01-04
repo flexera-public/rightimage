@@ -1,3 +1,4 @@
+rs_utils_marker :begin
 class Chef::Recipe
   include RightScale::RightImage::Helper
 end
@@ -14,6 +15,18 @@ block_device target_raw_root do
   lineage ri_lineage
 
   action :restore
+end
+
+bash "resize fs" do
+  flags "-x"
+  not_if node[:rightimage][:root_size_gb] == "10"
+  code <<-EOH
+    calc_mb="#{calc_mb}"
+    target_raw_path="#{target_raw_path}"
+
+    e2fsck -cn -f $target_raw_path
+    resize2fs $target_raw_path ${calc_mb}M
+  EOH
 end
 
 bash "mount image" do
@@ -36,3 +49,4 @@ bash "mount image" do
     mount $loop_map $source_image
   EOH
 end
+rs_utils_marker :end

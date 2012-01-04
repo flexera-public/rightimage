@@ -4,6 +4,7 @@ description      "image building tools"
 version          "0.0.1"
 
 depends "block_device"
+depends "rs_utils"
 
 recipe "rightimage::default", "starts builds image automatically at boot. See 'manual_mode' input to enable." 
 recipe "rightimage::build_image", "build image based on host platform"
@@ -78,7 +79,7 @@ attribute "rightimage/root_size_gb",
   :description => "Sets the size of the virtual image. Units are in GB.",
   :choice => [ "10", "4", "2" ],
   :default => "10",
-  :recipes => [ "rightimage::default", "rightimage::build_image" ] + cloud_add
+  :recipes => [ "rightimage::copy_image", "rightimage::do_restore", "rightimage::setup_loopback" ]
 
 attribute "rightimage/manual_mode",
   :display_name => "Manual Mode",

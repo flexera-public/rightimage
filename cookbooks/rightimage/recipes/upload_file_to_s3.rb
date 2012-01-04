@@ -1,3 +1,4 @@
+rs_utils_marker :begin
 class Chef::Resource::RightimageUploadS3
   include RightScale::RightImage::Helper
 end
@@ -28,3 +29,4 @@ rightimage_upload_s3 "Upload image image to s3" do
   bucket full_image_upload_bucket
   action :upload
 end
+rs_utils_marker :end
