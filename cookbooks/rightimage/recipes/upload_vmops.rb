@@ -8,7 +8,9 @@ class Chef::Resource::RubyBlock
 end
 
 
-["libxml2-devel", "libxslt-devel"].each do |p| 
+packages = ["libxml2-devel", "libxslt-devel"]
+packages.map!{|a| a.sub('devel','dev')} if node[:platform] == "ubuntu"
+packages.each do |p| 
   r = package p do 
     action :nothing 
   end
