@@ -20,7 +20,7 @@ set[:rightimage][:root_mount][:dev] = "LABEL=#{rightimage[:root_mount][:label_de
 #set[:rightimage][:platform] = platform
 #set[:rightimage][:release_number] = release_number
 #set[:rightimage][:release] = release
-#set[:rightimage][:arch] = arch
+set[:rightimage][:arch] = "x86_64" if node[:rightimage][:arch] == "x64"
 
 #set[:rightimage][:timestamp] = timestamp
 #set[:rightimage][:build] = build_number

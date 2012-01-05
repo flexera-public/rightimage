@@ -73,7 +73,7 @@ EOF
       end
 
       def ri_lineage
-        [platform,release_number,arch,timestamp,build_number].join("_")
+        [platform,release_number,short_arch,timestamp,build_number].join("_")
 
       end
 
@@ -116,6 +116,14 @@ EOF
         end
       end
 
+      def short_arch
+        if node[:rightimage][:arch] == "x86_64"
+          "x64"
+        else
+          node[:rightimage][:arch]
+        end
+      end
+
       def timestamp
         node[:rightimage][:timestamp]
       end
@@ -133,7 +141,7 @@ EOF
       end
 
       def os_string
-        platform + "_" + release_number + "_" + arch + "_" + timestamp + "_" + build_number
+        platform + "_" + release_number + "_" + short_arch + "_" + timestamp + "_" + build_number
       end
 
       def source_image
@@ -221,17 +229,25 @@ EOF
       end
 
       def full_image_upload_bucket
-        case node[:rightimage][:cloud]
-        when "vmops"
-          "rightscale-cloudstack-dev"
-        when "euca"
-          "rightscale-eucalyptus-dev"
-        when "openstack"
-          "rightscale-openstack-dev"
-        when "rackspace"
-          "rightscale-rackspace-dev"
-        when "ec2"
-          "rightscale-"+node[:rightimage][:region]
+        if !node[:rightimage][:image_upload_bucket].nil? and !node[:rightimage][:image_upload_bucket].empty?
+          node[:rightimage][:image_upload_bucket]
+        else
+          bucket_name = 
+            case node[:rightimage][:cloud]
+            when "vmops"
+              "rightscale-cloudstack"
+            when "euca"
+              "rightscale-eucalyptus"
+            when "openstack"
+              "rightscale-openstack"
+            when "rackspace"
+              "rightscale-rackspace"
+            when "ec2"
+              "rightscale-#{node[:rightimage][:region]}"
+            end
+          bucket_name.sub!(/eu-west$/,'eu')
+          bucket_name += "-dev" if image_name =~ /Dev/
+          return bucket_name
         end
       end
 

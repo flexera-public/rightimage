@@ -540,19 +540,14 @@
       "display_name": "File To Upload"
     },
     "rightimage/image_upload_bucket": {
-      "required": "required",
+      "required": "optional",
       "calculated": false,
       "choice": [
 
       ],
+      "default": "",
       "type": "string",
       "recipes": [
-        "rightimage::cloud_add_ec2",
-        "rightimage::do_tag_images",
-        "rightimage::do_create_mci",
-        "rightimage::base_centos",
-        "rightimage::base_ubuntu",
-        "rightimage::base_sles",
         "rightimage::default",
         "rightimage::build_image",
         "rightimage::upload_file_to_s3",
@@ -562,8 +557,8 @@
         "rightimage::upload_ec2_s3",
         "rightimage::upload_ec2_ebs"
       ],
-      "description": "The bucket to upload the image to.",
-      "display_name": "Image Upload Bucket"
+      "description": "The bucket to upload the image to. Calculated if left blank, specify to override"
+      "display_name": "Image Upload Bucket",
     },
     "rightimage/platform": {
       "required": "optional",
@@ -639,7 +634,7 @@
   },
   "recipes": {
     "rightimage::setup_block_device": "Creates, formats and mounts a brand new block_device volume stripe on the instance.",
-    "rightimage::upload_file_to_s3": "upload specified file to s3",
+    "rightimage::upload_file_to_s3": "upload image to s3",
     "rightimage::upload_openstack": "bundle and upload openstack kernel, ramdisk and image",
     "rightimage::cloud_add_vmops": "adds requirements for cloudstack based on hypervisor choice",
     "rightimage::rightscale_install": "installs rightscale",

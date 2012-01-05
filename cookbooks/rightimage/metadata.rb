@@ -34,7 +34,7 @@ recipe "rightimage::upload_ec2_ebs", "create EBS image snapshot (ec2 only)"
 recipe "rightimage::upload_vmops", "setup http server for download to test cloud"
 recipe "rightimage::upload_euca", "bundle and upload euca kernel, ramdisk and image"
 recipe "rightimage::upload_openstack", "bundle and upload openstack kernel, ramdisk and image"
-recipe "rightimage::upload_file_to_s3", "upload specified file to s3"
+recipe "rightimage::upload_file_to_s3", "upload image to s3 bucket"
 recipe "rightimage::base_upload", "compresses and uploads base image to s3"
 recipe "rightimage::setup_or_restore", "setup block device (on base mode) or restore volume (on full mode)"
 recipe "rightimage::setup_block_device", "Creates, formats and mounts a brand new block_device volume stripe on the instance."
@@ -133,9 +133,10 @@ attribute "rightimage/rightlink_version",
   
 attribute "rightimage/image_upload_bucket",
   :display_name => "Image Upload Bucket",
-  :description => "The bucket to upload the image to.",
-  :required => "required",
-  :recipes => [ "rightimage::cloud_add_ec2", "rightimage::do_tag_images" , "rightimage::do_create_mci" , "rightimage::base_centos" , "rightimage::base_ubuntu" , "rightimage::base_sles" , "rightimage::default", "rightimage::build_image" , "rightimage::upload_file_to_s3" ] + cloud_upload
+  :description => "The bucket to upload the image to. Calculated if left blank, specify to override",
+  :required => "optional",
+  :default => "",
+  :recipes => [ "rightimage::default", "rightimage::build_image" , "rightimage::upload_file_to_s3" ] + cloud_upload
 
 attribute "rightimage/file_to_upload",
   :display_name => "File To Upload",
