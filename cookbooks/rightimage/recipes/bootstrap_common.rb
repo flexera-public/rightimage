@@ -62,4 +62,10 @@ chmod +x $ROOT/tmp/rubygems_install.sh
 chroot $ROOT /tmp/rubygems_install.sh > /dev/null 
 EOC
 end
+
+# Clean up GUEST_ROOT image
+rightimage guest_root do
+  action :sanitize
+end
+
 rs_utils_marker :end
