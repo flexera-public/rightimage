@@ -7,15 +7,6 @@ class Chef::Resource::RubyBlock
   include RightScale::RightImage::Helper
 end
 
-packages = ["libxml2-devel", "libxslt-devel"]
-packages.map!{|a| a.sub('devel','dev')} if node[:platform] == "ubuntu"
-packages.each do |p| 
-  r = package p do 
-    action :nothing 
-  end
-  r.run_action(:install)
-end
-
 # This is a fog dependency.  The gem dependency code has a bug and causes fog install to fail unless we install this explicitly before
 r = gem_package "net-ssh" do
   gem_binary "/opt/rightscale/sandbox/bin/gem"

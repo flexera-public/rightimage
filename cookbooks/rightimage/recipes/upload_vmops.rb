@@ -7,16 +7,6 @@ class Chef::Resource::RubyBlock
   include RightScale::RightImage::Helper
 end
 
-
-packages = ["libxml2-devel", "libxslt-devel"]
-packages.map!{|a| a.sub('devel','dev')} if node[:platform] == "ubuntu"
-packages.each do |p| 
-  r = package p do 
-    action :nothing 
-  end
-  r.run_action(:install)
-end
-
 r = gem_package "nokogiri" do
   gem_binary "/opt/rightscale/sandbox/bin/gem"
   version "1.4.3.1"
