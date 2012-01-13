@@ -1,3 +1,4 @@
+rs_utils_marker :begin
 class Chef::Resource::Bash
   include RightScale::RightImage::Helper
 end
@@ -18,34 +19,14 @@ raise "ERROR: you must set your virtual_environment to xen!"  if hypervisor != "
 include_recipe "rightimage::install_vhd-util" if hypervisor == "xen"  
 
 bash "create_vmops_image" do 
+  flags "-ex"
   code <<-EOH
-    set -e 
-    set -x
-
-    base_root="#{base_root}"
-    source_image="#{source_image}" 
-    target_raw_root="#{target_raw_root}"
-    target_raw_path="#{target_raw_path}"
     guest_root="#{guest_root}"
 
-    umount -lf #{source_image}/proc || true 
     umount -lf #{guest_root}/proc || true 
     umount -lf #{guest_root}/sys || true 
-    umount -lf #{guest_root} || true
 
-    DISK_SIZE_GB=#{node[:rightimage][:root_size_gb]}  
-    BYTES_PER_MB=1024
-    DISK_SIZE_MB=$(($DISK_SIZE_GB * $BYTES_PER_MB))
-
-    rm -rf $base_root
-    mkdir -p $target_raw_root
-    dd if=/dev/zero of=$target_raw_path bs=1M count=$DISK_SIZE_MB    
-    mke2fs -F -j $target_raw_path
-    mkdir $guest_root
-    mount -o loop $target_raw_path $guest_root
-    rsync -a $source_image/ $guest_root/
     mkdir -p $guest_root/boot/grub
-
   EOH
 end
 
@@ -55,11 +36,9 @@ template "#{guest_root}/etc/fstab" do
   backup false
 end
 
-bash "mount proc" do 
+bash "mount proc" do
+  flags "-ex"
   code <<-EOH
-#!/bin/bash -ex
-    set -e 
-    set -x
     guest_root=#{guest_root}
     mount -t proc none $guest_root/proc
     mount --bind /dev $guest_root/dev
@@ -69,8 +48,6 @@ end
 
 rightimage_kernel "Install PV Kernel for Hypervisor" do
   provider "rightimage_kernel_#{hypervisor}"
-#  guest_root guest_root
-#  version node[:rightimage][:kernel_id]
   action :install
 end
 
@@ -80,17 +57,15 @@ template "#{guest_root}/boot/grub/grub.conf" do
   backup false 
 end
 
-include_recipe "rightimage::bootstrap_common"
+include_recipe "rightimage::bootstrap_common_debug"
 
-bash "configure for cloudstack" do 
+bash "configure for cloudstack" do
+  flags "-ex" 
   code <<-EOH
-#!/bin/bash -ex
-    set -e 
-    set -x
     guest_root=#{guest_root}
 
     # clean out packages
-    yum -c /tmp/yum.conf --installroot=$guest_root -y clean all
+    chroot $guest_root yum -y clean all
 
     # enable console access
     echo "2:2345:respawn:/sbin/mingetty xvc0" >> $guest_root/etc/inittab
@@ -107,13 +82,11 @@ bash "configure for cloudstack" do
   EOH
 end
 
-bash "unmount proc" do 
+bash "unmount proc" do
+  flags "-ex"
   code <<-EOH
-#!/bin/bash -ex
-    set -e 
-    set -x
-    target_mnt=#{guest_root}
-    umount -lf $target_mnt/proc || true
+    guest_root=#{guest_root}
+    umount -lf $guest_root/proc || true
     umount -lf $guest_root/dev
     umount -lf $guest_root/sys
   EOH
@@ -124,36 +97,28 @@ rightimage guest_root do
   action :sanitize
 end
 
-bash "sync fs" do 
+bash "sync fs" do
+  flags "-x" 
   code <<-EOH
-    set -x
     sync
   EOH
 end
 
-bash "unmount target filesystem" do 
-  code <<-EOH
-#!/bin/bash -ex
-    set -e 
-    set -x
-    target_mnt=#{guest_root}    
-    umount -lf $target_mnt
-  EOH
-end
+include_recipe "rightimage::do_destroy_loopback"
 
 bash "backup raw image" do 
   cwd target_raw_root
   code <<-EOH
     raw_image=$(basename #{target_raw_path})
-    cp -v $raw_image $raw_image.bak 
+    target_temp_root=#{target_temp_root}
+    cp -v $raw_image $target_temp_root 
   EOH
 end
 
 bash "xen convert" do 
-  cwd target_raw_root
+  cwd target_temp_root
+  flags "-ex"
   code <<-EOH
-    set -e
-    set -x
     raw_image=$(basename #{target_raw_path})
     vhd_image=${raw_image}.vhd
     vhd-util convert -s 0 -t 1 -i $raw_image -o $vhd_image
@@ -161,4 +126,4 @@ bash "xen convert" do
     bzip2 #{image_name}.vhd
   EOH
 end
-
+rs_utils_marker :end

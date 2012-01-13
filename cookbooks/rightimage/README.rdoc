@@ -1,71 +1,93 @@
 = DESCRIPTION:
 
-Builds a RightImage on a loopback filesystem.  Creates base OS install plus the RightScale package and common utils.  
-Then adds the cloud specific settings. Also has the ability to upload and register the RightImage with corresponding 
-cloud.
+Builds a RightImage on a loopback filesystem.  Creates base OS install and common utils then adds the cloud specific settings.  Also has the ability to upload and register the RightImage with corresponding cloud.
 
 
 = CONVENTIONS:
-"base" recipes clean, bootstrap and install rightscale on the specified os this gives us a base
-guest image in /mnt/image.
 
-"bootstrap" recipes install the a vanilla base image
+"base" recipes clean the base image and install RightLink.
 
-"cloud" recipes add cloud specific settings to the guest image
+"bootstrap" recipes install a vanilla base image.
 
-"upload" recipes convert the raw guest image and upload off host instance. 
+"cloud" recipes add cloud specific settings to the guest image.
+
+"upload" recipes convert the raw guest image and upload to the cloud. 
 
 
 = USAGE:
 
-Building a RightLink package and RightImages:
+ServerTemplate: 
 
- 1. Create server from right_image_creator [rev14] ST
- 2. Select image the matches the target guest platform
-      Centos 5.6 x64 builds x64 guest
-      Centos 5.6 i386 builds i386 guest
-      Ubuntu x64 builds both x64 and i386 guests
- 3. Set inputs
-  manual mode::
-    true: do nothing on boot; Allows for running recipes by hand.
-    false: build image but don't upload.
-  sanbox_repo_tag::
-    tag (i.e. "rightlink_package_5.N.N")
-    or branch name
-    or sha
-  debug::*
-    true - enables random root passwd login on image. 
+Use the latest version of right_image_creator.
+
+Image:
+
+Select an image that matches the target guest platform:
+  * Centos 5.6 x64 builds x64 guest
+  * Centos 5.6 i386 builds i386 guest
+  * Ubuntu x64 builds both x64 and i386 guests
+
+Inputs:
+
+  Build mode::
+    base: Creates a new base OS image.
+    full: Creates a full image with cloud-specific modifications and RightLink.
+  Build number::
+    Starts at 0.  Creates a lineage of base snapshots derived from the same day.
+  Build timestamp and mirror freeze date::
+    Specified in the format of YYYYMMDDHHMM (Year, month, day, 24 hour time)
+    Used to derive the lineage name and to set the software mirror freeze date.
+  Manual mode::
+    true: Do nothing on boot; allows for running recipes by hand.
+    false: In base mode, build a base image.  In full mode, build an image but don't upload.
+  Debug::
+    true: Enables random root password login on image. 
     password is appended to end of image name.
-    false - no password login enabled.  ssh key auth only.
-  Image Name::*
-    image name (must contain "Dev" if debug == true)
-    don't care for packages
-  Hypervisor*:: xen/kvm/esx
+    false: Password login via SSH is disabled.  SSH key auth only.
+  Image name::
+    Image name (must contain "Dev" if debug == true)
+  Hypervisor::
+    Set to the appropriate hypervisor type for the cloud.
+    esxi::
+      vmops
+    kvm::
+      openstack, vmops
+    xen::
+      ec2, euca, vmops
+    
+    
 
-* affects image only (not package)
+== Building a base OS image (Build mode: base, Manual mode: false):
 
-== Building packages:
+Automatic mode is useful when building a base image on boot
 
-  1. Set manual mode to false
+  1. Set ‘build mode’ to base and ‘manual mode’ to false
   2. launch server
-  3. once operational package can be found /mnt/image/root/.rightscale/*
 
-== Building rightimage (automode):
+== Building a base OS image (Build mode: base, Manual mode: true):
+
+Manual mode is useful when developing of the rightimage cookbooks
+
+  1. Set ‘build mode’ to base and ‘manual mode’ to true
+  2. launch server
+  3. once operational start the build using "rightimage::build_base" recipe
+
+== Building a RightImage (Build mode: full, Manual mode: false):
 
 Automatic mode is useful when building an image on boot
 
-  1. Set ‘manual mode’ to false
+  1. Set ‘build mode’ to full and ‘manual mode’ to false
   2. launch server
   3. once operational run "rightimage::upload_cloud_<cloud>" recipe
   4. run "rightimage::do_create_mci" to add image to MCI
   5. launch image_tester template with newly created image
   6. launch rightlink_tester template with newly created image
 
-== Building a RightImage (manual-mode):
+== Building a RightImage (Build mode: full, Manual mode: true):
 
-Manual-mode is useful when developing of the rightimage cookbooks
+Manual mode is useful when developing of the rightimage cookbooks
 
-  1. Set ‘manual mode’ input to true
+  1. Set ‘build mode’ to full and ‘manual mode’ to true
   2. launch server
   3. once operational start the build using "rightimage::build_image" recipe
   4. After the build is complete run "rightimage::upload_cloud_<cloud>" recipe
@@ -82,21 +104,6 @@ Stories to implement to for faster, simpler, lower cost MCI builds...
   So I can build and bundle once and
   upload to all regions from a single VM
   instead of launching a VM, building and bundling in every region
-
-  As a RightImage creator
-  I want to package and install on all clouds from a single VM
-  So I can build a given guest platform from a single VM
-  instead of launching a VM for every cloud permutation
-
-  As a RightImage Developer
-  I want to create a base image on a EBS volume and snapshot
-  So every I can attach a snapshot for every hypervisor/cloud image
-  instead of performing a 20min dd and rsync of the base image
-
-  As a RightImage Developer
-  I want to create install RightLink packages from the rightscale mirrors
-  So I can build with a tested and QA approvd package
-  instead of taking 20 min to build an untested package
 
   As a RightImage cookbook maintainer
   I want to refactor all cloud_add recipes

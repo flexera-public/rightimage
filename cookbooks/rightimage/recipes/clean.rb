@@ -1,12 +1,8 @@
+rs_utils_marker :begin
 execute "umount -lf  #{node[:rightimage][:build_dir]}/proc || true"
 execute "umount -lf  #{node[:rightimage][:mount_dir]}/proc || true"
 
 directory node[:rightimage][:build_dir] do 
-  action :delete
-  recursive true
-end
-
-directory node[:rightimage][:mount_dir] do 
   action :delete
   recursive true
 end
@@ -18,4 +14,4 @@ ruby_block "delete image id list" do
     id_list.clear
   end
 end
-
+rs_utils_marker :end

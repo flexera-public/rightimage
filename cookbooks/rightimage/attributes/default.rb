@@ -1,7 +1,9 @@
 ## when pasting a key into a json file, make sure to use the following command: 
 ## sed -e :a -e '$!N;s/\n/\\n/;ta' /path/to/key
 ## this seems not to work on os x
-
+class Chef::Node
+ include RightScale::RightImage::Helper
+end
 UNKNOWN = :unknown.to_s
 
 set_unless[:rightimage][:debug] = false
@@ -10,22 +12,23 @@ set_unless[:rightimage][:root_size_gb] = "10"
 set[:rightimage][:build_dir] = "/mnt/vmbuilder"
 set[:rightimage][:mount_dir] = "/mnt/image"
 set_unless[:rightimage][:virtual_environment] = "xen"
-set[:rightimage][:install_mirror] = "mirror.rightscale.com"
+set[:rightimage][:mirror] = "cf-mirror.rightscale.com"
 set_unless[:rightimage][:sandbox_repo_tag] = "rightlink_package_#{rightimage[:rightlink_version]}"
 set_unless[:rightimage][:cloud] = "raw"
-set[:rightimage][:ebs_mount_dir] = "/mnt/storage"
+set[:rightimage][:root_mount][:label_dev] = "ROOT"
+set[:rightimage][:root_mount][:dev] = "LABEL=#{rightimage[:root_mount][:label_dev]}"
 
 if rightimage[:platform] == "ubuntu"
-# for using apt-proxy
-  set[:rightimage][:install_mirror] = "localhost:9999"
+  set[:rightimage][:mirror_date] = "#{timestamp[0..3]}/#{timestamp[4..5]}/#{timestamp[6..7]}"
+  set[:rightimage][:mirror_url] = "http://#{node[:rightimage][:mirror]}/ubuntu_daily/#{node[:rightimage][:mirror_date]}"
+else
+  set[:rightimage][:mirror_date] = timestamp[0..7]
 end
-
-set_unless[:rightimage][:install_mirror_date] = "latest" 
 
 # set base os packages
 case rightimage[:platform]
 when "ubuntu"   
-  set[:rightimage][:guest_packages] = "ubuntu-standard binutils ruby1.8 curl unzip openssh-server ruby1.8-dev build-essential autoconf automake libtool logrotate rsync openssl openssh-server ca-certificates libopenssl-ruby1.8 subversion vim libreadline-ruby1.8 irb rdoc1.8 git-core liberror-perl libdigest-sha1-perl dmsetup emacs rake screen mailutils nscd bison ncurses-dev zlib1g-dev libreadline5-dev readline-common libxslt1-dev sqlite3 libxml2 flex libshadow-ruby1.8 postfix sysstat iptraf syslog-ng libarchive-dev"
+  set[:rightimage][:guest_packages] = "ubuntu-standard binutils ruby1.8 curl unzip openssh-server ruby1.8-dev build-essential autoconf automake libtool logrotate rsync openssl openssh-server ca-certificates libopenssl-ruby1.8 subversion vim libreadline-ruby1.8 irb rdoc1.8 git-core liberror-perl libdigest-sha1-perl dmsetup emacs rake screen mailutils nscd bison ncurses-dev zlib1g-dev libreadline5-dev readline-common libxslt1-dev sqlite3 libxml2 libxml2-dev flex libshadow-ruby1.8 postfix sysstat iptraf syslog-ng libarchive-dev tmux"
 
   node[:rightimage][:guest_packages] << " cloud-init" if node[:rightimage][:virtual_environment] == "ec2"
   set[:rightimage][:host_packages] = "openjdk-6-jre openssl ca-certificates"
@@ -41,7 +44,7 @@ when "ubuntu"
   rightimage[:guest_packages] << " euca2ools" if rightimage[:cloud] == "euca"
 
 when "centos" 
-  set[:rightimage][:guest_packages] = "wget mlocate nano logrotate ruby ruby-devel ruby-docs ruby-irb ruby-libs ruby-mode ruby-rdoc ruby-ri ruby-tcltk postfix openssl openssh openssh-askpass openssh-clients openssh-server curl gcc* zip unzip bison flex compat-libstdc++-296 cvs subversion autoconf automake libtool compat-gcc-34-g77 mutt sysstat rpm-build fping vim-common vim-enhanced rrdtool-1.2.27 rrdtool-devel-1.2.27 rrdtool-doc-1.2.27 rrdtool-perl-1.2.27 rrdtool-python-1.2.27 rrdtool-ruby-1.2.27 rrdtool-tcl-1.2.27 pkgconfig lynx screen yum-utils bwm-ng createrepo redhat-rpm-config redhat-lsb git nscd xfsprogs swig libarchive-devel"
+  set[:rightimage][:guest_packages] = "wget mlocate nano logrotate ruby ruby-devel ruby-docs ruby-irb ruby-libs ruby-mode ruby-rdoc ruby-ri ruby-tcltk postfix openssl openssh openssh-askpass openssh-clients openssh-server curl gcc* zip unzip bison flex compat-libstdc++-296 cvs subversion autoconf automake libtool compat-gcc-34-g77 mutt sysstat rpm-build fping vim-common vim-enhanced rrdtool-1.2.27 rrdtool-devel-1.2.27 rrdtool-doc-1.2.27 rrdtool-perl-1.2.27 rrdtool-python-1.2.27 rrdtool-ruby-1.2.27 rrdtool-tcl-1.2.27 pkgconfig lynx screen yum-utils bwm-ng createrepo redhat-rpm-config redhat-lsb git nscd xfsprogs swig libarchive-devel tmux libxml2 libxml2-devel libxslt libxslt-dev"
 
   rightimage[:guest_packages] << " iscsi-initiator-utils" if rightimage[:cloud] == "vmops" 
 
@@ -79,7 +82,6 @@ end if rightimage[:platform] == "ubuntu"
 # set cloud stuff
 case rightimage[:cloud]
   when "ec2", "euca" 
-    set[:rightimage][:root_mount][:dev] = "/dev/sda1"
     set[:rightimage][:root_mount][:dump] = "0" 
     set[:rightimage][:root_mount][:fsck] = "0" 
     set[:rightimage][:fstab][:ephemeral] = true
@@ -100,30 +102,24 @@ case rightimage[:cloud]
     when "xen"
       set[:rightimage][:fstab][:ephemeral_mount_opts] = "defaults"
       set[:rightimage][:fstab][:ephemeral] = false
-      set[:rightimage][:root_mount][:dev] = "/dev/xvda"
       set[:rightimage][:root_mount][:dump] = "1" 
       set[:rightimage][:root_mount][:fsck] = "1" 
       set[:rightimage][:ephemeral_mount] = nil
       set[:rightimage][:fstab][:ephemeral_mount_opts] = nil
     when "kvm"
       rightimage[:host_packages] << " qemu grub"
-      rightimage[:guest_packages] << " grub"
       set[:rightimage][:fstab][:ephemeral] = false
       set[:rightimage][:ephemeral_mount] = "/dev/vdb"
       set[:rightimage][:fstab][:ephemeral_mount_opts] = "defaults"
       set[:rightimage][:grub][:root_device] = "/dev/vda"
-      set[:rightimage][:root_mount][:dev] = "/dev/vda1"
       set[:rightimage][:root_mount][:dump] = "1" 
       set[:rightimage][:root_mount][:fsck] = "1" 
     when "esxi"
       rightimage[:host_packages] << " qemu grub"
-      rightimage[:guest_packages] << " grub"
       set[:rightimage][:ephemeral_mount] = nil
       set[:rightimage][:fstab][:ephemeral_mount_opts] = nil
       set[:rightimage][:fstab][:ephemeral] = false
       set[:rightimage][:grub][:root_device] = "/dev/sda"
-      set[:rightimage][:root_mount][:uuid] = `uuidgen`.strip
-      set[:rightimage][:root_mount][:dev] = "UUID=#{rightimage[:root_mount][:uuid]}"
       set[:rightimage][:root_mount][:dump] = "1" 
       set[:rightimage][:root_mount][:fsck] = "1" 
     else
@@ -152,51 +148,29 @@ case rightimage[:platform]
 
 end
 
-# set default mirrors and EC2 endpoint
+# set default EC2 endpoint
 case rightimage[:region]
   when "us-east"
-    set[:rightimage][:mirror] = "http://ec2-us-east-mirror.rightscale.com"
     set[:rightimage][:ec2_endpoint] = "https://ec2.us-east-1.amazonaws.com"
   when "us-west"
-    set[:rightimage][:mirror] = "http://ec2-us-west-mirror.rightscale.com"
     set[:rightimage][:ec2_endpoint] = "https://ec2.us-west-1.amazonaws.com"
   when "us-west-2"
-    set[:rightimage][:mirror] = "http://ec2-us-west-mirror.rightscale.com"
     set[:rightimage][:ec2_endpoint] = "https://ec2.us-west-2.amazonaws.com"
   when "eu-west"
-    set[:rightimage][:mirror] = "http://ec2-eu-west-mirror.rightscale.com"
     set[:rightimage][:ec2_endpoint] = "https://ec2.eu-west-1.amazonaws.com"
   when "ap-southeast"
-    set[:rightimage][:mirror] = "http://ec2-ap-southeast-mirror.rightscale.com"
     set[:rightimage][:ec2_endpoint] = "https://ec2.ap-southeast-1.amazonaws.com"
   when "ap-northeast"
-    set[:rightimage][:mirror] = "http://ec2-ap-northeast-mirror.rightscale.com"
     set[:rightimage][:ec2_endpoint] = "https://ec2.ap-northeast-1.amazonaws.com"
   when "sa-east"
-    set[:rightimage][:mirror] = "http://mirror.rightscale.com"
     set[:rightimage][:ec2_endpoint] = "https://ec2.sa-east-1.amazonaws.com"
   else
-    set[:rightimage][:mirror] = "http://mirror.rightscale.com"
     set[:rightimage][:ec2_endpoint] = "https://ec2.us-east-1.amazonaws.com"
 end #if rightimage[:cloud] == "ec2" 
 
 # if ubuntu then figure out the numbered name
-case rightimage[:release]
-  when "hardy" 
-    set[:rightimage][:release_number] = "8.04"
-  when "intrepid" 
-    set[:rightimage][:release_number] = "8.10"
-  when "jaunty" 
-    set[:rightimage][:release_number] = "9.04"
-  when "karmic" 
-    set[:rightimage][:release_number] = "9.10"
-  when "lucid" 
-    set[:rightimage][:release_number] = "10.04"
-  when "maverick" 
-    set[:rightimage][:release_number] = "10.10" 
-  else 
-    set[:rightimage][:release_number] = rightimage[:release]
-end
+set[:rightimage][:release_number] = release_number
+
 
 # Select kernel to use based on cloud
 #case rightimage[:cloud]

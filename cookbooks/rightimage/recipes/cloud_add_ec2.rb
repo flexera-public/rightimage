@@ -1,3 +1,4 @@
+rs_utils_marker :begin
 class Chef::Resource::Bash
   include RightScale::RightImage::Helper
 end
@@ -24,31 +25,13 @@ end
 # TODO: add uuca tools for centos 
 #  - create /etc/rightscale.d/cloud
 
-bash "create loopback" do 
+bash "cleanup" do 
   flags "-ex"
   code <<-EOH
-    base_root="#{base_root}"
-    source_image="#{source_image}" 
-    target_raw_root="#{target_raw_root}"
-    target_raw_path="#{target_raw_path}"
     guest_root="#{guest_root}"
 
-    umount -lf #{source_image}/proc || true 
     umount -lf #{guest_root}/proc || true 
     umount -lf #{guest_root}/sys || true 
-    umount -lf #{guest_root} || true
-
-    DISK_SIZE_GB=#{node[:rightimage][:root_size_gb]}  
-    BYTES_PER_MB=1024
-    DISK_SIZE_MB=$(($DISK_SIZE_GB * $BYTES_PER_MB))
-
-    rm -rf $base_root
-    mkdir -p $target_raw_root
-    dd if=/dev/zero of=$target_raw_path bs=1M count=$DISK_SIZE_MB    
-    mke2fs -F -j $target_raw_path
-    mkdir $guest_root
-    mount -o loop $target_raw_path $guest_root
-    rsync -a $source_image/ $guest_root/
     mkdir -p $guest_root/boot/grub
   EOH
 end
@@ -63,10 +46,9 @@ template "#{guest_root}/etc/fstab" do
   backup false
 end
 
-bash "mount proc & dev" do 
+bash "mount proc & dev" do
+  flags "-ex"
   code <<-EOH
-    set -e 
-    set -x
     GUEST_ROOT=#{guest_root}
     mount -t proc none $GUEST_ROOT/proc
 #    mount --bind /dev $GUEST_ROOT/dev
@@ -90,7 +72,7 @@ template "#{guest_root}/boot/grub/menu.lst" do
   source "menu.lst.erb"
 end
 
-include_recipe "rightimage::bootstrap_common"
+include_recipe "rightimage::bootstrap_common_debug"
 
 #  - add get_ssh_key script
 template "#{guest_root}/etc/init.d/getsshkey" do 
@@ -107,8 +89,8 @@ end
 #  - add cloud tools
 bash "install_ec2_tools" do 
   creates "#{guest_root}/home/ec2/bin"
+  flags "-ex"
   code <<-EOH
-#!/bin/bash -ex
     ROOT=#{guest_root}
     rm -rf $ROOT/home/ec2 || true
     mkdir -p $ROOT/home/ec2
@@ -126,24 +108,17 @@ bash "install_ec2_tools" do
 end
  
 bash "do_depmod" do 
+  flags "-ex"
   code <<-EOH
-#!/bin/bash -ex
   for module_version in $(cd #{guest_root}/lib/modules; ls); do
     chroot #{guest_root} depmod -a $module_version
   done
   EOH
 end if node[:rightimage][:platform] == "centos"
 
-#  - configure mirrors
-template "#{guest_root}/#{node[:rightimage][:mirror_file_path]}" do 
-  source node[:rightimage][:mirror_file] 
-  backup false
-end unless node[:rightimage][:platform] == "centos"
-
 bash "unmount proc & dev" do 
+  flags "-ex"
   code <<-EOH
-    set -e 
-    set -x
     GUEST_ROOT=#{guest_root}
     umount -lf $GUEST_ROOT/proc || true
 #    umount -lf $GUEST_ROOT/dev || true
@@ -156,17 +131,10 @@ rightimage guest_root do
   action :sanitize
 end
 
-bash "sync fs" do 
+bash "sync fs" do
+  flags "-ex"
   code <<-EOH
-    set -x
     sync
   EOH
 end
-
-bash "unmount target filesystem" do
-  flags "-ex" 
-  code <<-EOH
-    target_mnt=#{guest_root}    
-    umount -lf $target_mnt
-  EOH
-end
+rs_utils_marker :end

@@ -1,3 +1,4 @@
+rs_utils_marker :begin
 # bootstrap_ubuntu.rb
 # 
 # Use vmbuilder to generate a base virtual image.  We will use the image generated here for other recipes to add
@@ -51,8 +52,8 @@ bootstrap_cmd = "/usr/bin/vmbuilder  #{node[:rightimage][:virtual_environment]} 
     --suite=#{node[:rightimage][:release]} \
     -d #{node[:rightimage][:build_dir]} \
     --rootsize=2048 \
-    --install-mirror=http://mirror.rightscale.com/ubuntu \
-    --install-security-mirror=http://mirror.rightscale.com/ubuntu \
+    --install-mirror=#{node[:rightimage][:mirror_url]} \
+    --install-security-mirror=#{node[:rightimage][:mirror_url]} \
     --components=main,restricted,universe,multiverse \
     --lang=#{node[:rightimage][:lang]} --verbose "
 if node[:rightimage][:arch] == "i386"
@@ -145,12 +146,13 @@ case "#{node.rightimage.virtual_environment}" in
 esac
 
 
-loop_name="loop0"
+loop_name="loop1"
 loop_dev="/dev/$loop_name"
 loop_map="/dev/mapper/${loop_name}p1"
 
 base_raw_path="/mnt/vmbuilder/root.img"
 
+sync
 # Cleanup loopback stuff
 set +e
 [ -e $loop_map ] && kpartx -d $loop_dev
@@ -178,17 +180,22 @@ esac
     mkdir $random_dir
     mount -o loop $loopback_device  $random_dir
     umount $guest_root/proc || true
-    rm -rf $guest_root
-    mkdir -p $guest_root 
+    rm -rf $guest_root/*
     rsync -a $random_dir/ $guest_root/
     umount $random_dir
-    rm -rf  $random_dir
+    sync
+    losetup -d $loopback_device
+    rm -rf $random_dir
     mkdir -p $guest_root/var/man
     chroot $guest_root chown -R man:root /var/man
 EOH
-  # TODO: Fix this
-  not_if "test -e /mnt/vmbuilder/root.img"
 end
+
+#  - configure mirrors
+template "#{guest_root}/#{node[:rightimage][:mirror_file_path]}" do 
+  source node[:rightimage][:mirror_file] 
+  backup false
+end 
 
 bash "Restore original ext4 in /etc/mke2fs.conf" do
   code <<-EOH
@@ -272,3 +279,4 @@ bash "cleanup" do
     chroot #{source_image} apt-get clean
   EOH
 end
+rs_utils_marker :end

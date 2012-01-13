@@ -1,0 +1,473 @@
+#!/bin/bash
+# Copyright (c) 2009 by RightScale Inc., all rights reserved
+# chkconfig: 2345 96 01
+# description: This is the RightScale cloud seed script. \
+#   It is used to bootstrap the installation of the RightLink software onto a \
+#   cloud instance. If you have any questions please feel free to look through \
+#   the script or contact RightScale.
+#
+## suse init info
+### BEGIN INIT INFO
+# Provides:          rightimage
+# Required-Start:    $syslog $remote_fs $network $named
+# Required-Stop:     $syslog $remote_fs
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: RightLink agent
+# Description:       Starts or stops the RightLink agent.
+# X-Start-Before:    amazon
+# X-Stop-After:      amazon
+### END INIT INFO
+
+#############################################################################
+## Setup environment used by the remainder of this script
+#############################################################################
+
+#Set Root Home and working directory for temp files
+export HOME=/root
+export WORKING_DIR=$HOME/.rightscale
+
+function init_os_state() {
+  # Set Root Home
+  export HOME=/root
+
+  if [ -e /usr/bin/lsb_release ]; then
+    # For LSB-compliant distros, query lsb_release...
+    case `lsb_release -si` in
+      Ubuntu*)
+        export RS_DISTRO=ubuntu
+        export RS_BASE_OS=debian
+        ;;
+      Debian*)
+        export RS_DISTRO=debian
+        export RS_BASE_OS=debian
+        ;;
+      CentOS*)
+        export RS_DISTRO=centos
+        export RS_BASE_OS=redhat
+        ;;
+      Fedora*)
+        export RS_DISTRO=fedora
+        export RS_BASE_OS=redhat
+        ;;
+      RedHatEnterprise*)
+        export RS_DISTRO=rhel
+        export RS_BASE_OS=redhat
+        ;;
+      EnterpriseEnterpriseServer*)
+        export RS_DISTRO=oel
+        export RS_BASE_OS=redhat
+        ;;
+      SUSE*)
+        export RS_DISTRO=suse
+        export RS_BASE_OS=suse
+        ;;
+      *)
+        export RS_DISTRO=unknown
+        export RS_BASE_OS=unknown
+        ;;
+    esac
+
+    export RS_OS_VERSION=`lsb_release -rs`
+  elif [ -e /etc/fedora-release ]; then
+    #Fedora doesn't always have lsb_release, but it does have a release file
+    export RS_DISTRO=fedora
+    export RS_BASE_OS=redhat
+    export RS_OS_VERSION=`cat /etc/fedora-release | perl -wlne 'print $1 if /Fedora release ([0-9.]+)/'`
+  else
+    #Don't know our distro whatsoever...
+    export RS_DISTRO=unknown
+    export RS_BASE_OS=unknown
+    export RS_OS_VERSION=unknown
+  fi
+
+  # Get the architecture used by the packaging system on this machine
+  if [ "$RS_BASE_OS" == "debian" ]; then
+    #Debian's package manager tells us its architecture directly
+    export RS_ARCH=`dpkg --print-architecture || echo unknown`
+  else
+    #For RedHat and other distros, we need to guess using a heuristic based on the
+    #output of uname.
+    export RS_ARCH=`uname -i || echo unknown`
+
+    #On some systems, uname -i fails
+    if [ "$RS_ARCH" == "unknown" ]; then
+      export RS_ARCH=`uname -m || echo unknown`
+    fi
+
+    #Sometimes i686 is reported; this is equivalent to i386 for our purposes
+    if [ "$RS_ARCH" == "i686" ]; then
+      export RS_ARCH="i386"
+    fi
+  fi
+
+  # Source function library and networking configuration for Redhat-based distros
+  if [ "$RS_BASE_OS" == "redhat" ]; then
+    . /etc/rc.d/init.d/functions
+    [ -r /etc/sysconfig/network ] && . /etc/sysconfig/network
+  fi
+
+  ###############################################################################
+  ## Determine whether the script has everything it needs to continue
+  ###############################################################################
+
+  if [ "$RS_BASE_OS" == "unknown" -o "$RS_ARCH" == "unknown" ]; then
+    logger -st RightScale "Unsupported OS/architecture $RS_BASE_OS/$RS_ARCH; exiting."
+    exit 2
+  fi
+
+  # Check that networking is up. (Only works on Redhat-based systems.)
+  [ "${NETWORKING}" == "no" ] && exit 1
+}
+
+#############################################################################
+## Determine which cloud we're on
+#############################################################################
+
+function init_cloud_state() {
+  if [ -e /etc/rightscale.d/cloud ]; then
+    export RS_CLOUD=`cat /etc/rightscale.d/cloud`
+    chmod 0444 /etc/rightscale.d/cloud
+  else
+    logger -st RightScale "/etc/rightscale.d/cloud not found; cannot continue."
+    exit 1
+  fi
+}
+
+###############################################################################
+## Define some functions to be called by the start() function (see below)
+###############################################################################
+
+init_cloud_state
+init_os_state
+
+export CURL_OPT=(-s -S -f -L --retry 7)
+S3_PROD_BUCKET=http://s3.amazonaws.com/rightscale_rightlink
+S3_DEV_BUCKET=http://s3.amazonaws.com/rightscale_rightlink_dev
+
+function configure_proxy() {
+  if [ -f /etc/profile.d/http_proxy.sh ]; then
+    . /etc/profile.d/http_proxy.sh
+  fi
+}
+
+CLOUD_USERDATA=
+function get_cloud_userdata() {
+  #In any cloud, honor the user-data.txt file if it exists
+  if [ -e /var/spool/$RS_CLOUD/user-data.txt ]; then
+    CLOUD_USERDATA=`cat /var/spool/$RS_CLOUD/user-data.txt`
+    logger -st RightScale "Successfully retrieved user-data from local text file"
+    return
+  fi
+
+  case $RS_CLOUD in
+    #In EC2-type clouds, attempt to fetch userdata from the metadata server
+    ec2*|eucalyptus*|openstack*)
+      # Detect Eucalyptus metadata server address.
+      # Since dig always returns 0, we need to check for empty output
+      # to detect failure.
+      dig_output=`dig +short euca-metadata`
+      if [ "$dig_output" != "" ]; then
+        md_host=`dig +short euca-metadata | head -n 1`
+        md_port="8773"
+      else
+        md_host="169.254.169.254"
+        md_port="80"
+      fi
+
+      metadata_server="http://$md_host:$md_port/latest/user-data"
+      false #make $? != 0 so we ensure that we go thru the loop at least once!
+      while [ $? -ne 0 ]; do
+        logger -st RightScale "Querying metadata from ($metadata_server)..."
+        sleep 1
+        CLOUD_USERDATA=`curl -s "$metadata_server"`
+      done
+      logger -st RightScale "Successfully retrieved user-data from metadata server"
+      ;;
+
+    #In CloudStack clouds, our userdata comes from our DOM router who also happens to
+    #be our DHCP server. Scrape the DHCP leases file and query the DHCP server
+    #for metadata.
+    cloudstack*)
+      for candidate in [ /var/lib/dhcp3/dhclient.eth0.leases /var/lib/dhclient/dhclient-eth0.leases /var/lib/dhclient-eth0.leases ]; do
+        if [ -f $candidate ]; then
+          leases_file=$candidate
+        fi
+      done
+      if [ -z $leases_file ]; then
+        logger -st RightScale "Unable to query user data - can't locate DHCP leases file."
+        exit 1
+      fi
+
+      server_ip=$(grep dhcp-server-identifier $leases_file | tail -1 | awk '{print $NF}' | tr '\;' ' ' | tr -d ' ')
+      metadata_server="http://$server_ip/latest/user-data"
+      false
+      while [ $? -ne 0 ]; do
+        logger -st RightScale "Querying user-data from ($metadata_server)..."
+        sleep 1
+        CLOUD_USERDATA=`curl -s "$metadata_server"`
+      done
+      ;;
+    rackspace*)
+      #wait for userdata to appear
+      userdata_file="/var/spool/rackspace/user-data.txt"
+      while [ ! -e $userdata_file ]; do
+        logger -st RightScale "Waiting for user-data file ($userdata_file)..."
+        sleep 10
+      done
+
+      #wait for userdata to settle (don't want to read a half written file)
+      CLOUD_USERDATA_OLD=""
+      CLOUD_USERDATA=""
+      while [ "$CLOUD_USERDATA_OLD" != "$CLOUD_USERDATA" ] && [ "$CLOUD_USERDATA" == "" ]; do
+        sleep 1
+        CLOUD_USERDATA_OLD=`cat $userdata_file`
+        sleep 1
+        CLOUD_USERDATA=`cat $userdata_file`
+      done
+      ;;
+    *)
+      logger -st RightScale "Unable to query user data - unknown cloud family $RS_CLOUD. Cannot continue."
+      exit 1
+      ;;
+  esac
+}
+
+RS_VERSION=
+function get_rs_version() {
+  if imageversion=`expr "$CLOUD_USERDATA" : '.*RS_version=\([-_.0-9a-z]*\)'`; then
+    RS_VERSION=$imageversion
+  elif [ -e /etc/rightscale.d/rightscale-release ]; then
+    RS_VERSION=`cat /etc/rightscale.d/rightscale-release`
+  else
+    logger -st RightScale "RS_version not in userdata and rightscale-release file not found. Cannot continue."
+    exit 1
+  fi
+}
+
+RS_SRC=
+function get_rs_src() {
+  if devsrc=`expr "$CLOUD_USERDATA" : '.*RS_src=\([-_.0-9a-z/]*\)'`; then
+    RS_SRC=$devsrc
+  fi
+}
+
+PACKAGE_NAME=""
+DEV_PACKAGE_NAME=""
+TARBALL_NAME=""
+function get_package_names() {
+  if [ "$RS_BASE_OS" == "debian" ]; then
+    suffix="deb"
+  elif [ "$RS_BASE_OS" == 'suse' ]; then
+    suffix="rpm"
+  elif [ "$RS_BASE_OS" == "redhat" ]; then
+    suffix="rpm"
+  fi
+
+  PACKAGE_NAME="rightscale_${RS_VERSION}-${RS_DISTRO}_${RS_OS_VERSION}-${RS_ARCH}.${suffix}"
+  DEV_PACKAGE_NAME="rightscale_${RS_SRC}-${RS_DISTRO}_${RS_OS_VERSION}-${RS_ARCH}.${suffix}"
+  TARBALL_NAME="rightscale_${RS_SRC}.tgz"
+}
+
+function download_package_or_tarball() {
+  mkdir -p $WORKING_DIR
+
+  if [ $1 == $S3_DEV_BUCKET ] ; then
+    PACKAGE_NAME=$DEV_PACKAGE_NAME
+  fi
+
+  url_list=(
+    "$1/$RS_VERSION/$RS_DISTRO/$PACKAGE_NAME"
+    "$1/$RS_VERSION/$PACKAGE_NAME"
+    "$1/$RS_SRC/$RS_DISTRO/$PACKAGE_NAME"
+    "$1/$RS_SRC/$PACKAGE_NAME"
+    "$1/$PACKAGE_NAME"
+    "$1/$TARBALL_NAME"
+    "$1/$RS_SRC"
+    "$RS_SRC"
+  )
+
+  package_extension="${PACKAGE_NAME##*.}"
+  download_file url_list[@] "rightlink.installer"
+  if [ $?==0 ] ; then
+    local actual_extension=${DOWNLOADED_FILE_NAME##*.}
+    if [ "$package_extension" == "$actual_extension" ] ; then
+      PACKAGE_NAME=$DOWNLOADED_FILE_NAME
+    elif [ "tgz" == "$actual_extension" ] ; then
+      TARBALL_NAME=$DOWNLOADED_FILE_NAME
+    fi
+  fi
+}
+
+DOWNLOADED_FILE_NAME=
+function download_file() {
+  declare -a urls=("${!1}")
+  local temp_filename=$2
+
+  local final_filename=""
+  local output_file=$WORKING_DIR/$temp_filename
+  for url in "${urls[@]}" ; do
+    CODE=500
+    while [ "$CODE" -ge "500" ]; do
+      logger -st RightScale "Downloading $temp_filename from $url"
+      CODE=`curl "${CURL_OPT[@]}" -w '%{http_code}' -o $output_file $url`
+      logger -st RightScale "curl returned code: $CODE"
+      final_filename=$(basename $url)
+    done
+
+    if [[ -e $output_file ]]; then
+      DOWNLOADED_FILE_NAME=$final_filename
+      mv $output_file $WORKING_DIR/$final_filename
+      return 0;
+    fi
+  done
+
+  return 1;
+}
+
+function install_package() {
+  logger -st RightScale "installing package: $1"
+  if [ "$RS_BASE_OS" == "debian" ]; then
+    export DEBIAN_FRONTEND=noninteractive
+
+    #dpkg always returns 0, so we need to grep its output for some magic words
+    dpkg_output=`dpkg -i $WORKING_DIR/$1  2>&1`
+
+    if [[ "$dpkg_output" =~ "dependency problems prevent configuration" ]]; then
+      # install may have failed due to missing dependencies.
+      echo "$dpkg_output" | logger -st RightScale
+      exit 1 # Dependencies not installed in image -- fail
+    else
+      #If everything went okay, log the original dpkg output
+      echo "$dpkg_output" | logger -st RightScale
+    fi
+  elif [ "$RS_BASE_OS" == "redhat" -o "$RS_BASE_OS" == 'suse' ]; then
+    rpm_output=`rpm -iv $WORKING_DIR/$1 2>&1`
+    result=$?
+    echo "$rpm_output" | logger -st RightScale
+    if [ $result != 0 ]; then
+      logger -st RightScale "Failed to install package.  Cannot continue."
+      exit 1
+    fi
+  fi
+}
+
+function install_tarball() {
+  mkdir -p /opt
+  tar -C /opt/ -zxf $WORKING_DIR/$TARBALL_NAME
+
+  chmod +x /opt/rightscale/bin/*
+
+  if [ -e /opt/rightscale/bin/post_install_dev.sh ]; then
+    /opt/rightscale/bin/post_install_dev.sh
+  else
+    /opt/rightscale/bin/post_install.sh
+  fi
+}
+
+function remove_me() {
+  my_name=`readlink -e $0`
+
+  if [ "$RS_BASE_OS" == "debian" ]; then
+    update-rc.d -f `basename $my_name` remove
+  elif [ "$RS_BASE_OS" == "redhat" ]; then
+    chkconfig --del `basename $my_name`
+  fi
+}
+
+function start() {
+  logger -st RightScale "Installing RightScale on $RS_DISTRO-$RS_ARCH"
+
+  unset http_proxy ; unset HTTP_PROXY ; unset no_proxy; unset NO_PROXY
+  get_cloud_userdata
+  configure_proxy # must be done AFTER getting userdata due to old curl that doesn't grok $no_proxy
+  get_rs_version
+  get_rs_src
+  get_package_names
+
+  # If RS_SRC is not defined in userdata, we're booting in "production mode."
+  #  1) We always install an OS package (never a tarball)
+  #  2) The package version we install is defined by either:
+  #      2a) the contents of the RS_version userdata if present, or
+  #      2b) the contents of /etc/rightscale.d/rightscale-release
+  #  3) We look for a package with a suitable filename in:
+  #      3a) /root/.rightscale
+  #      3b) we will NOT search the S3 bucket "rightscale_rightlink" because
+  #          RightLink-enabled images are self-contained in terms of the
+  #          "production mode" base package (although patches are still
+  #          dynamically downloadable).
+  #  4) We only install the package if it hasn't already been installed
+  #      --In theory this script should only exist on systems where the package
+  #        hasn't been installed, but it never hurts to be paranoid...
+  if [ -z "$RS_SRC" ]; then
+    if [ "$RS_BASE_OS" == "debian" ]; then
+      pkg_query_cmd="dpkg -l"
+    elif [ "$RS_BASE_OS" == 'suse' ]; then
+      pkg_query_cmd="zypper packages"
+    else
+      pkg_query_cmd="yum list installed"
+    fi
+
+    # Install rightscale package if it isn't already installed
+    if ! `$pkg_query_cmd | grep rightscale`; then
+      if [ ! -e $WORKING_DIR/$PACKAGE_NAME ]; then
+        logger -st RightScale "Required version of RightScale package not found in $WORKING_DIR/$PACKAGE_NAME"
+        exit 1
+      else
+        logger -st RightScale "Local RightScale package found in $WORKING_DIR/$PACKAGE_NAME"
+      fi
+
+      install_package $PACKAGE_NAME
+    fi
+
+    remove_me
+
+  # If RS_SRC is included in userdata, we're booting in "developer mode."
+  #  1) We may install an OS package or tarball depending on what is available
+  #  2) The value of RS_SRC defines the filename suffix that we try to download
+  #        -- e.g. RS_SRC=foo --> rightscale_foo.deb OR rightscale_foo.tgz
+  #  3) We unconditionally download regardless of what is available locally
+  #  4) We always download from the S3 bucket "rightscale_rightlink_dev"
+  else
+    logger -st RightScale "Fetching dev package/tarball in $S3_DEV_BUCKET"
+    download_package_or_tarball $S3_DEV_BUCKET
+
+    if [ -e $WORKING_DIR/$PACKAGE_NAME ]; then
+      logger -st RightScale "Installing dev package $PACKAGE_NAME"
+      install_package $PACKAGE_NAME
+      remove_me
+    elif [ -e $WORKING_DIR/$TARBALL_NAME ]; then
+      logger -st RightScale "Installing dev tarball $TARBALL_NAME"
+      install_tarball
+      remove_me
+    else
+      logger -st RightScale "Could not find dev package or tarball! Is RS_src correct?"
+      exit 1
+    fi
+  fi
+
+  echo "Starting RightScale services; output is recorded to /var/log/messages."
+  /etc/init.d/rightboot start
+  /etc/init.d/rightscale start
+  /etc/init.d/rightlink start
+
+  exit 0
+}
+
+function stop() {
+  exit 0
+}
+
+# See how we were called.
+case "$1" in
+  start)
+    start
+    ;;
+  stop)
+    stop
+    ;;
+  *)
+    echo "Usage: $0 start|stop"
+    exit 255
+    ;;
+esac

@@ -1,3 +1,4 @@
+rs_utils_marker :begin
 class Chef::Resource::Bash
   include RightScale::RightImage::Helper
 end
@@ -15,66 +16,15 @@ raise "ERROR: you must set your virtual_environment to xen!"  if node[:rightimag
 
 euca_tools_version = "1.3.1"
 
-loop_name="loop0"
-loop_dev="/dev/#{loop_name}"
-
-
 bash "clean yum" do
   only_if { node[:platform] == "centos" }
+  flags "-x"
   code <<-EOH
-    set -x
     yum clean all
   EOH
 end
 
 package "grub"
-
-bash "cleanup" do 
-  code <<-EOH
-    set -x
-    base_root=#{base_root}
-    guest_root=#{guest_root}
-    source_image="#{source_image}"
-    target_raw_path="#{target_raw_path}"
-    loopdev=#{loop_dev}  
-
-    umount -lf $source_image/proc || true 
-    umount -lf $guest_root/proc || true 
-    umount -lf $guest_root/dev || true
-    umount -lf $guest_root/sys || true
-    umount -lf $guest_root || true
-    losetup -d $loopdev
-    rm -rf $base_root
-  EOH
-end
-
-bash "create eucalyptus loopback fs" do 
-  code <<-EOH
-    set -e 
-    set -x
-  
-    DISK_SIZE_GB=#{node[:rightimage][:root_size_gb]}  
-    BYTES_PER_MB=1024
-    DISK_SIZE_MB=$(($DISK_SIZE_GB * $BYTES_PER_MB))
-
-    source_image="#{source_image}" 
-    target_raw_root="#{target_raw_root}"
-    target_raw_path="#{target_raw_path}"
-    guest_root="#{guest_root}"
-    
-    mkdir -p $target_raw_root
-    dd if=/dev/zero of=$target_raw_path bs=1M count=$DISK_SIZE_MB    
-    
-    loopdev=#{loop_dev}
-    losetup $loopdev $target_raw_path
-    
-    mke2fs -F -j $loopdev
-    mkdir -p $guest_root
-    mount $loopdev $guest_root
-    
-    rsync -a $source_image/ $guest_root/
-  EOH
-end
 
 #  - add fstab
 template "#{guest_root}/etc/fstab" do
@@ -92,10 +42,9 @@ remote_file "/tmp/euca2ools-#{euca_tools_version}-centos-x86_64.tar.gz" do
   backup false
 end
 
-bash "mount proc & dev" do 
+bash "mount proc & dev" do
+  flags "-ex"
   code <<-EOH
-    set -e 
-    set -x
     guest_root=#{guest_root}
     mount -t proc none $guest_root/proc
     mount --bind /dev $guest_root/dev
@@ -110,7 +59,7 @@ rightimage_kernel "Install PV Kernel for Hypervisor" do
   action :install
 end
 
-include_recipe "rightimage::bootstrap_common"
+include_recipe "rightimage::bootstrap_common_debug"
 
 package "euca2ools" do
   only_if { node[:rightimage][:platform] == "ubuntu" }
@@ -118,11 +67,8 @@ end
 
 bash "install euca tools for centos" do 
   only_if { node[:rightimage][:platform] == "centos" }
+  flags "-ex"
   code <<-EOH
-#!/bin/bash -ex
-    set -e 
-    set -x
-    
     VERSION=#{euca_tools_version}  
     guest_root=#{guest_root}
       
@@ -143,10 +89,9 @@ bash "install euca tools for centos" do
   EOH
 end
 
-bash "configure for eucalyptus" do 
+bash "configure for eucalyptus" do
+  flags "-ex"
   code <<-EOH
-    set -e 
-    set -x
     guest_root=#{guest_root}
 
     ## insert cloud file
@@ -154,7 +99,7 @@ bash "configure for eucalyptus" do
     echo -n "eucalyptus" > $guest_root/etc/rightscale.d/cloud
 
     # clean out packages
-    yum -c /tmp/yum.conf --installroot=$guest_root -y clean all
+    chroot $guest_root yum -y clean all
     
     rm ${guest_root}/var/lib/rpm/__*
     chroot $guest_root rpm --rebuilddb
@@ -162,10 +107,9 @@ bash "configure for eucalyptus" do
   EOH
 end
 
-bash "unmount proc & dev" do 
+bash "unmount proc & dev" do
+  flags "-ex"
   code <<-EOH
-    set -e 
-    set -x
     guest_root=#{guest_root}
     umount -lf $guest_root/proc || true
     umount -lf $guest_root/dev || true
@@ -178,24 +122,13 @@ rightimage guest_root do
   action :sanitize
 end
 
-bash "sync fs" do 
-  code <<-EOH
-    set -x
-    sync
-  EOH
-end
-
-
 bash "package guest image" do 
   cwd "/mnt"
+  flags "-ex"
   code <<-EOH
-    set -e 
-    set -x
     guest_root=#{guest_root}
-#    KERNEL_VERSION=#{node[:rightimage][:kernel_id]}
     image_name=#{image_name}
-#    cloud_package_root=#{cloud_package_root}
-    cloud_package_root=#{target_raw_root}
+    cloud_package_root=#{target_temp_root}
     package_dir=$cloud_package_root/$image_name
     KERNEL_VERSION=$(ls -t $guest_root/lib/modules|awk '{ printf "%s ", $0 }'|cut -d ' ' -f1-1)
 
@@ -210,13 +143,13 @@ bash "package guest image" do
   EOH
 end
 
-bash "unmount" do 
+bash "unmount" do
+  flags "-x"
   code <<-EOH
-    set -x
     guest_root=#{guest_root}
     loopdev=#{loop_dev}  
     umount -lf $guest_root || true
     losetup -d $loopdev
   EOH
 end
-
+rs_utils_marker :end

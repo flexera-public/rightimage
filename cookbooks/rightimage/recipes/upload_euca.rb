@@ -1,3 +1,4 @@
+rs_utils_marker :begin
 class Chef::Resource::Bash
   include RightScale::RightImage::Helper
 end
@@ -7,18 +8,16 @@ end
 
 #target_mnt = "#{build_root}/euca"
 #tmp_creds_dir = "#{build_root}/euca_upload_creds"
-tmp_creds_dir = "#{base_root}/temp/euca_upload_creds"
+tmp_creds_dir = "#{target_temp_root}/temp/euca_upload_creds"
 
 #package_root = "#{build_root}/pkg"
 #package_dir = "#{package_root}/euca"
 
 
 ## copy the generic image 
-bash "copy_image" do 
+bash "copy_image" do
+  flags "-ex"
   code <<-EOC
-#!/bin/bash  -ex
-  set -x
-  set -e
   image_name=#{image_name}
   tmp_creds_dir=#{tmp_creds_dir}
   
@@ -26,7 +25,7 @@ bash "copy_image" do
   # 
   # Get paths to deliverables
   #
-  package_dir=#{target_raw_root}
+  package_dir=#{target_temp_root}
 
   image_path=$package_dir/$image_name/$image_name.img
   if [ -a $image_path ]; then 
@@ -66,7 +65,7 @@ bash "copy_image" do
   # Setup creds for upload
   #
   rm -rf $tmp_creds_dir
-  mkdir $tmp_creds_dir
+  mkdir -p $tmp_creds_dir
   cd $tmp_creds_dir
 
   # Global Cloud Cert
@@ -146,3 +145,4 @@ ruby_block "store image id" do
     id_list.add(image_id)
   end
 end
+rs_utils_marker :end

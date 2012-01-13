@@ -1,3 +1,4 @@
+rs_utils_marker :begin
 class Chef::Resource::Bash
   include RightScale::RightImage::Helper
 end
@@ -41,11 +42,8 @@ remote_file "#{node[:rightimage][:mount_dir]}/etc/sysconfig/network-scripts/ifcf
 end
 
 bash "bootstrap_centos" do 
-
+  flags "-ex"
   code <<-EOF
-set -x
-set -e
-
 ## yum is getting mad that /etc/fstab does not exist and that /proc is not mounted
 mkdir -p #{node[:rightimage][:mount_dir]}/etc
 touch #{node[:rightimage][:mount_dir]}/etc/fstab
@@ -88,7 +86,6 @@ yum -c /tmp/yum.conf --installroot=#{node[:rightimage][:mount_dir]} -y install  
 yum -c /tmp/yum.conf --installroot=#{node[:rightimage][:mount_dir]} -y remove bluez* gnome-bluetooth*
 yum -c /tmp/yum.conf --installroot=#{node[:rightimage][:mount_dir]} -y clean all
 
-
 ## stop crap from going in the logs...    
 rm #{node[:rightimage][:mount_dir]}/var/lib/rpm/__*
 chroot #{node[:rightimage][:mount_dir]} rpm --rebuilddb
@@ -114,7 +111,6 @@ perl -p -i -e 's/(.*tty3)/#\1/' #{node[:rightimage][:mount_dir]}/etc/inittab
 perl -p -i -e 's/(.*tty4)/#\1/' #{node[:rightimage][:mount_dir]}/etc/inittab
 perl -p -i -e 's/(.*tty5)/#\1/' #{node[:rightimage][:mount_dir]}/etc/inittab
 perl -p -i -e 's/(.*tty6)/#\1/' #{node[:rightimage][:mount_dir]}/etc/inittab
-chroot #{node[:rightimage][:mount_dir]} service network start
 
 rm #{node[:rightimage][:mount_dir]}/etc/yum.repos.d/CentOS-Media.repo
 curl -o #{node[:rightimage][:mount_dir]}/etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL http://download.fedora.redhat.com/pub/epel/RPM-GPG-KEY-EPEL
@@ -125,26 +121,19 @@ chmod +x #{node[:rightimage][:mount_dir]}/tmp/chkconfig
 chroot #{node[:rightimage][:mount_dir]} /tmp/chkconfig
 rm -f #{node[:rightimage][:mount_dir]}/tmp/chkconfig
 
-
 sed -i s/root::/root:*:/ #{node[:rightimage][:mount_dir]}/etc/shadow
-
-
 
 echo "127.0.0.1   localhost   localhost.localdomain" > #{node[:rightimage][:mount_dir]}/etc/hosts
 echo "NOZEROCONF=true" >> #{node[:rightimage][:mount_dir]}/etc/sysconfig/network
 
-chroot #{node[:rightimage][:mount_dir]} service network restart
-
-
 #install syslog-ng
 chroot #{node[:rightimage][:mount_dir]} rpm -e rsyslog --nodeps || true #remove rsyslog if it exists 
 if [ "#{node[:rightimage][:arch]}" == i386 ] ; then 
-  chroot #{node[:rightimage][:mount_dir]} rpm -Uvh http://s3.amazonaws.com/rightscale_scripts/syslog-ng-1.6.12-1.el5.centos.i386.rpm
+  rpm --root #{node[:rightimage][:mount_dir]} -Uvh http://s3.amazonaws.com/rightscale_scripts/syslog-ng-1.6.12-1.el5.centos.i386.rpm
 else 
-  chroot #{node[:rightimage][:mount_dir]} rpm -Uvh http://s3.amazonaws.com/rightscale_scripts/syslog-ng-1.6.12-1.x86_64.rpm
+  rpm --root #{node[:rightimage][:mount_dir]} -Uvh http://s3.amazonaws.com/rightscale_scripts/syslog-ng-1.6.12-1.x86_64.rpm
 fi
 chroot #{node[:rightimage][:mount_dir]} chkconfig --level 234 syslog-ng on
-
 
 #Install the JDK from S3.
 if [ "#{node[:rightimage][:arch]}" == x86_64 ] ; then 
@@ -195,7 +184,6 @@ chroot #{node[:rightimage][:mount_dir]} /sbin/chkconfig ip6tables off
 #echo "alias ipv6 off" >> #{node[:rightimage][:mount_dir]}/etc/modprobe.conf 
 #echo "alias net-pf-10 off" >> #{node[:rightimage][:mount_dir]}/etc/modprobe.conf 
 EOF
-
 end
 
 remote_file "#{node[:rightimage][:mount_dir]}/root/.bash_profile" do 
@@ -245,6 +233,4 @@ bash "cleanup" do
     umount -lf #{node[:rightimage][:mount_dir]}/dev/pts || true
   EOH
 end    
-
-
-
+rs_utils_marker :end

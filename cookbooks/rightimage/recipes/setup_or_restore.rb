@@ -1,7 +1,7 @@
 rs_utils_marker :begin
 #
 # Cookbook Name:: rightimage
-# Recipe:: default
+# Recipe:: setup_or_restore
 #
 # Copyright 2011, RightScale, Inc.
 #
@@ -17,8 +17,15 @@ rs_utils_marker :begin
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+class Chef::Recipe
+  include RightScale::RightImage::Helper
+end
 
-
-include_recipe "rightimage::clean"
-include_recipe "rightimage::rightscale_install"
+unless `mount`.grep(/#{target_raw_root}/).any?
+  if node[:rightimage][:build_mode] == "full"
+    include_recipe "rightimage::do_restore"
+  else
+    include_recipe "rightimage::setup_block_device"
+  end
+end
 rs_utils_marker :end

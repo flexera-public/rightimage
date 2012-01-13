@@ -20,22 +20,25 @@
 # LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+rs_utils_marker :begin
 
-class Chef::Resource::Execute
+class Chef::Resource::BlockDevice
   include RightScale::RightImage::Helper
 end
 
-#rs_utils_marker :begin
-
-#TODO add in checks if block device exists and bail out.
-#Current implementation leaves server in a bad state after
-#trying to re-setup the blockdevice
-#
-log "  Creating block device..."
-block_device node[:rightimage][:ebs_mount_dir] do
+block_device target_raw_root do
   provider "block_device_volume"
-  cloud node[:cloud][:provider]
-  lineage lineage_name
+  cloud "ec2"
+  max_snapshots "1000"
+  keep_daily "1000"
+  keep_weekly "1000"
+  keep_monthly "1000"
+  keep_yearly "1000"
+  volume_size "41"
+  stripe_count "1"
+  lineage ri_lineage
   action :create
+  persist true
 end
-#rs_utils_marker :end
+
+rs_utils_marker :end

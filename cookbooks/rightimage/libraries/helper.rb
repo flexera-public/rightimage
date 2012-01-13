@@ -10,7 +10,7 @@ module RightScale
       	name << "_#{generate_persisted_passwd}" if node[:rightimage][:debug] == "true"
       	name
       end   
-      
+
       def generate_persisted_passwd
         length = 14
         pw = nil
@@ -22,6 +22,17 @@ module RightScale
           File.open(filename, 'w') {|f| f.write(pw) }
         end
         pw
+      end
+
+      def image_file_ext
+        case node[:rightimage][:virtual_environment]
+        when "xen"
+          "vhd.bz2"
+        when "kvm"
+          "qcow2.bz2"
+        when "esxi"
+          "vmdk.ova"
+        end
       end
 
       def cloud_id
@@ -61,6 +72,70 @@ EOF
         require 'rest_connection'
       end
 
+      def ri_lineage
+        [platform,release_number,arch,timestamp,build_number].join("_")
+
+      end
+
+      def platform
+        node[:rightimage][:platform]
+      end
+
+      def release_number
+        if platform == "ubuntu"
+          case release
+          when "hardy" 
+            "8.04"
+          when "intrepid" 
+            "8.10"
+          when "jaunty" 
+            "9.04"
+          when "karmic" 
+            "9.10"
+          when "lucid" 
+            "10.04"
+          when "maverick" 
+            "10.10" 
+          else 
+            raise "Unknown release"
+          end
+        else 
+          release
+        end
+      end
+
+      def release
+        node[:rightimage][:release]
+      end
+
+      def arch
+        if node[:rightimage][:arch] == "x64"
+          "x86_64"
+        else
+          node[:rightimage][:arch]
+        end
+      end
+
+      def timestamp
+        node[:rightimage][:timestamp]
+      end
+
+      def install_mirror_date
+        timestamp[0..7]
+      end
+
+      def build_number
+        if node[:rightimage][:build_number] =~ /./
+          node[:rightimage][:build_number]
+        else
+          "0"
+        end
+      end
+
+      def os_string
+        platform + "_" + release_number + "_" + arch + "_" + timestamp + "_" + build_number
+      end
+
       def source_image
         node[:rightimage][:mount_dir]
       end
@@ -73,10 +148,27 @@ EOF
         end
       end
 
+      def partitioned?
+        case node[:rightimage][:cloud]
+        when "ec2", "euca"
+          return FALSE
+        when "vmops"
+          case node[:rightimage][:virtual_environment]
+          when "xen"
+            return FALSE
+          else
+            return TRUE
+          end
+        else
+          return TRUE
+        end
+      end
+
       def target_type
-        type = "#{node[:rightimage][:cloud]}_#{node[:rightimage][:virtual_environment]}"
-        type << "_dev" if node[:rightimage][:debug] == "true"
-        type
+        ret = "#{os_string}_hd0"
+        ret << "0" if node[:rightimage][:build_mode] == "full" && partitioned?
+
+        ret
       end
 
       def base_root
@@ -84,29 +176,85 @@ EOF
       end
 
       def guest_root
-        "#{base_root}/build"
+        source_image
       end
 
       def target_raw_root
-        "#{base_root}/image"
+        "/mnt/storage"
+      end
+
+      def target_raw_file
+       "#{target_type}.raw"
       end
 
       def target_raw_path
-        "#{target_raw_root}/#{target_type}.raw" 
+        "#{target_raw_root}/#{target_raw_file}" 
       end
 
-      def lineage_name
-        filename = "/tmp/rightimage_lineage"
-        if ::File.exists?(filename)
-          lineage = File.open(filename, 'rb') { |f| f.read }
-        else
-          time = Time.new
-          lineage = "#{node[:rightimage][:platform]}_#{node[:rightimage][:release]}_#{time.strftime("%Y%m%d%H%M")}"
-          File.open(filename, 'w') {|f| f.write(lineage) }
-        end
-        lineage
+      def target_raw_zip
+        "#{target_type}.gz"
       end
+
+      def target_raw_zip_path
+        "#{build_root}/#{target_raw_zip}"
+      end
+
+      def target_temp_root
+        "#{build_root}/rightimage-temp"
+      end
+
+      def target_temp_path
+        "#{target_temp_root}/#{target_raw_file}"
+      end
+
+      def full_image_path
+        target_temp_root+"/"+image_name+"."+image_file_ext
+      end
+
+      def s3_path_base
+        [platform,release_number,arch,timestamp[0..3]].join("/")
+      end
+
+      def s3_path_full
+        hypervisor = node[:rightimage][:virtual_environment]
+        [hypervisor,platform,release_number].join("/")
+      end
+
+      def base_image_upload_bucket
+        "rightscale-rightimage-base-dev"
+      end
+
+      def full_image_upload_bucket
+        case node[:rightimage][:cloud]
+        when "vmops"
+          "rightscale-cloudstack-dev"
+        when "euca"
+          "rightscale-eucalyptus-dev"
+        when "openstack"
+          "rightscale-openstack-dev"
+        when "rackspace"
+          "rightscale-rackspace-dev"
+        when "ec2"
+          "rightscale-"+node[:rightimage][:region]
+        end
+      end
+
+      def loop_name
+        "loop0"
+      end
+
+      def loop_dev
+        "/dev/#{loop_name}"
+      end 
+
+      def loop_map
+        "/dev/mapper/#{loop_name}p1"
+      end
+
+      def calc_mb
+        node[:rightimage][:root_size_gb].to_i * 1024 
+      end
+
     end
   end
 end
-

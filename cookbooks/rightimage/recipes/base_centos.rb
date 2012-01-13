@@ -1,3 +1,4 @@
+rs_utils_marker :begin
 #
 # Cookbook Name:: rightimage
 # Recipe:: default
@@ -20,5 +21,5 @@
 node[:rightimage][:host_packages].split.each { |p| package p }
 
 include_recipe "rightimage::clean"
-include_recipe "rightimage::bootstrap_centos"
-include_recipe "rightimage::rightscale_install" unless node[:rightimage][:cloud] == "raw"
+include_recipe "rightimage::rightscale_install"
+rs_utils_marker :end

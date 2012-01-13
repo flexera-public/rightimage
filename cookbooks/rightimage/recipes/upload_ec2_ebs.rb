@@ -1,3 +1,4 @@
+rs_utils_marker :begin
 class Chef::Resource::Bash
   include RightScale::RightImage::Helper
 end
@@ -19,16 +20,15 @@ end
 #  - bundle and upload
 bash "bundle_upload_ebs" do 
     only_if { node[:rightimage][:cloud] == "ec2" }
+    flags "-ex"
     code <<-EOH
-#!/bin/bash -ex
-    set -e
-    set -x
-
     . /etc/profile
     
     export JAVA_HOME=/usr
     export PATH=$PATH:/usr/local/bin:/home/ec2/bin
     export EC2_HOME=/home/ec2
+
+    root_label="#{node[:rightimage][:root_mount][:label_dev]}"
 
     umount "#{guest_root}/proc" || true
     
@@ -96,6 +96,7 @@ bash "bundle_upload_ebs" do
     sleep 10
 ## format and mount volume
     mkfs.ext3 -F /dev/sdj
+    tune2fs -L $root_label /dev/sdj
     mount /dev/sdj $ebs_mount
 
 ## mount EBS volume, rsync, and unmount ebs volume
@@ -181,3 +182,4 @@ ruby_block "store image id" do
     id_list.add(image_id, "EBS")
   end
 end
+rs_utils_marker :end

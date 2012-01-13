@@ -1,3 +1,4 @@
+rs_utils_marker :begin
 mount_dir = node[:rightimage][:mount_dir]
 package_release_version = node[:rightimage][:rightlink_version]
 target_platform = node[:rightimage][:platform]
@@ -30,3 +31,4 @@ bash "install_runrightscripts" do
     echo v#{package_release_version} > #{mount_dir}/etc/rightscale-release
   EOC
 end
+rs_utils_marker :end

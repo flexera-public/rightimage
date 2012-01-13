@@ -1,7 +1,7 @@
 rs_utils_marker :begin
 #
 # Cookbook Name:: rightimage
-# Recipe:: default
+# Recipe:: build_base
 #
 # Copyright 2011, RightScale, Inc.
 #
@@ -18,7 +18,11 @@ rs_utils_marker :begin
 # limitations under the License.
 #
 
-
-include_recipe "rightimage::clean"
-include_recipe "rightimage::rightscale_install"
+include_recipe "rightimage::setup_loopback"
+include_recipe "rightimage::bootstrap_#{node[:platform].downcase}"
+include_recipe "rightimage::bootstrap_common"
+include_recipe "rightimage::copy_image"
+include_recipe "rightimage::do_destroy_loopback"
+include_recipe "rightimage::do_backup"
+include_recipe "rightimage::base_upload"
 rs_utils_marker :end
