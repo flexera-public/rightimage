@@ -3,6 +3,8 @@ maintainer_email "support@rightscale.com"
 description      "image building tools"
 version          "0.0.1"
 
+depends "block_device"
+
 recipe "rightimage::default", "starts builds image automatically at boot. See 'manual_mode' input to enable." 
 recipe "rightimage::build_image", "build image based on host platform"
 recipe "rightimage::clean", "cleans everything" 
@@ -29,7 +31,9 @@ recipe "rightimage::upload_vmops", "setup http server for download to test cloud
 recipe "rightimage::upload_euca", "bundle and upload euca kernel, ramdisk and image"
 recipe "rightimage::upload_openstack", "bundle and upload openstack kernel, ramdisk and image"
 recipe "rightimage::upload_file_to_s3", "upload specified file to s3"
-
+recipe "rightimage::setup_block_device", "Creates, formats and mounts a brand new block_device volume stripe on the instance."
+recipe "rightimage::do_force_reset", "Unmounts and deletes the attached block_device and volumes that were attached to the instance for this lineage."
+ 
 # Add each cloud name to an array to use for common inputs on each cloud.
 cloud_add = []
 cloud_upload = []
@@ -95,9 +99,9 @@ attribute "rightimage/arch",
   
 attribute "rightimage/cloud",
   :display_name => "Target Cloud",
-  :description => "The supported cloud for the virtual image.",
+  :description => "The supported cloud for the virtual image. If unset, build a generic base image.",
   :choice => [ "ec2", "vmops", "euca", "openstack", "rackspace" ],
-  :required => true
+  :required => "optional"
   
 attribute "rightimage/region",
   :display_name => "EC2 Region",

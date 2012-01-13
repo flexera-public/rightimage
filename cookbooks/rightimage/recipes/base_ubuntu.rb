@@ -20,4 +20,4 @@
 
 include_recipe "rightimage::clean"
 include_recipe "rightimage::bootstrap_ubuntu"
-include_recipe "rightimage::rightscale_install"
+include_recipe "rightimage::rightscale_install" unless node[:rightimage][:cloud] == "raw"

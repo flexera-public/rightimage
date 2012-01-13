@@ -5,8 +5,6 @@ class Chef::Recipe
   include RightScale::RightImage::Helper
 end
 
-node.set['rightimage']['cloud'] = "raw"
-
 loop_name="loop0"
 loop_dev="/dev/#{loop_name}"
 
@@ -17,7 +15,7 @@ bash "create loopback fs" do
     set -e 
     set -x
   
-    DISK_SIZE_GB=#{node[:rightimage][:root_size_gb]} 
+    DISK_SIZE_GB=#{node[:rightimage][:root_size_gb]}  
     BYTES_PER_MB=1024
     DISK_SIZE_MB=$(($DISK_SIZE_GB * $BYTES_PER_MB))
 
