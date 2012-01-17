@@ -255,6 +255,10 @@ EOF
         node[:rightimage][:root_size_gb].to_i * 1024 
       end
 
+      def mounted?
+        `mount`.grep(/#{target_raw_root}/).any?
+      end
+
     end
   end
 end

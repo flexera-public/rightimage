@@ -1,4 +1,3 @@
-rs_utils_marker :begin
 #
 # Cookbook Name:: rightimage
 # Recipe:: default
@@ -18,10 +17,18 @@ rs_utils_marker :begin
 # limitations under the License.
 #
 
+rs_utils_marker :begin
+class Chef::Recipe
+  include RightScale::RightImage::Helper
+end
+
 unless node[:rightimage][:manual_mode] == "true"
-  if node[:rightimage][:build_mode] == "full"
+  case node[:rightimage][:build_mode] 
+  when "full"
+    include_recipe "rightimage::do_restore" unless mounted?
     include_recipe "rightimage::build_image"
-  else
+  when "base"
+    include_recipe "rightimage::setup_block_device" unless mounted?
     include_recipe "rightimage::build_base"
   end
 end
