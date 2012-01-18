@@ -36,7 +36,6 @@ recipe "rightimage::upload_euca", "bundle and upload euca kernel, ramdisk and im
 recipe "rightimage::upload_openstack", "bundle and upload openstack kernel, ramdisk and image"
 recipe "rightimage::upload_file_to_s3", "upload specified file to s3"
 recipe "rightimage::base_upload", "compresses and uploads base image to s3"
-recipe "rightimage::setup_or_restore", "setup block device (on base mode) or restore volume (on full mode)"
 recipe "rightimage::setup_block_device", "Creates, formats and mounts a brand new block_device volume stripe on the instance."
 recipe "rightimage::do_backup", "Backup image snapshot."
 recipe "rightimage::do_restore", "Restores image snapshot."

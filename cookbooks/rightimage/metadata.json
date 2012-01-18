@@ -650,7 +650,6 @@
     "rightimage::cloud_add_vmops": "adds requirements for cloudstack based on hypervisor choice",
     "rightimage::rightscale_install": "installs rightscale",
     "rightimage::base_sles": "coordinate a sles install",
-    "rightimage::setup_or_restore": "setup block device (on base mode) or restore volume (on full mode)",
     "rightimage::cloud_add_openstack": "adds requirements for openstack based on hypervisor choice",
     "rightimage::cloud_add_euca": "migrates the created image to eucalyptus",
     "rightimage::build_base": "build base image based on host platform",
