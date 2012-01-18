@@ -3,20 +3,21 @@ rightlink_file="rightscale_#{node[:rightimage][:rightlink_version]}-#{node[:righ
 
 bash "download_rightlink" do
   flags "-x"
+  location1 ="#{node[:rightimage][:rightlink_version]}/#{rightlink_file}"
+  location2 ="#{node[:rightimage][:rightlink_version]}/#{node[:rightimage][:platform]}/#{rightlink_file}"
   code <<-EOC
     mkdir -p #{node[:rightimage][:mount_dir]}/root/.rightscale
-    s3_file="#{node[:rightimage][:rightlink_version]}/#{node[:rightimage][:platform]}/#{rightlink_file}"
     
     buckets=( rightscale_rightlink rightscale_rightlink_dev )
-    locations=( #{rightlink_file} )
+    locations=( #{location1} #{location2})
     
     for bucket in ${buckets[@]}
     do
       for location in ${locations[@]}
       do
-        code=$(curl -o #{node[:rightimage][:mount_dir]}/root/.rightscale/#{rightlink_file} --connect-timeout 10 --fail --silent --write-out %{http_code} http://s3.amazonaws.com/$bucket/$s3_file)
+        code=$(curl -o #{node[:rightimage][:mount_dir]}/root/.rightscale/#{rightlink_file} --connect-timeout 10 --fail --silent --write-out %{http_code} http://s3.amazonaws.com/$bucket/$location)
         return=$?
-        echo "BUCKET: $bucket LOCATION: $s3_file RETURN: $return CODE: $code"
+        echo "BUCKET: $bucket LOCATION: $location RETURN: $return CODE: $code"
         [[ "$return" -eq "0" && "$code" -eq "200" ]] && break 2
       done
     done
