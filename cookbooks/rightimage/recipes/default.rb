@@ -30,6 +30,8 @@ unless node[:rightimage][:manual_mode] == "true"
   when "base"
     include_recipe "rightimage::setup_block_device" unless mounted?
     include_recipe "rightimage::build_base"
+  when "migrate"
+    include_recipe "rightimage::ec2_download_bundle"
   end
 end
 rs_utils_marker :end

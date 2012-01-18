@@ -7,7 +7,7 @@ module RightScale
       def image_name
       	raise "ERROR: you must specify an image_name!" unless node[:rightimage][:image_name]
       	name = node[:rightimage][:image_name].dup
-      	name << "_#{generate_persisted_passwd}" if node[:rightimage][:debug] == "true"
+      	name << "_#{generate_persisted_passwd}" if node[:rightimage][:debug] == "true" && node[:rightimage][:build_mode] != "migrate"
       	name
       end   
 
@@ -237,6 +237,23 @@ EOF
         when "ec2"
           "rightscale-"+node[:rightimage][:region]
         end
+      end
+
+      def image_source_bucket
+        bucket = "rightscale-#{image_source_cloud}"
+        bucket << "-dev" if node[:rightimage][:debug] == "true"
+       end
+
+      def image_source_cloud
+        "us-west-2"
+      end
+
+      def migrate_temp_bundled
+        "#{target_temp_root}/bundled"
+      end
+
+      def migrate_temp_unbundled
+        "#{target_temp_root}/unbundled"
       end
 
       def loop_name
