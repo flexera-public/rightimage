@@ -100,10 +100,14 @@ Manual mode is useful when developing of the rightimage cookbooks
 
 Migrate mode is used to replicate an existing image to other EC2 regions.
 
+NOTE: Migrations are currently limited from us-west-2 (Oregon) region only.
+Any RightLink-enabled image with EC2 AMI and API tools may be used to launch the instance.
+An instance size of at least m1.small is required.
+
   1. Set ‘build mode’ to migrate
   2. Set image_name input to the name of the image to migrate
-  3. launch server
-  4. once operational start the migration using "rightimage::upload_ec2_s3" and/or "rightimage::upload_ec2_ebs" recipe
+  3. Launch server in the region you wish to migrate to
+  4. Once operational, start the migration using "rightimage::upload_ec2_s3" and/or "rightimage::upload_ec2_ebs" recipe
 
 = Future Improvements
 
