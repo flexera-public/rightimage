@@ -275,3 +275,22 @@ attribute "rightimage/openstack/hostname",
   :description => "Hostname of Openstack Cloud Controller.",
   :required => "required",
   :recipes => [ "rightimage::upload_openstack" ]
+
+# CloudStack
+attribute "rightimage/cloudstack/cdc_url",
+  :display_name => "CloudStack API URL",
+  :description => "URL to your CloudStack Cloud Controller. (Ex. http://<server_ip>:8080/client/api)",
+  :required => "required",
+  :recipes => [ "rightimage::upload_vmops" ]
+
+attribute "rightimage/cloudstack/cdc_api_key",
+  :display_name => "CloudStack API Key",
+  :description => "CloudStack API key.",
+  :required => "required",
+  :recipes => [ "rightimage::upload_vmops" ]
+
+attribute "rightimage/cloudstack/cdc_secret_key",
+  :display_name => "CloudStack Secret Key",
+  :description => "CloudStack secret key.",
+  :required => "required",
+  :recipes => [ "rightimage::upload_vmops" ]

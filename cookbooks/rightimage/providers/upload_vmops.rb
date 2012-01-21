@@ -3,88 +3,109 @@ class Chef::Resource::RubyBlock
 end
 
 action :upload do
+  CDC_GEM_VER = "0.0.0"
+  CDC_GEM = ::File.join(::File.dirname(__FILE__), "..", "files", "default", "right_vmops-#{CDC_GEM_VER}.gem")
+  SANDBOX_BIN = "/opt/rightscale/sandbox/bin/gem"
+
+  r = gem_package "nokogiri" do
+    gem_binary SANDBOX_BIN
+    version "1.4.3.1"
+    action :nothing
+  end
+  r.run_action(:install)
+
+  r = gem_package CDC_GEM do
+    gem_binary SANDBOX_BIN
+    version CDC_GEM_VER
+    action :nothing
+  end
+  r.run_action(:install)
+
+  Gem.clear_paths
+
   ruby_block "trigger download to test cloud" do
     block do
       require "rubygems"
+      require "right_vmops"
       require "uri"
-      require "nokogiri"
+
+      name = "#{image_name}_#{node[:rightimage][:virtual_environment].upcase}"
+      zoneId = 1
+
+      case node[:rightimage][:platform]
+      when "centos"
+        if node[:rightimage][:release] == "5.4"
+          osTypeId = 14 # CentOS 5.4 (64-bit)
+        else
+          osTypeId = 112 # CentOS 5.5 (64-bit)
+        end
+      when "ubuntu"
+        osTypeId = 127 # Ubuntu 9.10 (64-bit)
+      end
       
-      # The public API URL allows access for developers and users to manage their 
-      # virtual machines or to create their own user interfaces.  Accesses to this URL must be secured.
-      # http://173.227.0.170:8080/client/api
-      # The private API URL allows full, unsecured access to the entire API.  This URL is intended to be 
-      # secured behind a firewall.
-      # http://173.227.0.170:8096/
-      api_url = "http://72.52.126.24:8096"
-      if new_resource.hypervisor == "xen"
-        api_url = "http://173.227.0.170:8096"
+      case node[:rightimage][:virtual_environment]
+      when "esxi"
+        format = "OVA"
+        hypervisor = "VMware"
+      when "kvm"
+        format = "QCOW2"
+        hypervisor = "KVM"
+      when "xen"
+        format = "VHD"
+        hypervisor = "XenServer"
       end
 
-      filename = "#{image_name}.#{new_resource.file_ext}"
+      file_ext = format.downcase
+      file_ext << ".bz2" unless hypervisor == "XenServer"
+
+      filename = "#{image_name}.#{file_ext}"
       local_file = "#{target_temp_root}/#{filename}"
       md5sum = Digest::MD5.hexdigest(::File.read(local_file))
 
       aws_url  = "rightscale-cloudstack-dev.s3.amazonaws.com"
       aws_path = s3_path_full
       image_url = "http://#{aws_url}/#{aws_path}/#{filename}"
-      Chef::Log::info("aws url #{image_url}")
-      encoded_image_url = URI.escape(image_url, Regexp.new("[^#{URI::PATTERN::UNRESERVED}]"))  
+      Chef::Log::info("Downloading from: #{image_url}...")
      
-      name = image_name.gsub(/RightImage/,"RI")
-      # remove random passwd from name
-      if name =~ /Dev/i
-        n = name.split("_")
-        n.pop
-        name = n.join("_")
-      end
-   
-      cmd = "/?command=registerTemplate"
-      cmd << "&name=#{name}&displayText=#{image_name}_#{new_resource.hypervisor.upcase}"
-      cmd << "&url=#{encoded_image_url}"
+      Chef::Log.info("Registering image on cloud...")
+      vmops = RightScale::VmopsFactory.right_vmops_class_for_version("2.2").new(node[:rightimage][:cloudstack][:cdc_api_key], node[:rightimage][:cloudstack][:cdc_secret_key], node[:rightimage][:cloudstack][:cdc_url])
+      res = vmops.register_template(name, name, image_url, format, osTypeId, zoneId, hypervisor, md5sum, true, true)
+      Chef::Log.info("Returned data: #{res.inspect}")
 
-      if new_resource.file_ext =~ /vmdk|ova/
-        format = "OVA"
-      elsif new_resource.file_ext =~ /qcow/
-        format = "QCOW"
-      elsif new_resource.file_ext =~ /vhd/
-        format = "VHD"
+      image_id = res["registertemplateresponse"]["template"][0]["id"]
+      Chef::Log.info("Waiting 5 minutes for upload to complete...")
+      # Expect it will take at least 5 minutes
+      sleep 300
+
+      $i=0
+      $retries=40
+      # Don't set less than 30 second polling period - It only updates every 30 seconds anyways.
+      $wait=30
+
+      until $i > $retries do
+        info = vmops.list_templates(image_id,nil,"self")["listtemplatesresponse"]["template"][0]
+        ready = info["isready"]
+        status = info["status"]
+
+        if ready == "true"
+          Chef::Log.info("Image ready")
+          break
+        else
+          $i += 1;
+          if status =~ /expected/
+            raise "Server returned error: #{status}"
+          else
+            Chef::Log.info("[#$i/#$retries] Image NOT ready! Status: #{status} Sleeping #$wait seconds...")
+            sleep $wait unless $i > $retries
+          end
+        end
       end
 
-      cmd << "&format=#{format}"
-  
-  #    case node[:rightimage][:platform]
-  #    when "centos"
-  #      case node[:rightimage][:release]
-  #      when "5.4"
-          cmd << "&osTypeId=14" # CentOS 5.4 x86
-  #      else
-  #        cmd << "&osTypeId=76"
-  #      end
-  #    end
-  
-      cmd << "&zoneId=1"
-      cmd << "&isPublic=true"
-      cmd << "&isFeatured=true"
-      cmd << "&checksum=#{md5sum}" 
+      raise "Upload failed! Status: #{status}" unless ready == "true"
 
-      Chef::Log.info("============")
-      Chef::Log.info("#{api_url}#{cmd}")
-      Chef::Log.info("============")
-      result = `curl -S -s -o - -f '#{api_url}#{cmd}'`
-  
-      if result =~ /created/ 
-        Chef::Log.info("Successfully started download of image to test cloud.")
-        
-        # Parse out image id from the registration call
-        doc = Nokogiri::XML(result)
-        image_id = doc.xpath('//template/id').first.text
-        
-        # add to global id store for use by other recipes
-        id_list = RightImage::IdList.new(Chef::Log)
-        id_list.add(image_id)
-      else
-        raise "ERROR: could not upload image to cloud at #{api_url} due to #{result.inspect}"
-      end
+      # add to global id store for use by other recipes
+      id_list = RightImage::IdList.new(Chef::Log)
+      id_list.add(image_id)
     end
   end
 end
