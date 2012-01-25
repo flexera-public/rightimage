@@ -20,6 +20,7 @@ r = gem_package "fog" do
   action :nothing
 end
 r.run_action(:install)
+Gem.clear_paths
 
 rightimage_upload_s3 "Upload image image to s3" do
   not_if { node[:rightimage][:cloud] == "ec2" }
