@@ -4,7 +4,6 @@ end
 
 action :upload do
   ruby_block "Upload image to s3" do
-    require 'fog'
 
     file = new_resource.image_location
     bucket_name = new_resource.bucket
@@ -17,6 +16,8 @@ action :upload do
     Chef::Log.info("file to upload: #{file}")
 
     block do 
+      require 'rubygems'
+      require 'fog'
       Chef::Log.info("Init fog...")
       storage = 
         Fog::Storage.new(
