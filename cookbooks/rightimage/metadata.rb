@@ -165,19 +165,19 @@ attribute "rightimage/aws_account_number",
   :display_name => "aws_account_number",
   :description => "aws_account_number",
   :required => "required",
-  :recipes => [ "rightimage::cloud_add_ec2", "rightimage::upload_ec2_s3", "rightimage::upload_ec2_ebs", "rightimage::do_tag_images" , "rightimage::do_create_mci" , "rightimage::base_centos" , "rightimage::base_ubuntu" , "rightimage::base_sles" , "rightimage::default", "rightimage::build_image" , "rightimage::cloud_add_vmops", "rightimage::cloud_add_openstack" ]
+  :recipes => [ "rightimage::cloud_add_ec2", "rightimage::upload_ec2_s3", "rightimage::upload_ec2_ebs", "rightimage::do_tag_images" , "rightimage::do_create_mci" , "rightimage::base_centos" , "rightimage::base_ubuntu" , "rightimage::base_sles", "rightimage::base_rhel" , "rightimage::default", "rightimage::build_image" , "rightimage::cloud_add_vmops", "rightimage::cloud_add_openstack", "rightimage::base_upload", "rightimage::upload_file_to_s3" ]
   
 attribute "rightimage/aws_access_key_id",
   :display_name => "aws_access_key_id",
   :description => "aws_access_key_id",
   :required => "required",
-  :recipes => [ "rightimage::cloud_add_ec2", "rightimage::upload_ec2_s3", "rightimage::upload_ec2_ebs", "rightimage::do_tag_images" , "rightimage::do_create_mci" , "rightimage::base_centos" , "rightimage::base_ubuntu" , "rightimage::base_sles", "rightimage::base_rhel" , "rightimage::default", "rightimage::build_image" , "rightimage::cloud_add_vmops", "rightimage::cloud_add_openstack", "rightimage::base_upload" ]
+  :recipes => [ "rightimage::cloud_add_ec2", "rightimage::upload_ec2_s3", "rightimage::upload_ec2_ebs", "rightimage::do_tag_images" , "rightimage::do_create_mci" , "rightimage::base_centos" , "rightimage::base_ubuntu" , "rightimage::base_sles", "rightimage::base_rhel" , "rightimage::default", "rightimage::build_image" , "rightimage::cloud_add_vmops", "rightimage::cloud_add_openstack", "rightimage::base_upload", "rightimage::upload_file_to_s3" ]
   
 attribute "rightimage/aws_secret_access_key",
   :display_name => "aws_secret_access_key",
   :description => "aws_secret_access_key",
   :required => "required",
-  :recipes => [ "rightimage::cloud_add_ec2", "rightimage::upload_ec2_s3", "rightimage::upload_ec2_ebs", "rightimage::do_tag_images" , "rightimage::do_create_mci" , "rightimage::base_centos" , "rightimage::base_sles" , "rightimage::base_ubuntu", "rightimage::base_rhel" , "rightimage::default", "rightimage::build_image" , "rightimage::cloud_add_vmops", "rightimage::cloud_add_openstack", "rightimage::base_upload" ]
+  :recipes => [ "rightimage::cloud_add_ec2", "rightimage::upload_ec2_s3", "rightimage::upload_ec2_ebs", "rightimage::do_tag_images" , "rightimage::do_create_mci" , "rightimage::base_centos" , "rightimage::base_ubuntu" , "rightimage::base_sles", "rightimage::base_rhel" , "rightimage::default", "rightimage::build_image" , "rightimage::cloud_add_vmops", "rightimage::cloud_add_openstack", "rightimage::base_upload", "rightimage::upload_file_to_s3" ]
   
 attribute "rightimage/aws_509_key",
   :display_name => "aws_509_key",
@@ -193,7 +193,7 @@ attribute "rightimage/aws_509_cert",
  
 attribute "rightimage/aws_access_key_id_for_upload",
   :display_name => "aws_access_key_id_for_upload",
-  :description => "aws_access_key_id for the uplaod bucket",
+  :description => "aws_access_key_id for the upload bucket",
   :required => "required",
   :recipes => [ "rightimage::cloud_add_ec2", "rightimage::upload_ec2_s3", "rightimage::upload_ec2_ebs", "rightimage::do_tag_images" , "rightimage::do_create_mci" , "rightimage::base_centos" , "rightimage::base_sles" , "rightimage::base_ubuntu", "rightimage::base_rhel" , "rightimage::default", "rightimage::build_image" , "rightimage::upload_vmops", "rightimage::upload_file_to_s3" ]
   
@@ -275,3 +275,22 @@ attribute "rightimage/openstack/hostname",
   :description => "Hostname of Openstack Cloud Controller.",
   :required => "required",
   :recipes => [ "rightimage::upload_openstack" ]
+
+# CloudStack
+attribute "rightimage/cloudstack/cdc_url",
+  :display_name => "CloudStack API URL",
+  :description => "URL to your CloudStack Cloud Controller. (Ex. http://<server_ip>:8080/client/api)",
+  :required => "required",
+  :recipes => [ "rightimage::upload_vmops" ]
+
+attribute "rightimage/cloudstack/cdc_api_key",
+  :display_name => "CloudStack API Key",
+  :description => "CloudStack API key.",
+  :required => "required",
+  :recipes => [ "rightimage::upload_vmops" ]
+
+attribute "rightimage/cloudstack/cdc_secret_key",
+  :display_name => "CloudStack Secret Key",
+  :description => "CloudStack secret key.",
+  :required => "required",
+  :recipes => [ "rightimage::upload_vmops" ]
