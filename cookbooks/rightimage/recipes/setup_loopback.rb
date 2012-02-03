@@ -28,7 +28,7 @@ bash "create loopback fs" do
     losetup $loop_dev $target_raw_path
 
     sfdisk $loop_dev << EOF
-0,1304,L
+0,1304,L,*
 EOF
     kpartx -a $loop_dev
     mke2fs -F -j $loop_map
