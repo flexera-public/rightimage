@@ -155,7 +155,11 @@ EOF
         when "vmops"
           case node[:rightimage][:virtual_environment]
           when "xen"
-            return FALSE
+            if node[:rightimage][:platform] == "ubuntu"
+              return TRUE
+            else
+              return FALSE
+            end
           else
             return TRUE
           end
