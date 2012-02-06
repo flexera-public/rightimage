@@ -9,6 +9,10 @@ class Chef::Resource::BlockDevice
   include RightScale::RightImage::Helper
 end
 
+package "kpartx" do
+  action :install
+end if node[:rightimage][:platform] == "ubuntu"
+
 block_device target_raw_root do
   provider "block_device_volume"
   cloud "ec2"
