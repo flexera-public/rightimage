@@ -40,7 +40,7 @@ action :upload do
           osTypeId = 112 # CentOS 5.5 (64-bit)
         end
       when "ubuntu"
-        osTypeId = 127 # Ubuntu 9.10 (64-bit)
+        osTypeId = 126 # Ubuntu 10.04 (64-bit)
       end
       
       case node[:rightimage][:virtual_environment]
@@ -56,7 +56,7 @@ action :upload do
       end
 
       file_ext = format.downcase
-      file_ext << ".bz2" unless hypervisor == "XenServer"
+      file_ext << ".bz2" unless hypervisor == "VMware"
 
       filename = "#{image_name}.#{file_ext}"
       local_file = "#{target_temp_root}/#{filename}"

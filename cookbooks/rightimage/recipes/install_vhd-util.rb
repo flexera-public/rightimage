@@ -1,6 +1,7 @@
 rs_utils_marker :begin
 
 ruby_block("reload-yum-cache") do
+  only_if { node[:rightimage][:platform] == "centos" }
   block do
     Chef::Provider::Package::Yum::YumCache.instance.reload
   end
@@ -10,7 +11,7 @@ case node[:rightimage][:platform]
   when "centos" 
     vhd_util_deps=%w{mercurial git ncurses-devel dev86 iasl SDL python-devel libgcrypt-devel uuid-devel openssl-devel} 
   when "ubuntu"
-    vhd_util_deps=%w{mercurial libncurses5-dev bin86 bcc iasl libsdl1.2debian-all python-dev libgcrypt11-dev uuid-dev libssl-dev}
+    vhd_util_deps=%w{mercurial libncurses5-dev bin86 bcc iasl libsdl1.2debian-all libsdl1.2-dev python-dev libgcrypt11-dev uuid-dev libssl-dev gettext}
   else
     raise "ERROR: plaform #{node[:rightimage][:platform]} not supported. Please feel free to add support ;) "
 end
@@ -23,13 +24,10 @@ end
 
 bash "install_vhd-util" do 
   not_if "which vhd-util"
+  flags "-ex"
   code <<-EOF
-#!/bin/bash -ex
-    set -e
-    set -x
-
     rm -rf /mnt/vhd && mkdir /mnt/vhd && cd /mnt/vhd
-    hg clone http://xenbits.xensource.com/xen-4.0-testing.hg
+    hg clone --updaterev 21560 http://xenbits.xensource.com/xen-4.0-testing.hg
     cd xen-4.0-testing.hg/tools
     patch -p0 < /tmp/vhd-util-patch
     cd ..

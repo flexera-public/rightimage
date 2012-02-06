@@ -48,7 +48,7 @@ if node[:lsb][:codename] == "maverick" || node[:lsb][:codename] == "lucid"
 end
 
 # TODO: Need this to be hypervisor unspecific.  debootstrap?
-bootstrap_cmd = "/usr/bin/vmbuilder  #{node[:rightimage][:virtual_environment]} ubuntu -o \
+bootstrap_cmd = "/usr/bin/vmbuilder xen ubuntu -o \
     --suite=#{node[:rightimage][:release]} \
     -d #{node[:rightimage][:build_dir]} \
     --rootsize=2048 \
