@@ -583,6 +583,9 @@
       ],
       "type": "string",
       "recipes": [
+        "rightimage::default",
+        "rightimage::build_image",
+        "rightimage::rightscale_rightlink",
         "rightimage::rightscale_install"
       ],
       "display_name": "Should RightLink be downloaded?",
@@ -627,6 +630,22 @@
       ],
       "display_name": "Openstack Hostname",
       "description": "Hostname of Openstack Cloud Controller."
+    },
+    "rightimage/mci_name": {
+      "required": "optional",
+      "calculated": false,
+      "choice": [
+
+      ],
+      "default": "",
+      "type": "string",
+      "recipes": [
+        "rightimage::default",
+        "rightimage::build_image",
+        "rightimage::do_create_mci"
+      ],
+      "display_name": "MCI Name",
+      "description": "MCI to add this image to. If empty, use Image Name"
     },
     "rightimage/file_to_upload": {
       "required": "required",
