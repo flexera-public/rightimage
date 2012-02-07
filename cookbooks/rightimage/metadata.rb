@@ -155,13 +155,6 @@ attribute "rightimage/mci_name",
    :recipes => [ "rightimage::default", "rightimage::build_image", "rightimage::do_create_mci" ],
    :required => "optional"
 
-attribute "rightimage/download_rightlink",
-  :display_name => "Should RightLink be downloaded?",
-  :description => "Set to true to download RighLink form S3.  This recipe will fail if the expected version of RightLink is not in either of the dev or production buckets.",
-  :choice => [ "yes", "no" ],
-  :required => "required",
-  :recipes => [ "rightimage::default", "rightimage::build_image", "rightimage::rightscale_rightlink", "rightimage::rightscale_install" ]
-
 attribute "rightimage/rebundle_base_image_id",
   :display_name => "Starting Image Id",
   :description => "Cloud specific ID for the image to start with when building a rebundle image",
