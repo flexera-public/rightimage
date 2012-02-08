@@ -3,23 +3,31 @@ class Chef::Resource::RubyBlock
   include RightScale::RightImage::Helper
 end
 
+SANDBOX_BIN_DIR = "/opt/rightscale/sandbox/bin"
+
 # This is needed until rest_connection pins it's activesupport dependency version
 # If you are reading this, you can prolly remove this.
 r = gem_package "activesupport" do
-  gem_binary "/opt/rightscale/sandbox/bin/gem"
+  gem_binary "#{SANDBOX_BIN_DIR}/gem"
   version "2.3.10"
   action :nothing
 end
 r.run_action(:install)
 
-# Install RestConnection (in compile phase)
-r = gem_package "rest_connection" do
-  gem_binary "/opt/rightscale/sandbox/bin/gem"
+# Newer rest connection gem, have to set mirror freeze date to too old a value
+# for the rest connection we want
+RC_VERSION = "0.1.2"
+RC_GEM = ::File.join(::File.dirname(__FILE__), "..", "files", "default", "rest_connection-#{RC_VERSION}.gem")
+
+r = gem_package RC_GEM do
+  gem_binary "#{SANDBOX_BIN_DIR}/gem"
+  version RC_VERSION
   action :nothing
 end
 r.run_action(:install)
 
 Gem.clear_paths
+
 
 # Create MCI from image
 ruby_block "Create MCI or Add to MCI" do
