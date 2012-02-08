@@ -19,15 +19,31 @@ rs_utils_marker :begin
 #
 
 SANDBOX_BIN_DIR = "/opt/rightscale/sandbox/bin"
+
+# These are needed until rest_connection pins it's activesupport dependency version
+r = gem_package "activesupport" do
+  gem_binary "#{SANDBOX_BIN_DIR}/gem"
+  version "2.3.10"
+  action :nothing
+end
+r.run_action(:install)
+
+r = gem_package "net-ssh" do 
+  gem_binary "#{SANDBOX_BIN_DIR}/gem"
+  version "2.1.4"
+  action :nothing
+end
+r.run_action(:install)
+
 RI_TOOL_VERSION = "0.1.0"
 RI_TOOL_GEM = ::File.join(::File.dirname(__FILE__), "..", "files", "default", "rightimage_tools-#{RI_TOOL_VERSION}.gem")
-
 r = gem_package RI_TOOL_GEM do
   gem_binary "#{SANDBOX_BIN_DIR}/gem"
   version RI_TOOL_VERSION
   action :nothing
 end
 r.run_action(:install)
+
 Gem.clear_paths
 
 unless node[:rightimage][:manual_mode] == "true"

@@ -5,15 +5,6 @@ end
 
 SANDBOX_BIN_DIR = "/opt/rightscale/sandbox/bin"
 
-# This is needed until rest_connection pins it's activesupport dependency version
-# If you are reading this, you can prolly remove this.
-r = gem_package "activesupport" do
-  gem_binary "#{SANDBOX_BIN_DIR}/gem"
-  version "2.3.10"
-  action :nothing
-end
-r.run_action(:install)
-
 # Newer rest connection gem, have to set mirror freeze date to too old a value
 # for the rest connection we want
 RC_VERSION = "0.1.2"

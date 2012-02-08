@@ -27,7 +27,6 @@ recipe "rightimage::cloud_add_openstack", "adds requirements for openstack based
 recipe "rightimage::setup_loopback", "creates loopback file"
 recipe "rightimage::do_destroy_loopback", "unmounts loopback file"
 recipe "rightimage::install_vhd-util", "install the vhd-util tool"
-recipe "rightimage::do_tag_images", "adds rightscale tags to images"
 recipe "rightimage::do_create_mci", "creates MCI for image(s) (only ec2 currently supported)"
 recipe "rightimage::upload_ec2_s3", "bundle and upload s3 image (ec2 only)"
 recipe "rightimage::upload_ec2_ebs", "create EBS image snapshot (ec2 only)"
@@ -135,7 +134,7 @@ attribute "rightimage/image_upload_bucket",
   :display_name => "Image Upload Bucket",
   :description => "The bucket to upload the image to.",
   :required => "required",
-  :recipes => [ "rightimage::cloud_add_ec2", "rightimage::do_tag_images" , "rightimage::do_create_mci" , "rightimage::base_centos" , "rightimage::base_ubuntu" , "rightimage::base_sles" , "rightimage::default", "rightimage::build_image" , "rightimage::upload_file_to_s3" ] + cloud_upload
+  :recipes => [ "rightimage::cloud_add_ec2", "rightimage::do_create_mci" , "rightimage::base_centos" , "rightimage::base_ubuntu" , "rightimage::base_sles" , "rightimage::default", "rightimage::build_image" , "rightimage::upload_file_to_s3" ] + cloud_upload
 
 attribute "rightimage/file_to_upload",
   :display_name => "File To Upload",
@@ -165,43 +164,43 @@ attribute "rightimage/aws_account_number",
   :display_name => "aws_account_number",
   :description => "aws_account_number",
   :required => "required",
-  :recipes => [ "rightimage::cloud_add_ec2", "rightimage::upload_ec2_s3", "rightimage::upload_ec2_ebs", "rightimage::do_tag_images" , "rightimage::do_create_mci" , "rightimage::base_centos" , "rightimage::base_ubuntu" , "rightimage::base_sles", "rightimage::base_rhel" , "rightimage::default", "rightimage::build_image" , "rightimage::cloud_add_vmops", "rightimage::cloud_add_openstack", "rightimage::base_upload", "rightimage::upload_file_to_s3" ]
+  :recipes => [ "rightimage::cloud_add_ec2", "rightimage::upload_ec2_s3", "rightimage::upload_ec2_ebs", "rightimage::do_create_mci" , "rightimage::base_centos" , "rightimage::base_ubuntu" , "rightimage::base_sles", "rightimage::base_rhel" , "rightimage::default", "rightimage::build_image" , "rightimage::cloud_add_vmops", "rightimage::cloud_add_openstack", "rightimage::base_upload", "rightimage::upload_file_to_s3" ]
   
 attribute "rightimage/aws_access_key_id",
   :display_name => "aws_access_key_id",
   :description => "aws_access_key_id",
   :required => "required",
-  :recipes => [ "rightimage::cloud_add_ec2", "rightimage::upload_ec2_s3", "rightimage::upload_ec2_ebs", "rightimage::do_tag_images" , "rightimage::do_create_mci" , "rightimage::base_centos" , "rightimage::base_ubuntu" , "rightimage::base_sles", "rightimage::base_rhel" , "rightimage::default", "rightimage::build_image" , "rightimage::cloud_add_vmops", "rightimage::cloud_add_openstack", "rightimage::base_upload", "rightimage::upload_file_to_s3" ]
+  :recipes => [ "rightimage::cloud_add_ec2", "rightimage::upload_ec2_s3", "rightimage::upload_ec2_ebs", "rightimage::do_create_mci" , "rightimage::base_centos" , "rightimage::base_ubuntu" , "rightimage::base_sles", "rightimage::base_rhel" , "rightimage::default", "rightimage::build_image" , "rightimage::cloud_add_vmops", "rightimage::cloud_add_openstack", "rightimage::base_upload", "rightimage::upload_file_to_s3" ]
   
 attribute "rightimage/aws_secret_access_key",
   :display_name => "aws_secret_access_key",
   :description => "aws_secret_access_key",
   :required => "required",
-  :recipes => [ "rightimage::cloud_add_ec2", "rightimage::upload_ec2_s3", "rightimage::upload_ec2_ebs", "rightimage::do_tag_images" , "rightimage::do_create_mci" , "rightimage::base_centos" , "rightimage::base_ubuntu" , "rightimage::base_sles", "rightimage::base_rhel" , "rightimage::default", "rightimage::build_image" , "rightimage::cloud_add_vmops", "rightimage::cloud_add_openstack", "rightimage::base_upload", "rightimage::upload_file_to_s3" ]
+  :recipes => [ "rightimage::cloud_add_ec2", "rightimage::upload_ec2_s3", "rightimage::upload_ec2_ebs", "rightimage::do_create_mci" , "rightimage::base_centos" , "rightimage::base_ubuntu" , "rightimage::base_sles", "rightimage::base_rhel" , "rightimage::default", "rightimage::build_image" , "rightimage::cloud_add_vmops", "rightimage::cloud_add_openstack", "rightimage::base_upload", "rightimage::upload_file_to_s3" ]
   
 attribute "rightimage/aws_509_key",
   :display_name => "aws_509_key",
   :description => "aws_509_key",
   :required => "required",
-  :recipes => [ "rightimage::cloud_add_ec2", "rightimage::upload_ec2_s3", "rightimage::upload_ec2_ebs", "rightimage::do_tag_images" , "rightimage::do_create_mci" , "rightimage::base_centos" , "rightimage::base_sles" , "rightimage::base_ubuntu" , "rightimage::default", "rightimage::build_image" ]
+  :recipes => [ "rightimage::cloud_add_ec2", "rightimage::upload_ec2_s3", "rightimage::upload_ec2_ebs", "rightimage::do_create_mci" , "rightimage::base_centos" , "rightimage::base_sles" , "rightimage::base_ubuntu" , "rightimage::default", "rightimage::build_image" ]
   
 attribute "rightimage/aws_509_cert",
   :display_name => "aws_509_cert",
   :description => "aws_509_cert",
   :required => "required",
-  :recipes => [ "rightimage::cloud_add_ec2", "rightimage::upload_ec2_s3", "rightimage::upload_ec2_ebs", "rightimage::do_tag_images" , "rightimage::do_create_mci" , "rightimage::base_centos" , "rightimage::base_sles" , "rightimage::base_ubuntu" , "rightimage::default", "rightimage::build_image" ]
+  :recipes => [ "rightimage::cloud_add_ec2", "rightimage::upload_ec2_s3", "rightimage::upload_ec2_ebs", "rightimage::do_create_mci" , "rightimage::base_centos" , "rightimage::base_sles" , "rightimage::base_ubuntu" , "rightimage::default", "rightimage::build_image" ]
  
 attribute "rightimage/aws_access_key_id_for_upload",
   :display_name => "aws_access_key_id_for_upload",
   :description => "aws_access_key_id for the upload bucket",
   :required => "required",
-  :recipes => [ "rightimage::cloud_add_ec2", "rightimage::upload_ec2_s3", "rightimage::upload_ec2_ebs", "rightimage::do_tag_images" , "rightimage::do_create_mci" , "rightimage::base_centos" , "rightimage::base_sles" , "rightimage::base_ubuntu", "rightimage::base_rhel" , "rightimage::default", "rightimage::build_image" , "rightimage::upload_vmops", "rightimage::upload_file_to_s3" ]
+  :recipes => [ "rightimage::cloud_add_ec2", "rightimage::upload_ec2_s3", "rightimage::upload_ec2_ebs", "rightimage::do_create_mci" , "rightimage::base_centos" , "rightimage::base_sles" , "rightimage::base_ubuntu", "rightimage::base_rhel" , "rightimage::default", "rightimage::build_image" , "rightimage::upload_vmops", "rightimage::upload_file_to_s3" ]
   
 attribute "rightimage/aws_secret_access_key_for_upload",
   :display_name => "aws_secret_access_key_for_upload",
   :description => "aws_secret_access_key_for_upload",
   :required => "required",
-  :recipes => [ "rightimage::cloud_add_ec2", "rightimage::upload_ec2_s3", "rightimage::upload_ec2_ebs", "rightimage::do_tag_images" , "rightimage::do_create_mci" , "rightimage::base_centos" , "rightimage::base_sles" , "rightimage::base_ubuntu", "rightimage::base_rhel" , "rightimage::default", "rightimage::build_image" , "rightimage::upload_vmops", "rightimage::upload_file_to_s3" ]
+  :recipes => [ "rightimage::cloud_add_ec2", "rightimage::upload_ec2_s3", "rightimage::upload_ec2_ebs", "rightimage::do_create_mci" , "rightimage::base_centos" , "rightimage::base_sles" , "rightimage::base_ubuntu", "rightimage::base_rhel" , "rightimage::default", "rightimage::build_image" , "rightimage::upload_vmops", "rightimage::upload_file_to_s3" ]
 
 attribute "rightimage/debug",
   :display_name => "Development Image?",
