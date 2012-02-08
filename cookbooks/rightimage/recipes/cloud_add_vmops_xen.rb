@@ -1,5 +1,5 @@
 rs_utils_marker :begin
-class Chef::Resource::Bash
+class Chef::Resource
   include RightScale::RightImage::Helper
 end
 class Chef::Recipe
@@ -30,7 +30,7 @@ bash "create_vmops_image" do
   EOH
 end
 
-# add fstab
+log "  add fstab"
 template "#{guest_root}/etc/fstab" do
   source "fstab.erb"
   backup false
@@ -46,15 +46,26 @@ bash "mount proc" do
   EOH
 end
 
+log "  Install PV Kernel for Hypervisor"
 rightimage_kernel "Install PV Kernel for Hypervisor" do
   provider "rightimage_kernel_#{hypervisor}"
   action :install
 end
 
-# insert grub conf
+log "  insert grub conf"
 template "#{guest_root}/boot/grub/grub.conf" do 
   source "menu.lst.erb"
   backup false 
+end
+
+log "  Link menu.list to our grub.conf"
+file "#{guest_root}/boot/grub/menu.lst" do 
+  action :delete
+  backup false
+end
+
+link "#{guest_root}/boot/grub/menu.lst" do 
+  to "#{guest_root}/boot/grub/grub.conf"
 end
 
 include_recipe "rightimage::bootstrap_common_debug"

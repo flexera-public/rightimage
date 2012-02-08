@@ -147,6 +147,16 @@ EOF
           "/mnt"
         end
       end
+      
+      def partition_number
+        number = 0
+        number = 1 if partitioned? && is_ubuntu?
+        number
+      end
+      
+      def is_ubuntu?
+        node[:rightimage][:platform] == "ubuntu"
+      end
 
       def partitioned?
         case node[:rightimage][:cloud]
@@ -155,7 +165,7 @@ EOF
         when "vmops"
           case node[:rightimage][:virtual_environment]
           when "xen"
-            if node[:rightimage][:platform] == "ubuntu"
+            if is_ubuntu?
               return TRUE
             else
               return FALSE
