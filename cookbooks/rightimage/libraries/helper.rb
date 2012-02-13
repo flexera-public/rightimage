@@ -1,9 +1,6 @@
 module RightScale
   module RightImage
     module Helper
-  
-      # NOTE: this code is basically duplicated code with the right_image_builder project
-      # albeit out of date duplicated code.  We should share code someday!
       def image_name
         raise "ERROR: you must specify an image_name!" unless node[:rightimage][:image_name] =~ /./
         name = node[:rightimage][:image_name].dup
@@ -83,7 +80,6 @@ EOF
 
       def ri_lineage
         [platform,release_number,arch,timestamp,build_number].join("_")
-
       end
 
       def platform
