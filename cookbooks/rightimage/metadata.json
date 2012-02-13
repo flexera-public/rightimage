@@ -54,7 +54,6 @@
     "rightimage::build_image": "build image based on host platform",
     "rightimage::copy_image": "Creates non-partitioned image.",
     "rightimage::do_restore": "Restores image snapshot.",
-    "rightimage::do_tag_images": "adds rightscale tags to images",
     "rightimage::bootstrap_common": "common configuration for linux base images",
     "rightimage::base_centos": "coordinate a centos install",
     "rightimage::do_force_reset": "Unmounts and deletes the attached block_device and volumes that were attached to the instance for this lineage.",
@@ -128,7 +127,6 @@
         "rightimage::cloud_add_ec2",
         "rightimage::upload_ec2_s3",
         "rightimage::upload_ec2_ebs",
-        "rightimage::do_tag_images",
         "rightimage::do_create_mci",
         "rightimage::base_centos",
         "rightimage::base_sles",
@@ -223,7 +221,6 @@
         "rightimage::cloud_add_ec2",
         "rightimage::upload_ec2_s3",
         "rightimage::upload_ec2_ebs",
-        "rightimage::do_tag_images",
         "rightimage::do_create_mci",
         "rightimage::base_centos",
         "rightimage::base_sles",
@@ -248,7 +245,6 @@
         "rightimage::cloud_add_ec2",
         "rightimage::upload_ec2_s3",
         "rightimage::upload_ec2_ebs",
-        "rightimage::do_tag_images",
         "rightimage::do_create_mci",
         "rightimage::base_centos",
         "rightimage::base_sles",
@@ -270,7 +266,6 @@
         "rightimage::cloud_add_ec2",
         "rightimage::upload_ec2_s3",
         "rightimage::upload_ec2_ebs",
-        "rightimage::do_tag_images",
         "rightimage::do_create_mci",
         "rightimage::base_centos",
         "rightimage::base_ubuntu",
@@ -340,7 +335,6 @@
         "rightimage::cloud_add_ec2",
         "rightimage::upload_ec2_s3",
         "rightimage::upload_ec2_ebs",
-        "rightimage::do_tag_images",
         "rightimage::do_create_mci",
         "rightimage::base_centos",
         "rightimage::base_ubuntu",
@@ -494,7 +488,6 @@
         "rightimage::cloud_add_ec2",
         "rightimage::upload_ec2_s3",
         "rightimage::upload_ec2_ebs",
-        "rightimage::do_tag_images",
         "rightimage::do_create_mci",
         "rightimage::base_centos",
         "rightimage::base_sles",
@@ -558,7 +551,6 @@
         "rightimage::cloud_add_ec2",
         "rightimage::upload_ec2_s3",
         "rightimage::upload_ec2_ebs",
-        "rightimage::do_tag_images",
         "rightimage::do_create_mci",
         "rightimage::base_centos",
         "rightimage::base_ubuntu",
@@ -573,20 +565,6 @@
       ],
       "display_name": "aws_access_key_id",
       "description": "aws_access_key_id"
-    },
-    "rightimage/download_rightlink": {
-      "required": "required",
-      "calculated": false,
-      "choice": [
-        "yes",
-        "no"
-      ],
-      "type": "string",
-      "recipes": [
-        "rightimage::rightscale_install"
-      ],
-      "display_name": "Should RightLink be downloaded?",
-      "description": "Set to true to download RighLink form S3.  This recipe will fail if the expected version of RightLink is not in either of the dev or production buckets."
     },
     "rightimage/arch": {
       "required": "optional",
@@ -628,6 +606,22 @@
       "display_name": "Openstack Hostname",
       "description": "Hostname of Openstack Cloud Controller."
     },
+    "rightimage/mci_name": {
+      "required": "optional",
+      "calculated": false,
+      "choice": [
+
+      ],
+      "default": "",
+      "type": "string",
+      "recipes": [
+        "rightimage::default",
+        "rightimage::build_image",
+        "rightimage::do_create_mci"
+      ],
+      "display_name": "MCI Name",
+      "description": "MCI to add this image to. If empty, use Image Name"
+    },
     "rightimage/file_to_upload": {
       "required": "required",
       "calculated": false,
@@ -650,7 +644,6 @@
       "type": "string",
       "recipes": [
         "rightimage::cloud_add_ec2",
-        "rightimage::do_tag_images",
         "rightimage::do_create_mci",
         "rightimage::base_centos",
         "rightimage::base_ubuntu",
