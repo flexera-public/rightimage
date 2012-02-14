@@ -7,19 +7,19 @@ class Chef::Resource::BlockDevice
   include RightScale::RightImage::Helper
 end
 
-block_device target_raw_root do
-  provider "block_device_volume"
+block_device ri_lineage do
   cloud "ec2"
   lineage ri_lineage
+  mount_point target_raw_root 
 
   action :snapshot
 end
 
-block_device target_raw_root do
-  provider "block_device_volume"
+block_device ri_lineage do
   cloud "ec2"
   lineage ri_lineage
+  mount_point target_raw_root 
 
-  action :backup
+  action :primary_backup
 end
 rs_utils_marker :end

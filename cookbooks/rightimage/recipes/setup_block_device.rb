@@ -22,13 +22,17 @@
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 rs_utils_marker :begin
 
+class Chef::Recipe
+    include RightScale::RightImage::Helper
+end
+
 class Chef::Resource::BlockDevice
   include RightScale::RightImage::Helper
 end
 
-block_device target_raw_root do
-  provider "block_device_volume"
+block_device ri_lineage do
   cloud "ec2"
+  mount_point target_raw_root 
   max_snapshots "1000"
   keep_daily "1000"
   keep_weekly "1000"
