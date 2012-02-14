@@ -1,4 +1,3 @@
-rs_utils_marker :begin
 #
 # Cookbook Name:: rightimage
 # Recipe:: default
@@ -17,6 +16,11 @@ rs_utils_marker :begin
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+
+rs_utils_marker :begin
+class Chef::Recipe
+  include RightScale::RightImage::Helper
+end
 
 SANDBOX_BIN_DIR = "/opt/rightscale/sandbox/bin"
 
@@ -47,10 +51,15 @@ r.run_action(:install)
 Gem.clear_paths
 
 unless node[:rightimage][:manual_mode] == "true"
-  if node[:rightimage][:build_mode] == "full"
+  case node[:rightimage][:build_mode] 
+  when "full"
+    include_recipe "rightimage::do_restore" unless mounted?
     include_recipe "rightimage::build_image"
-  else
+  when "base"
+    include_recipe "rightimage::setup_block_device" unless mounted?
     include_recipe "rightimage::build_base"
+  when "migrate"
+    include_recipe "rightimage::ec2_download_bundle"
   end
 end
 rs_utils_marker :end

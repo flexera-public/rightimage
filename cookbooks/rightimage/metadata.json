@@ -32,7 +32,6 @@
     "rightimage::cloud_add_vmops": "adds requirements for cloudstack based on hypervisor choice",
     "rightimage::rightscale_install": "installs rightscale",
     "rightimage::base_sles": "coordinate a sles install",
-    "rightimage::setup_or_restore": "setup block device (on base mode) or restore volume (on full mode)",
     "rightimage::cloud_add_openstack": "adds requirements for openstack based on hypervisor choice",
     "rightimage::cloud_add_euca": "migrates the created image to eucalyptus",
     "rightimage::build_base": "build base image based on host platform",
@@ -48,6 +47,7 @@
     "rightimage::do_create_mci": "creates MCI for image(s) (only ec2 currently supported)",
     "rightimage::do_destroy_loopback": "unmounts loopback file",
     "rightimage::base_rhel": "coordinate a rhel install",
+    "rightimage::ec2_download_bundle": "Downloads bundled image from EC2 S3.",
     "rightimage::upload_euca": "bundle and upload euca kernel, ramdisk and image",
     "rightimage::install_vhd-util": "install the vhd-util tool",
     "rightimage::bootstrap_common_debug": "common debug configuration for linux base images",
@@ -132,7 +132,8 @@
         "rightimage::base_sles",
         "rightimage::base_ubuntu",
         "rightimage::default",
-        "rightimage::build_image"
+        "rightimage::build_image",
+        "rightimage::ec2_download_bundle"
       ],
       "display_name": "aws_509_cert",
       "description": "aws_509_cert"
@@ -250,7 +251,8 @@
         "rightimage::base_sles",
         "rightimage::base_ubuntu",
         "rightimage::default",
-        "rightimage::build_image"
+        "rightimage::build_image",
+        "rightimage::ec2_download_bundle"
       ],
       "display_name": "aws_509_key",
       "description": "aws_509_key"
@@ -268,15 +270,16 @@
         "rightimage::upload_ec2_ebs",
         "rightimage::do_create_mci",
         "rightimage::base_centos",
-        "rightimage::base_ubuntu",
         "rightimage::base_sles",
+        "rightimage::base_ubuntu",
         "rightimage::base_rhel",
         "rightimage::default",
         "rightimage::build_image",
         "rightimage::cloud_add_vmops",
         "rightimage::cloud_add_openstack",
         "rightimage::base_upload",
-        "rightimage::upload_file_to_s3"
+        "rightimage::upload_file_to_s3",
+        "rightimage::ec2_download_bundle"
       ],
       "display_name": "aws_secret_access_key",
       "description": "aws_secret_access_key"
@@ -339,13 +342,14 @@
         "rightimage::base_centos",
         "rightimage::base_ubuntu",
         "rightimage::base_sles",
-        "rightimage::base_rhel",
         "rightimage::default",
         "rightimage::build_image",
         "rightimage::cloud_add_vmops",
         "rightimage::cloud_add_openstack",
+        "rightimage::base_rhel",
         "rightimage::base_upload",
-        "rightimage::upload_file_to_s3"
+        "rightimage::upload_file_to_s3",
+        "rightimage::ec2_download_bundle"
       ],
       "display_name": "aws_account_number",
       "description": "aws_account_number"
@@ -355,6 +359,7 @@
       "calculated": false,
       "choice": [
         "base",
+        "migrate",
         "full"
       ],
       "type": "string",
@@ -362,7 +367,7 @@
 
       ],
       "display_name": "Build Mode",
-      "description": "Build base or full image."
+      "description": "Build base image, full image, or migrate existing image."
     },
     "rightimage/cloudstack/cdc_secret_key": {
       "required": "required",
@@ -561,7 +566,8 @@
         "rightimage::cloud_add_vmops",
         "rightimage::cloud_add_openstack",
         "rightimage::base_upload",
-        "rightimage::upload_file_to_s3"
+        "rightimage::upload_file_to_s3",
+        "rightimage::ec2_download_bundle"
       ],
       "display_name": "aws_access_key_id",
       "description": "aws_access_key_id"
