@@ -134,7 +134,14 @@ attribute "rightimage/image_upload_bucket",
   :display_name => "Image Upload Bucket",
   :description => "The bucket to upload the image to.",
   :required => "required",
-  :recipes => [ "rightimage::cloud_add_ec2", "rightimage::do_create_mci" , "rightimage::base_centos" , "rightimage::base_ubuntu" , "rightimage::base_sles" , "rightimage::default", "rightimage::build_image" , "rightimage::upload_file_to_s3" ] + cloud_upload
+  :recipes => [ "rightimage::cloud_add_ec2", "rightimage::do_create_mci" , "rightimage::base_centos" , "rightimage::base_ubuntu" , "rightimage::base_sles" , "rightimage::default", "rightimage::build_image" , "rightimage::upload_file_to_s3", "rightimage::ec2_download_bundle"] + cloud_upload
+
+attribute "rightimage/image_source_bucket",
+  :display_name => "Image Source Bucket",
+  :description => "When migrating an image, where to download the image from.",
+  :required => "optional",
+  :default => "rightscale-us-west-2",
+  :recipes => [ "rightimage::cloud_add_ec2", "rightimage::do_create_mci" , "rightimage::base_centos" , "rightimage::base_ubuntu" , "rightimage::base_sles" , "rightimage::default", "rightimage::build_image" , "rightimage::upload_file_to_s3", "rightimage::ec2_download_bundle" ] + cloud_upload
 
 attribute "rightimage/file_to_upload",
   :display_name => "File To Upload",

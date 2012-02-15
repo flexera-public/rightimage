@@ -482,6 +482,33 @@
       "display_name": "Eucalyptus Secret Access Key",
       "description": "The EC2_SECRET_KEY value defined in your eucarc credentials file. User must have admin privileges."
     },
+    "rightimage/image_source_bucket": {
+      "required": "optional",
+      "calculated": false,
+      "choice": [
+
+      ],
+      "default": "rightscale-us-west-2",
+      "type": "string",
+      "recipes": [
+        "rightimage::cloud_add_ec2",
+        "rightimage::do_create_mci",
+        "rightimage::base_centos",
+        "rightimage::base_ubuntu",
+        "rightimage::base_sles",
+        "rightimage::default",
+        "rightimage::build_image",
+        "rightimage::upload_file_to_s3",
+        "rightimage::ec2_download_bundle",
+        "rightimage::upload_euca",
+        "rightimage::upload_vmops",
+        "rightimage::upload_openstack",
+        "rightimage::upload_ec2_s3",
+        "rightimage::upload_ec2_ebs"
+      ],
+      "display_name": "Image Source Bucket",
+      "description": "When migrating an image, where to download the image from."
+    },
     "rightimage/aws_access_key_id_for_upload": {
       "required": "required",
       "calculated": false,
@@ -657,6 +684,7 @@
         "rightimage::default",
         "rightimage::build_image",
         "rightimage::upload_file_to_s3",
+        "rightimage::ec2_download_bundle",
         "rightimage::upload_euca",
         "rightimage::upload_vmops",
         "rightimage::upload_openstack",
