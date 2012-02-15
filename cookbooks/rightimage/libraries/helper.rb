@@ -247,6 +247,7 @@ EOF
       def image_source_bucket
         bucket = "rightscale-#{image_source_cloud}"
         bucket << "-dev" if node[:rightimage][:debug] == "true"
+        bucket
        end
 
       def image_source_cloud
