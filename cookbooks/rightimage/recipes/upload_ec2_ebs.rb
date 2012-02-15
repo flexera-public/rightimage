@@ -17,53 +17,31 @@ rightimage guest_root do
   action :sanitize
 end
 
-#  - bundle and upload
-bash "bundle_upload_ebs" do 
-    only_if { node[:rightimage][:cloud] == "ec2" }
-    flags "-ex"
-    code <<-EOH
-    . /etc/profile
-    
-    export JAVA_HOME=/usr
-    export PATH=$PATH:/usr/local/bin:/home/ec2/bin
-    export EC2_HOME=/home/ec2
+execute "unset proc" do
+  command "umount '#{guest_root}/proc' || true"
+end
 
-    root_label="#{node[:rightimage][:root_mount][:label_dev]}"
-
-    umount "#{guest_root}/proc" || true
-    
-    kernel_opt=""
-    if [ -n "#{node[:rightimage][:aki_id]}" ]; then
-      kernel_opt="--kernel #{node[:rightimage][:aki_id]}"
-    fi 
-
-    ramdisk_opt=""
-    if [ -n "#{node[:rightimage][:ramdisk_id]}" ]; then
-      ramdisk_opt="--ramdisk #{node[:rightimage][:ramdisk_id]}"
-    fi
-
-    #create keyfiles for bundle
+bash "setup keyfiles" do
+  not_if { ::File.exists? "/tmp/AWS_X509_KEY.pem" }
+  code <<-EOH
     echo "#{node[:rightimage][:aws_509_key]}" > /tmp/AWS_X509_KEY.pem
     echo "#{node[:rightimage][:aws_509_cert]}" > /tmp/AWS_X509_CERT.pem
+  EOH
+end
+
+execute "mount loopback" do 
+  not_if "mount | grep #{guest_root}"
+  command "mount -o loop #{target_raw_path} #{guest_root}"
+end
 
 
-    echo "Doing EBS"
-
-# mount loopback
-    mount -o loop #{target_raw_path} #{guest_root}
-
-# switch to a random directory for the build
-    random_dir="/mnt/$RANDOM"
-    mkdir $random_dir
-    cd $random_dir
-    ebs_mount=${random_dir}/ebs_mount
-    mkdir -p $ebs_mount
-    image_mount=#{guest_root}
-
-## calculate ec2 region
-    length=`echo -n #{node[:ec2][:placement][:availability_zone]} | wc -c`
-    length_minus_one=$((length -1))
-    region=`echo  #{node[:ec2][:placement][:availability_zone]} | cut -c -$length_minus_one`
+bash "create ebs volume" do 
+  only_if { node[:rightimage][:cloud] == "ec2" }
+  not_if  { ::File.exists? "/var/tmp/ebs_volume_id" }
+  flags "-e"
+  code <<-EOH
+    #{setup_ec2_tools_env}
+    set -x
 
 ## create EBS volume
     vol_out=`/home/ec2/bin/ec2-create-volume \
@@ -71,10 +49,22 @@ bash "bundle_upload_ebs" do
       --cert /tmp/AWS_X509_CERT.pem \
       --size 8 \
       --url #{node[:rightimage][:ec2_endpoint]} \
-      --availability-zone #{node[:ec2][:placement][:availability_zone]} `
+      --availability-zone #{node[:ec2][:placement][:availability_zone]}`
 
 # parse out volume id
     vol_id=`echo -n $vol_out | awk '{ print $2 }'`
+    echo $vol_id > /var/tmp/ebs_volume_id
+  EOH
+end
+
+bash "attach ebs volume" do 
+  only_if { node[:rightimage][:cloud] == "ec2" }
+  not_if "cat /proc/partitions | grep sdj"
+  flags "-e"
+  code <<-EOH
+    #{setup_ec2_tools_env}
+    set -x
+    vol_id=`cat /var/tmp/ebs_volume_id`
 
 ## attach an EBS volume here
     /home/ec2/bin/ec2-attach-volume $vol_id \
@@ -94,8 +84,24 @@ bash "bundle_upload_ebs" do
     done 
 
     sleep 10
+  EOH
+end
+
+bash "create EBS snapshot" do 
+  only_if { node[:rightimage][:cloud] == "ec2" }
+  not_if  { ::File.exists? "/var/tmp/ebs_snapshot_id" }
+  flags "-e"
+  code <<-EOH
+    #{setup_ec2_tools_env}
+    set -x
+    vol_id=`cat /var/tmp/ebs_volume_id`
+    ebs_mount="/mnt/ebs_mount"
+    mkdir -p $ebs_mount
+    image_mount=#{guest_root}
+
 ## format and mount volume
     mkfs.ext3 -F /dev/sdj
+    root_label="#{node[:rightimage][:root_mount][:label_dev]}"
     tune2fs -L $root_label /dev/sdj
     mount /dev/sdj $ebs_mount
 
@@ -115,15 +121,40 @@ bash "bundle_upload_ebs" do
       
 # parse out snapshot id
     snap_id=`echo -n $snap_out | awk '{ print $2 }'`
-
+    echo $snap_id > /var/tmp/ebs_snapshot_id
     sleep 10
+  EOH
+end
 
+bash "register EBS snapshot" do 
+  only_if { node[:rightimage][:cloud] == "ec2" }
+  not_if { ::File.exists? "/var/tmp/image_id_ebs" }
+  flags "-e"
+  code <<-EOH
+    #{setup_ec2_tools_env}
+    set -x
+    snap_id=`cat /var/tmp/ebs_snapshot_id`
+    vol_id=`cat /var/tmp/ebs_volume_id`
 ## loop and wait for snapshot to become available
     while [ 1 ]; do 
       snap_status=`/home/ec2/bin/ec2-describe-snapshots $snap_id --private-key /tmp/AWS_X509_KEY.pem --cert /tmp/AWS_X509_CERT.pem --url #{node[:rightimage][:ec2_endpoint]} `
       if `echo $snap_status | grep -q "completed"` ; then break; fi
       sleep 5
     done 
+
+## calculate options
+    kernel_opt=""
+    if [ -n "#{node[:rightimage][:aki_id]}" ]; then
+      kernel_opt="--kernel #{node[:rightimage][:aki_id]}"
+    fi 
+
+    ramdisk_opt=""
+    if [ -n "#{node[:rightimage][:ramdisk_id]}" ]; then
+      ramdisk_opt="--ramdisk #{node[:rightimage][:ramdisk_id]}"
+    fi
+
+## calculate ec2 region
+    region=#{node[:ec2][:placement][:availability_zone].chop}
 
     image_out_ebs=`/home/ec2/bin/ec2-register \
       --private-key /tmp/AWS_X509_KEY.pem \
@@ -159,15 +190,22 @@ bash "bundle_upload_ebs" do
       --cert /tmp/AWS_X509_CERT.pem \
       --url #{node[:rightimage][:ec2_endpoint]} \
       --region $region 
+  EOH
+end
 
-# unmount loopback
-    umount -lf #{guest_root}
 
+execute "unmount guest root" do
+  only_if "mount | grep #{guest_root}"
+  command "umount -lf #{guest_root}"
+end
+
+bash "remove keys" do
+  only_if { ::File.exists? "/tmp/AWS_X509_KEY.pem" }
+  code <<-EOH
     #remove keys
     rm -f /tmp/AWS_X509_KEY.pem
     rm -f /tmp/AWS_X509_CERT.pem
-    
-    EOH
+  EOH
 end 
 
 ruby_block "store image id" do

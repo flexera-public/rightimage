@@ -282,6 +282,15 @@ EOF
         `mount`.grep(/#{target_raw_root}/).any?
       end
 
+      def setup_ec2_tools_env
+        bash_snippet = <<-EOF
+          . /etc/profile
+          export JAVA_HOME=/usr
+          export PATH=$PATH:/usr/local/bin:/home/ec2/bin
+          export EC2_HOME=/home/ec2
+        EOF
+        return bash_snippet
+      end
     end
   end
 end
