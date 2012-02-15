@@ -76,11 +76,11 @@ bash "attach ebs volume" do
 
     sleep 10
 
-## loop and wait for volume to become available
-    while [ 1 ]; do 
+## loop and wait for volume to become available, up to 20 minutes
+    for i in `seq 1 60`; do
       vol_status=`/home/ec2/bin/ec2-describe-volumes $vol_id  --private-key /tmp/AWS_X509_KEY.pem --cert /tmp/AWS_X509_CERT.pem --url #{node[:rightimage][:ec2_endpoint]}`
       if `echo $vol_status | grep -q "attached"` ; then break; fi
-      sleep 1
+      sleep 20
     done 
 
     sleep 10
@@ -122,7 +122,7 @@ bash "create EBS snapshot" do
 # parse out snapshot id
     snap_id=`echo -n $snap_out | awk '{ print $2 }'`
     echo $snap_id > /var/tmp/ebs_snapshot_id
-    sleep 10
+    sleep 60
   EOH
 end
 
@@ -135,11 +135,15 @@ bash "register EBS snapshot" do
     set -x
     snap_id=`cat /var/tmp/ebs_snapshot_id`
     vol_id=`cat /var/tmp/ebs_volume_id`
-## loop and wait for snapshot to become available
-    while [ 1 ]; do 
+## loop and wait for snapshot to become available, up to 60 minutes
+# Upped the time between polls quite a bit, hopefully avoid ClientRequestLimitExceeded better
+# Turn off error checking temporarily, if we get Req. limit exceeded we don't want it to stop us
+    for i in `seq 1 60`; do
+      set +e
       snap_status=`/home/ec2/bin/ec2-describe-snapshots $snap_id --private-key /tmp/AWS_X509_KEY.pem --cert /tmp/AWS_X509_CERT.pem --url #{node[:rightimage][:ec2_endpoint]} `
+      set -e
       if `echo $snap_status | grep -q "completed"` ; then break; fi
-      sleep 5
+      sleep 60
     done 
 
 ## calculate options
