@@ -1,30 +1,10 @@
 {
-  "maintainer_email": "support@rightscale.com",
-  "long_description": "",
-  "groupings": {
-  },
   "dependencies": {
-    "rs_utils": [
-
-    ],
-    "block_device": [
-
-    ]
-  },
-  "recommendations": {
-  },
-  "platforms": {
-  },
-  "license": "Apache v2.0",
-  "description": "image building tools",
-  "suggestions": {
-  },
-  "conflicting": {
-  },
-  "version": "0.0.1",
-  "providing": {
+    "rs_utils": ">= 0.0.0",
+    "block_device": ">= 0.0.0"
   },
   "name": "rightimage",
+<<<<<<< HEAD
   "recipes": {
     "rightimage::setup_block_device": "Creates, formats and mounts a brand new block_device volume stripe on the instance.",
     "rightimage::upload_file_to_s3": "upload specified file to s3",
@@ -62,6 +42,9 @@
     "rightimage::upload_vmops": "setup http server for download to test cloud",
     "rightimage::clean": "cleans everything"
   },
+=======
+  "maintainer_email": "support@rightscale.com",
+>>>>>>> 9705b30... Add datacenter input (a-37681)
   "attributes": {
     "rightimage/image_name": {
       "required": "required",
@@ -496,6 +479,7 @@
       "display_name": "Datacenter ID",
       "description": "Datacenter/Zone ID.  Defaults to 1"
     },
+<<<<<<< HEAD
     "rightimage/image_source_bucket": {
       "required": "optional",
       "calculated": false,
@@ -523,6 +507,8 @@
       "display_name": "Image Source Bucket",
       "description": "When migrating an image, where to download the image from."
     },
+=======
+>>>>>>> 9705b30... Add datacenter input (a-37681)
     "rightimage/aws_access_key_id_for_upload": {
       "required": "required",
       "calculated": false,
@@ -770,7 +756,61 @@
       "description": "RightScale API username. Ex. you@rightscale.com"
     }
   },
+  "license": "Apache v2.0",
+  "suggestions": {
+  },
+  "platforms": {
+  },
   "maintainer": "RightScale, Inc.",
+  "long_description": "",
+  "version": "0.0.1",
+  "recommendations": {
+  },
+  "recipes": {
+    "rightimage::setup_block_device": "Creates, formats and mounts a brand new block_device volume stripe on the instance.",
+    "rightimage::upload_file_to_s3": "upload specified file to s3",
+    "rightimage::upload_openstack": "bundle and upload openstack kernel, ramdisk and image",
+    "rightimage::cloud_add_vmops": "adds requirements for cloudstack based on hypervisor choice",
+    "rightimage::rightscale_install": "installs rightscale",
+    "rightimage::base_sles": "coordinate a sles install",
+    "rightimage::setup_or_restore": "setup block device (on base mode) or restore volume (on full mode)",
+    "rightimage::cloud_add_openstack": "adds requirements for openstack based on hypervisor choice",
+    "rightimage::cloud_add_euca": "migrates the created image to eucalyptus",
+    "rightimage::build_base": "build base image based on host platform",
+    "rightimage::cloud_add_ec2": "migrates the created image to ec2",
+    "rightimage::default": "starts builds image automatically at boot. See 'manual_mode' input to enable.",
+    "rightimage::do_backup": "Backup image snapshot.",
+    "rightimage::upload_ec2_ebs": "create EBS image snapshot (ec2 only)",
+    "rightimage::upload_ec2_s3": "bundle and upload s3 image (ec2 only)",
+    "rightimage::setup_loopback": "creates loopback file",
+    "rightimage::bootstrap_sles": "bootstraps a basic sles image",
+    "rightimage::bootstrap_ubuntu": "bootstraps a basic ubuntu image",
+    "rightimage::base_ubuntu": "coordinate an ubuntu install",
+    "rightimage::do_create_mci": "creates MCI for image(s) (only ec2 currently supported)",
+    "rightimage::do_destroy_loopback": "unmounts loopback file",
+    "rightimage::base_rhel": "coordinate a rhel install",
+    "rightimage::upload_euca": "bundle and upload euca kernel, ramdisk and image",
+    "rightimage::install_vhd-util": "install the vhd-util tool",
+    "rightimage::bootstrap_common_debug": "common debug configuration for linux base images",
+    "rightimage::build_image": "build image based on host platform",
+    "rightimage::copy_image": "Creates non-partitioned image.",
+    "rightimage::do_restore": "Restores image snapshot.",
+    "rightimage::do_tag_images": "adds rightscale tags to images",
+    "rightimage::bootstrap_common": "common configuration for linux base images",
+    "rightimage::base_centos": "coordinate a centos install",
+    "rightimage::do_force_reset": "Unmounts and deletes the attached block_device and volumes that were attached to the instance for this lineage.",
+    "rightimage::bootstrap_centos": "bootstraps a basic centos image",
+    "rightimage::base_upload": "compresses and uploads base image to s3",
+    "rightimage::upload_vmops": "setup http server for download to test cloud",
+    "rightimage::clean": "cleans everything"
+  },
+  "groupings": {
+  },
+  "conflicting": {
+  },
   "replacing": {
+  },
+  "description": "image building tools",
+  "providing": {
   }
 }
