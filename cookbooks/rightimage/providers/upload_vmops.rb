@@ -30,7 +30,7 @@ action :upload do
       require "uri"
 
       name = "#{image_name}_#{node[:rightimage][:virtual_environment].upcase}"
-      zoneId = 1
+      zoneId = node[:rightimage][:datacenter]
 
       case node[:rightimage][:platform]
       when "centos"
