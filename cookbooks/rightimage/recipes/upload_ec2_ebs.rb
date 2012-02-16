@@ -29,6 +29,22 @@ bash "setup keyfiles" do
   EOH
 end
 
+bash "check that image doesn't exist" do
+  only_if { node[:rightimage][:cloud] == "ec2" }
+  flags "-e"
+  code <<-EOH
+    #{setup_ec2_tools_env}
+    set -x
+
+    images=`/home/ec2/bin/ec2-describe-images --private-key /tmp/AWS_X509_KEY.pem --cert /tmp/AWS_X509_CERT.pem -o self --url #{node[:rightimage][:ec2_endpoint]} --filter name=#{image_name}_EBS`
+    if [ -n "$images" ]; then
+      echo "Found existing image, aborting:"
+      echo $images
+      exit 1
+    fi 
+  EOH
+end
+
 execute "mount loopback" do 
   not_if "mount | grep #{guest_root}"
   command "mount -o loop #{target_raw_path} #{guest_root}"

@@ -18,21 +18,41 @@ rightimage guest_root do
   action :sanitize
 end
 
-# bundle and upload
-bash "bundle_upload_s3_image" do 
-    only_if { node[:rightimage][:cloud] == "ec2" }
-    code <<-EOH
-#!/bin/bash -ex
-    set -e
+execute "unset proc" do
+  command "umount '#{guest_root}/proc' || true"
+end
+
+bash "setup keyfiles" do
+  not_if { ::File.exists? "/tmp/AWS_X509_KEY.pem" }
+  code <<-EOH
+    echo "#{node[:rightimage][:aws_509_key]}" > /tmp/AWS_X509_KEY.pem    echo "#{node[:rightimage][:aws_509_cert]}" > /tmp/AWS_X509_CERT.pem
+  EOH
+end
+
+bash "check that image doesn't exist" do
+  only_if { node[:rightimage][:cloud] == "ec2" }
+  flags "-e"
+  code <<-EOH
+    #{setup_ec2_tools_env}
     set -x
 
-    . /etc/profile
-    
-    export JAVA_HOME=/usr
-    export PATH=$PATH:/usr/local/bin:/home/ec2/bin
-    export EC2_HOME=/home/ec2
+    images=`/home/ec2/bin/ec2-describe-images --private-key /tmp/AWS_X509_KEY.pem --cert /tmp/AWS_X509_CERT.pem -o self --url #{node[:rightimage][:ec2_endpoint]} --filter name=#{image_name}`
+    if [ -n "$images" ]; then
+      echo "Found existing image, aborting:"
+      echo $images
+      exit 1
+    fi 
+  EOH
+end
 
-    umount "#{guest_root}/proc" || true
+# bundle and upload
+bash "bundle_upload_s3_image" do 
+  only_if { node[:rightimage][:cloud] == "ec2" }
+  not_if { ::File.exists? "/var/tmp/image_id_s3" }
+  flags "-e"
+  code <<-EOH
+    #{setup_ec2_tools_env}
+    set -x
     
     kernel_opt=""
     if [ -n "#{node[:rightimage][:aki_id]}" ]; then
@@ -43,10 +63,6 @@ bash "bundle_upload_s3_image" do
     if [ -n "#{node[:rightimage][:ramdisk_id]}" ]; then
       ramdisk_opt="--ramdisk #{node[:rightimage][:ramdisk_id]}"
     fi
-
-    #create keyfiles for bundle
-    echo "#{node[:rightimage][:aws_509_key]}" > /tmp/AWS_X509_KEY.pem
-    echo "#{node[:rightimage][:aws_509_cert]}" > /tmp/AWS_X509_CERT.pem
 
     echo "Doing S3 bundle"
   
@@ -65,12 +81,16 @@ bash "bundle_upload_s3_image" do
     ## parse out image id
     image_id_s3=`echo -n $image_out_s3 | awk '{ print $2 }'`
     echo "$image_id_s3" > /var/tmp/image_id_s3
+    EOH
+end 
 
+bash "remove keys" do
+  only_if { ::File.exists? "/tmp/AWS_X509_KEY.pem" }
+  code <<-EOH
     #remove keys
     rm -f /tmp/AWS_X509_KEY.pem
     rm -f /tmp/AWS_X509_CERT.pem
-
-    EOH
+  EOH
 end 
 
 ruby_block "store image id" do
