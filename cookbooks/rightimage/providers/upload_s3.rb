@@ -3,8 +3,18 @@ class Chef::Resource::RubyBlock
 end
 
 action :upload do
-  ruby_block "Upload image to s3" do
+  part_dir = "/mnt/parts"
 
+  directory part_dir do
+    action :delete
+    recursive true
+  end
+
+  directory part_dir do
+    action :create
+  end
+
+  ruby_block "Upload image to s3" do
     file = new_resource.image_location
     bucket_name = new_resource.bucket
     s3_path = new_resource.s3_path
@@ -32,17 +42,15 @@ action :upload do
       raise "ERROR: Bucket not found: #{bucket_name} -- please verify your image_upload_bucket and creds" unless b
       b.files.each { |f| Chef::Log.warn "WARNING: image already exists -- OVERWRITING!!" if f.key == s3_file }
       
-      unless FileTest::exists?("/mnt/parts")
-        Chef::Log::info("Splitting file...")
-        `mkdir -p /mnt/parts ; cd /mnt/parts ; split -b 100m #{file}`
-      end
+      Chef::Log::info("Splitting file...")
+      `cd #{part_dir} && split -b 100m #{file}`
    
       Chef::Log::info('Initiating multipart uploads')
       response = storage.initiate_multipart_upload(bucket_name, s3_file, { 'x-amz-acl' => 'public-read' })
       upload_id = response.body['UploadId']
       Chef::Log::info("Upload ID: #{upload_id}")
       
-      parts = Dir.glob('/mnt/parts/*').sort
+      parts = Dir.glob("#{part_dir}/*").sort
       part_ids = []
       parts.each_with_index do |part, position|
         part_number = (position + 1).to_s

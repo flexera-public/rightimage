@@ -482,6 +482,20 @@
       "display_name": "Eucalyptus Secret Access Key",
       "description": "The EC2_SECRET_KEY value defined in your eucarc credentials file. User must have admin privileges."
     },
+    "rightimage/datacenter": {
+      "required": "optional",
+      "calculated": false,
+      "choice": [
+
+      ],
+      "default": "1",
+      "type": "string",
+      "recipes": [
+
+      ],
+      "display_name": "Datacenter ID",
+      "description": "Datacenter/Zone ID.  Defaults to 1"
+    },
     "rightimage/image_source_bucket": {
       "required": "optional",
       "calculated": false,

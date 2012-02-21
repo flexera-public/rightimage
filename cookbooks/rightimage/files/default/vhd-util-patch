@@ -962,9 +962,9 @@ diff -Naur blktap2/vhd/lib/vhd-util-check.c blktap2-new/vhd/lib/vhd-util-check.c
  			footer->hidden = tmp;
  
  			if (checksum == footer->checksum)
-diff -Naur blktap2/vhd/lib/vhd-util-convert.c blktap2-new/vhd/lib/vhd-util-convert.c
+diff -Naur blktap2/vhd/lib/vhd-util-convert.c blktap2/vhd/lib/vhd-util-convert.c
 --- blktap2/vhd/lib/vhd-util-convert.c	1970-01-01 08:00:00.000000000 +0800
-+++ blktap2-new/vhd/lib/vhd-util-convert.c	2010-07-12 15:39:47.000000000 +0800
++++ blktap2/vhd/lib/vhd-util-convert.c	2010-07-12 15:39:47.000000000 +0800
 @@ -0,0 +1,136 @@
 +/*++
 +

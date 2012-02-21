@@ -1,5 +1,5 @@
 rs_utils_marker :begin
-class Chef::Resource::Bash
+class Chef::Resource
   include RightScale::RightImage::Helper
 end
 class Chef::Recipe
@@ -30,7 +30,7 @@ bash "create_vmops_image" do
   EOH
 end
 
-# add fstab
+log "  add fstab"
 template "#{guest_root}/etc/fstab" do
   source "fstab.erb"
   backup false
@@ -46,15 +46,26 @@ bash "mount proc" do
   EOH
 end
 
+log "  Install PV Kernel for Hypervisor"
 rightimage_kernel "Install PV Kernel for Hypervisor" do
   provider "rightimage_kernel_#{hypervisor}"
   action :install
 end
 
-# insert grub conf
+log "  insert grub conf"
 template "#{guest_root}/boot/grub/grub.conf" do 
   source "menu.lst.erb"
   backup false 
+end
+
+log "  Link menu.list to our grub.conf"
+file "#{guest_root}/boot/grub/menu.lst" do 
+  action :delete
+  backup false
+end
+
+link "#{guest_root}/boot/grub/menu.lst" do 
+  to "#{guest_root}/boot/grub/grub.conf"
 end
 
 include_recipe "rightimage::bootstrap_common_debug"
@@ -64,21 +75,25 @@ bash "configure for cloudstack" do
   code <<-EOH
     guest_root=#{guest_root}
 
-    # clean out packages
-    chroot $guest_root yum -y clean all
+    case "#{node[:rightimage][:platform]}" in
+    "centos" )
+      # configure dns timeout 
+      echo 'timeout 300;' > $guest_root/etc/dhclient.conf
+      rm -f ${guest_root}/var/lib/rpm/__*
+      chroot $guest_root rpm --rebuilddb
+      ;;
+    "ubuntu" )
+      echo 'timeout 300;' > $guest_root/etc/dhcp3/dhclient.conf
+      rm -f $guest_root/var/lib/dhcp3/*
+      ;;  
+    esac 
 
     # enable console access
     echo "2:2345:respawn:/sbin/mingetty xvc0" >> $guest_root/etc/inittab
     echo "xvc0" >> $guest_root/etc/securetty
 
-    # configure dns timeout 
-    echo 'timeout 300;' > $guest_root/etc/dhclient.conf
-
     mkdir -p $guest_root/etc/rightscale.d
     echo "cloudstack" > $guest_root/etc/rightscale.d/cloud
-
-    rm ${guest_root}/var/lib/rpm/__*
-    chroot $guest_root rpm --rebuilddb
   EOH
 end
 
@@ -95,13 +110,6 @@ end
 # Clean up guest image
 rightimage guest_root do
   action :sanitize
-end
-
-bash "sync fs" do
-  flags "-x" 
-  code <<-EOH
-    sync
-  EOH
 end
 
 include_recipe "rightimage::do_destroy_loopback"
@@ -123,6 +131,7 @@ bash "xen convert" do
     vhd_image=${raw_image}.vhd
     vhd-util convert -s 0 -t 1 -i $raw_image -o $vhd_image
     vhd-util convert -s 1 -t 2 -i $vhd_image -o #{image_name}.vhd
+    rm -f #{image_name}.vhd.bz2
     bzip2 #{image_name}.vhd
   EOH
 end

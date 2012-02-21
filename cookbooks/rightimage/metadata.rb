@@ -233,6 +233,12 @@ attribute "rightimage/virtual_environment",
   :choice => [ "xen", "kvm", "esxi" ],
   :required => "required"
 
+attribute "rightimage/datacenter",
+  :display_name => "Datacenter ID",
+  :description => "Datacenter/Zone ID.  Defaults to 1",
+  :default => "1",
+  :required => "optional"
+
 ## euca inputs  
 attribute "rightimage/euca/user_id",
   :display_name => "Eucalyptus User ID",
