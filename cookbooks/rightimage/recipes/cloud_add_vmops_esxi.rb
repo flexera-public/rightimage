@@ -278,7 +278,7 @@ bash "Create create vmdk and create ovf/ova files" do
   code <<-EOH
     ./ovftool #{target_temp_root}/temp.ovf #{target_temp_root}/ova/#{bundled_image}.ovf  > /dev/null 2>&1
     cd #{target_temp_root}/ova
-    tar -cf #{bundled_image}.ova #{bundled_image}.ovf #{bundled_image}.mf *.vmdk
+    tar -cf ../#{bundled_image}.ova #{bundled_image}.ovf #{bundled_image}.mf *.vmdk
   EOH
 end
 rs_utils_marker :end

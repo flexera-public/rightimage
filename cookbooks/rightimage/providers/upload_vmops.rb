@@ -47,16 +47,17 @@ action :upload do
       when "esxi"
         format = "OVA"
         hypervisor = "VMware"
+        file_ext = "vmdk.ova"
       when "kvm"
         format = "QCOW2"
         hypervisor = "KVM"
+        file_ext = "qcow2.bz2"
       when "xen"
         format = "VHD"
         hypervisor = "XenServer"
+        file_ext = "vhd.bz2"
       end
 
-      file_ext = format.downcase
-      file_ext << ".bz2" unless hypervisor == "VMware"
 
       filename = "#{image_name}.#{file_ext}"
       local_file = "#{target_temp_root}/#{filename}"
