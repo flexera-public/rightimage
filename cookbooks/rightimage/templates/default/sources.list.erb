@@ -1,9 +1,9 @@
 deb <%= node[:rightimage][:mirror_url] %> <%= node[:rightimage][:release] %> main restricted universe multiverse
-#deb-src http://archive.ubuntu.com/ubuntu/ <%= node[:rightimage][:release] %>/ubuntu main restricted universe multiverse
+#deb-src http://archive.ubuntu.com/ubuntu/ <%= node[:rightimage][:release] %> main restricted universe multiverse
 
 ## MAJOR BUG FIX UPDATES produced after the final release
 deb <%= node[:rightimage][:mirror_url] %> <%= node[:rightimage][:release] %>-updates main restricted universe multiverse
-#deb-src http://archive.ubuntu.com/ubuntu/ <%= node[:rightimage][:release] %>/ubuntu-updates main restricted universe multiverse
+#deb-src http://archive.ubuntu.com/ubuntu/ <%= node[:rightimage][:release] %>-updates main restricted universe multiverse
 
 ## UBUNTU SECURITY UPDATES
 deb <%= node[:rightimage][:mirror_url] %>  <%= node[:rightimage][:release] %>-security main restricted universe multiverse
@@ -11,5 +11,5 @@ deb <%= node[:rightimage][:mirror_url] %>  <%= node[:rightimage][:release] %>-se
 
 ## BACKPORTS REPOSITORY (Unsupported.  May contain illegal packages.  Use at own risk.)
 #deb <%= node[:rightimage][:mirror_url] %> <%= node[:rightimage][:release] %>-backports main restricted universe multiverse
-#deb-src http://archive.ubuntu.com/ubuntu/ <%= node[:rightimage][:release] %>/ubuntu-backports main restricted universe multiverse
+#deb-src http://archive.ubuntu.com/ubuntu/ <%= node[:rightimage][:release] %>-backports main restricted universe multiverse
 
