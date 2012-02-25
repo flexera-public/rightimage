@@ -273,8 +273,10 @@ end
 
 # TODO: Add cleanup
 bash "cleanup" do
+  flags "-ex"
   code <<-EOH
-    set -ex
+
+    chroot #{source_image} rm -rf /etc/init/plymouth* /etc/init/rsyslog.conf
     chroot #{source_image} apt-get update
     chroot #{source_image} apt-get clean
   EOH
