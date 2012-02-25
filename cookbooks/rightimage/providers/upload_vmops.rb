@@ -66,7 +66,7 @@ action :upload do
      
       Chef::Log.info("Registering image on cloud...")
       vmops = RightScale::VmopsFactory.right_vmops_class_for_version("2.2").new(node[:rightimage][:cloudstack][:cdc_api_key], node[:rightimage][:cloudstack][:cdc_secret_key], node[:rightimage][:cloudstack][:cdc_url])
-      res = vmops.register_template(name, name, image_url, format, osTypeId, zoneId, hypervisor, md5sum, true, true)
+      res = vmops.register_template(name, name, image_url, format, osTypeId, zoneId, hypervisor, md5sum, false, true)
       Chef::Log.info("Returned data: #{res.inspect}")
 
       image_id = res["registertemplateresponse"]["template"][0]["id"]
