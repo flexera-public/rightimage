@@ -55,10 +55,7 @@ action :upload do
         hypervisor = "XenServer"
       end
 
-      file_ext = format.downcase
-      file_ext << ".bz2" unless hypervisor == "VMware"
-
-      filename = "#{image_name}.#{file_ext}"
+      filename = "#{image_name}.#{image_file_ext}"
       local_file = "#{target_temp_root}/#{filename}"
       md5sum = Digest::MD5.hexdigest(::File.read(local_file))
 
