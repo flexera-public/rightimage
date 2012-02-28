@@ -282,10 +282,26 @@ attribute "rightimage/euca/euca_cert",
   :required => "required",
   :recipes => [ "rightimage::upload_euca" ]
 
+# Openstack
 attribute "rightimage/openstack/hostname",
   :display_name => "Openstack Hostname",
   :description => "Hostname of Openstack Cloud Controller.",
-  :required => "required",
+  :required => "optional",
+  :default => "",
+  :recipes => [ "rightimage::upload_openstack" ]
+
+attribute "rightimage/openstack/user",
+  :display_name => "Openstack User",
+  :description => "User to access API of Openstack Cloud Controller.",
+  :required => "optional",
+  :default => "",
+  :recipes => [ "rightimage::upload_openstack" ]
+
+attribute "rightimage/openstack/password",
+  :display_name => "Openstack Password",
+  :description => "Password for user to access API of Openstack Cloud Controller.",
+  :required => "optional",
+  :default => "",
   :recipes => [ "rightimage::upload_openstack" ]
 
 # CloudStack

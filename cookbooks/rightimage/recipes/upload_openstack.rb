@@ -12,9 +12,20 @@ end
 
 ruby_block "upload to cloud" do
   block do
+    require 'json'
     filename = "#{image_name}.qcow2"
     local_file = "#{target_temp_root}/#{filename}"
-    result = `glance-upload --host #{node[:rightimage][:openstack][:hostname]} --disk-format qcow2 --container-format ovf #{local_file} #{image_name}`
+
+    openstack_user = node[:rightimage][:openstack][:user]
+    openstack_password = node[:rightimage][:openstack][:password]
+    openstack_hostname = node[:rightimage][:openstack][:hostname]
+
+    Chef::Log.info("Getting openstack api token for user #{openstack_user}@#{openstack_hostname}")
+    auth_resp = `curl -d '{"auth":{"passwordCredentials":{"username": "#{openstack_user}", "password": "#{openstack_pass}"}}}' -H "Content-type: application/json" http://#{openstack_hostname}:5000/v2.0/tokens` 
+    Chef::Log.info("got response #{auth_resp}")
+    auth_data = JSON.parse(auth_resp)
+
+#    result = `glance-upload -A --host #{node[:rightimage][:openstack][:hostname]} --disk-format qcow2 --container-format ovf #{local_file} #{image_name}`
 
     if result =~ /Stored image/ 
       image_id = result.scan(/u'id':\s(\d+)/).first

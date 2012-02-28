@@ -89,6 +89,20 @@
       "display_name": "RightLink Version",
       "description": "The RightLink version we are building into our image"
     },
+    "rightimage/openstack/user": {
+      "required": "optional",
+      "calculated": false,
+      "choice": [
+
+      ],
+      "default": "",
+      "type": "string",
+      "recipes": [
+        "rightimage::upload_openstack"
+      ],
+      "display_name": "Openstack User",
+      "description": "User to access API of Openstack Cloud Controller."
+    },
     "rightimage/euca/x509_cert": {
       "required": "required",
       "calculated": false,
@@ -641,11 +655,12 @@
       "description": "The rightscale account specific api url to use.  Ex. https://my.rightscale.com/api/acct/1234 (where 1234 is your account id)"
     },
     "rightimage/openstack/hostname": {
-      "required": "required",
+      "required": "optional",
       "calculated": false,
       "choice": [
 
       ],
+      "default": "",
       "type": "string",
       "recipes": [
         "rightimage::upload_openstack"
@@ -723,6 +738,20 @@
       ],
       "display_name": "Guest OS Platform",
       "description": "The operating system for the virtual image."
+    },
+    "rightimage/openstack/password": {
+      "required": "optional",
+      "calculated": false,
+      "choice": [
+
+      ],
+      "default": "",
+      "type": "string",
+      "recipes": [
+        "rightimage::upload_openstack"
+      ],
+      "display_name": "Openstack Password",
+      "description": "Password for user to access API of Openstack Cloud Controller."
     },
     "rightimage/euca/user_id": {
       "required": "required",
