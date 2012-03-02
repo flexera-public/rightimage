@@ -87,16 +87,26 @@ yum -c /tmp/yum.conf --installroot=#{node[:rightimage][:mount_dir]} -y remove bl
 yum -c /tmp/yum.conf --installroot=#{node[:rightimage][:mount_dir]} -y clean all
 
 ## stop crap from going in the logs...    
-rm #{node[:rightimage][:mount_dir]}/var/lib/rpm/__*
+rm -f #{node[:rightimage][:mount_dir]}/var/lib/rpm/__*
 chroot #{node[:rightimage][:mount_dir]} rpm --rebuilddb
 
-## Remove yum-fastestmirror plugin
-chroot #{node[:rightimage][:mount_dir]} rpm -e --nodeps yum-fastestmirror
+if [ #{node[:rightimage][:release].to_i} -lt 6 ]; then
+  ## Remove yum-fastestmirror plugin
+  chroot #{node[:rightimage][:mount_dir]} rpm -e --nodeps yum-fastestmirror
+
+  echo 'hwcap 0 nosegneg' > #{node[:rightimage][:mount_dir]}/etc/ld.so.conf.d/libc6-xen.conf
+  chroot #{node[:rightimage][:mount_dir]} /sbin/ldconfig -v
+
+  curl -o #{node[:rightimage][:mount_dir]}/etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL https://fedoraproject.org/static/217521F6.txt
+else
+  curl -o #{node[:rightimage][:mount_dir]}/etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-6 https://fedoraproject.org/static/0608B895.txt
+
+  # Disable ttys
+  sed -i "s/ACTIVE_CONSOLES=.*/ACTIVE_CONSOLES=/" #{node[:rightimage][:mount_dir]}/etc/sysconfig/init
+fi
 
 mkdir -p #{node[:rightimage][:mount_dir]}/etc/ssh
 
-echo 'hwcap 0 nosegneg' > #{node[:rightimage][:mount_dir]}/etc/ld.so.conf.d/libc6-xen.conf
-chroot #{node[:rightimage][:mount_dir]} /sbin/ldconfig -v
 mv #{node[:rightimage][:mount_dir]}/lib/tls #{node[:rightimage][:mount_dir]}/lib/tls.disabled || true
 
 ## fix logrotate
@@ -112,8 +122,7 @@ perl -p -i -e 's/(.*tty4)/#\1/' #{node[:rightimage][:mount_dir]}/etc/inittab
 perl -p -i -e 's/(.*tty5)/#\1/' #{node[:rightimage][:mount_dir]}/etc/inittab
 perl -p -i -e 's/(.*tty6)/#\1/' #{node[:rightimage][:mount_dir]}/etc/inittab
 
-rm #{node[:rightimage][:mount_dir]}/etc/yum.repos.d/CentOS-Media.repo
-curl -o #{node[:rightimage][:mount_dir]}/etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL http://download.fedora.redhat.com/pub/epel/RPM-GPG-KEY-EPEL
+rm -f #{node[:rightimage][:mount_dir]}/etc/yum.repos.d/CentOS-Media.repo
 
 echo "PKG_CONFIG_PATH=/usr/lib/pkgconfig:/usr/local/lib/pkgconfig" > #{node[:rightimage][:mount_dir]}/etc/profile.d/pkgconfig.sh
 
@@ -221,7 +230,7 @@ end
 bash "clean_db" do 
   code <<-EOH
     #have to do this to fix a yummy bug
-    rm #{node[:rightimage][:mount_dir]}/var/lib/rpm/__*
+    rm -f #{node[:rightimage][:mount_dir]}/var/lib/rpm/__*
     chroot #{node[:rightimage][:mount_dir]} rpm --rebuilddb
   EOH
 end
