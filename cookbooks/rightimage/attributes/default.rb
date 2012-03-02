@@ -95,6 +95,12 @@ case rightimage[:cloud]
       when "centos"
         set[:rightimage][:fstab][:ephemeral_mount_opts] = "defaults"
         set[:rightimage][:fstab][:swap] = "defaults"
+
+        # CentOS 6.1 and above start SCSI device naming from e
+        if rightimage[:release].to_f >= 6.1
+          set[:rightimage][:ephemeral_mount] = "/dev/xvdf"
+          set[:rightimage][:swap_mount] = "/dev/xvde3"  unless rightimage[:arch]  == "x86_64"
+        end
     end
   when "vmops", "openstack"
     rightimage[:host_packages] << " python26-distribute python26-devel python26-libs" if rightimage[:cloud] == "openstack"
