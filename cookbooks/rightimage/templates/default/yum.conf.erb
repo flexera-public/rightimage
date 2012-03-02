@@ -62,7 +62,7 @@ baseurl = http://<%= node[:rightimage][:mirror] %>/epel/<%= node[:rightimage][:r
 failovermethod=priority
 gpgcheck=1
 enabled=1
-gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL<% if node[:rightimage][:release].to_i >= 6 -%>-<%= node[:rightimage][:release][0].chr %><% end -%>
 
 [rightscale-epel]
 name = none
