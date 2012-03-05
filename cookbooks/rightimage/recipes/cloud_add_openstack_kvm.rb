@@ -139,6 +139,8 @@ bash "package image" do
     BUNDLED_IMAGE_PATH="#{target_temp_root}/$BUNDLED_IMAGE"
     
     qemu-img convert -O qcow2 #{target_temp_path} $BUNDLED_IMAGE_PATH
+    [ -f $BUNDLED_IMAGE_PATH.bz2 ] && rm -f $BUNDLED_IMAGE_PATH.bz2
+    bzip2 -k $BUNDLED_IMAGE_PATH
   EOH
 end
 rs_utils_marker :end
