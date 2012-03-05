@@ -25,7 +25,8 @@ end
 bash "setup keyfiles" do
   not_if { ::File.exists? "/tmp/AWS_X509_KEY.pem" }
   code <<-EOH
-    echo "#{node[:rightimage][:aws_509_key]}" > /tmp/AWS_X509_KEY.pem    echo "#{node[:rightimage][:aws_509_cert]}" > /tmp/AWS_X509_CERT.pem
+    echo "#{node[:rightimage][:aws_509_key]}" > /tmp/AWS_X509_KEY.pem    
+    echo "#{node[:rightimage][:aws_509_cert]}" > /tmp/AWS_X509_CERT.pem
   EOH
 end
 
