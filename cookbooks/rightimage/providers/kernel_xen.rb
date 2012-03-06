@@ -26,8 +26,8 @@ action :install do
           # Remove any installed kernels
           for i in `chroot $guest_root dpkg --get-selections linux-headers* linux-image*|sed "s/install//g"`; do chroot $guest_root env DEBIAN_FRONTEND=noninteractive apt-get -y purge $i; done
 
-          chroot $guest_root apt-get -y install linux-image-2.6.32-317-ec2 linux-headers-2.6.32-317-ec2 grub-legacy-ec2
-          chroot $guest_root apt-get clean 
+          chroot $guest_root apt-get -y install linux-image-virtual linux-headers-virtual grub-legacy-ec2
+          chroot $guest_root apt-get clean
           ;;
         esac
     EOH
