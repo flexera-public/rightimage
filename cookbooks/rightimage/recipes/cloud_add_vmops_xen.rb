@@ -81,16 +81,23 @@ bash "configure for cloudstack" do
       echo 'timeout 300;' > $guest_root/etc/dhclient.conf
       rm -f ${guest_root}/var/lib/rpm/__*
       chroot $guest_root rpm --rebuilddb
+
+      # enable console access
+      echo "2:2345:respawn:/sbin/mingetty xvc0" >> $guest_root/etc/inittab
+      echo "xvc0" >> $guest_root/etc/securetty
       ;;
     "ubuntu" )
-      echo 'timeout 300;' > $guest_root/etc/dhcp3/dhclient.conf
-      rm -f $guest_root/var/lib/dhcp3/*
+      # enable console access
+      cp $guest_root/etc/init/tty1.conf* $guest_root/etc/init/hvc0.conf
+      sed -i "s/tty1/hvc0/g" $guest_root/etc/init/hvc0.conf
+      echo "hvc0" >> $guest_root/etc/securetty
+
+      for i in $guest_root/etc/init/tty*; do
+        mv $i $i.disabled;
+      done
       ;;  
     esac 
 
-    # enable console access
-    echo "2:2345:respawn:/sbin/mingetty xvc0" >> $guest_root/etc/inittab
-    echo "xvc0" >> $guest_root/etc/securetty
 
     mkdir -p $guest_root/etc/rightscale.d
     echo "cloudstack" > $guest_root/etc/rightscale.d/cloud
@@ -102,8 +109,8 @@ bash "unmount proc" do
   code <<-EOH
     guest_root=#{guest_root}
     umount -lf $guest_root/proc || true
-    umount -lf $guest_root/dev
-    umount -lf $guest_root/sys
+    umount -lf $guest_root/dev || true
+    umount -lf $guest_root/sys || true
   EOH
 end
 

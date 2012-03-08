@@ -155,7 +155,7 @@ EOF
       
       def partition_number
         number = 0
-        number = 1 if partitioned? && is_ubuntu?
+        number = 1 if partitioned? && is_ubuntu? && node[:rightimage][:virtual_environment] == "xen"
         number
       end
       

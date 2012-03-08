@@ -34,7 +34,8 @@ action :upload do
           :provider               => 'AWS',
           :host                   => 's3-us-west-1.amazonaws.com',
           :aws_secret_access_key  => node[:rightimage][:aws_secret_access_key],
-          :aws_access_key_id      => node[:rightimage][:aws_access_key_id]
+          :aws_access_key_id      => node[:rightimage][:aws_access_key_id],
+          :persistent => false
       )
 
       Chef::Log.info("Get bucket #{bucket_name}...")  

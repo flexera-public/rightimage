@@ -627,19 +627,6 @@
       "display_name": "MCI Name",
       "description": "MCI to add this image to. If empty, use Image Name"
     },
-    "rightimage/file_to_upload": {
-      "required": "required",
-      "calculated": false,
-      "choice": [
-
-      ],
-      "type": "string",
-      "recipes": [
-        "rightimage::upload_file_to_s3"
-      ],
-      "display_name": "File To Upload",
-      "description": "The absolute pathname of the file to upload to S3."
-    },
     "rightimage/image_upload_bucket": {
       "required": "required",
       "calculated": false,

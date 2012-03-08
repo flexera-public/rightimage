@@ -23,9 +23,8 @@
 rs_utils_marker :begin
 
 class Chef::Recipe
-    include RightScale::RightImage::Helper
+  include RightScale::RightImage::Helper
 end
-
 class Chef::Resource::BlockDevice
   include RightScale::RightImage::Helper
 end

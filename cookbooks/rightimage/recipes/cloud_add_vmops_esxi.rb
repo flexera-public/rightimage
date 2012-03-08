@@ -30,12 +30,17 @@ raise "ERROR: you must set your virtual_environment to esxi!"  if node[:rightima
 
 bundled_image = "#{image_name}.vmdk"
 
+package "grub"
 package "qemu"
 
 bash "mount proc & dev" do
   flags "-ex" 
   code <<-EOH
     guest_root=#{guest_root}
+
+    umount -lf $guest_root/proc || true 
+    umount -lf $guest_root/sys || true 
+
     mount -t proc none $guest_root/proc
     mount --bind /dev $guest_root/dev
     mount --bind /sys $guest_root/sys
@@ -55,6 +60,7 @@ end
 
 bash "install grub" do
   flags "-ex"
+  only_if { node[:rightimage][:platform] == "centos" } 
   code <<-EOH
     guest_root="#{guest_root}"
     chroot $guest_root yum -y install grub
@@ -77,6 +83,7 @@ bash "setup grub" do
 
     case "#{node[:rightimage][:platform]}" in
       "ubuntu" )
+        chroot $guest_root cp -p /usr/lib/grub/i386-pc/* /boot/grub
         grub_command="/usr/sbin/grub"
         ;;
 
@@ -94,8 +101,9 @@ bash "setup grub" do
     cat > device.map <<EOF
 (hd0) #{target_raw_path}
 EOF
-    ${grub_command} --batch --device-map=device.map <<EOF
-root (hd0,0)
+  
+  ${grub_command} --batch --device-map=device.map <<EOF
+root (hd0,1)
 setup (hd0)
 quit
 EOF 
@@ -160,12 +168,6 @@ bash "configure for cloudstack" do
       rm ${guest_root}/var/lib/rpm/__*
       chroot $guest_root rpm --rebuilddb
       ;;
-
-    "ubuntu" )
-      echo 'timeout 300;' > $guest_root/etc/dhcp3/dhclient.conf
-      rm $guest_root/var/lib/dhcp3/*
-      ;;
-     
   esac 
 
     mkdir -p $guest_root/etc/rightscale.d
@@ -251,10 +253,6 @@ bash "Install ovftools" do
   EOH
 end
 
-directory "#{target_temp_root}/ova" do
-  action :create
-end
-
 ovf_filename = bundled_image
 ovf_image_name = bundled_image
 ovf_vmdk_size = `ls -l1 #{target_temp_root}/#{bundled_image} | awk '{ print $5; }'`.chomp
@@ -276,7 +274,7 @@ bash "Create create vmdk and create ovf/ova files" do
   cwd "/tmp/ovftool"
   flags "-ex"
   code <<-EOH
-    ./ovftool #{target_temp_root}/temp.ovf #{target_temp_root}/ova/#{bundled_image}.ovf  > /dev/null 2>&1
+    ./ovftool #{target_temp_root}/temp.ovf #{target_temp_root}/#{bundled_image}.ovf  > /dev/null 2>&1
     cd #{target_temp_root}/ova
     tar -cf ../#{bundled_image}.ova #{bundled_image}.ovf #{bundled_image}.mf *.vmdk
   EOH
