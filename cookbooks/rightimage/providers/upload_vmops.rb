@@ -70,12 +70,9 @@ action :upload do
       Chef::Log.info("Returned data: #{res.inspect}")
 
       image_id = res["registertemplateresponse"]["template"][0]["id"]
-      Chef::Log.info("Waiting 3 minutes for upload to complete...")
-      # Expect it will take at least 3 minutes
-      sleep 180
 
       $i=0
-      $retries=40
+      $retries=60
       # Don't set less than 30 second polling period - It only updates every 30 seconds anyways.
       $wait=30
 
