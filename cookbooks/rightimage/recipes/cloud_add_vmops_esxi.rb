@@ -168,12 +168,6 @@ bash "configure for cloudstack" do
       rm ${guest_root}/var/lib/rpm/__*
       chroot $guest_root rpm --rebuilddb
       ;;
-
-    "ubuntu" )
-      echo 'timeout 300;' > $guest_root/etc/dhcp3/dhclient.conf
-      rm $guest_root/var/lib/dhcp3/*
-      ;;
-     
   esac 
 
     mkdir -p $guest_root/etc/rightscale.d

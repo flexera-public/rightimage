@@ -26,9 +26,11 @@ action :install do
       grep "acpiphp" $guest_root/etc/rc.local
       [ "$?" == "1" ] && echo "/sbin/modprobe acpiphp" >> $guest_root/etc/rc.local
       set -e
+
+      chroot $guest_root yum -y install grub
       ;;
     "ubuntu" )
-      # Anything need to be done?
+      chroot $guest_root apt-get -y install grub
       ;;
     esac  
   EOH
