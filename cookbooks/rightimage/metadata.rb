@@ -137,12 +137,6 @@ attribute "rightimage/image_upload_bucket",
   :required => "required",
   :recipes => [ "rightimage::cloud_add_ec2", "rightimage::do_tag_images" , "rightimage::do_create_mci" , "rightimage::base_centos" , "rightimage::base_ubuntu" , "rightimage::base_sles" , "rightimage::default", "rightimage::build_image" , "rightimage::upload_file_to_s3" ] + cloud_upload
 
-attribute "rightimage/file_to_upload",
-  :display_name => "File To Upload",
-  :description => "The absolute pathname of the file to upload to S3.",
-  :required => "required",
-  :recipes => [ "rightimage::upload_file_to_s3" ]
-
 attribute "rightimage/image_name",
    :display_name => "Image Name",
    :description => "The name you want to give this new image.",
