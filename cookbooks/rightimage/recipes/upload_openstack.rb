@@ -3,10 +3,20 @@ class Chef::Resource::RubyBlock
   include RightScale::RightImage::Helper
 end
 
+package "python2.6-dev" do
+  only_if node[:platform] == "ubuntu"
+  action :install
+end
+
+package "python-setuptools" do
+  only_if node[:platform] == "ubuntu"
+  action :install
+end
+
 bash "install python modules" do
+  flags "-ex"
   code <<-EOH
-    set -ex
-    easy_install-2.6 sqlalchemy eventlet routes webob paste pastedeploy glance argparse xattr httplib2 kombu
+    easy_install-2.6 sqlalchemy eventlet routes webob paste pastedeploy glance argparse xattr httplib2 kombu iso8601
   EOH
 end
 
@@ -29,7 +39,7 @@ ruby_block "upload to cloud" do
     access_token = auth_hash["access"]["token"]["id"]
 
     # Don't use location=file://path/to/file like you might think, thats the name of the location to store the file on the server that hosts the images, not this machine
-    cmd = %Q(glance add --auth_token=#{access_token} --url=http://#{openstack_host}:#{openstack_glance_port}/v2.0 name=#{image_name} is_public=true disk_format=qcow2 container_format=ovf < #{local_file})
+    cmd = %Q(/usr/local/bin/glance add --auth_token=#{access_token} --url=http://#{openstack_host}:#{openstack_glance_port}/v2.0 name=#{image_name} is_public=true disk_format=qcow2 container_format=ovf < #{local_file})
     Chef::Log.debug(cmd)
     upload_resp = `#{cmd}`
     Chef::Log.info("got response for upload req: #{upload_resp} to cloud.")
