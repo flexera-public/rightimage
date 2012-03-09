@@ -1,8 +1,5 @@
 rs_utils_marker :begin
 #
-# Cookbook Name:: rightimage
-# Recipe:: default
-#
 # Copyright 2011, RightScale, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,43 +27,71 @@ end
 
 git BaseRhelConstants::REBUNDLE_SOURCE_PATH do
   repository "git@github.com:rightscale/rightimage_rebundle.git"
-  revision "jes_add_sandbox_option"
+  revision "master"
   action :sync
 end
 
 bash "install bundler" do
   flags "-ex"
-  code "gem install bundler --no-ri --no-rdoc"
+  code "/opt/rightscale/sandbox/bin/gem install bundler --no-ri --no-rdoc"
 end
 
 bash "install bundled gems" do
   flags "-ex"
-  code "bundle install"
+  code "/opt/rightscale/sandbox/bin/bundle install"
   cwd BaseRhelConstants::REBUNDLE_SOURCE_PATH
 end
 
-bash "upload code to the instance" do
+bash "launch the remote instance" do
   flags "-e +x"
   environment({'AWS_ACCESS_KEY_ID'    => node[:rightimage][:aws_access_key_id],
                'AWS_SECRET_ACCESS_KEY'=> node[:rightimage][:aws_secret_access_key]})
-  code <<-EOH
-  bundle exec bin/launch --provider #{node[:rightimage][:cloud]} --rightlink #{node[:rightimage][:rightlink_version]} --image-id #{node[:rightimage][:rebundle_base_image_id]} --sandbox-revision #{node[:rightimage][:sandbox_repo_tag]} --flavor-id c1.medium
-  EOH
   cwd BaseRhelConstants::REBUNDLE_SOURCE_PATH
+  code <<-EOH
+  /opt/rightscale/sandbox/bin/ruby bin/launch --provider #{node[:rightimage][:cloud]} --image-id #{node[:rightimage][:rebundle_base_image_id]} --flavor-id c1.medium --no-auto
+  EOH
+end
+
+bash "upload code to the remote instance" do
+  flags "-e +x"
+  cwd BaseRhelConstants::REBUNDLE_SOURCE_PATH
+  code <<-EOH
+  /opt/rightscale/sandbox/bin/ruby bin/upload --rightlink #{node[:rightimage][:rightlink_version]} --no-checkout --no-configure
+  EOH
+end
+
+bash "configure the remote instance" do
+  flags "-e +x"
+  cwd BaseRhelConstants::REBUNDLE_SOURCE_PATH
+  code <<-EOH
+  /opt/rightscale/sandbox/bin/ruby bin/configure --rightlink #{node[:rightimage][:rightlink_version]}
+  EOH
 end
 
 directory BaseRhelConstants::LOCAL_PACKAGE_PATH do
   action :create
   recursive true
-end
-
+end 
+ 
 bash "get the build package from remote" do
   flags "-ex"
   code "scp -i config/private_key root@`cat config/hostname`:/root/.rightscale/*.rpm #{BaseRhelConstants::LOCAL_PACKAGE_PATH}"
-  cwd BaseRhelConstants::REBUNDLE_SOURCE_PATH
 end
 
-# TODO - upload package to s3
-# TODO - bundle instance
-# TODO - kill running instance
+bash "bundle instance" do
+  flags "-e +x"
+  cwd BaseRhelConstants::REBUNDLE_SOURCE_PATH
+  environment({'AWS_ACCESS_KEY_ID'    => node[:rightimage][:aws_access_key_id],
+               'AWS_SECRET_ACCESS_KEY'=> node[:rightimage][:aws_secret_access_key]})
+  code <<-EOH
+  /opt/rightscale/sandbox/bin/ruby bin/bundle --rightlink #{node[:rightimage][:rightlink_version]} --image-id #{node[:rightimage][:rebundle_base_image_id]} --flavor-id c1.medium
+  EOH
+end
+#
+
+bash "destroy instance" do
+  flags "-e +x"
+  code "/opt/rightscale/sandbox/bin/ruby bin/destroy"
+end  
+
 rs_utils_marker :end

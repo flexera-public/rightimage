@@ -28,19 +28,20 @@ directory target_temp_root do
   recursive true
 end
 
-packages = {
-"ubuntu" => ["libxml2-dev", "libxslt1-dev"],
-"centos" => ["libxml2-devel", "libxslt-devel"]
-}
-packages[node[:platform]].each do |p| 
+packages = case node[:platform]
+           when "ubuntu" then %w(libxml2-dev libxslt1-dev)
+           when "centos", "redhat" then %w(libxml2-devel libxslt-devel)
+           end
+
+packages.each do |p| 
   r = package p do 
     action :nothing 
   end
   r.run_action(:install)
 end
 
-include_recipe "rightimage::base_#{node.platform.downcase}"
-include_recipe "rightimage::cloud_add_#{node.rightimage.cloud.downcase}" if node.rightimage.cloud
+include_recipe "rightimage::base_#{node.rightimage.platform.downcase}"
+include_recipe "rightimage::cloud_add_#{node.rightimage.cloud.downcase}" if node.rightimage.cloud and node.rightimage.platform != "rhel"
 include_recipe "rightimage::do_destroy_loopback"
-include_recipe "rightimage::upload_file_to_s3"
+include_recipe "rightimage::upload_file_to_s3" if node.rightimage.platform != "rhel"
 rs_utils_marker :end
