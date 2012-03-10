@@ -24,6 +24,7 @@ action :install do
           chroot $guest_root mkinitrd --with=mptbase --with=mptscsih --with=mptspi --with=scsi_transport_spi --with=ata_piix \
              --with=ext3 -v initrd-#{node[:rightimage][:kernel_id]} #{node[:rightimage][:kernel_id]}
           mv $guest_root/initrd-$kernel_version  $guest_root/boot/.
+          chroot $guest_root yum -y install grub
         ;;
         "ubuntu" )
           # These don't seem necessary.  Remove in the future?
@@ -33,6 +34,7 @@ action :install do
             echo "$mod" >> $guest_root/etc/initramfs-tools/modules
           done 
           chroot $guest_root update-initramfs -c -k all
+          chroot $guest_root apt-get -y install grub
         ;;
       esac
     EOH

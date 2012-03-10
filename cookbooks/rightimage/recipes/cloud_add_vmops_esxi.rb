@@ -58,15 +58,6 @@ rightimage_kernel "Install Ramdisk" do
   action :install
 end
 
-bash "install grub" do
-  flags "-ex"
-  only_if { node[:rightimage][:platform] == "centos" } 
-  code <<-EOH
-    guest_root="#{guest_root}"
-    chroot $guest_root yum -y install grub
-  EOH
-end
-
 # insert grub conf
 template "#{guest_root}/boot/grub/grub.conf" do 
   source "menu.lst.erb"
@@ -83,7 +74,7 @@ bash "setup grub" do
 
     case "#{node[:rightimage][:platform]}" in
       "ubuntu" )
-        chroot $guest_root cp -p /usr/lib/grub/i386-pc/* /boot/grub
+        chroot $guest_root cp -p /usr/lib/grub/x86_64-pc/* /boot/grub
         grub_command="/usr/sbin/grub"
         ;;
 
@@ -157,21 +148,34 @@ bash "configure for cloudstack" do
   code <<-EOH
     guest_root=#{guest_root}
 
-  case "#{node[:rightimage][:platform]}" in
-    "centos" )
+    case "#{node[:rightimage][:platform]}" in
+    "centos")
       # clean out packages
       chroot $guest_root yum -y clean all
 
-      # configure dns timeout 
-      echo 'timeout 300;' > $guest_root/etc/dhclient.conf
-
+      # clean centos RPM data
       rm ${guest_root}/var/lib/rpm/__*
       chroot $guest_root rpm --rebuilddb
+
+      # configure dhcp timeout
+      echo 'timeout 300;' > $guest_root/etc/dhclient.conf
+
+      [ -f $guest_root/var/lib/rpm/__* ] && rm ${guest_root}/var/lib/rpm/__*
+      chroot $guest_root rpm --rebuilddb
       ;;
-  esac 
+    "ubuntu")
+      # Disable all ttys except for tty1 (console)
+#      for i in `ls $guest_root/etc/init/tty[2-9].conf`; do
+#        mv $i $i.disabled;
+#      done
+      ;;
+    esac
 
     mkdir -p $guest_root/etc/rightscale.d
     echo "cloudstack" > $guest_root/etc/rightscale.d/cloud
+
+    # set hwclock to UTC
+#    echo "UTC" >> $guest_root/etc/adjtime
   EOH
 end
 
@@ -216,15 +220,10 @@ end
 
 include_recipe "rightimage::do_destroy_loopback"
 
-# TODO: Need to fix this up.
 bash "cleanup working directories" do
   flags "-ex" 
   code <<-EOH
-      [ -e "/tmp/ovftool.sh" ] && rm -f "/tmp/ovftool.sh"
-      [ -d "/tmp/ovftool" ] && rm -rf /tmp/ovftool
-      [ -d "/mnt/ova/" ] && rm -rf /mnt/ova
-      [ -e "/mnt/temp.ovf" ] && rm -f /mnt/temp.ovf  
-      rm -fv /mnt/*.vmdk
+    rm -rf /tmp/ovftool.sh /tmp/ovftool #{target_temp_root}/temp.ovf #{target_temp_root}/#{bundled_image}*
   EOH
 end
 
@@ -271,12 +270,11 @@ template "#{target_temp_root}/temp.ovf" do
 end
 
 bash "Create create vmdk and create ovf/ova files" do
-  cwd "/tmp/ovftool"
+  cwd target_temp_root
   flags "-ex"
   code <<-EOH
-    ./ovftool #{target_temp_root}/temp.ovf #{target_temp_root}/#{bundled_image}.ovf  > /dev/null 2>&1
-    cd #{target_temp_root}/ova
-    tar -cf ../#{bundled_image}.ova #{bundled_image}.ovf #{bundled_image}.mf *.vmdk
+    /tmp/ovftool/ovftool #{target_temp_root}/temp.ovf #{target_temp_root}/#{bundled_image}.ovf
+    tar -cf #{bundled_image}.ova #{bundled_image}.ovf #{bundled_image}.mf *.vmdk
   EOH
 end
 rs_utils_marker :end
