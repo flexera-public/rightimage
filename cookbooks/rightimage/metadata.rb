@@ -208,7 +208,7 @@ attribute "rightimage/debug",
   :description => "If set, a random root password will be set for debugging purposes. NOTE: you must include 'Dev' in the image name or the build with fail.",
   :choice => [ "true", "false" ],
   :required => "optional",
-  :recipes => [ "rightimage::base_centos" , "rightimage::base_sles" , "rightimage::base_ubuntu", "rightimage::base_rhel" , "rightimage::default", "rightimage::build_image" , "rightimage::bootstrap_centos" , "rightimage::bootstrap_sles" , "rightimage::bootstrap_ubuntu"] + cloud_add + cloud_upload
+  :recipes => [ "rightimage::base_centos" , "rightimage::base_sles" , "rightimage::base_ubuntu", "rightimage::base_rhel" , "rightimage::default", "rightimage::build_image" , "rightimage::bootstrap_centos" , "rightimage::bootstrap_sles" , "rightimage::bootstrap_ubuntu", "rightimage::upload_file_to_s3"] + cloud_add + cloud_upload
 
 attribute "rightimage/timestamp",
   :display_name => "Build timestamp and mirror freeze date",
