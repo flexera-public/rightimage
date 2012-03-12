@@ -31,6 +31,30 @@ git BaseRhelConstants::REBUNDLE_SOURCE_PATH do
   action :sync
 end
 
+bash "setup keyfiles" do
+  not_if { ::File.exists? "/tmp/AWS_X509_KEY.pem" }
+  code <<-EOH
+    echo "#{node[:rightimage][:aws_509_key]}" > /tmp/AWS_X509_KEY.pem
+    echo "#{node[:rightimage][:aws_509_cert]}" > /tmp/AWS_X509_CERT.pem
+  EOH
+end
+
+bash "check that image doesn't exist" do
+  only_if { node[:rightimage][:cloud] == "ec2" }
+  flags "-e"
+  code <<-EOH
+    #{setup_ec2_tools_env}
+    set -x
+
+    images=`/home/ec2/bin/ec2-describe-images --private-key /tmp/AWS_X509_KEY.pem --cert /tmp/AWS_X509_CERT.pem -o self --url #{node[:rightimage][:ec2_endpoint]} --filter name=#{image_name}`
+    if [ -n "$images" ]; then
+      echo "Found existing image, aborting:"
+      echo $images
+      exit 1
+    fi 
+  EOH
+end
+
 bash "install bundler" do
   flags "-ex"
   code "/opt/rightscale/sandbox/bin/gem install bundler --no-ri --no-rdoc"
@@ -47,8 +71,9 @@ bash "launch the remote instance" do
   environment({'AWS_ACCESS_KEY_ID'    => node[:rightimage][:aws_access_key_id],
                'AWS_SECRET_ACCESS_KEY'=> node[:rightimage][:aws_secret_access_key]})
   cwd BaseRhelConstants::REBUNDLE_SOURCE_PATH
+  region_opt = node[:rightimage][:cloud] == "ec2" ? "--region #{node[:ec2][:placement][:availability_zone].chop}": ""
   code <<-EOH
-  /opt/rightscale/sandbox/bin/ruby bin/launch --provider #{node[:rightimage][:cloud]} --image-id #{node[:rightimage][:rebundle_base_image_id]} --flavor-id c1.medium --no-auto
+  /opt/rightscale/sandbox/bin/ruby bin/launch --provider #{node[:rightimage][:cloud]} --image-id #{node[:rightimage][:rebundle_base_image_id]} #{region_opt} --flavor-id c1.medium --no-auto
   EOH
 end
 
@@ -75,6 +100,7 @@ end
  
 bash "get the build package from remote" do
   flags "-ex"
+  cwd BaseRhelConstants::REBUNDLE_SOURCE_PATH
   code "scp -i config/private_key root@`cat config/hostname`:/root/.rightscale/*.rpm #{BaseRhelConstants::LOCAL_PACKAGE_PATH}"
 end
 
@@ -84,13 +110,36 @@ bash "bundle instance" do
   environment({'AWS_ACCESS_KEY_ID'    => node[:rightimage][:aws_access_key_id],
                'AWS_SECRET_ACCESS_KEY'=> node[:rightimage][:aws_secret_access_key]})
   code <<-EOH
-  /opt/rightscale/sandbox/bin/ruby bin/bundle --rightlink #{node[:rightimage][:rightlink_version]} --image-id #{node[:rightimage][:rebundle_base_image_id]} --flavor-id c1.medium
+  /opt/rightscale/sandbox/bin/ruby bin/bundle --name #{image_name} --aws-cert /tmp/AWS_X509_CERT.pem --aws-key /tmp/AWS_X509_KEY.pem
   EOH
 end
 #
 
+bash "remove keys" do
+  only_if { ::File.exists? "/tmp/AWS_X509_KEY.pem" }
+  code <<-EOH
+    #remove keys
+    rm -f /tmp/AWS_X509_KEY.pem
+    rm -f /tmp/AWS_X509_CERT.pem
+  EOH
+end 
+
+ruby_block "store image id" do
+  block do
+    image_id = nil 
+    
+    # read id which was written in previous stanza
+    ::File.open(::File.join(BaseRhelConstants::REBUNDLE_SOURCE_PATH,"config","imageid"), "r") { |f| image_id = f.read() }
+    
+    # add to global id store for use by other recipes
+    id_list = RightImage::IdList.new(Chef::Log)
+    id_list.add(image_id)
+  end 
+end
+
 bash "destroy instance" do
   flags "-e +x"
+  cwd BaseRhelConstants::REBUNDLE_SOURCE_PATH
   code "/opt/rightscale/sandbox/bin/ruby bin/destroy"
 end  
 
