@@ -4,14 +4,10 @@ end
 
 action :install do
  
-  bash "install esxi ramdisk" do 
+  bash "install esxi ramdisk" do
+    flags "-ex"
     code <<-EOH
-      set -e 
-      set -x
-#      kernel_version=#{new_resource.version}
-      
       # Install to guest. 
-#      guest_root=#{new_resource.guest_root}
       guest_root=#{guest_root}
 
       rm -f $guest_root/boot/initrd* $guest_root/initrd*

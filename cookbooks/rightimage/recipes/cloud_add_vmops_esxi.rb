@@ -12,7 +12,7 @@ rs_utils_marker :begin
 # 7. Covert to archived OVF format using ovftool
 #
 
-class Chef::Resource::Bash
+class Chef::Resource
   include RightScale::RightImage::Helper
 end
 
@@ -93,8 +93,8 @@ bash "setup grub" do
 (hd0) #{target_raw_path}
 EOF
   
-  ${grub_command} --batch --device-map=device.map <<EOF
-root (hd0,1)
+    ${grub_command} --batch --device-map=device.map <<EOF
+root (hd0,0)
 setup (hd0)
 quit
 EOF 
@@ -165,9 +165,9 @@ bash "configure for cloudstack" do
       ;;
     "ubuntu")
       # Disable all ttys except for tty1 (console)
-#      for i in `ls $guest_root/etc/init/tty[2-9].conf`; do
-#        mv $i $i.disabled;
-#      done
+      for i in `ls $guest_root/etc/init/tty[2-9].conf`; do
+        mv $i $i.disabled;
+      done
       ;;
     esac
 
@@ -175,7 +175,7 @@ bash "configure for cloudstack" do
     echo "cloudstack" > $guest_root/etc/rightscale.d/cloud
 
     # set hwclock to UTC
-#    echo "UTC" >> $guest_root/etc/adjtime
+    echo "UTC" >> $guest_root/etc/adjtime
   EOH
 end
 
@@ -223,13 +223,13 @@ include_recipe "rightimage::do_destroy_loopback"
 bash "cleanup working directories" do
   flags "-ex" 
   code <<-EOH
-    rm -rf /tmp/ovftool.sh /tmp/ovftool #{target_temp_root}/temp.ovf #{target_temp_root}/#{bundled_image}*
+    rm -rf /tmp/ovftool.sh /tmp/ovftool #{target_temp_root}/temp.ovf #{target_temp_root}/#{image_name}*
   EOH
 end
 
 bash "convert raw image to VMDK flat file" do
-  flags "-ex" 
   cwd target_temp_root
+  flags "-ex"
   code <<-EOH
     BUNDLED_IMAGE="#{bundled_image}"
     BUNDLED_IMAGE_PATH="#{target_temp_root}/$BUNDLED_IMAGE"
@@ -244,8 +244,8 @@ remote_file "/tmp/ovftool.sh" do
 end
 
 bash "Install ovftools" do
-  flags "-ex"
   cwd "/tmp"
+  flags "-ex"
   code <<-EOH
     mkdir -p /tmp/ovftool
     ./ovftool.sh --silent /tmp/ovftool AGREE_TO_EULA 
@@ -254,7 +254,6 @@ end
 
 ovf_filename = bundled_image
 ovf_image_name = bundled_image
-ovf_vmdk_size = `ls -l1 #{target_temp_root}/#{bundled_image} | awk '{ print $5; }'`.chomp
 ovf_capacity = node[:rightimage][:root_size_gb] 
 ovf_ostype = "other26xLinux64Guest"
 
@@ -263,7 +262,6 @@ template "#{target_temp_root}/temp.ovf" do
   variables({
     :ovf_filename => ovf_filename,
     :ovf_image_name => ovf_image_name,
-    :ovf_vmdk_size => ovf_vmdk_size,
     :ovf_capacity => ovf_capacity,
     :ovf_ostype => ovf_ostype
   })
@@ -273,8 +271,8 @@ bash "Create create vmdk and create ovf/ova files" do
   cwd target_temp_root
   flags "-ex"
   code <<-EOH
-    /tmp/ovftool/ovftool #{target_temp_root}/temp.ovf #{target_temp_root}/#{bundled_image}.ovf
-    tar -cf #{bundled_image}.ova #{bundled_image}.ovf #{bundled_image}.mf *.vmdk
+    /tmp/ovftool/ovftool #{target_temp_root}/temp.ovf #{target_temp_root}/#{bundled_image}.ovf  > /dev/null 2>&1
+    tar -cf #{bundled_image}.ova #{bundled_image}.ovf #{bundled_image}.mf #{image_name}.vmdk-disk*.vmdk
   EOH
 end
 rs_utils_marker :end
