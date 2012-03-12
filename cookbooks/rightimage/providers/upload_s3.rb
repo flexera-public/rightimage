@@ -85,9 +85,9 @@ action :upload do
 #      response = storage.list_multipart_uploads bucket_name
 #      Chef::Log::info(response.inspect)
 #
-#      Chef::Log::info('Checking the uploaded object')
-#      response = storage.directories.get(bucket_name).files.get(s3_file)
-#      Chef::Log::info(response.inspect)
+      Chef::Log::info('Checking the uploaded object')
+      response = storage.directories.get(bucket_name).files.get(s3_file)
+      Chef::Log::info(response.inspect)
     end
   end
 end
