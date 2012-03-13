@@ -140,6 +140,8 @@ end
 bash "destroy instance" do
   flags "-e +x"
   cwd BaseRhelConstants::REBUNDLE_SOURCE_PATH
+  environment({'AWS_ACCESS_KEY_ID'    => node[:rightimage][:aws_access_key_id],
+               'AWS_SECRET_ACCESS_KEY'=> node[:rightimage][:aws_secret_access_key]})
   code "/opt/rightscale/sandbox/bin/ruby bin/destroy"
 end  
 
