@@ -21,7 +21,8 @@ set_unless[:rightimage][:image_source_bucket] = "rightscale-us-west-2"
 
 if rightimage[:platform] == "ubuntu"
   set[:rightimage][:mirror_date] = "#{timestamp[0..3]}/#{timestamp[4..5]}/#{timestamp[6..7]}"
-  set[:rightimage][:mirror_url] = "http://#{node[:rightimage][:mirror]}/ubuntu_daily/#{node[:rightimage][:mirror_date]}"
+#  set[:rightimage][:mirror_url] = "http://#{node[:rightimage][:mirror]}/ubuntu_daily/#{node[:rightimage][:mirror_date]}"
+  set[:rightimage][:mirror_url] = "http://archive.ubuntu.com/ubuntu/"
 else
   set[:rightimage][:mirror_date] = timestamp[0..7]
 end
