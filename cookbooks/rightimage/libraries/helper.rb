@@ -100,7 +100,9 @@ EOF
           when "lucid" 
             "10.04"
           when "maverick" 
-            "10.10" 
+            "10.10"
+          when "precise"
+            "12.04"
           else 
             raise "Unknown release"
           end

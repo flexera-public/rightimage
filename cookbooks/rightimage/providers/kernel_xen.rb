@@ -23,10 +23,7 @@ action :install do
           mv $guest_root/initrd-$kernel_version  $guest_root/boot/.
           ;;
         "ubuntu")
-          # Remove any installed kernels
-          for i in `chroot $guest_root dpkg --get-selections linux-headers* linux-image*|sed "s/install//g"`; do chroot $guest_root env DEBIAN_FRONTEND=noninteractive apt-get -y purge $i; done
-
-          chroot $guest_root apt-get -y install linux-image-virtual linux-headers-virtual grub-legacy-ec2
+          chroot $guest_root apt-get -y install grub-legacy-ec2
           chroot $guest_root apt-get clean
           ;;
         esac
