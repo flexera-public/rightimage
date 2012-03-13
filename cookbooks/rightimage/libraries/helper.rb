@@ -79,15 +79,17 @@ EOF
       end
 
       def ri_lineage
-        [platform,release_number,arch,timestamp,build_number].join("_")
+        [guest_platform,release_number,arch,timestamp,build_number].join("_")
       end
 
-      def platform
+      # call this guest_platform, not platform, otherwise can introduce a 
+      # weird bug where platform func can overwrite chef default platform func
+      def guest_platform
         node[:rightimage][:platform]
       end
 
       def release_number
-        if platform == "ubuntu"
+        if guest_platform == "ubuntu"
           case release
           when "hardy" 
             "8.04"
@@ -138,7 +140,7 @@ EOF
       end
 
       def os_string
-        platform + "_" + release_number + "_" + arch + "_" + timestamp + "_" + build_number
+        guest_platform + "_" + release_number + "_" + arch + "_" + timestamp + "_" + build_number
       end
 
       def source_image
@@ -231,12 +233,12 @@ EOF
       end
 
       def s3_path_base
-        [platform,release_number,arch,timestamp[0..3]].join("/")
+        [guest_platform,release_number,arch,timestamp[0..3]].join("/")
       end
 
       def s3_path_full
         hypervisor = node[:rightimage][:virtual_environment]
-        [hypervisor,platform,release_number].join("/")
+        [hypervisor,guest_platform,release_number].join("/")
       end
 
       def base_image_upload_bucket
