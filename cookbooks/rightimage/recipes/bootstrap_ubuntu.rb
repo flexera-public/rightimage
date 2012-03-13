@@ -111,7 +111,7 @@ chroot \\$1 userdel -r ubuntu
 chroot \\$1 rm -rf /home/ubuntu
 chroot \\$1 rm -f /etc/hostname
 chroot \\$1 touch /fastboot
-chroot \\$1 apt-get remove -y apparmor apparmor-utils 
+chroot \\$1 apt-get purge -y apparmor apparmor-utils
 chroot \\$1 shadowconfig on
 chroot \\$1  sed -i s/root::/root:*:/ /etc/shadow
 chroot \\$1 ln -s /usr/bin/env /bin/env
