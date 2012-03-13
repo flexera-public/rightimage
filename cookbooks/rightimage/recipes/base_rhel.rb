@@ -104,6 +104,15 @@ bash "get the build package from remote" do
   code "scp -i config/private_key root@`cat config/hostname`:/root/.rightscale/*.rpm #{BaseRhelConstants::LOCAL_PACKAGE_PATH}"
 end
 
+bash "run clean script on remote instance" do
+  flags "-e +x"
+  cwd BaseRhelConstants::REBUNDLE_SOURCE_PATH
+  code <<-EOH
+  /opt/rightscale/sandbox/bin/ruby bin/clean
+  EOH
+end
+
+
 bash "bundle instance" do
   flags "-e +x"
   cwd BaseRhelConstants::REBUNDLE_SOURCE_PATH
