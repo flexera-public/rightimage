@@ -307,6 +307,16 @@ EOF
         EOF
         return bash_snippet
       end
+
+      def rebundle?
+        if node[:rightimage][:cloud] == "ec2" and node[:rightimage][:platform] == "rhel"
+          return true
+        elsif node[:rightimage][:cloud] == "rackspace"
+          return true
+        else
+          return false
+        end
+      end
     end
   end
 end

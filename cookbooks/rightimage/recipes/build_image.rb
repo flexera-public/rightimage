@@ -30,7 +30,7 @@ end
 
 packages = case node[:platform]
            when "ubuntu" then %w(libxml2-dev libxslt1-dev)
-           when "centos", "redhat" then %w(libxml2-devel libxslt-devel)
+           when "centos", /redhat/ then %w(libxml2-devel libxslt-devel)
            end
 
 packages.each do |p| 
@@ -41,7 +41,7 @@ packages.each do |p|
 end
 
 include_recipe "rightimage::base_#{node.rightimage.platform.downcase}"
-include_recipe "rightimage::cloud_add_#{node.rightimage.cloud.downcase}" if node.rightimage.cloud and node.rightimage.platform != "rhel"
+include_recipe "rightimage::cloud_add_#{node.rightimage.cloud.downcase}" if node.rightimage.cloud 
 include_recipe "rightimage::do_destroy_loopback"
-include_recipe "rightimage::upload_file_to_s3" if node.rightimage.platform != "rhel"
+include_recipe "rightimage::upload_file_to_s3"
 rs_utils_marker :end

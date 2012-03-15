@@ -15,7 +15,6 @@ end if node[:rightimage][:platform] == "ubuntu"
 
 block_device ri_lineage do
 #  provider "block_device_volume"
-  not_if { node[:rightimage][:platform] == 'rhel' }
   cloud "ec2"
   lineage ri_lineage
   mount_point target_raw_root
@@ -26,7 +25,6 @@ end
 bash "resize fs" do
   flags "-x"
   not_if { node[:rightimage][:root_size_gb] == "10" }
-  not_if { node[:rightimage][:platform] == 'rhel' }
   code <<-EOH
     calc_mb="#{calc_mb}"
     target_raw_path="#{target_raw_path}"
@@ -38,7 +36,6 @@ end
 
 bash "mount image" do
   flags "-ex"
-  not_if { node[:rightimage][:platform] == 'rhel' }
   code <<-EOH
     loop_dev="#{loop_dev}"
     source_image="#{source_image}"
