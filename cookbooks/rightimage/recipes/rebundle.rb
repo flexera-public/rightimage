@@ -20,6 +20,13 @@ module BaseRhelConstants
   LOCAL_PACKAGE_PATH    = "/tmp/rightscale/dist"
 end
 
+packages = case node[:platform]
+           when "ubuntu" then %w(libxml2-dev libxslt1-dev)
+           when "centos", /redhat/ then %w(libxml2-devel libxslt-devel)
+           end 
+
+packages.each { |p| package p }
+
 directory BaseRhelConstants::REBUNDLE_SOURCE_PATH do
   action :create
   recursive true
