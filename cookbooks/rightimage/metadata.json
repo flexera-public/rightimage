@@ -153,16 +153,19 @@
       "description": "aws_509_cert"
     },
     "rightimage/rebundle_base_image_id": {
-      "required": "required",
+      "required": "optional",
       "calculated": false,
       "choice": [
 
       ],
+      "default": "",
       "type": "string",
       "recipes": [
+        "rightimage::default",
+        "rightimage::build_image",
         "rightimage::base_rhel"
       ],
-      "display_name": "Starting Image Id",
+      "display_name": "Rebundle Base Image ID",
       "description": "Cloud specific ID for the image to start with when building a rebundle image"
     },
     "rightimage/release": {

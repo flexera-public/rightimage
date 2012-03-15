@@ -156,10 +156,11 @@ attribute "rightimage/mci_name",
    :required => "optional"
 
 attribute "rightimage/rebundle_base_image_id",
-  :display_name => "Starting Image Id",
+  :display_name => "Rebundle Base Image ID",
   :description => "Cloud specific ID for the image to start with when building a rebundle image",
-  :required => "required",
-  :recipes => [ "rightimage::base_rhel" ]
+  :required => "optional",
+  :default => "",
+  :recipes => [ "rightimage::default", "rightimage::build_image", "rightimage::base_rhel" ]
 
 attribute "rightimage/aws_account_number",
   :display_name => "aws_account_number",

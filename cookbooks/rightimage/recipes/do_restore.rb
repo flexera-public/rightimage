@@ -24,7 +24,7 @@ end
 
 bash "resize fs" do
   flags "-x"
-  not_if node[:rightimage][:root_size_gb] == "10"
+  not_if { node[:rightimage][:root_size_gb] == "10" }
   code <<-EOH
     calc_mb="#{calc_mb}"
     target_raw_path="#{target_raw_path}"
