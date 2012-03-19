@@ -83,7 +83,7 @@ yum -c /tmp/yum.conf -y makecache
 yum -c /tmp/yum.conf -y install #{node[:rightimage][:guest_packages]}
 # install the guest packages in the chroot
 yum -c /tmp/yum.conf --installroot=#{node[:rightimage][:mount_dir]} -y install  #{node[:rightimage][:guest_packages]}
-yum -c /tmp/yum.conf --installroot=#{node[:rightimage][:mount_dir]} -y remove bluez* gnome-bluetooth*
+yum -c /tmp/yum.conf --installroot=#{node[:rightimage][:mount_dir]} -y remove bluez* gnome-bluetooth* yum-fastestmirror
 yum -c /tmp/yum.conf --installroot=#{node[:rightimage][:mount_dir]} -y clean all
 
 ## stop crap from going in the logs...    
@@ -91,9 +91,6 @@ rm -f #{node[:rightimage][:mount_dir]}/var/lib/rpm/__*
 chroot #{node[:rightimage][:mount_dir]} rpm --rebuilddb
 
 if [ #{node[:rightimage][:release].to_i} -lt 6 ]; then
-  ## Remove yum-fastestmirror plugin
-  chroot #{node[:rightimage][:mount_dir]} rpm -e --nodeps yum-fastestmirror
-
   echo 'hwcap 0 nosegneg' > #{node[:rightimage][:mount_dir]}/etc/ld.so.conf.d/libc6-xen.conf
   chroot #{node[:rightimage][:mount_dir]} /sbin/ldconfig -v
 
@@ -138,9 +135,9 @@ echo "NOZEROCONF=true" >> #{node[:rightimage][:mount_dir]}/etc/sysconfig/network
 #install syslog-ng
 chroot #{node[:rightimage][:mount_dir]} rpm -e rsyslog --nodeps || true #remove rsyslog if it exists 
 if [ "#{node[:rightimage][:arch]}" == i386 ] ; then 
-  rpm --root #{node[:rightimage][:mount_dir]} -Uvh http://s3.amazonaws.com/rightscale_scripts/syslog-ng-1.6.12-1.el5.centos.i386.rpm
+  rpm --force --root #{node[:rightimage][:mount_dir]} -Uvh http://s3.amazonaws.com/rightscale_scripts/syslog-ng-1.6.12-1.el5.centos.i386.rpm
 else 
-  rpm --root #{node[:rightimage][:mount_dir]} -Uvh http://s3.amazonaws.com/rightscale_scripts/syslog-ng-1.6.12-1.x86_64.rpm
+  rpm --force --root #{node[:rightimage][:mount_dir]} -Uvh http://s3.amazonaws.com/rightscale_scripts/syslog-ng-1.6.12-1.x86_64.rpm
 fi
 chroot #{node[:rightimage][:mount_dir]} chkconfig --level 234 syslog-ng on
 
