@@ -4,12 +4,12 @@ class Chef::Resource::RubyBlock
 end
 
 package "python2.6-dev" do
-  only_if node[:platform] == "ubuntu"
+  only_if { node[:platform] == "ubuntu" }
   action :install
 end
 
 package "python-setuptools" do
-  only_if node[:platform] == "ubuntu"
+  only_if { node[:platform] == "ubuntu" }
   action :install
 end
 
