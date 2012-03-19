@@ -19,6 +19,8 @@ bash "mount proc & dev" do
   flags "-ex"
   code <<-EOH
     guest_root=#{guest_root}
+    umount -lf $guest_root/proc || true
+    umount -lf $guest_root/sys || true
     mount -t proc none $guest_root/proc
     mount --bind /dev $guest_root/dev
     mount --bind /sys $guest_root/sys
@@ -36,14 +38,6 @@ rightimage_kernel "Install PV Kernel for Hypervisor" do
   action :install
 end
 
-bash "install grub" do
-  flags "-ex"
-  code <<-EOH
-    guest_root=#{guest_root}
-    chroot $guest_root yum -y install grub
-  EOH
-end
-
 # insert grub conf
 template "#{guest_root}/boot/grub/grub.conf" do 
   source "menu.lst.erb"
@@ -57,21 +51,33 @@ bash "setup grub" do
     guest_root="#{guest_root}"
     
     chroot $guest_root mkdir -p /boot/grub
-    chroot $guest_root cp -p /usr/share/grub/x86_64-redhat/* /boot/grub
-    chroot $guest_root ln -s /boot/grub/grub.conf /boot/grub/menu.lst
-    
+
+    case "#{node[:rightimage][:platform]}" in
+      "ubuntu")
+        chroot $guest_root cp -p /usr/lib/grub/x86_64-pc/* /boot/grub
+        grub_command="/usr/sbin/grub"
+        ;;
+      "centos"|*)
+        chroot $guest_root cp -p /usr/share/grub/x86_64-redhat/* /boot/grub
+        grub_command="/sbin/grub"
+        ;;
+    esac
+
+    chroot $guest_root ln -sf /boot/grub/grub.conf /boot/grub/menu.lst
+
     echo "(hd0) #{node[:rightimage][:grub][:root_device]}" > $guest_root/boot/grub/device.map
     echo "" >> $guest_root/boot/grub/device.map
 
     cat > device.map <<EOF
 (hd0) #{target_raw_path}
 EOF
-    /sbin/grub --batch --device-map=device.map <<EOF
+
+  ${grub_command} --batch --device-map=device.map <<EOF
 root (hd0,0)
 setup (hd0)
 quit
 EOF 
-    
+
   EOH
 end
 
@@ -82,25 +88,38 @@ bash "configure for openstack" do
   code <<-EOH
     guest_root=#{guest_root}
 
-    # clean out packages
-    chroot $guest_root yum -y clean all
+    case "#{node[:rightimage][:platform]}" in
+    "centos")
+      # clean out packages
+      chroot $guest_root yum -y clean all
 
-    # enable console access
-    #echo "2:2345:respawn:/sbin/mingetty tty2" >> $guest_root/etc/inittab
-    #echo "tty2" >> $guest_root/etc/securetty
+      # clean centos RPM data
+      rm ${guest_root}/var/lib/rpm/__*
+      chroot $guest_root rpm --rebuilddb
 
-    # configure dns timeout 
-    echo 'timeout 300;' > $guest_root/etc/dhclient.conf
+      # enable console access
+      echo "2:2345:respawn:/sbin/mingetty tty2" >> $guest_root/etc/inittab
+      echo "tty2" >> $guest_root/etc/securetty
+
+      # configure dhcp timeout
+      echo 'timeout 300;' > $guest_root/etc/dhclient.conf
+
+      [ -f $guest_root/var/lib/rpm/__* ] && rm ${guest_root}/var/lib/rpm/__*
+      chroot $guest_root rpm --rebuilddb
+      ;;
+    "ubuntu")
+      # Disable all ttys except for tty1 (console)
+      for i in `ls $guest_root/etc/init/tty[2-9].conf`; do
+        mv $i $i.disabled;
+      done
+      ;;
+    esac
 
     mkdir -p $guest_root/etc/rightscale.d
     echo "openstack" > $guest_root/etc/rightscale.d/cloud
 
-    rm ${guest_root}/var/lib/rpm/__*
-    chroot $guest_root rpm --rebuilddb
-    
     # set hwclock to UTC
     echo "UTC" >> $guest_root/etc/adjtime
-
   EOH
 end
 
