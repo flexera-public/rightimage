@@ -151,7 +151,10 @@ else
   java_arch="i586"
 fi
 
-array=( jdk-6u27-linux-$java_arch.rpm sun-javadb-common-10.4.2-1.1.i386.rpm sun-javadb-client-10.4.2-1.1.i386.rpm sun-javadb-core-10.4.2-1.1.i386.rpm sun-javadb-demo-10.4.2-1.1.i386.rpm )
+java_ver="6u31"
+javadb_ver="10.6.2-1.1"
+
+array=( jdk-$java_ver-linux-$java_arch.rpm sun-javadb-common-$javadb_ver.i386.rpm sun-javadb-client-$javadb_ver.i386.rpm sun-javadb-core-$javadb_ver.i386.rpm sun-javadb-demo-$javadb_ver.i386.rpm )
 set +e
 for i in "${array[@]}"; do
   ret=$(rpm --root #{node[:rightimage][:mount_dir]} -Uvh http://s3.amazonaws.com/rightscale_software/java/$i 2>&1)
