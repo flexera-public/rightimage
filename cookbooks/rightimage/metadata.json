@@ -77,20 +77,6 @@
       "display_name": "Eucalyptus x509 Certificate",
       "description": "The contents of the file pointed to by the EC2_CERT value defined in your eucarc credentials file."
     },
-    "rightimage/build_number": {
-      "required": "recommended",
-      "calculated": false,
-      "choice": [
-
-      ],
-      "default": "0",
-      "type": "string",
-      "recipes": [
-
-      ],
-      "display_name": "Build number",
-      "description": "Build number of this image.  Defaults to 0"
-    },
     "rightimage/aws_509_cert": {
       "required": "required",
       "calculated": false,
@@ -111,6 +97,20 @@
       ],
       "display_name": "aws_509_cert",
       "description": "aws_509_cert"
+    },
+    "rightimage/build_number": {
+      "required": "recommended",
+      "calculated": false,
+      "choice": [
+
+      ],
+      "default": "0",
+      "type": "string",
+      "recipes": [
+
+      ],
+      "display_name": "Build number",
+      "description": "Build number of this image.  Defaults to 0"
     },
     "rightimage/rebundle_base_image_id": {
       "required": "optional",
@@ -158,21 +158,6 @@
       "display_name": "Eucalyptus x509 Private Key",
       "description": "The contents of the file pointed to by the EC2_PRIVATE_KEY value defined in your eucarc credentials file."
     },
-    "rightimage/debug": {
-      "required": "optional",
-      "calculated": false,
-      "choice": [
-        "true",
-        "false"
-      ],
-      "default": "false",
-      "type": "string",
-      "recipes": [
-
-      ],
-      "display_name": "Development Image?",
-      "description": "If set, a random root password will be set for debugging purposes. NOTE: you must include 'Dev' in the image name or the build with fail."
-    },
     "rightimage/aws_509_key": {
       "required": "required",
       "calculated": false,
@@ -215,6 +200,21 @@
       "display_name": "aws_secret_access_key",
       "description": "aws_secret_access_key"
     },
+    "rightimage/debug": {
+      "required": "optional",
+      "calculated": false,
+      "choice": [
+        "true",
+        "false"
+      ],
+      "default": "false",
+      "type": "string",
+      "recipes": [
+
+      ],
+      "display_name": "Development Image?",
+      "description": "If set, a random root password will be set for debugging purposes. NOTE: you must include 'Dev' in the image name or the build with fail."
+    },
     "rightimage/manual_mode": {
       "required": "optional",
       "calculated": false,
@@ -229,21 +229,6 @@
       ],
       "display_name": "Manual Mode",
       "description": "Sets the template's operation mode. Ex. 'true' = don't build at boot time."
-    },
-    "rightimage/virtual_environment": {
-      "required": "required",
-      "calculated": false,
-      "choice": [
-        "xen",
-        "kvm",
-        "esxi"
-      ],
-      "type": "string",
-      "recipes": [
-
-      ],
-      "display_name": "Hypervisor",
-      "description": "Which hypervisor is this image for?"
     },
     "rightimage/aws_account_number": {
       "required": "required",
@@ -265,6 +250,21 @@
       ],
       "display_name": "aws_account_number",
       "description": "aws_account_number"
+    },
+    "rightimage/virtual_environment": {
+      "required": "required",
+      "calculated": false,
+      "choice": [
+        "xen",
+        "kvm",
+        "esxi"
+      ],
+      "type": "string",
+      "recipes": [
+
+      ],
+      "display_name": "Hypervisor",
+      "description": "Which hypervisor is this image for?"
     },
     "rightimage/build_mode": {
       "required": "required",
@@ -464,19 +464,6 @@
       "display_name": "Eucalyptus URL",
       "description": "Base URL to your Eucalyptus Cloud Controller. Don't include port. (Ex. http://<server_ip>)"
     },
-    "rightimage/timestamp": {
-      "required": "recommended",
-      "calculated": false,
-      "choice": [
-
-      ],
-      "type": "string",
-      "recipes": [
-
-      ],
-      "display_name": "Build timestamp and mirror freeze date",
-      "description": "Initial build date of this image.  Also doubles as the archive date from which to pull packages. Expected format is YYYYMMDDHHMM"
-    },
     "rightimage/aws_access_key_id": {
       "required": "required",
       "calculated": false,
@@ -497,6 +484,19 @@
       ],
       "display_name": "aws_access_key_id",
       "description": "aws_access_key_id"
+    },
+    "rightimage/timestamp": {
+      "required": "recommended",
+      "calculated": false,
+      "choice": [
+
+      ],
+      "type": "string",
+      "recipes": [
+
+      ],
+      "display_name": "Build timestamp and mirror freeze date",
+      "description": "Initial build date of this image.  Also doubles as the archive date from which to pull packages. Expected format is YYYYMMDDHHMM"
     },
     "rightimage/arch": {
       "required": "required",
@@ -662,7 +662,7 @@
   },
   "maintainer": "RightScale, Inc.",
   "long_description": "",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "recommendations": {
   },
   "recipes": {
@@ -708,7 +708,7 @@
   },
   "replacing": {
   },
-  "description": "image building tools",
+  "description": "A cookbook for building RightImages",
   "providing": {
   }
 }

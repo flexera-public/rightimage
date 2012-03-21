@@ -1,7 +1,7 @@
 maintainer       "RightScale, Inc."
 maintainer_email "support@rightscale.com"
-description      "image building tools"
-version          "0.0.1"
+description      "A cookbook for building RightImages"
+version          "0.1.0"
 
 depends "block_device"
 depends "rs_utils"
@@ -165,36 +165,6 @@ attribute "rightimage/rebundle_base_image_id",
   :default => "",
   :recipes => [ "rightimage::default", "rightimage::rebundle"]
 
-attribute "rightimage/aws_account_number",
-  :display_name => "aws_account_number",
-  :description => "aws_account_number",
-  :required => "required",
-  :recipes => [ "rightimage::build_base", "rightimage::default", "rightimage::build_image" , "rightimage::rebundle", "rightimage::base_upload", "rightimage::upload_file_to_s3" ] | cloud_upload_ec2
-  
-attribute "rightimage/aws_access_key_id",
-  :display_name => "aws_access_key_id",
-  :description => "aws_access_key_id",
-  :required => "required",
-  :recipes => [ "rightimage::build_base", "rightimage::default", "rightimage::build_image" , "rightimage::rebundle", "rightimage::base_upload", "rightimage::upload_file_to_s3" ] | cloud_upload_ec2
-  
-attribute "rightimage/aws_secret_access_key",
-  :display_name => "aws_secret_access_key",
-  :description => "aws_secret_access_key",
-  :required => "required",
-  :recipes => [ "rightimage::build_base", "rightimage::default", "rightimage::build_image" , "rightimage::rebundle", "rightimage::base_upload", "rightimage::upload_file_to_s3" ] | cloud_upload_ec2
-  
-attribute "rightimage/aws_509_key",
-  :display_name => "aws_509_key",
-  :description => "aws_509_key",
-  :required => "required",
-  :recipes => [ "rightimage::build_base", "rightimage::default", "rightimage::build_image" , "rightimage::rebundle", "rightimage::base_upload", "rightimage::upload_file_to_s3" ] | cloud_upload_ec2
-  
-attribute "rightimage/aws_509_cert",
-  :display_name => "aws_509_cert",
-  :description => "aws_509_cert",
-  :required => "required",
-  :recipes => [ "rightimage::build_base", "rightimage::default", "rightimage::build_image" , "rightimage::rebundle", "rightimage::base_upload", "rightimage::upload_file_to_s3" ] | cloud_upload_ec2
- 
 attribute "rightimage/debug",
   :display_name => "Development Image?",
   :description => "If set, a random root password will be set for debugging purposes. NOTE: you must include 'Dev' in the image name or the build with fail.",
@@ -225,7 +195,38 @@ attribute "rightimage/datacenter",
   :default => "1",
   :required => "optional"
 
-## euca inputs  
+# AWS
+attribute "rightimage/aws_account_number",
+  :display_name => "aws_account_number",
+  :description => "aws_account_number",
+  :required => "required",
+  :recipes => [ "rightimage::build_base", "rightimage::default", "rightimage::build_image" , "rightimage::rebundle", "rightimage::base_upload", "rightimage::upload_file_to_s3" ] | cloud_upload_ec2
+  
+attribute "rightimage/aws_access_key_id",
+  :display_name => "aws_access_key_id",
+  :description => "aws_access_key_id",
+  :required => "required",
+  :recipes => [ "rightimage::build_base", "rightimage::default", "rightimage::build_image" , "rightimage::rebundle", "rightimage::base_upload", "rightimage::upload_file_to_s3" ] | cloud_upload_ec2
+  
+attribute "rightimage/aws_secret_access_key",
+  :display_name => "aws_secret_access_key",
+  :description => "aws_secret_access_key",
+  :required => "required",
+  :recipes => [ "rightimage::build_base", "rightimage::default", "rightimage::build_image" , "rightimage::rebundle", "rightimage::base_upload", "rightimage::upload_file_to_s3" ] | cloud_upload_ec2
+  
+attribute "rightimage/aws_509_key",
+  :display_name => "aws_509_key",
+  :description => "aws_509_key",
+  :required => "required",
+  :recipes => [ "rightimage::build_base", "rightimage::default", "rightimage::build_image" , "rightimage::rebundle", "rightimage::base_upload", "rightimage::upload_file_to_s3" ] | cloud_upload_ec2
+  
+attribute "rightimage/aws_509_cert",
+  :display_name => "aws_509_cert",
+  :description => "aws_509_cert",
+  :required => "required",
+  :recipes => [ "rightimage::build_base", "rightimage::default", "rightimage::build_image" , "rightimage::rebundle", "rightimage::base_upload", "rightimage::upload_file_to_s3" ] | cloud_upload_ec2
+
+# Eucalyptus
 attribute "rightimage/euca/user_id",
   :display_name => "Eucalyptus User ID",
   :description => "The EC2_USER_ID value defined in your eucarc credentials file. User must have admin privileges.",
