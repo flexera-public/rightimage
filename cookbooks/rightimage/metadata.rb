@@ -230,7 +230,7 @@ attribute "rightimage/virtual_environment",
 
 attribute "rightimage/datacenter",
   :display_name => "Datacenter ID",
-  :description => "Datacenter/Zone ID.  Defaults to 1",
+  :description => "Datacenter/Zone ID.  Defaults to 1.  Use UK for rackspace UK",
   :default => "1",
   :required => "optional"
 
@@ -317,3 +317,17 @@ attribute "rightimage/cloudstack/cdc_secret_key",
   :description => "CloudStack secret key.",
   :required => "required",
   :recipes => [ "rightimage::upload_vmops" ]
+
+# RackSpace
+attribute "rightimage/rackspace/account",
+  :display_name => "Rackspace Account ID",
+  :description => "Rackspace Account ID",
+  :required => "required",
+  :recipes => [ "rightimage::rebundle", "rightimage::default" ]
+
+attribute "rightimage/rackspace/api_token",
+  :display_name => "Rackspace API Token",
+  :description => "Rackspace API Token",
+  :required => "required",
+  :recipes => [ "rightimage::rebundle", "rightimage::default" ]
+

@@ -75,10 +75,13 @@ end
 
 bash "launch the remote instance" do
   flags "-e +x"
-  environment({'AWS_ACCESS_KEY_ID'    => node[:rightimage][:aws_access_key_id],
-               'AWS_SECRET_ACCESS_KEY'=> node[:rightimage][:aws_secret_access_key]})
+  environment(cloud_credentials)
   cwd BaseRhelConstants::REBUNDLE_SOURCE_PATH
-  region_opt = node[:rightimage][:cloud] == "ec2" ? "--region #{node[:ec2][:placement][:availability_zone].chop}": ""
+  region_opt = case node[:rightimage][:cloud]
+               when "ec2" then "--region #{node[:ec2][:placement][:availability_zone].chop}"
+               when "rackspace" then "--region #{node[:rightimage][:zone]}"
+               else ""
+               end
   code <<-EOH
   /opt/rightscale/sandbox/bin/ruby bin/launch --provider #{node[:rightimage][:cloud]} --image-id #{node[:rightimage][:rebundle_base_image_id]} #{region_opt} --flavor-id c1.medium --no-auto
   EOH
@@ -123,8 +126,7 @@ end
 bash "bundle instance" do
   flags "-e +x"
   cwd BaseRhelConstants::REBUNDLE_SOURCE_PATH
-  environment({'AWS_ACCESS_KEY_ID'    => node[:rightimage][:aws_access_key_id],
-               'AWS_SECRET_ACCESS_KEY'=> node[:rightimage][:aws_secret_access_key]})
+  environment(cloud_credentials)
   code <<-EOH
   /opt/rightscale/sandbox/bin/ruby bin/bundle --name #{image_name} --aws-cert /tmp/AWS_X509_CERT.pem --aws-key /tmp/AWS_X509_KEY.pem
   EOH
@@ -156,8 +158,7 @@ end
 bash "destroy instance" do
   flags "-e +x"
   cwd BaseRhelConstants::REBUNDLE_SOURCE_PATH
-  environment({'AWS_ACCESS_KEY_ID'    => node[:rightimage][:aws_access_key_id],
-               'AWS_SECRET_ACCESS_KEY'=> node[:rightimage][:aws_secret_access_key]})
+  environment(cloud_credentials)
   code "/opt/rightscale/sandbox/bin/ruby bin/destroy"
 end  
 
