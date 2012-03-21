@@ -1,68 +1,25 @@
 {
-  "maintainer_email": "support@rightscale.com",
-  "long_description": "",
-  "groupings": {
-  },
   "dependencies": {
-    "rs_utils": [
-
-    ],
-    "block_device": [
-
-    ]
-  },
-  "recommendations": {
-  },
-  "platforms": {
-  },
-  "license": "Apache v2.0",
-  "description": "image building tools",
-  "suggestions": {
-  },
-  "conflicting": {
-  },
-  "version": "0.0.1",
-  "providing": {
+    "rs_utils": ">= 0.0.0",
+    "block_device": ">= 0.0.0"
   },
   "name": "rightimage",
-  "recipes": {
-    "rightimage::setup_block_device": "Creates, formats and mounts a brand new block_device volume stripe on the instance.",
-    "rightimage::upload_file_to_s3": "upload specified file to s3",
-    "rightimage::upload_openstack": "bundle and upload openstack kernel, ramdisk and image",
-    "rightimage::cloud_add_vmops": "adds requirements for cloudstack based on hypervisor choice",
-    "rightimage::rightscale_install": "installs rightscale",
-    "rightimage::base_sles": "coordinate a sles install",
-    "rightimage::cloud_add_openstack": "adds requirements for openstack based on hypervisor choice",
-    "rightimage::cloud_add_euca": "migrates the created image to eucalyptus",
-    "rightimage::build_base": "build base image based on host platform",
-    "rightimage::cloud_add_ec2": "migrates the created image to ec2",
-    "rightimage::default": "starts builds image automatically at boot. See 'manual_mode' input to enable.",
-    "rightimage::do_backup": "Backup image snapshot.",
-    "rightimage::upload_ec2_ebs": "create EBS image snapshot (ec2 only)",
-    "rightimage::upload_ec2_s3": "bundle and upload s3 image (ec2 only)",
-    "rightimage::setup_loopback": "creates loopback file",
-    "rightimage::bootstrap_sles": "bootstraps a basic sles image",
-    "rightimage::bootstrap_ubuntu": "bootstraps a basic ubuntu image",
-    "rightimage::base_ubuntu": "coordinate an ubuntu install",
-    "rightimage::do_create_mci": "creates MCI for image(s) (only ec2 currently supported)",
-    "rightimage::do_destroy_loopback": "unmounts loopback file",
-    "rightimage::base_rhel": "coordinate a rhel install",
-    "rightimage::ec2_download_bundle": "Downloads bundled image from EC2 S3.",
-    "rightimage::upload_euca": "bundle and upload euca kernel, ramdisk and image",
-    "rightimage::install_vhd-util": "install the vhd-util tool",
-    "rightimage::bootstrap_common_debug": "common debug configuration for linux base images",
-    "rightimage::build_image": "build image based on host platform",
-    "rightimage::copy_image": "Creates non-partitioned image.",
-    "rightimage::do_restore": "Restores image snapshot.",
-    "rightimage::bootstrap_common": "common configuration for linux base images",
-    "rightimage::base_centos": "coordinate a centos install",
-    "rightimage::do_force_reset": "Unmounts and deletes the attached block_device and volumes that were attached to the instance for this lineage.",
-    "rightimage::bootstrap_centos": "bootstraps a basic centos image",
-    "rightimage::base_upload": "compresses and uploads base image to s3",
-    "rightimage::upload_vmops": "setup http server for download to test cloud",
-    "rightimage::clean": "cleans everything"
-  },
+  "maintainer_email": "support@rightscale.com",
   "attributes": {
+    "rightimage/rackspace/account": {
+      "required": "required",
+      "calculated": false,
+      "choice": [
+
+      ],
+      "type": "string",
+      "recipes": [
+        "rightimage::rebundle",
+        "rightimage::default"
+      ],
+      "display_name": "Rackspace Account ID",
+      "description": "Rackspace Account ID"
+    },
     "rightimage/image_name": {
       "required": "required",
       "calculated": false,
@@ -84,7 +41,11 @@
       ],
       "type": "string",
       "recipes": [
-
+        "rightimage::default",
+        "rightimage::build_image",
+        "rightimage::rightscale_rightlink",
+        "rightimage::rebundle",
+        "rightimage::rightscale_install"
       ],
       "display_name": "RightLink Version",
       "description": "The RightLink version we are building into our image"
@@ -117,7 +78,7 @@
       "description": "The contents of the file pointed to by the EC2_CERT value defined in your eucarc credentials file."
     },
     "rightimage/build_number": {
-      "required": "optional",
+      "required": "recommended",
       "calculated": false,
       "choice": [
 
@@ -138,15 +99,14 @@
       ],
       "type": "string",
       "recipes": [
-        "rightimage::cloud_add_ec2",
-        "rightimage::upload_ec2_s3",
-        "rightimage::upload_ec2_ebs",
-        "rightimage::do_create_mci",
-        "rightimage::base_centos",
-        "rightimage::base_sles",
-        "rightimage::base_ubuntu",
+        "rightimage::build_base",
         "rightimage::default",
         "rightimage::build_image",
+        "rightimage::rebundle",
+        "rightimage::base_upload",
+        "rightimage::upload_file_to_s3",
+        "rightimage::upload_ec2_s3",
+        "rightimage::upload_ec2_ebs",
         "rightimage::ec2_download_bundle"
       ],
       "display_name": "aws_509_cert",
@@ -162,14 +122,13 @@
       "type": "string",
       "recipes": [
         "rightimage::default",
-        "rightimage::build_image",
-        "rightimage::base_rhel"
+        "rightimage::rebundle"
       ],
       "display_name": "Rebundle Base Image ID",
       "description": "Cloud specific ID for the image to start with when building a rebundle image"
     },
     "rightimage/release": {
-      "required": "optional",
+      "required": "required",
       "calculated": false,
       "choice": [
         "5.4",
@@ -206,54 +165,13 @@
         "true",
         "false"
       ],
+      "default": "false",
       "type": "string",
       "recipes": [
-        "rightimage::base_centos",
-        "rightimage::base_sles",
-        "rightimage::base_ubuntu",
-        "rightimage::base_rhel",
-        "rightimage::default",
-        "rightimage::build_image",
-        "rightimage::bootstrap_centos",
-        "rightimage::bootstrap_sles",
-        "rightimage::bootstrap_ubuntu",
-        "rightimage::upload_file_to_s3",
-        "rightimage::cloud_add_euca",
-        "rightimage::cloud_add_vmops",
-        "rightimage::cloud_add_openstack",
-        "rightimage::cloud_add_ec2",
-        "rightimage::upload_euca",
-        "rightimage::upload_vmops",
-        "rightimage::upload_openstack",
-        "rightimage::upload_ec2_s3",
-        "rightimage::upload_ec2_ebs"
+
       ],
       "display_name": "Development Image?",
       "description": "If set, a random root password will be set for debugging purposes. NOTE: you must include 'Dev' in the image name or the build with fail."
-    },
-    "rightimage/aws_secret_access_key_for_upload": {
-      "required": "required",
-      "calculated": false,
-      "choice": [
-
-      ],
-      "type": "string",
-      "recipes": [
-        "rightimage::cloud_add_ec2",
-        "rightimage::upload_ec2_s3",
-        "rightimage::upload_ec2_ebs",
-        "rightimage::do_create_mci",
-        "rightimage::base_centos",
-        "rightimage::base_sles",
-        "rightimage::base_ubuntu",
-        "rightimage::base_rhel",
-        "rightimage::default",
-        "rightimage::build_image",
-        "rightimage::upload_vmops",
-        "rightimage::upload_file_to_s3"
-      ],
-      "display_name": "aws_secret_access_key_for_upload",
-      "description": "aws_secret_access_key_for_upload"
     },
     "rightimage/aws_509_key": {
       "required": "required",
@@ -263,15 +181,14 @@
       ],
       "type": "string",
       "recipes": [
-        "rightimage::cloud_add_ec2",
-        "rightimage::upload_ec2_s3",
-        "rightimage::upload_ec2_ebs",
-        "rightimage::do_create_mci",
-        "rightimage::base_centos",
-        "rightimage::base_sles",
-        "rightimage::base_ubuntu",
+        "rightimage::build_base",
         "rightimage::default",
         "rightimage::build_image",
+        "rightimage::rebundle",
+        "rightimage::base_upload",
+        "rightimage::upload_file_to_s3",
+        "rightimage::upload_ec2_s3",
+        "rightimage::upload_ec2_ebs",
         "rightimage::ec2_download_bundle"
       ],
       "display_name": "aws_509_key",
@@ -285,37 +202,18 @@
       ],
       "type": "string",
       "recipes": [
-        "rightimage::cloud_add_ec2",
-        "rightimage::upload_ec2_s3",
-        "rightimage::upload_ec2_ebs",
-        "rightimage::do_create_mci",
-        "rightimage::base_centos",
-        "rightimage::base_sles",
-        "rightimage::base_ubuntu",
-        "rightimage::base_rhel",
+        "rightimage::build_base",
         "rightimage::default",
         "rightimage::build_image",
-        "rightimage::cloud_add_vmops",
-        "rightimage::cloud_add_openstack",
+        "rightimage::rebundle",
         "rightimage::base_upload",
         "rightimage::upload_file_to_s3",
+        "rightimage::upload_ec2_s3",
+        "rightimage::upload_ec2_ebs",
         "rightimage::ec2_download_bundle"
       ],
       "display_name": "aws_secret_access_key",
       "description": "aws_secret_access_key"
-    },
-    "rightimage/sandbox_repo_tag": {
-      "required": "optional",
-      "calculated": false,
-      "choice": [
-
-      ],
-      "type": "string",
-      "recipes": [
-
-      ],
-      "display_name": "Sandbox Repository Tag",
-      "description": "The tag on the sandbox_builds repo from which to build rightscale package."
     },
     "rightimage/manual_mode": {
       "required": "optional",
@@ -355,20 +253,14 @@
       ],
       "type": "string",
       "recipes": [
-        "rightimage::cloud_add_ec2",
-        "rightimage::upload_ec2_s3",
-        "rightimage::upload_ec2_ebs",
-        "rightimage::do_create_mci",
-        "rightimage::base_centos",
-        "rightimage::base_ubuntu",
-        "rightimage::base_sles",
+        "rightimage::build_base",
         "rightimage::default",
         "rightimage::build_image",
-        "rightimage::cloud_add_vmops",
-        "rightimage::cloud_add_openstack",
-        "rightimage::base_rhel",
+        "rightimage::rebundle",
         "rightimage::base_upload",
         "rightimage::upload_file_to_s3",
+        "rightimage::upload_ec2_s3",
+        "rightimage::upload_ec2_ebs",
         "rightimage::ec2_download_bundle"
       ],
       "display_name": "aws_account_number",
@@ -416,7 +308,7 @@
       "description": "The EC2_ACCESS_KEY value defined in your eucarc credentials file. User must have admin privileges."
     },
     "rightimage/cloud": {
-      "required": "optional",
+      "required": "recommended",
       "calculated": false,
       "choice": [
         "ec2",
@@ -443,6 +335,7 @@
       "default": "10",
       "type": "string",
       "recipes": [
+        "rightimage::default",
         "rightimage::copy_image",
         "rightimage::do_restore",
         "rightimage::setup_loopback"
@@ -458,7 +351,7 @@
       ],
       "type": "string",
       "recipes": [
-
+        "rightimage::do_create_mci"
       ],
       "display_name": "API Password",
       "description": "Rightscale API password."
@@ -514,7 +407,7 @@
 
       ],
       "display_name": "Datacenter ID",
-      "description": "Datacenter/Zone ID.  Defaults to 1"
+      "description": "Datacenter/Zone ID.  Defaults to 1.  Use UK for rackspace UK"
     },
     "rightimage/image_source_bucket": {
       "required": "optional",
@@ -525,25 +418,13 @@
       "default": "rightscale-us-west-2",
       "type": "string",
       "recipes": [
-        "rightimage::cloud_add_ec2",
-        "rightimage::do_create_mci",
-        "rightimage::base_centos",
-        "rightimage::base_ubuntu",
-        "rightimage::base_sles",
         "rightimage::default",
-        "rightimage::build_image",
-        "rightimage::upload_file_to_s3",
-        "rightimage::ec2_download_bundle",
-        "rightimage::upload_euca",
-        "rightimage::upload_vmops",
-        "rightimage::upload_openstack",
-        "rightimage::upload_ec2_s3",
-        "rightimage::upload_ec2_ebs"
+        "rightimage::ec2_download_bundle"
       ],
       "display_name": "Image Source Bucket",
       "description": "When migrating an image, where to download the image from."
     },
-    "rightimage/aws_access_key_id_for_upload": {
+    "rightimage/rackspace/api_token": {
       "required": "required",
       "calculated": false,
       "choice": [
@@ -551,21 +432,11 @@
       ],
       "type": "string",
       "recipes": [
-        "rightimage::cloud_add_ec2",
-        "rightimage::upload_ec2_s3",
-        "rightimage::upload_ec2_ebs",
-        "rightimage::do_create_mci",
-        "rightimage::base_centos",
-        "rightimage::base_sles",
-        "rightimage::base_ubuntu",
-        "rightimage::base_rhel",
-        "rightimage::default",
-        "rightimage::build_image",
-        "rightimage::upload_vmops",
-        "rightimage::upload_file_to_s3"
+        "rightimage::rebundle",
+        "rightimage::default"
       ],
-      "display_name": "aws_access_key_id_for_upload",
-      "description": "aws_access_key_id for the upload bucket"
+      "display_name": "Rackspace API Token",
+      "description": "Rackspace API Token"
     },
     "rightimage/cloudstack/cdc_url": {
       "required": "required",
@@ -594,7 +465,7 @@
       "description": "Base URL to your Eucalyptus Cloud Controller. Don't include port. (Ex. http://<server_ip>)"
     },
     "rightimage/timestamp": {
-      "required": "optional",
+      "required": "recommended",
       "calculated": false,
       "choice": [
 
@@ -614,27 +485,21 @@
       ],
       "type": "string",
       "recipes": [
-        "rightimage::cloud_add_ec2",
-        "rightimage::upload_ec2_s3",
-        "rightimage::upload_ec2_ebs",
-        "rightimage::do_create_mci",
-        "rightimage::base_centos",
-        "rightimage::base_ubuntu",
-        "rightimage::base_sles",
-        "rightimage::base_rhel",
+        "rightimage::build_base",
         "rightimage::default",
         "rightimage::build_image",
-        "rightimage::cloud_add_vmops",
-        "rightimage::cloud_add_openstack",
+        "rightimage::rebundle",
         "rightimage::base_upload",
         "rightimage::upload_file_to_s3",
+        "rightimage::upload_ec2_s3",
+        "rightimage::upload_ec2_ebs",
         "rightimage::ec2_download_bundle"
       ],
       "display_name": "aws_access_key_id",
       "description": "aws_access_key_id"
     },
     "rightimage/arch": {
-      "required": "optional",
+      "required": "required",
       "calculated": false,
       "choice": [
         "i386",
@@ -655,7 +520,7 @@
       ],
       "type": "string",
       "recipes": [
-
+        "rightimage::do_create_mci"
       ],
       "display_name": "API URL",
       "description": "The rightscale account specific api url to use.  Ex. https://my.rightscale.com/api/acct/1234 (where 1234 is your account id)"
@@ -683,8 +548,6 @@
       "default": "",
       "type": "string",
       "recipes": [
-        "rightimage::default",
-        "rightimage::build_image",
         "rightimage::do_create_mci"
       ],
       "display_name": "MCI Name",
@@ -698,11 +561,8 @@
       ],
       "type": "string",
       "recipes": [
-        "rightimage::cloud_add_ec2",
-        "rightimage::do_create_mci",
-        "rightimage::base_centos",
-        "rightimage::base_ubuntu",
-        "rightimage::base_sles",
+        "rightimage::base_upload",
+        "rightimage::build_base",
         "rightimage::default",
         "rightimage::build_image",
         "rightimage::upload_file_to_s3",
@@ -710,14 +570,17 @@
         "rightimage::upload_euca",
         "rightimage::upload_vmops",
         "rightimage::upload_openstack",
-        "rightimage::upload_ec2_s3",
-        "rightimage::upload_ec2_ebs"
+        [
+          "rightimage::upload_ec2_s3",
+          "rightimage::upload_ec2_ebs",
+          "rightimage::ec2_download_bundle"
+        ]
       ],
       "display_name": "Image Upload Bucket",
       "description": "The bucket to upload the image to."
     },
     "rightimage/platform": {
-      "required": "optional",
+      "required": "required",
       "calculated": false,
       "choice": [
         "centos",
@@ -786,13 +649,66 @@
       ],
       "type": "string",
       "recipes": [
-
+        "rightimage::do_create_mci"
       ],
       "display_name": "API User",
       "description": "RightScale API username. Ex. you@rightscale.com"
     }
   },
+  "license": "Apache v2.0",
+  "suggestions": {
+  },
+  "platforms": {
+  },
   "maintainer": "RightScale, Inc.",
+  "long_description": "",
+  "version": "0.0.1",
+  "recommendations": {
+  },
+  "recipes": {
+    "rightimage::setup_block_device": "Creates, formats and mounts a brand new block_device volume stripe on the instance.",
+    "rightimage::upload_file_to_s3": "upload specified file to s3",
+    "rightimage::upload_openstack": "bundle and upload openstack kernel, ramdisk and image",
+    "rightimage::cloud_add_vmops": "adds requirements for cloudstack based on hypervisor choice",
+    "rightimage::rightscale_install": "installs rightscale",
+    "rightimage::rebundle": "coordinate a rebundled image build (redhat on on ec2 or rackspace)",
+    "rightimage::base_sles": "coordinate a sles install",
+    "rightimage::cloud_add_openstack": "adds requirements for openstack based on hypervisor choice",
+    "rightimage::cloud_add_euca": "migrates the created image to eucalyptus",
+    "rightimage::build_base": "build base image based on host platform",
+    "rightimage::cloud_add_ec2": "migrates the created image to ec2",
+    "rightimage::default": "starts builds image automatically at boot. See 'manual_mode' input to enable.",
+    "rightimage::do_backup": "Backup image snapshot.",
+    "rightimage::upload_ec2_ebs": "create EBS image snapshot (ec2 only)",
+    "rightimage::upload_ec2_s3": "bundle and upload s3 image (ec2 only)",
+    "rightimage::setup_loopback": "creates loopback file",
+    "rightimage::bootstrap_sles": "bootstraps a basic sles image",
+    "rightimage::bootstrap_ubuntu": "bootstraps a basic ubuntu image",
+    "rightimage::base_ubuntu": "coordinate an ubuntu install",
+    "rightimage::do_create_mci": "creates MCI for image(s) (only ec2 currently supported)",
+    "rightimage::do_destroy_loopback": "unmounts loopback file",
+    "rightimage::ec2_download_bundle": "Downloads bundled image from EC2 S3.",
+    "rightimage::upload_euca": "bundle and upload euca kernel, ramdisk and image",
+    "rightimage::install_vhd-util": "install the vhd-util tool",
+    "rightimage::bootstrap_common_debug": "common debug configuration for linux base images",
+    "rightimage::build_image": "build image based on host platform",
+    "rightimage::copy_image": "Creates non-partitioned image.",
+    "rightimage::do_restore": "Restores image snapshot.",
+    "rightimage::bootstrap_common": "common configuration for linux base images",
+    "rightimage::base_centos": "coordinate a centos install",
+    "rightimage::do_force_reset": "Unmounts and deletes the attached block_device and volumes that were attached to the instance for this lineage.",
+    "rightimage::bootstrap_centos": "bootstraps a basic centos image",
+    "rightimage::base_upload": "compresses and uploads base image to s3",
+    "rightimage::upload_vmops": "setup http server for download to test cloud",
+    "rightimage::clean": "cleans everything"
+  },
+  "groupings": {
+  },
+  "conflicting": {
+  },
   "replacing": {
+  },
+  "description": "image building tools",
+  "providing": {
   }
 }
