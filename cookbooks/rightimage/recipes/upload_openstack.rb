@@ -39,7 +39,7 @@ ruby_block "upload to cloud" do
     access_token = auth_hash["access"]["token"]["id"]
 
     # Don't use location=file://path/to/file like you might think, thats the name of the location to store the file on the server that hosts the images, not this machine
-    cmd = %Q(/usr/local/bin/glance add --auth_token=#{access_token} --url=http://#{openstack_host}:#{openstack_glance_port}/v2.0 name=#{image_name} is_public=true disk_format=qcow2 container_format=ovf < #{local_file})
+    cmd = %Q(env PATH=$PATH:/usr/local/bin glance add --auth_token=#{access_token} --url=http://#{openstack_host}:#{openstack_glance_port}/v2.0 name=#{image_name} is_public=true disk_format=qcow2 container_format=ovf < #{local_file})
     Chef::Log.debug(cmd)
     upload_resp = `#{cmd}`
     Chef::Log.info("got response for upload req: #{upload_resp} to cloud.")
