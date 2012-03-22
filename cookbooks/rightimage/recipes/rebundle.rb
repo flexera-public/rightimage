@@ -78,10 +78,12 @@ bash "launch the remote instance" do
   environment(cloud_credentials)
   cwd BaseRhelConstants::REBUNDLE_SOURCE_PATH
   region_opt = case node[:rightimage][:cloud]
-               when "ec2" then "--region #{node[:ec2][:placement][:availability_zone].chop}"
-               when "rackspace" then "--region #{node[:rightimage][:zone]}"
+               when "ec2" then "#{node[:ec2][:placement][:availability_zone].chop}"
+               when "rackspace" then "#{node[:rightimage][:zone]}"
                else ""
                end
+
+  region_opt = "--region #{region_opt}" if region_opt =~ /./
   code <<-EOH
   /opt/rightscale/sandbox/bin/ruby bin/launch --provider #{node[:rightimage][:cloud]} --image-id #{node[:rightimage][:rebundle_base_image_id]} #{region_opt} --flavor-id c1.medium --no-auto
   EOH
