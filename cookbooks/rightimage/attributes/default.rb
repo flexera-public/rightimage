@@ -86,7 +86,12 @@ case rightimage[:cloud]
     set[:rightimage][:root_mount][:dump] = "0" 
     set[:rightimage][:root_mount][:fsck] = "0" 
     set[:rightimage][:fstab][:ephemeral] = true
-    set[:rightimage][:ephemeral_mount] = "/dev/sdb" 
+    # The kernel in ubuntu 10.04.4 (vs 10.04.3) seems to have changed the device naming scheme from sdX to xvdX
+    if timestamp[0..7] > "20120217" and rightimage[:platform] == "ubuntu"
+      set[:rightimage][:ephemeral_mount] = "/dev/xvdb" 
+    else
+      set[:rightimage][:ephemeral_mount] = "/dev/sdb" 
+    end
     set[:rightimage][:swap_mount] = "/dev/sda3"  unless rightimage[:arch]  == "x86_64"
     case rightimage[:platform]
       when "ubuntu" 
