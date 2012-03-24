@@ -18,7 +18,7 @@ action :install do
     
           # Now rebuild ramdisk with xen drivers
           chroot $guest_root mkinitrd --with=mptbase --with=mptscsih --with=mptspi --with=scsi_transport_spi --with=ata_piix \
-             --with=ext3 -v initrd-#{node[:rightimage][:kernel_id]} #{node[:rightimage][:kernel_id]}
+             --with=ext3 -v initrd-$kernel_version $kernel_version
           mv $guest_root/initrd-$kernel_version  $guest_root/boot/.
           chroot $guest_root yum -y install grub
         ;;
