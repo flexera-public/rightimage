@@ -308,6 +308,20 @@ EOF
         return bash_snippet
       end
 
+      def cloud_credentials(cloud_type = node[:rightimage][:cloud])
+        case cloud_type
+        when "ec2"
+          return {'AWS_CALLING_FORMAT' => 'SUBDOMAIN',
+                  'AWS_ACCESS_KEY_ID'  => node[:rightimage][:aws_access_key_id],
+                  'AWS_SECRET_ACCESS_KEY'=> node[:rightimage][:aws_secret_access_key]}
+        when "rackspace" 
+          return {'RACKSPACE_ACCOUNT' => node[:rightimage][:rackspace][:account],
+                  'RACKSPACE_API_TOKEN' => node[:rightimage][:rackspace][:api_token]}
+        else
+          raise "Cloud #{cloud_type} passed to cloud_credentials, which it doesn't know how to handle"
+        end
+      end
+
       def rebundle?
         if node[:rightimage][:cloud] == "ec2" and node[:rightimage][:platform] == "rhel"
           return true
