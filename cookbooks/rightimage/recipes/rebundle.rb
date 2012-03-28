@@ -74,23 +74,26 @@ bash "install bundled gems" do
 end
 
 bash "launch the remote instance" do
-  flags "-e +x"
+  flags "-ex"
   environment(cloud_credentials)
   cwd BaseRhelConstants::REBUNDLE_SOURCE_PATH
   region_opt = case node[:rightimage][:cloud]
                when "ec2" then "#{node[:ec2][:placement][:availability_zone].chop}"
-               when "rackspace" then "#{node[:rightimage][:zone]}"
+               when "rackspace" then "#{node[:rightimage][:datacenter]}"
                else ""
                end
 
   region_opt = "--region #{region_opt}" if region_opt =~ /./
+  flavor_opt = node[:rightimage][:cloud] == "ec2" ? "--flavor-id c1.medium" : ""
+  zone = node[:rightimage][:datacenter].to_s.empty? ? "US" : node[:rightimage][:datacenter]
+  name_opt   = node[:rightimage][:cloud] == "rackspace" ? "--hostname ri-rebundle-#{node[:rightimage][:platform]}-#{zone.downcase}" : ""
   code <<-EOH
-  /opt/rightscale/sandbox/bin/ruby bin/launch --provider #{node[:rightimage][:cloud]} --image-id #{node[:rightimage][:rebundle_base_image_id]} #{region_opt} --flavor-id c1.medium --no-auto
+  /opt/rightscale/sandbox/bin/ruby bin/launch --provider #{node[:rightimage][:cloud]} --image-id #{node[:rightimage][:rebundle_base_image_id]} #{region_opt} #{flavor_opt} #{name_opt} --no-auto
   EOH
 end
 
 bash "upload code to the remote instance" do
-  flags "-e +x"
+  flags "-ex"
   cwd BaseRhelConstants::REBUNDLE_SOURCE_PATH
   code <<-EOH
   /opt/rightscale/sandbox/bin/ruby bin/upload --rightlink #{node[:rightimage][:rightlink_version]} --no-checkout --no-configure
@@ -98,39 +101,28 @@ bash "upload code to the remote instance" do
 end
 
 bash "configure the remote instance" do
-  flags "-e +x"
+  flags "-ex"
   cwd BaseRhelConstants::REBUNDLE_SOURCE_PATH
   code <<-EOH
   /opt/rightscale/sandbox/bin/ruby bin/configure --rightlink #{node[:rightimage][:rightlink_version]}
   EOH
 end
 
-directory BaseRhelConstants::LOCAL_PACKAGE_PATH do
-  action :create
-  recursive true
-end 
- 
-bash "get the build package from remote" do
-  flags "-ex"
-  cwd BaseRhelConstants::REBUNDLE_SOURCE_PATH
-  code "scp -i config/private_key root@`cat config/hostname`:/root/.rightscale/*.rpm #{BaseRhelConstants::LOCAL_PACKAGE_PATH}"
-end
-
 bash "run clean script on remote instance" do
-  flags "-e +x"
+  flags "-ex"
   cwd BaseRhelConstants::REBUNDLE_SOURCE_PATH
   code <<-EOH
   /opt/rightscale/sandbox/bin/ruby bin/clean
   EOH
 end
 
-
 bash "bundle instance" do
-  flags "-e +x"
+  flags "-ex"
   cwd BaseRhelConstants::REBUNDLE_SOURCE_PATH
   environment(cloud_credentials)
+  certs_opt = node[:rightimage][:cloud] == "ec2" ? "--aws-cert /tmp/AWS_X509_CERT.pem --aws-key /tmp/AWS_X509_KEY.pem" : ""
   code <<-EOH
-  /opt/rightscale/sandbox/bin/ruby bin/bundle --name #{image_name} --aws-cert /tmp/AWS_X509_CERT.pem --aws-key /tmp/AWS_X509_KEY.pem
+  /opt/rightscale/sandbox/bin/ruby bin/bundle --name #{image_name} #{certs_opt}
   EOH
 end
 #
@@ -158,7 +150,7 @@ ruby_block "store image id" do
 end
 
 bash "destroy instance" do
-  flags "-e +x"
+  flags "-ex"
   cwd BaseRhelConstants::REBUNDLE_SOURCE_PATH
   environment(cloud_credentials)
   code "/opt/rightscale/sandbox/bin/ruby bin/destroy"
