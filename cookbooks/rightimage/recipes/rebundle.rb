@@ -15,6 +15,11 @@ rs_utils_marker :begin
 # limitations under the License.
 #
 
+
+class Chef::Resource::Bash
+  include RightScale::RightImage::Helper
+end
+
 module BaseRhelConstants
   REBUNDLE_SOURCE_PATH  = "/tmp/rightscale/rightimage_rebundle"
   LOCAL_PACKAGE_PATH    = "/tmp/rightscale/dist"
@@ -95,8 +100,13 @@ end
 bash "upload code to the remote instance" do
   flags "-ex"
   cwd BaseRhelConstants::REBUNDLE_SOURCE_PATH
+  freeze_date_opt = ""
+  if timestamp
+    freeze_date_opt = "--freeze-date #{timestamp[0..3]}-#{timestamp[4..5]}-#{timestamp[6..7]}"
+  end
+
   code <<-EOH
-  /opt/rightscale/sandbox/bin/ruby bin/upload --rightlink #{node[:rightimage][:rightlink_version]} --no-checkout --no-configure
+  /opt/rightscale/sandbox/bin/ruby bin/upload --rightlink #{node[:rightimage][:rightlink_version]} #{freeze_date_opt} --no-checkout --no-configure
   EOH
 end
 
