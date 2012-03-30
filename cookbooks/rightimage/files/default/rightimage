@@ -199,7 +199,11 @@ function get_cloud_userdata() {
         exit 1
       fi
 
-      server_ip=$(grep dhcp-server-identifier $leases_file | tail -1 | awk '{print $NF}' | tr '\;' ' ' | tr -d ' ')
+      while [ -z "$server_ip" ]; do
+        server_ip=$(grep dhcp-server-identifier $leases_file | tail -1 | awk '{print $NF}' | tr '\;' ' ' | tr -d ' ')
+        sleep 1
+      done
+
       metadata_server="http://$server_ip/latest/user-data"
       false
       while [ $? -ne 0 ]; do

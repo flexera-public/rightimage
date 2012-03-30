@@ -189,29 +189,6 @@ bash "unmount proc & dev" do
   EOH
 end
 
-remote_file "/tmp/rightimage.patch" do
-  source "rightimage.patch"
-end
-
-bash "Patch /etc/init.d/rightimage" do
-  flags "-x"
-  code <<-EOH
-    output=`patch --forward #{guest_root}/etc/init.d/rightimage /tmp/rightimage.patch`
-    # Patch applied cleanly, first time
-    if [ "$?" == "0" ]; then
-      exit 0
-    fi
-
-    # Patch already applied from a previous run
-    [[ $output =~ 'previously applied' ]]
-    res=$?
-    echo "OUTPUT: $output"
-
-    exit $res
-  EOH
-end
-
-
 
 # Clean up guest image
 rightimage guest_root do
