@@ -4,7 +4,6 @@
 class Chef::Node
  include RightScale::RightImage::Helper
 end
-UNKNOWN = :unknown.to_s
 
 set_unless[:rightimage][:debug] = false
 set[:rightimage][:lang] = "en_US.UTF-8"
@@ -150,7 +149,6 @@ case rightimage[:platform]
                chroot $GUEST_ROOT chkconfig --level 4 getsshkey on"
     set[:rightimage][:mirror_file] = "CentOS.repo.erb"
     set[:rightimage][:mirror_file_path] = "/etc/yum.repos.d/CentOS.repo"
-  when UNKNOWN
 
 end
 
