@@ -19,5 +19,3 @@ bash "sync fs" do
   code "sync"
 end
 
-
-include_recipe "rightimage::do_destroy_loopback"
