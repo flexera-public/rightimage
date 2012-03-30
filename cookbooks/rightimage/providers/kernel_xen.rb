@@ -2,7 +2,9 @@ class Chef::Resource::Bash
   include RightScale::RightImage::Helper
 end
 
+
 action :install do
+  include_recipe "install_vhd-util"
  
   bash "install xen kernel" do
     flags "-ex"

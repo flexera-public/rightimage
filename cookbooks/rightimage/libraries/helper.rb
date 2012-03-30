@@ -167,9 +167,9 @@ EOF
 
       def partitioned?
         case node[:rightimage][:cloud]
-        when "ec2", "euca"
+        when "ec2", "eucalyptus"
           return FALSE
-        when "vmops"
+        when "cloudstack"
           case node[:rightimage][:virtual_environment]
           when "xen"
             if is_ubuntu?
@@ -247,9 +247,9 @@ EOF
 
       def full_image_upload_bucket
         case node[:rightimage][:cloud]
-        when "vmops"
+        when "cloudstack"
           "rightscale-cloudstack-dev"
-        when "euca"
+        when "eucalyptus"
           "rightscale-eucalyptus-dev"
         when "openstack"
           "rightscale-openstack-dev"

@@ -23,56 +23,14 @@ end
 #  - insert proper init scripts (rackspace needs lvm hack)
 
 # TODO: add uuca tools for centos 
-#  - create /etc/rightscale.d/cloud
 
-bash "cleanup" do 
-  flags "-ex"
-  code <<-EOH
-    guest_root="#{guest_root}"
 
-    umount -lf #{guest_root}/proc || true 
-    umount -lf #{guest_root}/sys || true 
-    mkdir -p $guest_root/boot/grub
-  EOH
-end
-
-execute "echo -n #{node[:rightimage][:cloud]} > #{guest_root}/etc/rightscale.d/cloud" do 
-  creates "#{guest_root}/etc/rightscale.d/cloud"
-end
-
-#  - add fstab
-template "#{guest_root}/etc/fstab" do 
-  source "fstab.erb" 
-  backup false
-end
-
-bash "mount proc & dev" do
-  flags "-ex"
-  code <<-EOH
-    GUEST_ROOT=#{guest_root}
-    mount -t proc none $GUEST_ROOT/proc
-#    mount --bind /dev $GUEST_ROOT/dev
-    mount --bind /sys $GUEST_ROOT/sys
-  EOH
-end
+include_recipe "cloud_add_begin"
 
 rightimage_kernel "Install PV Kernel for Hypervisor" do
   provider "rightimage_kernel_#{node[:rightimage][:virtual_environment]}"
   action :install
 end
-
-directory "#{guest_root}/boot/grub" do
-  owner "root"
-  group "root"
-  mode "0750"
-  action :create
-end 
-
-template "#{guest_root}/boot/grub/menu.lst" do
-  source "menu.lst.erb"
-end
-
-include_recipe "rightimage::bootstrap_common_debug"
 
 #  - add get_ssh_key script
 template "#{guest_root}/etc/init.d/getsshkey" do 
@@ -109,32 +67,12 @@ end
  
 bash "do_depmod" do 
   flags "-ex"
+  only_if { node[:rightimage][:platform] == "centos" }
   code <<-EOH
   for module_version in $(cd #{guest_root}/lib/modules; ls); do
     chroot #{guest_root} depmod -a $module_version
   done
   EOH
-end if node[:rightimage][:platform] == "centos"
+end 
 
-bash "unmount proc & dev" do 
-  flags "-ex"
-  code <<-EOH
-    GUEST_ROOT=#{guest_root}
-    umount -lf $GUEST_ROOT/proc || true
-#    umount -lf $GUEST_ROOT/dev || true
-    umount -lf $GUEST_ROOT/sys || true
-  EOH
-end
-
-# Clean up GUEST_ROOT image
-rightimage guest_root do
-  action :sanitize
-end
-
-bash "sync fs" do
-  flags "-ex"
-  code <<-EOH
-    sync
-  EOH
-end
-rs_utils_marker :end
+include_recipe "cloud_add_end"

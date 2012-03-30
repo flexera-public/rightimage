@@ -18,8 +18,8 @@ recipe "rightimage::bootstrap_common", "common configuration for linux base imag
 recipe "rightimage::bootstrap_common_debug", "common debug configuration for linux base images" 
 recipe "rightimage::rightscale_install", "installs rightscale"
 recipe "rightimage::cloud_add_ec2", "migrates the created image to ec2"
-recipe "rightimage::cloud_add_euca", "migrates the created image to eucalyptus" 
-recipe "rightimage::cloud_add_vmops", "adds requirements for cloudstack based on hypervisor choice"
+recipe "rightimage::cloud_add_eucalyptus", "migrates the created image to eucalyptus" 
+recipe "rightimage::cloud_add_cloudstack", "adds requirements for cloudstack based on hypervisor choice"
 recipe "rightimage::cloud_add_openstack", "adds requirements for openstack based on hypervisor choice"
 recipe "rightimage::setup_loopback", "creates loopback file"
 recipe "rightimage::do_destroy_loopback", "unmounts loopback file"
@@ -27,8 +27,8 @@ recipe "rightimage::install_vhd-util", "install the vhd-util tool"
 recipe "rightimage::do_create_mci", "creates MCI for image(s) (only ec2 currently supported)"
 recipe "rightimage::upload_ec2_s3", "bundle and upload s3 image (ec2 only)"
 recipe "rightimage::upload_ec2_ebs", "create EBS image snapshot (ec2 only)"
-recipe "rightimage::upload_vmops", "setup http server for download to test cloud"
-recipe "rightimage::upload_euca", "bundle and upload euca kernel, ramdisk and image"
+recipe "rightimage::upload_cloudstack", "setup http server for download to test cloud"
+recipe "rightimage::upload_eucalyptus", "bundle and upload euca kernel, ramdisk and image"
 recipe "rightimage::upload_openstack", "bundle and upload openstack kernel, ramdisk and image"
 recipe "rightimage::upload_file_to_s3", "upload specified file to s3"
 recipe "rightimage::base_upload", "compresses and uploads base image to s3"
@@ -43,7 +43,7 @@ recipe "rightimage::ec2_download_bundle","Downloads bundled image from EC2 S3."
 cloud_add = []
 cloud_upload = []
 
-['euca', 'vmops', 'openstack'].each do |cloud|
+['eucalyptus', 'cloudstack', 'openstack'].each do |cloud|
   cloud_add << "rightimage::cloud_add_#{cloud}"
   cloud_upload << "rightimage::upload_#{cloud}"
 end
@@ -115,7 +115,7 @@ attribute "rightimage/arch",
 attribute "rightimage/cloud",
   :display_name => "Target Cloud",
   :description => "The supported cloud for the virtual image. If unset, build a generic base image.",
-  :choice => [ "ec2", "vmops", "euca", "openstack", "rackspace" ],
+  :choice => [ "ec2", "cloudstack", "eucalyptus", "openstack", "rackspace" ],
   :required => "recommended"
   
 attribute "rightimage/region",
@@ -228,43 +228,43 @@ attribute "rightimage/euca/user_id",
   :display_name => "Eucalyptus User ID",
   :description => "The EC2_USER_ID value defined in your eucarc credentials file. User must have admin privileges.",
   :required => "required",
-  :recipes => [ "rightimage::upload_euca" ]
+  :recipes => [ "rightimage::upload_eucalyptus" ]
   
 attribute "rightimage/euca/euca_url",
   :display_name => "Eucalyptus URL",
   :description => "Base URL to your Eucalyptus Cloud Controller. Don't include port. (Ex. http://<server_ip>)",
   :required => "required",
-  :recipes => [ "rightimage::upload_euca" ]
+  :recipes => [ "rightimage::upload_eucalyptus" ]
 
 attribute "rightimage/euca/access_key_id",
   :display_name => "Eucalyptus Access Key",
   :description => "The EC2_ACCESS_KEY value defined in your eucarc credentials file. User must have admin privileges.",
   :required => "required",
-  :recipes => [ "rightimage::upload_euca" ]
+  :recipes => [ "rightimage::upload_eucalyptus" ]
 
 attribute "rightimage/euca/secret_access_key",
   :display_name => "Eucalyptus Secret Access Key",
   :description => "The EC2_SECRET_KEY value defined in your eucarc credentials file. User must have admin privileges.",
   :required => "required",
-  :recipes => [ "rightimage::upload_euca" ]
+  :recipes => [ "rightimage::upload_eucalyptus" ]
 
 attribute "rightimage/euca/x509_key",
   :display_name => "Eucalyptus x509 Private Key",
   :description => "The contents of the file pointed to by the EC2_PRIVATE_KEY value defined in your eucarc credentials file.",
   :required => "required",
-  :recipes => [ "rightimage::upload_euca" ]
+  :recipes => [ "rightimage::upload_eucalyptus" ]
 
 attribute "rightimage/euca/x509_cert",
   :display_name => "Eucalyptus x509 Certificate",
   :description => "The contents of the file pointed to by the EC2_CERT value defined in your eucarc credentials file.",
   :required => "required",
-  :recipes => [ "rightimage::upload_euca" ]
+  :recipes => [ "rightimage::upload_eucalyptus" ]
 
 attribute "rightimage/euca/euca_cert",
   :display_name => "Eucalyptus Cloud Certificate",
   :description => "The contents of the file pointed to by the EUCALYPTUS_CERT value defined in your eucarc credentials file.",
   :required => "required",
-  :recipes => [ "rightimage::upload_euca" ]
+  :recipes => [ "rightimage::upload_eucalyptus" ]
 
 # Openstack
 attribute "rightimage/openstack/hostname",
@@ -293,19 +293,19 @@ attribute "rightimage/cloudstack/cdc_url",
   :display_name => "CloudStack API URL",
   :description => "URL to your CloudStack Cloud Controller. (Ex. http://<server_ip>:8080/client/api)",
   :required => "required",
-  :recipes => [ "rightimage::upload_vmops" ]
+  :recipes => [ "rightimage::upload_cloudstack" ]
 
 attribute "rightimage/cloudstack/cdc_api_key",
   :display_name => "CloudStack API Key",
   :description => "CloudStack API key.",
   :required => "required",
-  :recipes => [ "rightimage::upload_vmops" ]
+  :recipes => [ "rightimage::upload_cloudstack" ]
 
 attribute "rightimage/cloudstack/cdc_secret_key",
   :display_name => "CloudStack Secret Key",
   :description => "CloudStack secret key.",
   :required => "required",
-  :recipes => [ "rightimage::upload_vmops" ]
+  :recipes => [ "rightimage::upload_cloudstack" ]
 
 # RackSpace
 attribute "rightimage/rackspace/account",

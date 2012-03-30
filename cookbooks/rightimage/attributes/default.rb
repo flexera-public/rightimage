@@ -41,12 +41,12 @@ when "ubuntu"
   end
 
   set[:rightimage][:package_type] = "deb"
-  rightimage[:guest_packages] << " euca2ools" if rightimage[:cloud] == "euca"
+  rightimage[:guest_packages] << " euca2ools" if rightimage[:cloud] == "eucalyptus"
 
 when "centos","rhel"
   set[:rightimage][:guest_packages] = "wget mlocate nano logrotate ruby ruby-devel ruby-docs ruby-irb ruby-libs ruby-mode ruby-rdoc ruby-ri ruby-tcltk postfix openssl openssh openssh-askpass openssh-clients openssh-server curl gcc* zip unzip bison flex compat-libstdc++-296 cvs subversion autoconf automake libtool compat-gcc-34-g77 mutt sysstat rpm-build fping vim-common vim-enhanced rrdtool-1.2.27 rrdtool-devel-1.2.27 rrdtool-doc-1.2.27 rrdtool-perl-1.2.27 rrdtool-python-1.2.27 rrdtool-ruby-1.2.27 rrdtool-tcl-1.2.27 pkgconfig lynx screen yum-utils bwm-ng createrepo redhat-rpm-config redhat-lsb git nscd xfsprogs swig libarchive-devel tmux libxml2 libxml2-devel libxslt libxslt-devel"
 
-  rightimage[:guest_packages] << " iscsi-initiator-utils" if rightimage[:cloud] == "vmops" 
+  rightimage[:guest_packages] << " iscsi-initiator-utils" if rightimage[:cloud] == "cloudstack" 
 
   set[:rightimage][:host_packages] = "swig"
   set[:rightimage][:package_type] = "rpm"
@@ -81,7 +81,7 @@ end if rightimage[:platform] == "ubuntu"
 
 # set cloud stuff
 case rightimage[:cloud]
-  when "ec2", "euca" 
+  when "ec2", "eucalyptus" 
     set[:rightimage][:root_mount][:dump] = "0" 
     set[:rightimage][:root_mount][:fsck] = "0" 
     set[:rightimage][:fstab][:ephemeral] = true
@@ -100,7 +100,7 @@ case rightimage[:cloud]
         set[:rightimage][:fstab][:ephemeral_mount_opts] = "defaults"
         set[:rightimage][:fstab][:swap] = "defaults"
     end
-  when "vmops", "openstack"
+  when "cloudstack", "openstack"
     rightimage[:host_packages] << " python26-distribute python26-devel python26-libs" if rightimage[:cloud] == "openstack"
 
     case rightimage[:virtual_environment]

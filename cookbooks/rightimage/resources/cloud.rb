@@ -1,0 +1,3 @@
+actions :configure, :upload
+
+

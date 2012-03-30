@@ -50,11 +50,11 @@ Inputs:
   Hypervisor::
     Set to the appropriate hypervisor type for the cloud.
     esxi::
-      vmops
+      cloudstack
     kvm::
-      openstack, vmops
+      openstack, cloudstack
     xen::
-      ec2, euca, vmops
+      ec2, eucalyptus, cloudstack
     
     
 

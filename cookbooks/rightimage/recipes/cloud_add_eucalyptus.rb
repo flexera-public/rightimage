@@ -12,7 +12,17 @@ class Chef::Resource::Execute
   include RightScale::RightImage::Helper
 end
 
+
 raise "ERROR: you must set your virtual_environment to xen!"  if node[:rightimage][:virtual_environment] != "xen"
+
+
+include_recipe "cloud_add_begin"
+
+rightimage_kernel "Install PV Kernel for Hypervisor" do
+  provider "rightimage_kernel_#{node[:rightimage][:virtual_environment]}"
+  guest_root guest_root
+  action :install
+end
 
 euca_tools_version = "1.3.1"
 
@@ -24,14 +34,6 @@ bash "clean yum" do
   EOH
 end
 
-package "grub"
-
-#  - add fstab
-template "#{guest_root}/etc/fstab" do
-  source "fstab.erb"
-  backup false
-end
-
 remote_file "/tmp/euca2ools-#{euca_tools_version}-centos-i386.tar.gz" do 
   source "euca2ools-#{euca_tools_version}-centos-i386.tar.gz"
   backup false
@@ -41,24 +43,6 @@ remote_file "/tmp/euca2ools-#{euca_tools_version}-centos-x86_64.tar.gz" do
   source "euca2ools-#{euca_tools_version}-centos-x86_64.tar.gz"
   backup false
 end
-
-bash "mount proc & dev" do
-  flags "-ex"
-  code <<-EOH
-    guest_root=#{guest_root}
-    mount -t proc none $guest_root/proc
-    mount --bind /dev $guest_root/dev
-    mount --bind /sys $guest_root/sys
-  EOH
-end
-
-rightimage_kernel "Install PV Kernel for Hypervisor" do
-  provider "rightimage_kernel_#{node[:rightimage][:virtual_environment]}"
-  guest_root guest_root
-  action :install
-end
-
-include_recipe "rightimage::bootstrap_common_debug"
 
 package "euca2ools" do
   only_if { node[:rightimage][:platform] == "ubuntu" }
@@ -88,14 +72,12 @@ bash "install euca tools for centos" do
   EOH
 end
 
+# Need to cleanup for ubuntu?
 bash "configure for eucalyptus" do
   flags "-ex"
+  only_if { node[:rightimage][:platform] == "centos" }
   code <<-EOH
     guest_root=#{guest_root}
-
-    ## insert cloud file
-    mkdir -p $guest_root/etc/rightscale.d
-    echo -n "eucalyptus" > $guest_root/etc/rightscale.d/cloud
 
     # clean out packages
     chroot $guest_root yum -y clean all
@@ -106,21 +88,8 @@ bash "configure for eucalyptus" do
   EOH
 end
 
-bash "unmount proc & dev" do
-  flags "-ex"
-  code <<-EOH
-    guest_root=#{guest_root}
-    umount -lf $guest_root/proc || true
-    umount -lf $guest_root/dev || true
-    umount -lf $guest_root/sys || true
-  EOH
-end
 
-# Clean up guest_root image
-rightimage guest_root do
-  action :sanitize
-end
-
+# TODO REFACTOR, DELETE, PART OF HYPERVISOR XEN STUFF?
 bash "package guest image" do 
   cwd "/mnt"
   flags "-ex"
@@ -142,13 +111,5 @@ bash "package guest image" do
   EOH
 end
 
-bash "unmount" do
-  flags "-x"
-  code <<-EOH
-    guest_root=#{guest_root}
-    loopdev=#{loop_dev}  
-    umount -lf $guest_root || true
-    losetup -d $loopdev
-  EOH
-end
-rs_utils_marker :end
+include_recipe "cloud_add_end"
+
