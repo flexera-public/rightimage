@@ -178,25 +178,6 @@ end #if rightimage[:cloud] == "ec2"
 set[:rightimage][:release_number] = release_number
 
 
-# Select kernel to use based on cloud
-#case rightimage[:cloud]
-#when "vmops", "euca", "openstack"
-case rightimage[:release]
-when "5.2" 
-  set[:rightimage][:kernel_id] = "2.6.18-92.1.22.el5.centos.plus"
-  rightimage[:kernel_id] << "xen" if rightimage[:virtual_environment] == "xen"
-when "5.4" 
-  set[:rightimage][:kernel_id] = "2.6.18-164.15.1.el5.centos.plus"
-  rightimage[:kernel_id] << "xen" if rightimage[:virtual_environment] == "xen"
-when "5.6"
-  set[:rightimage][:kernel_id] = "2.6.18-238.19.1.el5.centos.plus"
-  rightimage[:kernel_id] << "xen" if rightimage[:virtual_environment] == "xen"
-when "lucid"
-  set[:rightimage][:kernel_id] = "2.6.32-31-server"
-  rightimage[:kernel_id] << "kvm" if rightimage[:virtual_environment] == "kvm"
-  #rightimage[:kernel_id] << "esxi" if rightimage[:virtual_environment] == "esxi"
-end
-
 case rightimage[:cloud]
 when "ec2"
   # Using pvgrub kernels

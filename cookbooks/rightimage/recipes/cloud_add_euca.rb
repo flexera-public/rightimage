@@ -55,7 +55,6 @@ end
 rightimage_kernel "Install PV Kernel for Hypervisor" do
   provider "rightimage_kernel_#{node[:rightimage][:virtual_environment]}"
   guest_root guest_root
-  version node[:rightimage][:kernel_id]
   action :install
 end
 
