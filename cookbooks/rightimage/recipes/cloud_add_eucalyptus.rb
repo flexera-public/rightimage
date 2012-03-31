@@ -18,10 +18,10 @@ raise "ERROR: you must set your virtual_environment to xen!"  if node[:rightimag
 
 include_recipe "cloud_add_begin"
 
-rightimage_kernel "Install PV Kernel for Hypervisor" do
-  provider "rightimage_kernel_#{node[:rightimage][:virtual_environment]}"
+rightimage_hypervisor "Install PV Kernel for Hypervisor" do
+  provider "rightimage_hypervisor_#{node[:rightimage][:virtual_environment]}"
   guest_root guest_root
-  action :install
+  action :install_kernel
 end
 
 euca_tools_version = "1.3.1"

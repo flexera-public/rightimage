@@ -33,13 +33,13 @@ end
 
 include_recipe "cloud_add_begin"
 
-rightimage_kernel "Install PV kernel for hypervisor" do
-  provider "rightimage_kernel_#{node[:rightimage][:virtual_environment]}"
+rightimage_hypervisor "Install PV kernel for hypervisor" do
+  provider "rightimage_hypervisor_#{node[:rightimage][:virtual_environment]}"
   action :install_kernel
 end
 
-rightimage_kernel "Install software toolchain for hypervisor" do
-  provider "rightimage_kernel_#{node[:rightimage][:virtual_environment]}"
+rightimage_hypervisor "Install software toolchain for hypervisor" do
+  provider "rightimage_hypervisor_#{node[:rightimage][:virtual_environment]}"
   action :install_tools
 end
 
@@ -175,11 +175,9 @@ bash "backup raw image" do
   EOH
 end
 
-
-rightimage_kernel "Package image for hypervisor" do
-  provider "rightimage_kernel_#{node[:rightimage][:virtual_environment]}"
+rightimage_hypervisor "Package image for hypervisor" do
+  provider "rightimage_hypervisor_#{node[:rightimage][:virtual_environment]}"
   action :package_image
 end
-
 
 rs_utils_marker :end

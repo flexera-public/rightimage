@@ -27,9 +27,9 @@ end
 
 include_recipe "cloud_add_begin"
 
-rightimage_kernel "Install PV Kernel for Hypervisor" do
-  provider "rightimage_kernel_#{node[:rightimage][:virtual_environment]}"
-  action :install
+rightimage_hypervisor "Install PV Kernel for Hypervisor" do
+  provider "rightimage_hypervisor_#{node[:rightimage][:virtual_environment]}"
+  action :install_kernel
 end
 
 #  - add get_ssh_key script

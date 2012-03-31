@@ -29,14 +29,17 @@ class Erubis::Context
   include RightScale::RightImage::Helper
 end
 
+include_recipe "cloud_add_begin"
 
-
-rightimage_kernel "Install PV Kernel for Hypervisor" do
-  provider "rightimage_kernel_#{node[:rightimage][:virtual_environment]}"
-  action :install
+rightimage_hypervisor "Install PV Kernel for Hypervisor" do
+  provider "rightimage_hypervisor_#{node[:rightimage][:virtual_environment]}"
+  action :install_kernel
 end
 
-include_recipe "cloud_add_begin"
+rightimage_hypervisor "Install software toolchain for hypervisor" do
+  provider "rightimage_hypervisor_#{node[:rightimage][:virtual_environment]}"
+  action :install_tools
+end
 
 bash "configure for openstack" do
   flags "-ex"
@@ -86,19 +89,9 @@ bash "backup raw image" do
   EOH
 end
 
-bash "package image" do 
-  cwd target_temp_root
-  flags "-ex"
-  code <<-EOH
-    
-    BUNDLED_IMAGE="#{image_name}.qcow2"
-    BUNDLED_IMAGE_PATH="#{target_temp_root}/$BUNDLED_IMAGE"
-    
-    qemu-img convert -O qcow2 #{target_temp_path} $BUNDLED_IMAGE_PATH
-    [ -f $BUNDLED_IMAGE_PATH.bz2 ] && rm -f $BUNDLED_IMAGE_PATH.bz2
-    bzip2 -k $BUNDLED_IMAGE_PATH
-  EOH
+rightimage_hypervisor "Package image for hypervisor" do
+  provider "rightimage_hypervisor_#{node[:rightimage][:virtual_environment]}"
+  action :package_image
 end
-
 
 rs_utils_marker :end
