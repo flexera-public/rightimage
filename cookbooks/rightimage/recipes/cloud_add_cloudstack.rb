@@ -1,7 +1,7 @@
 rs_utils_marker :begin
 #
 # Cookbook Name:: rightimage
-# Recipe:: cloud_add_vmops
+# Recipe:: cloud_add_cloudstack
 #
 # Copyright 2011, RightScale, Inc.
 #
@@ -43,118 +43,64 @@ rightimage_hypervisor "Install software toolchain for hypervisor" do
   action :install_tools
 end
 
-##### XEN VERSION
 bash "configure for cloudstack" do
   flags "-ex" 
   code <<-EOH
     guest_root=#{guest_root}
 
     case "#{node[:rightimage][:platform]}" in
-    "ubuntu" )
-      # enable console access
-      cp $guest_root/etc/init/tty1.conf* $guest_root/etc/init/hvc0.conf
-      sed -i "s/tty1/hvc0/g" $guest_root/etc/init/hvc0.conf
-      echo "hvc0" >> $guest_root/etc/securetty
-
-      for i in $guest_root/etc/init/tty*; do
-        mv $i $i.disabled;
-      done
-      ;;  
-    "centos"|"rhel")
-      # configure dns timeout 
-      echo 'timeout 300;' > $guest_root/etc/dhclient.conf
-      rm -f ${guest_root}/var/lib/rpm/__*
-      chroot $guest_root rpm --rebuilddb
-
-      # enable console access
-      echo "2:2345:respawn:/sbin/mingetty xvc0" >> $guest_root/etc/inittab
-      echo "xvc0" >> $guest_root/etc/securetty
-      ;;
-    esac 
-  EOH
-end
-
-####### KVM VERSION
-bash "configure for cloudstack" do
-  flags "-ex" 
-  code <<-EOH
-    guest_root=#{guest_root}
-
-    case "#{node[:rightimage][:platform]}" in
-    "centos"|"rhel")
-      # following found on functioning CDC test image Centos 64bit using KVM hypervisor
-      echo "alias scsi_hostadapter ata_piix"     > $guest_root/etc/modprobe.conf
-      echo "alias scsi_hostadapter1 virtio_blk" >> $guest_root/etc/modprobe.conf
-      echo "alias eth0 virtio_net"              >> $guest_root/etc/modprobe.conf
-
-      # modprobe acpiphp at startup - required for CDC KVM hypervisor to detect attaching/detaching volumes
-      echo "/sbin/modprobe acpiphp" >> $guest_root/etc/rc.local
-
-      # clean out packages
-      chroot $guest_root yum -y clean all
-
-      # clean centos RPM data
-      rm ${guest_root}/var/lib/rpm/__*
-      chroot $guest_root rpm --rebuilddb
-
-      # enable console access
-      echo "2:2345:respawn:/sbin/mingetty tty2" >> $guest_root/etc/inittab
-      echo "tty2" >> $guest_root/etc/securetty
-
-      # configure dns timeout 
-      echo 'timeout 300;' > $guest_root/etc/dhclient.conf
-
-      [ -f $guest_root/var/lib/rpm/__* ] && rm ${guest_root}/var/lib/rpm/__*
-      chroot $guest_root rpm --rebuilddb
-      ;;
     "ubuntu")
-      # Disable all ttys except for tty1 (console)
-      for i in `ls $guest_root/etc/init/tty[2-9].conf`; do
-        mv $i $i.disabled;
-      done
-      ;;
-    esac
+      case "#{node[:rightimage][:virtual_environment]}" in
+      "xen")
+        # enable console access
+        cp $guest_root/etc/init/tty1.conf* $guest_root/etc/init/hvc0.conf
+        sed -i "s/tty1/hvc0/g" $guest_root/etc/init/hvc0.conf
+        echo "hvc0" >> $guest_root/etc/securetty
 
-    mkdir -p $guest_root/etc/rightscale.d
-    echo "cloudstack" > $guest_root/etc/rightscale.d/cloud
-
-    # set hwclock to UTC
-    echo "UTC" >> $guest_root/etc/adjtime
-  EOH
-end
-
-
-########### VMWARE VERSION
-#
-# Add additional CloudStack specific configuration changes here
-#
-
-
-bash "configure for cloudstack" do
-  flags "-ex"
-  code <<-EOH
-    guest_root=#{guest_root}
-
-    case "#{node[:rightimage][:platform]}" in
+        for i in $guest_root/etc/init/tty*; do
+          mv $i $i.disabled;
+        done
+        ;;
+      "kvm"|"esxi")
+        # Disable all ttys except for tty1 (console)
+        for i in `ls $guest_root/etc/init/tty[2-9].conf`; do
+          mv $i $i.disabled;
+        done
+        ;;
+      esac
     "centos"|"rhel")
       # clean out packages
       chroot $guest_root yum -y clean all
 
       # clean centos RPM data
-      rm ${guest_root}/var/lib/rpm/__*
+      rm -rf ${guest_root}/var/lib/rpm/__*
       chroot $guest_root rpm --rebuilddb
 
       # configure dhcp timeout
       echo 'timeout 300;' > $guest_root/etc/dhclient.conf
 
-      [ -f $guest_root/var/lib/rpm/__* ] && rm ${guest_root}/var/lib/rpm/__*
-      chroot $guest_root rpm --rebuilddb
-      ;;
-    "ubuntu")
-      # Disable all ttys except for tty1 (console)
-      for i in `ls $guest_root/etc/init/tty[2-9].conf`; do
-        mv $i $i.disabled;
-      done
+      case "#{node[:rightimage][:virtual_environment]}" in
+      "xen")
+        # enable console access
+        echo "2:2345:respawn:/sbin/mingetty xvc0" >> $guest_root/etc/inittab
+        echo "xvc0" >> $guest_root/etc/securetty
+        ;;
+      "esxi")
+        ;;
+      "kvm")
+        # following found on functioning CDC test image Centos 64bit using KVM hypervisor
+        echo "alias scsi_hostadapter ata_piix"     > $guest_root/etc/modprobe.conf
+        echo "alias scsi_hostadapter1 virtio_blk" >> $guest_root/etc/modprobe.conf
+        echo "alias eth0 virtio_net"              >> $guest_root/etc/modprobe.conf
+
+        # modprobe acpiphp at startup - required for CDC KVM hypervisor to detect attaching/detaching volumes
+        echo "/sbin/modprobe acpiphp" >> $guest_root/etc/rc.local
+
+        # enable console access
+        echo "2:2345:respawn:/sbin/mingetty tty2" >> $guest_root/etc/inittab
+        echo "tty2" >> $guest_root/etc/securetty
+        ;;
+      esac
       ;;
     esac
 
