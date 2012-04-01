@@ -1,9 +1,6 @@
 rs_utils_marker :begin
-class Chef::Resource::RightimageUploadS3
-  include RightScale::RightImage::Helper
-end
 
-class Chef::Resource::RubyBlock
+class Chef::Resource
   include RightScale::RightImage::Helper
 end
 

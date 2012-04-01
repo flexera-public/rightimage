@@ -77,7 +77,6 @@ action :install_tools do
 end
 
 action :package_image do
-
   package "qemu"
 
   bash "cleanup working directories" do

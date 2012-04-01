@@ -1,97 +1,95 @@
-rs_utils_marker :begin
-#
-# Cookbook Name:: rightimage
-# Recipe:: cloud_add_openstack
-#
-# Copyright 2011, RightScale, Inc.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-# 
-#     http://www.apache.org/licenses/LICENSE-2.0
-# 
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-#
+action :configure do 
+  bash "configure for openstack" do
+    flags "-ex"
+    code <<-EOH
+      guest_root=#{guest_root}
 
+      case "#{node[:rightimage][:platform]}" in
+      "centos")
+        # clean out packages
+        chroot $guest_root yum -y clean all
 
-class Chef::Resource::Bash
-  include RightScale::RightImage::Helper
-end
-class Chef::Recipe
-  include RightScale::RightImage::Helper
-end
-class Erubis::Context
-  include RightScale::RightImage::Helper
-end
+        # clean centos RPM data
+        rm ${guest_root}/var/lib/rpm/__*
+        chroot $guest_root rpm --rebuilddb
 
-include_recipe "cloud_add_begin"
+        # enable console access
+        echo "2:2345:respawn:/sbin/mingetty tty2" >> $guest_root/etc/inittab
+        echo "tty2" >> $guest_root/etc/securetty
 
-rightimage_hypervisor "Install PV Kernel for Hypervisor" do
-  provider "rightimage_hypervisor_#{node[:rightimage][:virtual_environment]}"
-  action :install_kernel
-end
+        # configure dhcp timeout
+        echo 'timeout 300;' > $guest_root/etc/dhclient.conf
 
-rightimage_hypervisor "Install software toolchain for hypervisor" do
-  provider "rightimage_hypervisor_#{node[:rightimage][:virtual_environment]}"
-  action :install_tools
+        [ -f $guest_root/var/lib/rpm/__* ] && rm ${guest_root}/var/lib/rpm/__*
+        chroot $guest_root rpm --rebuilddb
+        ;;
+      "ubuntu")
+        # Disable all ttys except for tty1 (console)
+        for i in `ls $guest_root/etc/init/tty[2-9].conf`; do
+          mv $i $i.disabled;
+        done
+        ;;
+      esac
+
+      # set hwclock to UTC
+      echo "UTC" >> $guest_root/etc/adjtime
+    EOH
+  end
 end
 
-bash "configure for openstack" do
-  flags "-ex"
-  code <<-EOH
-    guest_root=#{guest_root}
 
-    case "#{node[:rightimage][:platform]}" in
-    "centos")
-      # clean out packages
-      chroot $guest_root yum -y clean all
+action :upload do
+  package "python2.6-dev" do
+    only_if { node[:platform] == "ubuntu" }
+    action :install
+  end
 
-      # clean centos RPM data
-      rm ${guest_root}/var/lib/rpm/__*
-      chroot $guest_root rpm --rebuilddb
+  package "python-setuptools" do
+    only_if { node[:platform] == "ubuntu" }
+    action :install
+  end
 
-      # enable console access
-      echo "2:2345:respawn:/sbin/mingetty tty2" >> $guest_root/etc/inittab
-      echo "tty2" >> $guest_root/etc/securetty
+  bash "install python modules" do
+    flags "-ex"
+    code <<-EOH
+      easy_install-2.6 sqlalchemy eventlet routes webob paste pastedeploy glance argparse xattr httplib2 kombu iso8601
+    EOH
+  end
 
-      # configure dhcp timeout
-      echo 'timeout 300;' > $guest_root/etc/dhclient.conf
+  ruby_block "upload to cloud" do
+    block do
+      require 'json'
+      filename = "#{image_name}.qcow2"
+      local_file = "#{target_temp_root}/#{filename}"
 
-      [ -f $guest_root/var/lib/rpm/__* ] && rm ${guest_root}/var/lib/rpm/__*
-      chroot $guest_root rpm --rebuilddb
-      ;;
-    "ubuntu")
-      # Disable all ttys except for tty1 (console)
-      for i in `ls $guest_root/etc/init/tty[2-9].conf`; do
-        mv $i $i.disabled;
-      done
-      ;;
-    esac
+      openstack_user = node[:rightimage][:openstack][:user]
+      openstack_password = node[:rightimage][:openstack][:password]
+      openstack_host = node[:rightimage][:openstack][:hostname].split(":")[0]
+      openstack_api_port = node[:rightimage][:openstack][:hostname].split(":")[1] || "5000"
+      openstack_glance_port = "9292"
 
-    # set hwclock to UTC
-    echo "UTC" >> $guest_root/etc/adjtime
-  EOH
+      Chef::Log.info("Getting openstack api token for user #{openstack_user}@#{openstack_host}:#{openstack_api_port}")
+      auth_resp = `curl -d '{"auth":{"passwordCredentials":{"username": "#{openstack_user}", "password": "#{openstack_password}"}}}' -H "Content-type: application/json" http://#{openstack_host}:#{openstack_api_port}/v2.0/tokens` 
+      Chef::Log.info("got response for auth req: #{auth_resp}")
+      auth_hash = JSON.parse(auth_resp)
+      access_token = auth_hash["access"]["token"]["id"]
+
+      # Don't use location=file://path/to/file like you might think, thats the name of the location to store the file on the server that hosts the images, not this machine
+      cmd = %Q(env PATH=$PATH:/usr/local/bin glance add --auth_token=#{access_token} --url=http://#{openstack_host}:#{openstack_glance_port}/v2.0 name=#{image_name} is_public=true disk_format=qcow2 container_format=ovf < #{local_file})
+      Chef::Log.debug(cmd)
+      upload_resp = `#{cmd}`
+      Chef::Log.info("got response for upload req: #{upload_resp} to cloud.")
+
+      if upload_resp =~ /added/i 
+        image_id = upload_resp.scan(/ID:\s(\d+)/i).first
+        Chef::Log.info("Successfully uploaded image #{image_id} to cloud.")
+        
+        # add to global id store for use by other recipes
+        id_list = RightImage::IdList.new(Chef::Log)
+        id_list.add(image_id)
+      else
+        raise "ERROR: could not upload image to cloud at #{node[:rightimage][:openstack][:hostname]} due to #{upload_resp.inspect}"
+      end
+    end
+  end
 end
-
-include_recipe "cloud_add_end"
-
-bash "backup raw image" do 
-  cwd target_raw_root
-  code <<-EOH
-    raw_image=$(basename #{target_raw_path})
-    target_temp_root=#{target_temp_root}
-    cp -v $raw_image $target_temp_root
-  EOH
-end
-
-rightimage_hypervisor "Package image for hypervisor" do
-  provider "rightimage_hypervisor_#{node[:rightimage][:virtual_environment]}"
-  action :package_image
-end
-
-rs_utils_marker :end
