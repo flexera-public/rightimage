@@ -22,7 +22,6 @@ rs_utils_marker :begin
 class Chef::Recipe
     include RightScale::RightImage::Helper
 end
-
 class Chef::Resource
   include RightScale::RightImage::Helper
 end

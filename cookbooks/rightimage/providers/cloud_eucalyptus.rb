@@ -94,13 +94,7 @@ end
 
 
 action :upload do
-  #target_mnt = "#{build_root}/euca"
-  #tmp_creds_dir = "#{build_root}/euca_upload_creds"
   tmp_creds_dir = "#{target_temp_root}/temp/euca_upload_creds"
-
-  #package_root = "#{build_root}/pkg"
-  #package_dir = "#{package_root}/euca"
-
 
   ## copy the generic image 
   bash "copy_image" do

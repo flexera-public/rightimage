@@ -2,6 +2,20 @@ class Chef::Resource
   include RightScale::RightImage::Helper
 end
 
+
+# refactor for resource interface
+#   guest_root
+#   ri platform
+#   ri virtual_environment
+#   ri arch for euca
+#   
+#   for upload:
+#   cloud creds (api_key, api_pass, api_endpoint)
+#   target_temp_root (really path/to/file on disk), target_raw_path
+#   image_name, image_file_ext (hypervisor derivative)
+#   euca: target_temp_root to temporary store creds, can be anywhere?
+#
+
 action :configure do
   bash "configure for cloudstack" do
     flags "-ex" 
@@ -67,6 +81,13 @@ action :configure do
       # set hwclock to UTC
       echo "UTC" >> $guest_root/etc/adjtime
     EOH
+  end
+end
+
+action :package do
+  rightimage_hypervisor "Package image for #{node[:rightimage][:virtual_environment]}" do
+    provider "rightimage_hypervisor_#{node[:rightimage][:virtual_environment]}"
+    action :package_image
   end
 end
 
