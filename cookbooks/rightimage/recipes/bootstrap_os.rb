@@ -1,12 +1,16 @@
 rs_utils_marker :begin
-class Chef::Resource::Template
-  include RightScale::RightImage::Helper
-end
-class Chef::Resource::Bash
+
+class Chef::Resource
   include RightScale::RightImage::Helper
 end
 class Chef::Recipe
   include RightScale::RightImage::Helper
+end
+
+# Most of the heavy lifting, install the os from scratch
+rightimage_os node[:rightimage][:platform] do
+  provider "rightimage_os_#{node[:rightimage][:platform]}"
+  action :install
 end
 
 # Common base image configurations 

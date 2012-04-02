@@ -128,12 +128,12 @@ include_recipe "rightimage::bootstrap_common_debug"
 
 
 # BEGIN cloud specific additions
-rightimage_hypervisor "Install PV kernel for hypervisor" do
+rightimage_hypervisor node[:rightimage][:virtual_environment] do
   provider "rightimage_hypervisor_#{node[:rightimage][:virtual_environment]}"
   action :install_kernel
 end
 
-rightimage_hypervisor "Install software toolchain for hypervisor" do
+rightimage_hypervisor node[:rightimage][:virtual_environment] do
   provider "rightimage_hypervisor_#{node[:rightimage][:virtual_environment]}"
   action :install_tools
 end
