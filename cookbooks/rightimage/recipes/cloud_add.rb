@@ -123,9 +123,7 @@ execute "echo -n #{node[:rightimage][:cloud]} > #{guest_root}/etc/rightscale.d/c
   creates "#{guest_root}/etc/rightscale.d/cloud"
 end
 
-
-include_recipe "rightimage::bootstrap_common_debug"
-
+include_recipe "rightimage::enable_debug" if node[:rightimage][:debug] == "true"
 
 # BEGIN cloud specific additions
 rightimage_hypervisor node[:rightimage][:virtual_environment] do
