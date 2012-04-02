@@ -12,7 +12,6 @@ set[:rightimage][:build_dir] = "/mnt/vmbuilder"
 set[:rightimage][:mount_dir] = "/mnt/image"
 set_unless[:rightimage][:virtual_environment] = "xen"
 set[:rightimage][:mirror] = "cf-mirror.rightscale.com"
-set_unless[:rightimage][:sandbox_repo_tag] = "rightlink_package_#{rightimage[:rightlink_version]}"
 set_unless[:rightimage][:cloud] = "raw"
 set[:rightimage][:root_mount][:label_dev] = "ROOT"
 set[:rightimage][:root_mount][:dev] = "LABEL=#{rightimage[:root_mount][:label_dev]}"
@@ -33,14 +32,6 @@ when "ubuntu"
   node[:rightimage][:guest_packages] << " cloud-init" if node[:rightimage][:virtual_environment] == "ec2"
   set[:rightimage][:host_packages] = "openjdk-6-jre openssl ca-certificates"
 
-  case node[:lsb][:codename]
-    when "maverick"
-      rightimage[:host_packages] << " apt-cacher"
-    else
-      rightimage[:host_packages] << " apt-proxy"
-  end
-
-  set[:rightimage][:package_type] = "deb"
   rightimage[:guest_packages] << " euca2ools" if rightimage[:cloud] == "eucalyptus"
 
 when "centos","rhel"
@@ -49,7 +40,6 @@ when "centos","rhel"
   rightimage[:guest_packages] << " iscsi-initiator-utils" if rightimage[:cloud] == "cloudstack" 
 
   set[:rightimage][:host_packages] = "swig"
-  set[:rightimage][:package_type] = "rpm"
 when "suse"
   set[:rightimage][:guest_packages] = "gcc"
 
@@ -135,6 +125,7 @@ end
 
 # set rightscale stuff
 set_unless[:rightimage][:rightlink_version] = ""
+set_unless[:rightimage][:sandbox_repo_tag] = "rightlink_package_#{rightimage[:rightlink_version]}"
 set_unless[:rightimage][:aws_access_key_id] = nil
 set_unless[:rightimage][:aws_secret_access_key] = nil
 
