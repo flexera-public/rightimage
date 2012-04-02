@@ -29,31 +29,6 @@ recipe "rightimage::copy_image","Creates non-partitioned image."
 recipe "rightimage::ec2_download_bundle","Downloads bundled image from EC2 S3."
 
 
-
-
-cloud_add << "rightimage::cloud_add_ec2"
-cloud_upload_ec2 = [ "rightimage::upload_ec2_s3", "rightimage::upload_ec2_ebs", "rightimage::ec2_download_bundle" ]
-cloud_upload << cloud_upload_ec2 
-
-attribute "rest_connection/user",
-  :display_name => "API User",
-  :description => "RightScale API username. Ex. you@rightscale.com",
-  :recipes => [ "rightimage::do_create_mci" ],
-  :required => true
-
-
-attribute "rest_connection/pass",
-  :display_name => "API Password",
-  :description => "Rightscale API password.",
-  :recipes => [ "rightimage::do_create_mci" ],
-  :required => true
- 
-attribute "rest_connection/api_url",
-  :display_name => "API URL",
-  :description => "The rightscale account specific api url to use.  Ex. https://my.rightscale.com/api/acct/1234 (where 1234 is your account id)",
-  :recipes => [ "rightimage::do_create_mci" ],
-  :required => true
-
 #
 # required
 #
@@ -131,13 +106,6 @@ attribute "rightimage/image_name",
    :description => "The name you want to give this new image.",
    :required => "required"
 
-attribute "rightimage/mci_name",
-   :display_name => "MCI Name",
-   :description => "MCI to add this image to. If empty, use Image Name",
-   :default => "",
-   :recipes => [ "rightimage::do_create_mci" ],
-   :required => "optional"
-
 attribute "rightimage/rebundle_base_image_id",
   :display_name => "Rebundle Base Image ID",
   :description => "Cloud specific ID for the image to start with when building a rebundle image",
@@ -174,6 +142,32 @@ attribute "rightimage/datacenter",
   :description => "Datacenter/Zone ID.  Defaults to 1.  Use UK for rackspace UK",
   :default => "1",
   :required => "recommended"
+
+# Optional, parameters for auto creation of mci
+attribute "rest_connection/user",
+  :display_name => "API User",
+  :description => "RightScale API username. Ex. you@rightscale.com",
+  :recipes => [ "rightimage::do_create_mci" ],
+  :required => true
+
+attribute "rest_connection/pass",
+  :display_name => "API Password",
+  :description => "Rightscale API password.",
+  :recipes => [ "rightimage::do_create_mci" ],
+  :required => true
+ 
+attribute "rest_connection/api_url",
+  :display_name => "API URL",
+  :description => "The rightscale account specific api url to use.  Ex. https://my.rightscale.com/api/acct/1234 (where 1234 is your account id)",
+  :recipes => [ "rightimage::do_create_mci" ],
+  :required => true
+
+attribute "rightimage/mci_name",
+   :display_name => "MCI Name",
+   :description => "MCI to add this image to. If empty, use Image Name",
+   :default => "",
+   :recipes => [ "rightimage::do_create_mci" ],
+   :required => "optional"
 
 # AWS
 aws_x509_recipes = ["rightimage::upload_image_cloud", "rightimage::rebundle", "rightimage::default", "rightimage::ec2_download_bundle"]
