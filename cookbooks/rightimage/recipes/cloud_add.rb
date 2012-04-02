@@ -56,10 +56,10 @@ directory "#{guest_root}/boot/grub" do
   group "root"
   mode "0750"
   action :create
-  recursive :true
+  recursive true
 end 
 
-# Setup grub Version 1
+# Setup grub Version 1, ec2
 template "#{guest_root}/boot/grub/grub.conf" do 
   not_if { node[:rightimage][:cloud] =~ /cloudstack|openstack/ } ### TBD, double check correct only if, see if we can delete this step
   source "menu.lst.erb"

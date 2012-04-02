@@ -1,7 +1,12 @@
-raise "ERROR: you must set your virtual_environment to xen!"  if node[:rightimage][:virtual_environment] != "xen"
 
 action :configure do
   euca_tools_version = "1.3.1"
+
+  ruby_block "check hypervisor" do
+    block do
+      raise "ERROR: you must set your virtual_environment to xen!"  if node[:rightimage][:virtual_environment] != "xen"
+    end
+  end
 
   bash "clean yum" do
     only_if { node[:platform] == "centos" }

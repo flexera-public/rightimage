@@ -48,7 +48,7 @@ end
 
 
 
-action :upload_ebs
+action :upload_ebs do
   # Clean up guest image
   rightimage guest_root do
     action :sanitize
