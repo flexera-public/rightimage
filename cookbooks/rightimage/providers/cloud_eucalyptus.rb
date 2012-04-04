@@ -72,9 +72,8 @@ action :configure do
 end
 
 
-# TODO REFACTOR, DELETE, PART OF HYPERVISOR XEN STUFF?
 action :package do
-  bash "package guest image" do 
+  bash "package guest image for eucalyptus" do 
     cwd "/mnt"
     flags "-ex"
     code <<-EOH

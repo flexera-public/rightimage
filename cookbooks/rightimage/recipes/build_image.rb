@@ -46,5 +46,5 @@ include_recipe "rightimage::clean"
 include_recipe "rightimage::rightscale_install"
 include_recipe "rightimage::cloud_add"
 include_recipe "rightimage::do_destroy_loopback"
-include_recipe "rightimage::upload_file_to_s3"
+include_recipe "rightimage::upload_image_s3"
 rs_utils_marker :end

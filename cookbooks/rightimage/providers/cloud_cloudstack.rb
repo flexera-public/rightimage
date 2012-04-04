@@ -3,20 +3,58 @@ class Chef::Resource
 end
 
 
-# refactor for resource interface
-#   guest_root
-#   ri platform
-#   ri virtual_environment
-#   ri arch for euca
-#   
-#   for upload:
-#   cloud creds (api_key, api_pass, api_endpoint)
-#   target_temp_root (really path/to/file on disk), target_raw_path
-#   image_name, image_file_ext (hypervisor derivative)
-#   euca: target_temp_root to temporary store creds, can be anywhere?
-#
 
 action :configure do
+  # insert grub conf, and link menu.lst to grub.conf
+  directory "#{guest_root}/boot/grub" do
+    owner "root"
+    group "root"
+    mode "0750"
+    action :create
+    recursive true
+  end 
+
+  # insert grub conf
+  template "#{guest_root}/boot/grub/grub.conf" do 
+    source "menu.lst.erb"
+    backup false 
+  end
+
+  bash "setup grub" do
+    flags "-ex"
+    code <<-EOH
+      target_raw_path="#{target_raw_path}"
+      guest_root="#{guest_root}"
+      
+      case "#{node[:rightimage][:platform]}" in
+        "ubuntu")
+          chroot $guest_root cp -p /usr/lib/grub/x86_64-pc/* /boot/grub
+          grub_command="/usr/sbin/grub"
+          ;;
+        "centos"|"rhel")
+          chroot $guest_root cp -p /usr/share/grub/x86_64-redhat/* /boot/grub
+          grub_command="/sbin/grub"
+          ;;
+      esac
+
+      chroot $guest_root ln -sf /boot/grub/grub.conf /boot/grub/menu.lst
+
+      echo "(hd0) #{node[:rightimage][:grub][:root_device]}" > $guest_root/boot/grub/device.map
+      echo "" >> $guest_root/boot/grub/device.map
+
+      cat > device.map <<EOF
+  (hd0) #{target_raw_path}
+  EOF
+
+    ${grub_command} --batch --device-map=device.map <<EOF
+  root (hd0,0)
+  setup (hd0)
+  quit
+  EOF 
+
+    EOH
+  end
+
   bash "configure for cloudstack" do
     flags "-ex" 
     code <<-EOH
@@ -85,9 +123,9 @@ action :configure do
 end
 
 action :package do
-  rightimage_hypervisor "Package image for #{node[:rightimage][:virtual_environment]}" do
-    provider "rightimage_hypervisor_#{node[:rightimage][:virtual_environment]}"
-    action :package_image
+  rightimage_image node[:rightimage][:image_type] do
+    provider "rightimage_hypervisor_#{node[:rightimage][:image_type]}"
+    action :package
   end
 end
 

@@ -1,7 +1,31 @@
-# TODO: add uuca tools for centos 
-
-
 action :configure do
+  # insert grub conf, and link menu.lst to grub.conf
+  directory "#{guest_root}/boot/grub" do
+    owner "root"
+    group "root"
+    mode "0750"
+    action :create
+    recursive true
+  end 
+
+  # Setup grub Version 1, ec2
+  template "#{guest_root}/boot/grub/grub.conf" do 
+    not_if { node[:rightimage][:cloud] =~ /cloudstack|openstack/ } ### TBD, double check correct only if, see if we can delete this step
+    source "menu.lst.erb"
+    backup false 
+  end
+
+  file "#{guest_root}/boot/grub/menu.lst" do 
+    not_if { node[:rightimage][:cloud] =~ /cloudstack|openstack/ } ### TBD, double check correct only if, see if we can delete this step
+    action :delete
+    backup false
+  end
+
+  link "#{guest_root}/boot/grub/menu.lst" do 
+    not_if { node[:rightimage][:cloud] =~ /cloudstack|openstack/ } ### TBD, double check correct only if, see if we can delete this step
+    to "#{guest_root}/boot/grub/grub.conf"
+  end
+
   #  - add get_ssh_key script
   template "#{guest_root}/etc/init.d/getsshkey" do 
     source "getsshkey.erb" 
@@ -46,6 +70,8 @@ action :configure do
   end 
 end
 
+action :package do
+end
 
 
 action :upload_ebs do

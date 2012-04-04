@@ -19,10 +19,10 @@ end
 r.run_action(:install)
 Gem.clear_paths
 
-rightimage_upload_s3 "Upload image image to s3" do
+rightimage_upload "Upload image image to s3" do
   not_if { node[:rightimage][:cloud] == "ec2" }
 
-  image_location full_image_path
+  file full_image_path
   s3_path s3_path_full
   bucket full_image_upload_bucket
   action :upload

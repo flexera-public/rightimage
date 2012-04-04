@@ -24,6 +24,14 @@ else
   set[:rightimage][:mirror_date] = timestamp[0..7]
 end
 
+
+case node[:rightimage][:virtual_environment]
+when "xen" then set[:rightimage][:image_type] = "vhd"
+when "esxi" then set[:rightimage][:image_type] = "vmdk"
+when "kvm" then set[:rightimage][:image_type] = "qcow2"
+else raise ArgumentError, "don't know what image format to use for #{node[:rightimage][:virtual_environment]}!"
+end
+
 # set base os packages
 case rightimage[:platform]
 when "ubuntu"   

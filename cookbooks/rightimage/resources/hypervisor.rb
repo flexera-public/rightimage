@@ -1,4 +1,4 @@
-actions :install
+actions :install_kernel, :install_tools
 
 attribute :guest_root, :kind_of => String
 attribute :platform, :kind_of => String, :equal_to => ["rhel","ubuntu","centos"]
