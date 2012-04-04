@@ -1,4 +1,6 @@
 action :configure do
+  guest_root = new_resource.guest_root
+
   # insert grub conf, and link menu.lst to grub.conf
   directory "#{guest_root}/boot/grub" do
     owner "root"
@@ -74,7 +76,12 @@ action :package do
 end
 
 
-action :upload_ebs do
+action :upload do
+  guest_root = new_resource.guest_root
+  is_ebs = new_resource.image_type =~ /ebs/i
+  image_name = new_resource.image_name
+  image_name << "_EBS" if is_ebs
+
   # Clean up guest image
   rightimage guest_root do
     action :sanitize
@@ -82,6 +89,21 @@ action :upload_ebs do
 
   execute "unset proc" do
     command "umount '#{guest_root}/proc' || true"
+  end
+
+  bash "check that image doesn't exist" do
+    flags "-e"
+    code <<-EOH
+      #{setup_ec2_tools_env}
+      set -x
+
+      images=`/home/ec2/bin/ec2-describe-images --private-key /tmp/AWS_X509_KEY.pem --cert /tmp/AWS_X509_CERT.pem -o self --url #{node[:rightimage][:ec2_endpoint]} --filter name=#{image_name}`
+      if [ -n "$images" ]; then
+        echo "Found existing image, aborting:"
+        echo $images
+        exit 1
+      fi 
+    EOH
   end
 
   bash "setup keyfiles" do
@@ -92,21 +114,36 @@ action :upload_ebs do
     EOH
   end
 
-  bash "check that image doesn't exist" do
-    flags "-e"
-    code <<-EOH
-      #{setup_ec2_tools_env}
-      set -x
-
-      images=`/home/ec2/bin/ec2-describe-images --private-key /tmp/AWS_X509_KEY.pem --cert /tmp/AWS_X509_CERT.pem -o self --url #{node[:rightimage][:ec2_endpoint]} --filter name=#{image_name}_EBS`
-      if [ -n "$images" ]; then
-        echo "Found existing image, aborting:"
-        echo $images
-        exit 1
-      fi 
-    EOH
+  if is_ebs
+    upload_ebs(guest_root,image_name)
+  else
+    upload_s3(guest_root,image_name)
   end
 
+  bash "remove keys" do
+    only_if { ::File.exists? "/tmp/AWS_X509_KEY.pem" }
+    code <<-EOH
+      #remove keys
+      rm -f /tmp/AWS_X509_KEY.pem
+      rm -f /tmp/AWS_X509_CERT.pem
+    EOH
+  end 
+
+  ruby_block "store image id" do
+    block do
+      image_id = nil
+      
+      # read id which was written in previous stanza
+      ::File.open("/var/tmp/image_id_ebs", "r") { |f| image_id = f.read() }
+      
+      # add to global id store for use by other recipes
+      id_list = RightImage::IdList.new(Chef::Log)
+      id_list.add(image_id, "EBS")
+    end
+  end
+end
+
+def upload_ebs(guest_root)
   execute "mount loopback" do 
     not_if "mount | grep #{guest_root}"
     command "mount -o loop #{target_raw_path} #{guest_root}"
@@ -192,7 +229,7 @@ action :upload_ebs do
         --private-key /tmp/AWS_X509_KEY.pem \
         --cert /tmp/AWS_X509_CERT.pem \
         --url #{node[:rightimage][:ec2_endpoint]} \
-        --description "This snapshot will be used to create #{image_name}_EBS"`
+        --description "This snapshot will be used to create #{image_name}"`
         
   # parse out snapshot id
       snap_id=`echo -n $snap_out | awk '{ print $2 }'`
@@ -241,8 +278,8 @@ action :upload_ebs do
         --url #{node[:rightimage][:ec2_endpoint]}\
         --architecture #{node[:rightimage][:arch]} \
         --block-device-mapping "/dev/sdb=ephemeral0" \
-        --description "#{image_name}_EBS" \
-        --name "#{image_name}_EBS" \
+        --description "#{image_name}" \
+        --name "#{image_name}" \
         --snapshot $snap_id \
         $kernel_opt \
         $ramdisk_opt \
@@ -271,72 +308,17 @@ action :upload_ebs do
     EOH
   end
 
-
   execute "unmount guest root" do
     only_if "mount | grep #{guest_root}"
     command "umount -lf #{guest_root}"
   end
 
-  bash "remove keys" do
-    only_if { ::File.exists? "/tmp/AWS_X509_KEY.pem" }
-    code <<-EOH
-      #remove keys
-      rm -f /tmp/AWS_X509_KEY.pem
-      rm -f /tmp/AWS_X509_CERT.pem
-    EOH
-  end 
-
-  ruby_block "store image id" do
-    block do
-      image_id = nil
-      
-      # read id which was written in previous stanza
-      ::File.open("/var/tmp/image_id_ebs", "r") { |f| image_id = f.read() }
-      
-      # add to global id store for use by other recipes
-      id_list = RightImage::IdList.new(Chef::Log)
-      id_list.add(image_id, "EBS")
-    end
-  end
 end
 
 
-action :upload do
-  # Clean up guest image
-  rightimage guest_root do
-    action :sanitize
-  end
-
-  execute "unset proc" do
-    command "umount '#{guest_root}/proc' || true"
-  end
-
-  bash "setup keyfiles" do
-    not_if { ::File.exists? "/tmp/AWS_X509_KEY.pem" }
-    code <<-EOH
-      echo "#{node[:rightimage][:aws_509_key]}" > /tmp/AWS_X509_KEY.pem    
-      echo "#{node[:rightimage][:aws_509_cert]}" > /tmp/AWS_X509_CERT.pem
-    EOH
-  end
-
-  bash "check that image doesn't exist" do
-    flags "-e"
-    code <<-EOH
-      #{setup_ec2_tools_env}
-      set -x
-
-      images=`/home/ec2/bin/ec2-describe-images --private-key /tmp/AWS_X509_KEY.pem --cert /tmp/AWS_X509_CERT.pem -o self --url #{node[:rightimage][:ec2_endpoint]} --filter name=#{image_name}`
-      if [ -n "$images" ]; then
-        echo "Found existing image, aborting:"
-        echo $images
-        exit 1
-      fi 
-    EOH
-  end
-
+def upload_s3(guest_root,image_name)
   # bundle and upload
   bash "bundle_upload_s3_image" do 
-    not_if { ::File.exists? "/var/tmp/image_id_s3" }
     flags "-e"
     code <<-EOH
       #{setup_ec2_tools_env}
@@ -371,26 +353,4 @@ action :upload do
       echo "$image_id_s3" > /var/tmp/image_id_s3
       EOH
   end 
-
-  bash "remove keys" do
-    only_if { ::File.exists? "/tmp/AWS_X509_KEY.pem" }
-    code <<-EOH
-      #remove keys
-      rm -f /tmp/AWS_X509_KEY.pem
-      rm -f /tmp/AWS_X509_CERT.pem
-    EOH
-  end 
-
-  ruby_block "store image id" do
-    block do
-      image_id = nil
-      
-      # read id which was written in previous stanza
-      ::File.open("/var/tmp/image_id_s3", "r") { |f| image_id = f.read() }
-      
-      # add to global id store for use by other recipes
-      id_list = RightImage::IdList.new(Chef::Log)
-      id_list.add(image_id)
-    end
-  end
 end

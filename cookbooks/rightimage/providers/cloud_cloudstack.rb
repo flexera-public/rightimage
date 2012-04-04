@@ -6,7 +6,7 @@ end
 
 action :configure do
   # insert grub conf, and link menu.lst to grub.conf
-  directory "#{guest_root}/boot/grub" do
+  directory "#{new_resource.guest_root}/boot/grub" do
     owner "root"
     group "root"
     mode "0750"
@@ -15,7 +15,7 @@ action :configure do
   end 
 
   # insert grub conf
-  template "#{guest_root}/boot/grub/grub.conf" do 
+  template "#{new_resource.guest_root}/boot/grub/grub.conf" do 
     source "menu.lst.erb"
     backup false 
   end
@@ -24,7 +24,7 @@ action :configure do
     flags "-ex"
     code <<-EOH
       target_raw_path="#{target_raw_path}"
-      guest_root="#{guest_root}"
+      guest_root="#{new_resource.guest_root}"
       
       case "#{node[:rightimage][:platform]}" in
         "ubuntu")
@@ -58,7 +58,7 @@ action :configure do
   bash "configure for cloudstack" do
     flags "-ex" 
     code <<-EOH
-      guest_root=#{guest_root}
+      guest_root=#{new_resource.guest_root}
 
       case "#{node[:rightimage][:platform]}" in
       "ubuntu")

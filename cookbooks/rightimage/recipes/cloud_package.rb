@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: rightimage
-# Recipe::upload_to_cloud
+# Recipe:: cloud_add
 #
 # Copyright 2011, RightScale, Inc.
 #
@@ -19,16 +19,19 @@
 
 rs_utils_marker :begin
 
-class Chef::Recipe
-  include RightScale::RightImage::Helper
-end
 class Chef::Resource
   include RightScale::RightImage::Helper
 end
+class Chef::Recipe
+  include RightScale::RightImage::Helper
+end
 
-rightimage_cloud "Upload #{node[:rightimage][:cloud]} image" do
-  provider "rightimage_cloud_${node[:rightimage][:cloud]}"
-  action :upload
+package "grub"
+package "qemu"
+
+rightimage_cloud node[:rightimage][:cloud] do
+  provider "rightimage_cloud_#{node[:rightimage][:cloud]}"
+  action :package
 end
 
 rs_utils_marker :end
