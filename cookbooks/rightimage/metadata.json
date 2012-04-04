@@ -339,7 +339,9 @@
         "rightimage::default",
         "rightimage::copy_image",
         "rightimage::do_restore",
-        "rightimage::setup_loopback"
+        "rightimage::setup_loopback",
+        "rightimage::cloud_add",
+        "rightimage::cloud_package"
       ],
       "display_name": "Root Size GB",
       "description": "Sets the size of the virtual image. Units are in GB."
@@ -656,7 +658,7 @@
     "rightimage::do_backup": "Backup image snapshot.",
     "rightimage::upload_image_s3": "bundle and upload private cloud image to s3 bucket for distribution/download",
     "rightimage::setup_loopback": "creates loopback file",
-    "rightimage::cloud_add": "configures and packages image for a specific cloud",
+    "rightimage::cloud_add": "configures base os image for a specific cloud",
     "rightimage::do_create_mci": "creates RightScale MultiCloudImage (MCI) for image (only ec2 currently supported)",
     "rightimage::do_destroy_loopback": "unmounts loopback file",
     "rightimage::ec2_download_bundle": "Downloads bundled image from EC2 S3.",
@@ -664,6 +666,7 @@
     "rightimage::copy_image": "Creates non-partitioned image.",
     "rightimage::do_restore": "Restores image snapshot.",
     "rightimage::upload_base": "upload raw image to s3",
+    "rightimage::cloud_package": "packages RightImage for a specific cloud",
     "rightimage::do_force_reset": "Unmounts and deletes the attached block_device and volumes that were attached to the instance for this lineage.",
     "rightimage::upload_image_cloud": "upload and register image with cloud",
     "rightimage::bootstrap_os": "bootstraps a base image",

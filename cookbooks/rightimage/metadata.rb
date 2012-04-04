@@ -14,7 +14,8 @@ recipe "rightimage::rebundle", "coordinate a rebundled image build (redhat on on
 recipe "rightimage::bootstrap_os", "bootstraps a base image"
 recipe "rightimage::enable_debug", "enables a root login on image for debugging purposes"
 recipe "rightimage::rightscale_install", "installs rightscale"
-recipe "rightimage::cloud_add", "configures and packages image for a specific cloud"
+recipe "rightimage::cloud_add", "configures base os image for a specific cloud"
+recipe "rightimage::cloud_package", "packages RightImage for a specific cloud"
 recipe "rightimage::setup_loopback", "creates loopback file"
 recipe "rightimage::do_destroy_loopback", "unmounts loopback file"
 recipe "rightimage::do_create_mci", "creates RightScale MultiCloudImage (MCI) for image (only ec2 currently supported)"
@@ -37,7 +38,7 @@ attribute "rightimage/root_size_gb",
   :description => "Sets the size of the virtual image. Units are in GB.",
   :choice => [ "10", "4", "2" ],
   :default => "10",
-  :recipes => [ "rightimage::default", "rightimage::copy_image", "rightimage::do_restore", "rightimage::setup_loopback" ]
+  :recipes => [ "rightimage::default", "rightimage::copy_image", "rightimage::do_restore", "rightimage::setup_loopback", "rightimage::cloud_add", "rightimage::cloud_package"]
 
 attribute "rightimage/manual_mode",
   :display_name => "Manual Mode",
