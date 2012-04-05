@@ -82,10 +82,8 @@ end
 bash "configure_image"  do
   user "root"
   cwd "/tmp"
+  flags "-ex"
   code <<-EOH
-    set -e
-    set -x
-
     image_name=#{image_name}
   
     modprobe dm-mod
@@ -126,65 +124,38 @@ EOS
     #{bootstrap_cmd} --exec=/tmp/configure_script
 
 
-case "#{node.rightimage.virtual_environment}" in
+    if ( [ "#{node[:rightimage][:release]}" == "lucid" ] || [ "#{node[:rightimage][:release]}" == "maverick" ] ) ; then
+     kvm_image=`cat /mnt/vmbuilder/xen.conf  | grep xvda1 | grep -v root  | cut -c 25- | cut -c -9`
+    else
+     kvm_image=$image_name
+    fi
 
-  "kvm" )
-      kvm_image=`basename $(ls -1 /mnt/vmbuilder/tmp*.qcow2)`
-      ;;
+    loop_name="loop1"
+    loop_dev="/dev/$loop_name"
 
-  "esxi" )
-      kvm_image=`basename $(ls -1 /mnt/vmbuilder/tmp*-flat.vmdk)`
-      ;;
+    base_raw_path="/mnt/vmbuilder/root.img"
 
-  "ec2"|* )
-      if ( [ "#{node[:rightimage][:release]}" == "lucid" ] || [ "#{node[:rightimage][:release]}" == "maverick" ] ) ; then
-        kvm_image=`cat /mnt/vmbuilder/xen.conf  | grep xvda1 | grep -v root  | cut -c 25- | cut -c -9`
-      else 
-        kvm_image=$image_name
-      fi
-      ;;
-esac
+    sync
+    # Cleanup loopback stuff
+    set +e
+    losetup -a | grep $loop_name
+    [ "$?" == "0" ] && losetup -d $loop_dev
+    set -e
 
-
-loop_name="loop1"
-loop_dev="/dev/$loop_name"
-loop_map="/dev/mapper/${loop_name}p1"
-
-base_raw_path="/mnt/vmbuilder/root.img"
-
-sync
-# Cleanup loopback stuff
-set +e
-[ -e $loop_map ] && kpartx -d $loop_dev
-losetup -a | grep $loop_name
-[ "$?" == "0" ] && losetup -d $loop_dev
-set -e
-
-qemu-img convert -O raw /mnt/vmbuilder/$kvm_image $base_raw_path
-losetup $loop_dev $base_raw_path
-
-# Setup loopback device
-case "#{node.rightimage.virtual_environment}" in 
-  "kvm"|"esxi" )
-    kpartx -a $loop_dev
-    loopback_device=$loop_map
-   ;;
-  "ec2"|*)
-    loopback_device=$loop_dev
-   ;;
-esac
+    qemu-img convert -O raw /mnt/vmbuilder/$kvm_image $base_raw_path
+    losetup $loop_dev $base_raw_path
 
     guest_root=#{source_image}
 
     random_dir=/tmp/rightimage-$RANDOM
     mkdir $random_dir
-    mount -o loop $loopback_device  $random_dir
+    mount -o loop $loop_dev  $random_dir
     umount $guest_root/proc || true
     rm -rf $guest_root/*
     rsync -a $random_dir/ $guest_root/
     umount $random_dir
     sync
-    losetup -d $loopback_device
+    losetup -d $loop_dev
     rm -rf $random_dir
     mkdir -p $guest_root/var/man
     chroot $guest_root chown -R man:root /var/man
@@ -205,65 +176,47 @@ bash "Restore original ext4 in /etc/mke2fs.conf" do
   EOH
 end
 
+java_temp = "/tmp/java"
 
-if node[:rightimage][:release] == "maverick" || node[:rightimage][:release] == "lucid"
-  # Fix apt config so it does not install all recommended packages
-  log "Fixing apt.conf APT::Install-Recommends setting prior to installing Java"
-  log "Installing Sun Java for Lucid..."
+directory java_temp do
+  action :delete
+  recursive true
+end
 
-  guest_java_install = "/tmp/java_install"
-  host_java_install = "#{source_image}#{guest_java_install}"
-  
-  bash "install sun java" do
-    user "root"
-    cwd "/tmp"
-    code <<-EOH
-    
-    cat <<-EOS > #{host_java_install}
-#!/bin/bash
-set -e
-set -x
+directory java_temp do
+  action :create
+end
 
-echo "Setting APT::Install-Recommends to false"
-echo "APT::Install-Recommends \"0\";" > /etc/apt/apt.conf
+bash "install sun java" do
+  cwd java_temp
+  flags "-ex"
+  code <<-EOH
+    guest_root=#{guest_root}
+    java_home="/usr/lib/jvm/java-6-sun"
+    java_ver="31"
 
-cp /etc/apt/sources.list /etc/apt/sources.java.sav
-echo "deb http://archive.canonical.com/ #{node[:rightimage][:release]} partner" >> /etc/apt/sources.list
-apt-get update
+    if [ "#{node[:rightimage][:arch]}" == x86_64 ] ; then
+      java_arch="x64"
+    else
+      java_arch="i586"
+    fi
 
-apt-get -y install debconf-utils
-echo 'sun-java6-bin   shared/accepted-sun-dlj-v1-1    boolean true
-sun-java6-jdk   shared/accepted-sun-dlj-v1-1    boolean true
-sun-java6-jre   shared/accepted-sun-dlj-v1-1    boolean true
-sun-java6-jre   sun-java6-jre/stopthread        boolean true
-sun-java6-jre   sun-java6-jre/jcepolicy note
-sun-java6-bin   shared/present-sun-dlj-v1-1     note
-sun-java6-jdk   shared/present-sun-dlj-v1-1     note
-sun-java6-jre   shared/present-sun-dlj-v1-1     note
-'|debconf-set-selections
-apt-get -y install sun-java6-jdk
+    java_file=jdk-6u$java_ver-linux-$java_arch.bin
 
-cat >/etc/profile.d/java.sh <<EOF
+    wget http://s3.amazonaws.com/rightscale_software/java/$java_file
+    chmod +x /tmp/java/$java_file
+    echo "\\n" | /tmp/java/$java_file
+    rm -rf $guest_root${java_home}
+    mkdir -p $guest_root${java_home}
+    mv /tmp/java/jdk1.6.0_$java_ver/* $guest_root${java_home}
 
-JAVA_HOME=/usr/lib/jvm/java-6-sun
+    cat >$guest_root/etc/profile.d/java.sh <<EOF
+JAVA_HOME=$java_home
 export JAVA_HOME
-
 EOF
 
-chmod 775 /etc/profile.d/java.sh
-
-echo "Restore origional repo list"
-cp /etc/apt/sources.java.sav /etc/apt/sources.list
-apt-get update
-
-EOS
-
-    chmod +x #{host_java_install}
-    chroot #{source_image} #{guest_java_install}    
-    rm -f #{host_java_install}
-
-    EOH
-  end
+    chmod 775 $guest_root/etc/profile.d/java.sh
+  EOH
 end
 
 # Modified version of syslog-ng.conf that will properly route recipe output to /var/log/messages
@@ -271,10 +224,45 @@ remote_file "#{source_image}/etc/syslog-ng/syslog-ng.conf" do
   source "syslog-ng.conf"
 end
 
+# Set DHCP timeout
+bash "dhcp timeout" do
+  flags "-ex"
+  code <<-EOH
+    sed -i "s/#timeout.*/timeout 300;/" #{source_image}/etc/dhcp3/dhclient.conf
+    rm -f #{source_image}/var/lib/dhcp3/*
+  EOH
+end
+
+# Don't let SysV init start until more than lo0 is ready
+bash "sysv upstart fix" do
+  flags "-ex"
+  code <<-EOH
+    sed -i "s/IFACE=/IFACE\!=/" #{source_image}/etc/init/rc-sysinit.conf
+  EOH
+end
+
+log "Setting APT::Install-Recommends to false"
+bash "apt config" do
+  flags "-ex"
+  code <<-EOH
+    echo "APT::Install-Recommends \"0\";" > #{source_image}/etc/apt/apt.conf
+  EOH
+end
+
+log "Disable HTTP pipeline on APT"
+bash "apt config pipeline" do
+  flags "-ex"
+  code <<-EOH
+    echo "Acquire::http::Pipeline-Depth \"0\";" > #{source_image}/etc/apt/apt.conf.d/99-no-pipelining
+  EOH
+end
+
 # TODO: Add cleanup
 bash "cleanup" do
+  flags "-ex"
   code <<-EOH
-    set -ex
+
+    chroot #{source_image} rm -rf /etc/init/plymouth* /etc/init/rsyslog.conf
     chroot #{source_image} apt-get update
     chroot #{source_image} apt-get clean
   EOH

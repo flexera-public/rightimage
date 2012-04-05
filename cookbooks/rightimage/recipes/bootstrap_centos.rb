@@ -92,7 +92,9 @@ chroot #{node[:rightimage][:mount_dir]} rpm --rebuilddb
 
 if [ #{node[:rightimage][:release].to_i} -lt 6 ]; then
   ## Remove yum-fastestmirror plugin
+  set +e
   chroot #{node[:rightimage][:mount_dir]} rpm -e --nodeps yum-fastestmirror
+  set -e
 
   echo 'hwcap 0 nosegneg' > #{node[:rightimage][:mount_dir]}/etc/ld.so.conf.d/libc6-xen.conf
   chroot #{node[:rightimage][:mount_dir]} /sbin/ldconfig -v
@@ -138,9 +140,9 @@ echo "NOZEROCONF=true" >> #{node[:rightimage][:mount_dir]}/etc/sysconfig/network
 #install syslog-ng
 chroot #{node[:rightimage][:mount_dir]} rpm -e rsyslog --nodeps || true #remove rsyslog if it exists 
 if [ "#{node[:rightimage][:arch]}" == i386 ] ; then 
-  rpm --root #{node[:rightimage][:mount_dir]} -Uvh http://s3.amazonaws.com/rightscale_scripts/syslog-ng-1.6.12-1.el5.centos.i386.rpm
+  rpm --force --root #{node[:rightimage][:mount_dir]} -Uvh http://s3.amazonaws.com/rightscale_scripts/syslog-ng-1.6.12-1.el5.centos.i386.rpm
 else 
-  rpm --root #{node[:rightimage][:mount_dir]} -Uvh http://s3.amazonaws.com/rightscale_scripts/syslog-ng-1.6.12-1.x86_64.rpm
+  rpm --force --root #{node[:rightimage][:mount_dir]} -Uvh http://s3.amazonaws.com/rightscale_scripts/syslog-ng-1.6.12-1.x86_64.rpm
 fi
 chroot #{node[:rightimage][:mount_dir]} chkconfig --level 234 syslog-ng on
 
@@ -151,7 +153,10 @@ else
   java_arch="i586"
 fi
 
-array=( jdk-6u27-linux-$java_arch.rpm sun-javadb-common-10.4.2-1.1.i386.rpm sun-javadb-client-10.4.2-1.1.i386.rpm sun-javadb-core-10.4.2-1.1.i386.rpm sun-javadb-demo-10.4.2-1.1.i386.rpm )
+java_ver="6u31"
+javadb_ver="10.6.2-1.1"
+
+array=( jdk-$java_ver-linux-$java_arch.rpm sun-javadb-common-$javadb_ver.i386.rpm sun-javadb-client-$javadb_ver.i386.rpm sun-javadb-core-$javadb_ver.i386.rpm sun-javadb-demo-$javadb_ver.i386.rpm )
 set +e
 for i in "${array[@]}"; do
   ret=$(rpm --root #{node[:rightimage][:mount_dir]} -Uvh http://s3.amazonaws.com/rightscale_software/java/$i 2>&1)
@@ -168,16 +173,6 @@ chmod +x #{node[:rightimage][:mount_dir]}/etc/profile.d/java.sh
 
 #Disable FSCK on the image
 touch #{node[:rightimage][:mount_dir]}/fastboot
-
-if [ "#{node[:rightimage][:virtual_environment]}" == "kvm" ] ; then
-  # following found on functioning CDC test image Centos 64bit using KVM hypervisor
-  echo "alias scsi_hostadapter ata_piix"     > #{node[:rightimage][:mount_dir]}/etc/modprobe.conf
-  echo "alias scsi_hostadapter1 virtio_blk" >> #{node[:rightimage][:mount_dir]}/etc/modprobe.conf
-  echo "alias eth0 virtio_net"              >> #{node[:rightimage][:mount_dir]}/etc/modprobe.conf
-
-  # modprobe acpiphp at startup - required for CDC KVM hypervisor to detect attaching/detaching volumes
-  echo "/sbin/modprobe acpiphp" >> #{node[:rightimage][:mount_dir]}/etc/rc.local
-fi
 
 # disable loading pata_acpi module - currently breaks acpid from discovering volumes attached to CDC KVM hypervisor
 echo "blacklist pata_acpi"          > #{node[:rightimage][:mount_dir]}/etc/modprobe.d/disable-pata_acpi.conf

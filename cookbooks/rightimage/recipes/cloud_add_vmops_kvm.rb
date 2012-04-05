@@ -25,6 +25,8 @@ bash "mount proc & dev" do
   flags "-ex"
   code <<-EOH
     guest_root=#{guest_root}
+    umount -lf $guest_root/proc || true
+    umount -lf $guest_root/sys || true
     mount -t proc none $guest_root/proc
     mount --bind /dev $guest_root/dev
     mount --bind /sys $guest_root/sys
@@ -34,15 +36,6 @@ end
 rightimage_kernel "Install PV Kernel for Hypervisor" do
   provider "rightimage_kernel_#{node[:rightimage][:virtual_environment]}"
   action :install
-end
-
-bash "install grub" do
-  code <<-EOH
-    set -e 
-    set -x
-    guest_root="#{guest_root}"
-    chroot $guest_root yum -y install grub
-  EOH
 end
 
 # insert grub conf
@@ -59,12 +52,19 @@ bash "setup grub" do
     
     chroot $guest_root mkdir -p /boot/grub
 
-    if [ "#{node[:rightimage][:platform]}" == "centos" ]; then 
-      chroot $guest_root cp -p /usr/share/grub/x86_64-redhat/* /boot/grub
-    fi
+    case "#{node[:rightimage][:platform]}" in
+      "ubuntu")
+        chroot $guest_root cp -p /usr/lib/grub/x86_64-pc/* /boot/grub
+        grub_command="/usr/sbin/grub"
+        ;;
+      "centos"|*)
+        chroot $guest_root cp -p /usr/share/grub/x86_64-redhat/* /boot/grub
+        grub_command="/sbin/grub"
+        ;;
+    esac
 
     chroot $guest_root ln -sf /boot/grub/grub.conf /boot/grub/menu.lst
-    
+
     echo "(hd0) #{node[:rightimage][:grub][:root_device]}" > $guest_root/boot/grub/device.map
     echo "" >> $guest_root/boot/grub/device.map
 
@@ -72,18 +72,12 @@ bash "setup grub" do
 (hd0) #{target_raw_path}
 EOF
 
-    if [ "#{node[:rightimage][:platform]}" == "ubuntu" ]; then
-      sbin_command="/usr/sbin/grub"
-    else
-      sbin_command="/sbin/grub"
-    fi
-
-    ${sbin_command} --batch --device-map=device.map <<EOF
+  ${grub_command} --batch --device-map=device.map <<EOF
 root (hd0,0)
 setup (hd0)
 quit
 EOF 
-    
+
   EOH
 end
 
@@ -96,6 +90,13 @@ bash "configure for cloudstack" do
 
     case "#{node[:rightimage][:platform]}" in
     "centos")
+      # following found on functioning CDC test image Centos 64bit using KVM hypervisor
+      echo "alias scsi_hostadapter ata_piix"     > $guest_root/etc/modprobe.conf
+      echo "alias scsi_hostadapter1 virtio_blk" >> $guest_root/etc/modprobe.conf
+      echo "alias eth0 virtio_net"              >> $guest_root/etc/modprobe.conf
+
+      # modprobe acpiphp at startup - required for CDC KVM hypervisor to detect attaching/detaching volumes
+      echo "/sbin/modprobe acpiphp" >> $guest_root/etc/rc.local
 
       # clean out packages
       chroot $guest_root yum -y clean all
@@ -110,23 +111,23 @@ bash "configure for cloudstack" do
 
       # configure dns timeout 
       echo 'timeout 300;' > $guest_root/etc/dhclient.conf
-      ;;
 
+      [ -f $guest_root/var/lib/rpm/__* ] && rm ${guest_root}/var/lib/rpm/__*
+      chroot $guest_root rpm --rebuilddb
+      ;;
     "ubuntu")
-      # More to do for Ubuntu?
-      echo 'timeout 300;' > $guest_root/etc/dhcp3/dhclient.conf      
+      # Disable all ttys except for tty1 (console)
+      for i in `ls $guest_root/etc/init/tty[2-9].conf`; do
+        mv $i $i.disabled;
+      done
       ;;
     esac
 
     mkdir -p $guest_root/etc/rightscale.d
     echo "cloudstack" > $guest_root/etc/rightscale.d/cloud
 
-    [ -f $guest_root/var/lib/rpm/__* ] && rm ${guest_root}/var/lib/rpm/__*
-    chroot $guest_root rpm --rebuilddb
-    
     # set hwclock to UTC
     echo "UTC" >> $guest_root/etc/adjtime
-
   EOH
 end
 

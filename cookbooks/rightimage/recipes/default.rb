@@ -53,8 +53,12 @@ Gem.clear_paths
 unless node[:rightimage][:manual_mode] == "true"
   case node[:rightimage][:build_mode] 
   when "full"
-    include_recipe "rightimage::do_restore" unless mounted?
-    include_recipe "rightimage::build_image"
+    if rebundle?
+      include_recipe "rightimage::rebundle"
+    else
+      include_recipe "rightimage::do_restore" unless mounted?
+      include_recipe "rightimage::build_image"
+    end
   when "base"
     include_recipe "rightimage::setup_block_device" unless mounted?
     include_recipe "rightimage::build_base"
