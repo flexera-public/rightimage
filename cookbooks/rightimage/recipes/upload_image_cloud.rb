@@ -26,8 +26,8 @@ class Chef::Resource
   include RightScale::RightImage::Helper
 end
 
-rightimage_cloud "Upload #{node[:rightimage][:cloud]} image" do
-  provider "rightimage_cloud_${node[:rightimage][:cloud]}"
+rightimage_cloud node[:rightimage][:cloud] do
+  provider "rightimage_cloud_#{node[:rightimage][:cloud]}"
   action :upload
 end
 

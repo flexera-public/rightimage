@@ -228,38 +228,6 @@ EOF
         "#{target_temp_root}/#{target_raw_file}"
       end
 
-      def full_image_path
-        target_temp_root+"/"+image_name+"."+image_file_ext
-      end
-
-      def s3_path_base
-        [guest_platform,release_number,arch,timestamp[0..3]].join("/")
-      end
-
-      def s3_path_full
-        hypervisor = node[:rightimage][:virtual_environment]
-        [hypervisor,guest_platform,release_number].join("/")
-      end
-
-      def base_image_upload_bucket
-        "rightscale-rightimage-base-dev"
-      end
-
-      def full_image_upload_bucket
-        case node[:rightimage][:cloud]
-        when "cloudstack"
-          "rightscale-cloudstack-dev"
-        when "eucalyptus"
-          "rightscale-eucalyptus-dev"
-        when "openstack"
-          "rightscale-openstack-dev"
-        when "rackspace"
-          "rightscale-rackspace-dev"
-        when "ec2"
-          "rightscale-"+node[:rightimage][:region]
-        end
-      end
-
       def image_source_bucket
         bucket = "rightscale-#{image_source_cloud}"
         bucket << "-dev" if node[:rightimage][:debug] == "true"

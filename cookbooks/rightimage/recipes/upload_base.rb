@@ -21,23 +21,24 @@ bash "compress partitioned base image" do
   EOH
 end
 
-bash "upload unpartitioned base image" do
-  cwd build_root 
-  not_if {`curl -o /dev/null --head --connect-timeout 10 --fail --silent --write-out %{http_code} http://#{base_image_upload_bucket}.s3.amazonaws.com/#{s3_path_base}/#{target_type}.raw.gz`.strip == "200" }
-  flags "-ex"
-  environment(cloud_credentials("ec2"))
-  code <<-EOH
-    s3cmd put #{base_image_upload_bucket}:#{s3_path_base}/#{target_type}.raw.gz #{target_type}.raw.gz x-amz-acl:public-read
-  EOH
+
+image_s3_path = guest_platform+"/"+release_number+"/"+arch+"/"+timestamp[0..3]]+"/"
+image_upload_bucket = "rightscale-rightimage-base-dev"
+
+# Upload partitioned image
+rightimage_upload "#{build_root}/#{target_type}0.raw.gz" do
+  provider "rightimage_upload_s3"
+  s3_path image_s3_path
+  bucket image_upload_bucket
+  action :upload
 end
 
-bash "upload partitioned base image" do
-  cwd build_root 
-  not_if {`curl -o /dev/null --head --connect-timeout 10 --fail --silent --write-out %{http_code} http://#{base_image_upload_bucket}.s3.amazonaws.com/#{s3_path_base}/#{target_type}0.raw.gz`.strip == "200" }
-  flags "-ex"
-  environment(cloud_credentials("ec2"))
-  code <<-EOH
-    s3cmd put #{base_image_upload_bucket}:#{s3_path_base}/#{target_type}0.raw.gz #{target_type}0.raw.gz x-amz-acl:public-read
-  EOH
+# Upload unpartitioned image
+rightimage_upload "#{build_root}/#{target_type}.raw.gz" do
+  provider "rightimage_upload_s3"
+  s3_path image_s3_path
+  bucket image_upload_bucket
+  action :upload
 end
+
 rs_utils_marker :end
