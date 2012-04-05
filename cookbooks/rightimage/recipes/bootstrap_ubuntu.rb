@@ -249,6 +249,14 @@ bash "apt config" do
   EOH
 end
 
+log "Disable HTTP pipeline on APT"
+bash "apt config pipeline" do
+  flags "-ex"
+  code <<-EOH
+    echo "Acquire::http::Pipeline-Depth \"0\";" > #{source_image}/etc/apt/apt.conf.d/99-no-pipelining
+  EOH
+end
+
 # TODO: Add cleanup
 bash "cleanup" do
   flags "-ex"
