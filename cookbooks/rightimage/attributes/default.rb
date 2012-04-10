@@ -80,8 +80,8 @@ case rightimage[:cloud]
     set[:rightimage][:root_mount][:dump] = "0" 
     set[:rightimage][:root_mount][:fsck] = "0" 
     set[:rightimage][:fstab][:ephemeral] = true
-    # The kernel in ubuntu 10.04.4 (vs 10.04.3) seems to have changed the device naming scheme from sdX to xvdX
-    if timestamp[0..7] > "20120217" and rightimage[:platform] == "ubuntu"
+    # Might have to double check don't know if maverick should use kernel linux-image-ec2 or not
+    if rightimage[:platform] == "ubuntu" and rightimage[:release_number].to_f >= 10.10
       set[:rightimage][:ephemeral_mount] = "/dev/xvdb" 
     else
       set[:rightimage][:ephemeral_mount] = "/dev/sdb" 
