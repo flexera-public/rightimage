@@ -63,21 +63,15 @@ case rightimage[:release]
     set[:rightimage][:guest_packages] = rightimage[:guest_packages] + " sysv-rc-conf debian-helper-scripts"
     rightimage[:host_packages] << " ubuntu-vm-builder"
   when "karmic"
-    rightimage[:guest_packages] << " linux-image-ec2"
-    #set[:rightimage][:guest_packages] = rightimage[:guest_packages] + " linux-image-ec2"
     rightimage[:host_packages] << " python-vm-builder-ec2"
   when "lucid"
     if rightimage[:cloud] == "ec2"
-      #set[:rightimage][:guest_packages] = rightimage[:guest_packages] + " linux-image-2.6.32-309-ec2 linux-image-2.6.32-308-ec2 linux-image-2.6.32-305-ec2" 
       rightimage[:host_packages] << " python-vm-builder-ec2 devscripts"
-      #set[:rightimage][:guest_packages] = rightimage[:guest_packages] + " linux-image-virtual-lts-backport-maverick linux-headers-virtual-lts-backport-maverick grub-legacy-ec2" 
     else
-      #set[:rightimage][:guest_packages] = rightimage[:guest_packages] + " linux-image-virtual-lts-backport-maverick linux-headers-virtual-lts-backport-maverick grub-legacy-ec2" 
       rightimage[:host_packages] << " devscripts"
     end
   when "maverick"
     rightimage[:host_packages] << " devscripts"
-    set[:rightimage][:guest_packages] = rightimage[:guest_packages] + " linux-image-virtual grub-legacy-ec2"
 end if rightimage[:platform] == "ubuntu" 
 
 # set cloud stuff
