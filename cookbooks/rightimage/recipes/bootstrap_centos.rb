@@ -172,6 +172,9 @@ echo "Configuring Java Home"
 echo "export JAVA_HOME=/usr/java/default" >> #{node[:rightimage][:mount_dir]}/etc/profile.d/java.sh
 chmod +x #{node[:rightimage][:mount_dir]}/etc/profile.d/java.sh
 
+# Remove system java
+yum -y --installroot=#{guest_root} remove java
+
 #Disable FSCK on the image
 touch #{node[:rightimage][:mount_dir]}/fastboot
 
