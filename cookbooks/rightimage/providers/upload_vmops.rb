@@ -49,7 +49,7 @@ action :upload do
         when "centos"
           if node[:rightimage][:release] == "5.4"
             osTypeId = "f288db0e-43a9-435e-b6f8-157dd4c7cdbb" # CentOS 5.4 (64-bit)
-          if node[:rightimage][:release].to_f >= 6.0
+          elsif node[:rightimage][:release].to_f >= 6.0
             osTypeId = "60a8f583-8632-41aa-90bd-b44ec221f7e8" # CentOS 6.0 (64-bit)
           else
             osTypeId = "9a57e335-a6ae-4d4f-b077-de815e1b623b" # CentOS 5.5 (64-bit)
