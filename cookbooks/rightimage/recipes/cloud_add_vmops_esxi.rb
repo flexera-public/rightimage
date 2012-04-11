@@ -30,9 +30,6 @@ raise "ERROR: you must set your virtual_environment to esxi!"  if node[:rightima
 
 bundled_image = "#{image_name}.vmdk"
 
-package "grub"
-package "qemu"
-
 bash "mount proc & dev" do
   flags "-ex" 
   code <<-EOH
