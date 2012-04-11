@@ -10,8 +10,7 @@ action :install do
 
     case "#{node[:rightimage][:platform]}" in 
     "centos" )
-      # The following should be needed when using ubuntu vmbuilder
-      chroot $guest_root yum -y install kmod-kvm
+      [ "#{node[:rightimage][:release].to_f < 6}" == "true" ] && chroot $guest_root yum -y install kmod-kvm
 
       kernel_version=$(ls -t $guest_root/lib/modules|awk '{ printf "%s ", $0 }'|cut -d ' ' -f1-1)
 
