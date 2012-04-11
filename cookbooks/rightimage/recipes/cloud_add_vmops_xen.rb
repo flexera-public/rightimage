@@ -97,10 +97,6 @@ bash "configure for cloudstack" do
       done
       ;;  
     esac 
-
-
-    mkdir -p $guest_root/etc/rightscale.d
-    echo "cloudstack" > $guest_root/etc/rightscale.d/cloud
   EOH
 end
 

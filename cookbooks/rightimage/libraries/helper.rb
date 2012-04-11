@@ -330,6 +330,17 @@ EOF
           return false
         end
       end
+
+      def rightlink_cloud
+        case node[:rightimage][:cloud]
+        when "euca"
+          "eucalyptus"
+        when "vmops"
+          "cloudstack"
+        else
+          node[:rightimage][:cloud]
+        end
+      end
     end
   end
 end

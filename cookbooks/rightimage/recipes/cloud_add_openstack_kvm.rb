@@ -115,9 +115,6 @@ bash "configure for openstack" do
       ;;
     esac
 
-    mkdir -p $guest_root/etc/rightscale.d
-    echo "openstack" > $guest_root/etc/rightscale.d/cloud
-
     # set hwclock to UTC
     echo "UTC" >> $guest_root/etc/adjtime
   EOH
