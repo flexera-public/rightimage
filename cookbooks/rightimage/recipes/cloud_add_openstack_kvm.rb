@@ -12,9 +12,6 @@ end
 
 raise "ERROR: you must set your virtual_environment to kvm!"  if node[:rightimage][:virtual_environment] != "kvm"
 
-package "qemu"
-package "grub"
-
 bash "mount proc & dev" do
   flags "-ex"
   code <<-EOH

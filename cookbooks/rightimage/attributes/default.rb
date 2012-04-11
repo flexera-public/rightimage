@@ -108,8 +108,6 @@ case rightimage[:cloud]
         end
     end
   when "vmops", "openstack"
-    rightimage[:host_packages] << " python26-distribute python26-devel python26-libs" if rightimage[:cloud] == "openstack"
-
     case rightimage[:virtual_environment]
     when "xen"
       set[:rightimage][:fstab][:ephemeral_mount_opts] = "defaults"
@@ -119,7 +117,7 @@ case rightimage[:cloud]
       set[:rightimage][:ephemeral_mount] = nil
       set[:rightimage][:fstab][:ephemeral_mount_opts] = nil
     when "kvm"
-      rightimage[:host_packages] << " qemu grub"
+      rightimage[:host_packages] << " grub"
       set[:rightimage][:fstab][:ephemeral] = false
       set[:rightimage][:ephemeral_mount] = "/dev/vdb"
       set[:rightimage][:fstab][:ephemeral_mount_opts] = "defaults"
@@ -127,7 +125,7 @@ case rightimage[:cloud]
       set[:rightimage][:root_mount][:dump] = "1" 
       set[:rightimage][:root_mount][:fsck] = "1" 
     when "esxi"
-      rightimage[:host_packages] << " qemu grub"
+      rightimage[:host_packages] << " grub"
       set[:rightimage][:ephemeral_mount] = nil
       set[:rightimage][:fstab][:ephemeral_mount_opts] = nil
       set[:rightimage][:fstab][:ephemeral] = false
@@ -139,6 +137,17 @@ case rightimage[:cloud]
     end
 end
 
+case node[:rightimage][:cloud]
+when "vmops", "openstack"
+  case rightimage[:virtual_environment]
+  when "kvm", "esxi"
+    if node[:platform] == "centos" && node[:platform_version].to_f >= 6.0
+      rightimage[:host_packages] << " qemu-img"
+    else
+      rightimage[:host_packages] << " qemu"
+    end
+  end
+end
 
 # set rightscale stuff
 set_unless[:rightimage][:rightlink_version] = ""

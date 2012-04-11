@@ -3,14 +3,22 @@ class Chef::Resource::RubyBlock
   include RightScale::RightImage::Helper
 end
 
-package "python2.6-dev" do
-  only_if { node[:platform] == "ubuntu" }
-  action :install
-end
+packages = case node[:platform]
+           when "centos" then
+             if node[:platform_version].to_f >= 6.0
+               %w(python-setuptools python-devel python-libs)
+             else
+               %w(python26-distribute python26-devel python26-libs)
+             end
+           when "ubuntu" then
+             %w(python2.6-dev python-setuptools)
+           end
 
-package "python-setuptools" do
-  only_if { node[:platform] == "ubuntu" }
-  action :install
+packages.each do |p|
+  r = package p do
+    action :nothing
+  end
+  r.run_action(:install)
 end
 
 bash "install python modules" do
