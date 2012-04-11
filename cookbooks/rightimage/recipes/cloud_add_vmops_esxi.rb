@@ -159,6 +159,9 @@ bash "configure for cloudstack" do
 
       [ -f $guest_root/var/lib/rpm/__* ] && rm ${guest_root}/var/lib/rpm/__*
       chroot $guest_root rpm --rebuilddb
+
+      # Setup console
+      [ -f $guest_root/etc/sysconfig/init ] && sed -i "s/ACTIVE_CONSOLES=.*/ACTIVE_CONSOLES=\/dev\/tty1/" $guest_root/etc/sysconfig/init
       ;;
     "ubuntu")
       # Disable all ttys except for tty1 (console)
