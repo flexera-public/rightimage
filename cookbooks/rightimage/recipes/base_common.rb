@@ -1,7 +1,7 @@
 rs_utils_marker :begin
 #
 # Cookbook Name:: rightimage
-# Recipe:: default
+# Recipe:: base_common
 #
 # Copyright 2011, RightScale, Inc.
 #
@@ -18,7 +18,23 @@ rs_utils_marker :begin
 # limitations under the License.
 #
 
+node[:rightimage][:host_packages].split.each { |p| package p }
 
 include_recipe "rightimage::clean"
 include_recipe "rightimage::rightscale_install"
+
+log "Add RightLink cloud file"
+execute "echo -n #{rightlink_cloud} > #{guest_root}/etc/rightscale.d/cloud" do
+  creates "#{guest_root}/etc/rightscale.d/cloud"
+end
+
+log "Add RightLink 5.6 backwards compatibility symlink"
+bash "rightlink56 symlink" do
+#  not_if "test -L #{guest_root}/var/spool/#{node[:rightimage][:cloud]}"
+  code <<-EOH
+    file=/var/spool/#{node[:rightimage][:cloud]}
+    rm -rf #{guest_root}$file
+    chroot #{guest_root} ln -s /var/spool/cloud $file
+  EOH
+end
 rs_utils_marker :end
