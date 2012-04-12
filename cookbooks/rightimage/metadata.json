@@ -698,6 +698,7 @@
     "rightimage::setup_loopback": "creates loopback file",
     "rightimage::bootstrap_sles": "bootstraps a basic sles image",
     "rightimage::bootstrap_ubuntu": "bootstraps a basic ubuntu image",
+    "rightimage::bootstrap_rhel": "bootstraps a basic rhel image",
     "rightimage::base_ubuntu": "coordinate an ubuntu install",
     "rightimage::do_create_mci": "creates MCI for image(s) (only ec2 currently supported)",
     "rightimage::do_destroy_loopback": "unmounts loopback file",
