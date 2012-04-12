@@ -101,6 +101,7 @@ if [ #{node[:rightimage][:release].to_i} -lt 6 ]; then
 
   curl -o #{node[:rightimage][:mount_dir]}/etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL https://fedoraproject.org/static/217521F6.txt
 else
+  chroot #{node[:rightimage][:mount_dir]} rpm -e --nodeps yum-plugin-fastestmirror
   curl -o #{node[:rightimage][:mount_dir]}/etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-6 https://fedoraproject.org/static/0608B895.txt
 
   # Disable ttys
@@ -170,6 +171,9 @@ set -e
 echo "Configuring Java Home" 
 echo "export JAVA_HOME=/usr/java/default" >> #{node[:rightimage][:mount_dir]}/etc/profile.d/java.sh
 chmod +x #{node[:rightimage][:mount_dir]}/etc/profile.d/java.sh
+
+# Remove system java
+yum -y --installroot=#{guest_root} remove java
 
 #Disable FSCK on the image
 touch #{node[:rightimage][:mount_dir]}/fastboot

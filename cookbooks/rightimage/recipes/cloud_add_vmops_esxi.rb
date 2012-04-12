@@ -30,9 +30,6 @@ raise "ERROR: you must set your virtual_environment to esxi!"  if node[:rightima
 
 bundled_image = "#{image_name}.vmdk"
 
-package "grub"
-package "qemu"
-
 bash "mount proc & dev" do
   flags "-ex" 
   code <<-EOH
@@ -162,6 +159,9 @@ bash "configure for cloudstack" do
 
       [ -f $guest_root/var/lib/rpm/__* ] && rm ${guest_root}/var/lib/rpm/__*
       chroot $guest_root rpm --rebuilddb
+
+      # Setup console
+      [ -f $guest_root/etc/sysconfig/init ] && sed -i "s/ACTIVE_CONSOLES=.*/ACTIVE_CONSOLES=\\/dev\\/tty1/" $guest_root/etc/sysconfig/init
       ;;
     "ubuntu")
       # Disable all ttys except for tty1 (console)
@@ -170,9 +170,6 @@ bash "configure for cloudstack" do
       done
       ;;
     esac
-
-    mkdir -p $guest_root/etc/rightscale.d
-    echo "cloudstack" > $guest_root/etc/rightscale.d/cloud
 
     # set hwclock to UTC
     echo "UTC" >> $guest_root/etc/adjtime

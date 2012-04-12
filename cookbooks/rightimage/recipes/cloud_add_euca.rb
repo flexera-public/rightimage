@@ -94,10 +94,6 @@ bash "configure for eucalyptus" do
   code <<-EOH
     guest_root=#{guest_root}
 
-    ## insert cloud file
-    mkdir -p $guest_root/etc/rightscale.d
-    echo -n "eucalyptus" > $guest_root/etc/rightscale.d/cloud
-
     # clean out packages
     chroot $guest_root yum -y clean all
     

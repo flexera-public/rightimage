@@ -12,9 +12,6 @@ end
 
 raise "ERROR: you must set your virtual_environment to kvm!"  if node[:rightimage][:virtual_environment] != "kvm"
 
-package "qemu"
-package "grub"
-
 bash "mount proc & dev" do
   flags "-ex"
   code <<-EOH
@@ -114,9 +111,6 @@ bash "configure for openstack" do
       done
       ;;
     esac
-
-    mkdir -p $guest_root/etc/rightscale.d
-    echo "openstack" > $guest_root/etc/rightscale.d/cloud
 
     # set hwclock to UTC
     echo "UTC" >> $guest_root/etc/adjtime

@@ -301,7 +301,6 @@ EOF
       def setup_ec2_tools_env
         bash_snippet = <<-EOF
           . /etc/profile
-          export JAVA_HOME=/usr
           export PATH=$PATH:/usr/local/bin:/home/ec2/bin
           export EC2_HOME=/home/ec2
         EOF
@@ -329,6 +328,17 @@ EOF
           return true
         else
           return false
+        end
+      end
+
+      def rightlink_cloud
+        case node[:rightimage][:cloud]
+        when "euca"
+          "eucalyptus"
+        when "vmops"
+          "cloudstack"
+        else
+          node[:rightimage][:cloud]
         end
       end
     end

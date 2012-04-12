@@ -45,7 +45,7 @@ when "ubuntu"
   rightimage[:guest_packages] << " euca2ools" if rightimage[:cloud] == "euca"
 
 when "centos","rhel"
-  set[:rightimage][:guest_packages] = "wget mlocate nano logrotate ruby ruby-devel ruby-docs ruby-irb ruby-libs ruby-mode ruby-rdoc ruby-ri ruby-tcltk postfix openssl openssh openssh-askpass openssh-clients openssh-server curl gcc* zip unzip bison flex compat-libstdc++-296 cvs subversion autoconf automake libtool compat-gcc-34-g77 mutt sysstat rpm-build fping vim-common vim-enhanced rrdtool-1.2.27 rrdtool-devel-1.2.27 rrdtool-doc-1.2.27 rrdtool-perl-1.2.27 rrdtool-python-1.2.27 rrdtool-ruby-1.2.27 rrdtool-tcl-1.2.27 pkgconfig lynx screen yum-utils bwm-ng createrepo redhat-rpm-config redhat-lsb git nscd xfsprogs swig libarchive-devel tmux libxml2 libxml2-devel libxslt libxslt-devel"
+  set[:rightimage][:guest_packages] = "wget mlocate nano logrotate ruby ruby-devel ruby-docs ruby-irb ruby-libs ruby-mode ruby-rdoc ruby-ri ruby-tcltk postfix openssl openssh openssh-askpass openssh-clients openssh-server curl gcc* zip unzip bison flex compat-libstdc++-296 cvs subversion autoconf automake libtool compat-gcc-34-g77 mutt sysstat rpm-build fping vim-common vim-enhanced rrdtool-1.2.27 rrdtool-devel-1.2.27 rrdtool-doc-1.2.27 rrdtool-perl-1.2.27 rrdtool-python-1.2.27 rrdtool-ruby-1.2.27 rrdtool-tcl-1.2.27 pkgconfig lynx screen yum-utils bwm-ng createrepo redhat-rpm-config redhat-lsb git nscd xfsprogs swig libarchive-devel tmux libxml2 libxml2-devel libxslt libxslt-devel dhclient sudo telnet"
 
   rightimage[:guest_packages] << " iscsi-initiator-utils" if rightimage[:cloud] == "vmops" 
 
@@ -100,10 +100,14 @@ case rightimage[:cloud]
       when "centos", "rhel"
         set[:rightimage][:fstab][:ephemeral_mount_opts] = "defaults"
         set[:rightimage][:fstab][:swap] = "defaults"
+
+        # CentOS 6.1 and above start SCSI device naming from e
+        if rightimage[:release].to_f >= 6.1
+          set[:rightimage][:ephemeral_mount] = "/dev/xvdf"
+          set[:rightimage][:swap_mount] = "/dev/xvde3"  unless rightimage[:arch]  == "x86_64"
+        end
     end
   when "vmops", "openstack"
-    rightimage[:host_packages] << " python26-distribute python26-devel python26-libs" if rightimage[:cloud] == "openstack"
-
     case rightimage[:virtual_environment]
     when "xen"
       set[:rightimage][:fstab][:ephemeral_mount_opts] = "defaults"
@@ -113,7 +117,7 @@ case rightimage[:cloud]
       set[:rightimage][:ephemeral_mount] = nil
       set[:rightimage][:fstab][:ephemeral_mount_opts] = nil
     when "kvm"
-      rightimage[:host_packages] << " qemu grub"
+      rightimage[:host_packages] << " grub"
       set[:rightimage][:fstab][:ephemeral] = false
       set[:rightimage][:ephemeral_mount] = "/dev/vdb"
       set[:rightimage][:fstab][:ephemeral_mount_opts] = "defaults"
@@ -121,7 +125,7 @@ case rightimage[:cloud]
       set[:rightimage][:root_mount][:dump] = "1" 
       set[:rightimage][:root_mount][:fsck] = "1" 
     when "esxi"
-      rightimage[:host_packages] << " qemu grub"
+      rightimage[:host_packages] << " grub"
       set[:rightimage][:ephemeral_mount] = nil
       set[:rightimage][:fstab][:ephemeral_mount_opts] = nil
       set[:rightimage][:fstab][:ephemeral] = false
@@ -133,6 +137,17 @@ case rightimage[:cloud]
     end
 end
 
+case node[:rightimage][:cloud]
+when "vmops", "openstack"
+  case rightimage[:virtual_environment]
+  when "kvm", "esxi"
+    if node[:platform] == "centos" && node[:platform_version].to_f >= 6.0
+      rightimage[:host_packages] << " qemu-img"
+    else
+      rightimage[:host_packages] << " qemu"
+    end
+  end
+end
 
 # set rightscale stuff
 set_unless[:rightimage][:rightlink_version] = ""

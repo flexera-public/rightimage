@@ -36,10 +36,6 @@ bash "cleanup" do
   EOH
 end
 
-execute "echo -n #{node[:rightimage][:cloud]} > #{guest_root}/etc/rightscale.d/cloud" do 
-  creates "#{guest_root}/etc/rightscale.d/cloud"
-end
-
 #  - add fstab
 template "#{guest_root}/etc/fstab" do 
   source "fstab.erb" 

@@ -32,17 +32,33 @@ action :upload do
       name = "#{image_name}_#{node[:rightimage][:virtual_environment].upcase}"
       zoneId = node[:rightimage][:datacenter]
 
-      case node[:rightimage][:platform]
-      when "centos"
-        if node[:rightimage][:release] == "5.4"
-          osTypeId = 14 # CentOS 5.4 (64-bit)
-        else
-          osTypeId = 112 # CentOS 5.5 (64-bit)
+      case node[:rightimage][:cloudstack][:version]
+      when "2"
+        case node[:rightimage][:platform]
+        when "centos"
+          if node[:rightimage][:release] == "5.4"
+            osTypeId = 14 # CentOS 5.4 (64-bit)
+          else
+            osTypeId = 112 # CentOS 5.5 (64-bit)
+          end
+        when "ubuntu"
+          osTypeId = 126 # Ubuntu 10.04 (64-bit)
         end
-      when "ubuntu"
-        osTypeId = 126 # Ubuntu 10.04 (64-bit)
+      when "3"
+        case node[:rightimage][:platform]
+        when "centos"
+          if node[:rightimage][:release] == "5.4"
+            osTypeId = "f288db0e-43a9-435e-b6f8-157dd4c7cdbb" # CentOS 5.4 (64-bit)
+          elsif node[:rightimage][:release].to_f >= 6.0
+            osTypeId = "60a8f583-8632-41aa-90bd-b44ec221f7e8" # CentOS 6.0 (64-bit)
+          else
+            osTypeId = "9a57e335-a6ae-4d4f-b077-de815e1b623b" # CentOS 5.5 (64-bit)
+          end
+        when "ubuntu"
+          osTypeId = "9759556b-da29-4c22-b541-272e71bb68eb" # Ubuntu 10.04 (64-bit)
+        end
       end
-      
+
       case node[:rightimage][:virtual_environment]
       when "esxi"
         format = "OVA"
