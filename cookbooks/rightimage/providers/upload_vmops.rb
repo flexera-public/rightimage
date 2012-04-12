@@ -60,7 +60,7 @@ action :upload do
 
       filename = "#{image_name}.#{image_file_ext}"
       local_file = "#{target_temp_root}/#{filename}"
-      md5sum = Digest::MD5.hexdigest(::File.read(local_file))
+      md5sum = calc_md5sum(local_file)
 
       aws_url  = "rightscale-cloudstack-dev.s3.amazonaws.com"
       aws_path = s3_path_full
