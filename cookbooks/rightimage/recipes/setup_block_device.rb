@@ -37,7 +37,7 @@ block_device ri_lineage do
   keep_weekly "1000"
   keep_monthly "1000"
   keep_yearly "1000"
-  volume_size "41"
+  volume_size "42"
   stripe_count "1"
   lineage ri_lineage
   action :create
