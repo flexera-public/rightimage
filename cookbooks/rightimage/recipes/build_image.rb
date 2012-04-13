@@ -17,30 +17,11 @@ rs_utils_marker :begin
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-
 class Chef::Recipe
   include RightScale::RightImage::Helper
 end
 
-directory target_temp_root do
-  owner "root"
-  group "root"
-  recursive true
-end
-
-packages = case node[:platform]
-           when "ubuntu" then %w(libxml2-dev libxslt1-dev)
-           when "centos", /redhat/ then %w(libxml2-devel libxslt-devel)
-           end
-
-packages.each do |p| 
-  r = package p do 
-    action :nothing 
-  end
-  r.run_action(:install)
-end
-
-include_recipe "rightimage::base_#{node.rightimage.platform.downcase}"
+include_recipe "rightimage::base_common"
 include_recipe "rightimage::cloud_add_#{node.rightimage.cloud.downcase}" if node.rightimage.cloud 
 include_recipe "rightimage::do_destroy_loopback"
 include_recipe "rightimage::upload_file_to_s3"

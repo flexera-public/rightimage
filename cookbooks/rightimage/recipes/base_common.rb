@@ -17,6 +17,30 @@ rs_utils_marker :begin
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+class Chef::Resource
+  include RightScale::RightImage::Helper
+end
+class Chef::Recipe
+  include RightScale::RightImage::Helper
+end
+
+directory target_temp_root do
+  owner "root"
+  group "root"
+  recursive true
+end
+
+packages = case node[:platform]
+           when "ubuntu" then %w(libxml2-dev libxslt1-dev)
+           when "centos", /redhat/ then %w(libxml2-devel libxslt-devel)
+           end
+
+packages.each do |p|
+  r = package p do
+    action :nothing
+  end
+  r.run_action(:install)
+end
 
 node[:rightimage][:host_packages].split.each { |p| package p }
 
