@@ -321,6 +321,18 @@ EOF
         end
       end
 
+      def calc_md5sum(file)
+        require "digest/md5"
+        # read incrementally, files are large can cause out of memory exceptions
+        md5 = ::File.open(file, 'rb') do |io|
+          dig = ::Digest::MD5.new
+          buf = ""
+          dig.update(buf) while io.read(4096, buf)
+          dig
+        end
+        return md5
+      end
+
       def rebundle?
         if node[:rightimage][:cloud] == "ec2" and node[:rightimage][:platform] == "rhel"
           return true

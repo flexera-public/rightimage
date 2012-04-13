@@ -6,6 +6,11 @@ action :install do
  
   bash "install xen kernel" do
     flags "-ex"
+    ubuntu_kernel_packages = 'linux-image-virtual linux-headers-virtual grub-legacy-ec2'
+    if node[:rightimage][:release_number].to_f <= 10.04
+      ubuntu_kernel_packages = 'linux-image-ec2 linux-headers-ec2 grub-legacy-ec2'
+    end
+
     code <<-EOH
       # Install to guest. 
       guest_root=#{guest_root}
@@ -28,7 +33,7 @@ action :install do
           # Remove any installed kernels
           for i in `chroot $guest_root dpkg --get-selections linux-headers* linux-image*|sed "s/install//g"`; do chroot $guest_root env DEBIAN_FRONTEND=noninteractive apt-get -y purge $i; done
 
-          chroot $guest_root apt-get -y install linux-image-virtual linux-headers-virtual grub-legacy-ec2
+          chroot $guest_root apt-get -y install #{ubuntu_kernel_packages}
           chroot $guest_root apt-get clean
           ;;
         esac

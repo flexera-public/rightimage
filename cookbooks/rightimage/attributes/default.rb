@@ -63,21 +63,15 @@ case rightimage[:release]
     set[:rightimage][:guest_packages] = rightimage[:guest_packages] + " sysv-rc-conf debian-helper-scripts"
     rightimage[:host_packages] << " ubuntu-vm-builder"
   when "karmic"
-    rightimage[:guest_packages] << " linux-image-ec2"
-    #set[:rightimage][:guest_packages] = rightimage[:guest_packages] + " linux-image-ec2"
     rightimage[:host_packages] << " python-vm-builder-ec2"
   when "lucid"
     if rightimage[:cloud] == "ec2"
-      #set[:rightimage][:guest_packages] = rightimage[:guest_packages] + " linux-image-2.6.32-309-ec2 linux-image-2.6.32-308-ec2 linux-image-2.6.32-305-ec2" 
       rightimage[:host_packages] << " python-vm-builder-ec2 devscripts"
-      #set[:rightimage][:guest_packages] = rightimage[:guest_packages] + " linux-image-virtual-lts-backport-maverick linux-headers-virtual-lts-backport-maverick grub-legacy-ec2" 
     else
-      #set[:rightimage][:guest_packages] = rightimage[:guest_packages] + " linux-image-virtual-lts-backport-maverick linux-headers-virtual-lts-backport-maverick grub-legacy-ec2" 
       rightimage[:host_packages] << " devscripts"
     end
   when "maverick"
     rightimage[:host_packages] << " devscripts"
-    set[:rightimage][:guest_packages] = rightimage[:guest_packages] + " linux-image-virtual grub-legacy-ec2"
 end if rightimage[:platform] == "ubuntu" 
 
 # set cloud stuff
@@ -86,8 +80,8 @@ case rightimage[:cloud]
     set[:rightimage][:root_mount][:dump] = "0" 
     set[:rightimage][:root_mount][:fsck] = "0" 
     set[:rightimage][:fstab][:ephemeral] = true
-    # The kernel in ubuntu 10.04.4 (vs 10.04.3) seems to have changed the device naming scheme from sdX to xvdX
-    if timestamp[0..7] > "20120217" and rightimage[:platform] == "ubuntu"
+    # Might have to double check don't know if maverick should use kernel linux-image-ec2 or not
+    if rightimage[:platform] == "ubuntu" and rightimage[:release_number].to_f >= 10.10
       set[:rightimage][:ephemeral_mount] = "/dev/xvdb" 
     else
       set[:rightimage][:ephemeral_mount] = "/dev/sdb" 
