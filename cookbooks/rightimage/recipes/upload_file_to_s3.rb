@@ -26,7 +26,7 @@ Gem.clear_paths
 
 r = gem_package "fog" do
   gem_binary "/opt/rightscale/sandbox/bin/gem"
-  version "1.13.1"
+  version "1.3.1"
   action :nothing
 end
 r.run_action(:install)

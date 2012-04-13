@@ -109,7 +109,7 @@ bash "install vmware tools" do
 
 # TODO: THIS NEEDS TO BE CLEANED UP
   case "#{node[:rightimage][:platform]}" in 
-    "centos" )
+    "centos"|"rhel" )
       chroot $guest_root mkdir -p $TMP_DIR
       chroot $guest_root curl --fail http://packages.vmware.com/tools/keys/VMWARE-PACKAGING-GPG-DSA-KEY.pub -o $TMP_DIR/dsa.pub
       chroot $guest_root curl --fail http://packages.vmware.com/tools/keys/VMWARE-PACKAGING-GPG-RSA-KEY.pub -o $TMP_DIR/rsa.pub
@@ -146,7 +146,7 @@ bash "configure for cloudstack" do
     guest_root=#{guest_root}
 
     case "#{node[:rightimage][:platform]}" in
-    "centos")
+    "centos"|"rhel")
       # clean out packages
       chroot $guest_root yum -y clean all
 
