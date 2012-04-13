@@ -341,6 +341,10 @@ EOF
           node[:rightimage][:cloud]
         end
       end
+
+      def rhel?
+        node[:rightimage][:platform] == "rhel"
+      end
     end
   end
 end

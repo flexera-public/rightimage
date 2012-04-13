@@ -141,7 +141,7 @@ case node[:rightimage][:cloud]
 when "vmops", "openstack"
   case rightimage[:virtual_environment]
   when "kvm", "esxi"
-    if node[:platform] == "centos" && node[:platform_version].to_f >= 6.0
+    if (node[:platform] == "centos" || rhel?) && node[:platform_version].to_f >= 6.0
       rightimage[:host_packages] << " qemu-img"
     else
       rightimage[:host_packages] << " qemu"
