@@ -357,6 +357,14 @@ EOF
       def rhel?
         node[:rightimage][:platform] == "rhel"
       end
+
+      def epel_key_name
+        if node[:rightimage][:release].to_i >= 6
+          "-#{node[:rightimage][:release][0].chr}"
+        else
+          ""
+        end
+      end
     end
   end
 end

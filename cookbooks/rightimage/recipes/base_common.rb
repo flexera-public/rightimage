@@ -24,6 +24,11 @@ class Chef::Recipe
   include RightScale::RightImage::Helper
 end
 
+remote_file "/etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL#{epel_key_name}" do
+   source "RPM-GPG-KEY-EPEL#{epel_key_name}"
+   backup false
+end
+
 directory target_temp_root do
   owner "root"
   group "root"
