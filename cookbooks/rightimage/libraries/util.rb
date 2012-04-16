@@ -3,7 +3,7 @@ module RightImage
 
   class Util
       
-    DIRS = [ "/mnt", "/tmp" ]
+    DIRS = [ "/mnt", "/tmp", "/var/cache/yum" ]
     
     # Utility Class
     #
