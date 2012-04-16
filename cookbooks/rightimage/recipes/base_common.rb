@@ -74,7 +74,7 @@ log "Add RightLink 5.6 backwards compatibility symlink"
 bash "rightlink56 symlink" do
 #  not_if "test -L #{guest_root}/var/spool/#{node[:rightimage][:cloud]}"
   code <<-EOH
-    file=/var/spool/#{node[:rightimage][:cloud]}
+    file=/var/spool/#{rightlink_cloud}
     rm -rf #{guest_root}$file
     chroot #{guest_root} ln -s /var/spool/cloud $file
   EOH
