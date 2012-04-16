@@ -23,10 +23,23 @@ end
 class Chef::Recipe
   include RightScale::RightImage::Helper
 end
+class Erubis::Context
+  include RightScale::RightImage::Helper
+end
+
+template "/tmp/yum.conf" do
+  only_if { el? }
+  source "yum.conf.erb"
+  backup false
+  variables ({
+    :bootstrap => true
+  })
+end
 
 remote_file "/etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL#{epel_key_name}" do
-   source "RPM-GPG-KEY-EPEL#{epel_key_name}"
-   backup false
+  only_if { el? }
+  source "RPM-GPG-KEY-EPEL#{epel_key_name}"
+  backup false
 end
 
 directory target_temp_root do

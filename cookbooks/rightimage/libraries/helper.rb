@@ -354,8 +354,16 @@ EOF
         end
       end
 
+      def centos?
+        node[:rightimage][:platform] == "centos"
+      end
+
       def rhel?
         node[:rightimage][:platform] == "rhel"
+      end
+
+      def el?
+        centos? || rhel?
       end
 
       def epel_key_name
