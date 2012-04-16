@@ -86,7 +86,7 @@ bash "configure for cloudstack" do
     guest_root=#{guest_root}
 
     case "#{node[:rightimage][:platform]}" in
-    "centos")
+    "centos"|"rhel")
       # following found on functioning CDC test image Centos 64bit using KVM hypervisor
       echo "alias scsi_hostadapter ata_piix"     > $guest_root/etc/modprobe.conf
       echo "alias scsi_hostadapter1 virtio_blk" >> $guest_root/etc/modprobe.conf

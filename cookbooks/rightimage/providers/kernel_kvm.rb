@@ -9,7 +9,7 @@ action :install do
     guest_root=#{guest_root}
 
     case "#{node[:rightimage][:platform]}" in 
-    "centos" )
+    "centos"|"rhel" )
       [ "#{node[:rightimage][:release].to_f < 6}" == "true" ] && chroot $guest_root yum -y install kmod-kvm
 
       kernel_version=$(ls -t $guest_root/lib/modules|awk '{ printf "%s ", $0 }'|cut -d ' ' -f1-1)
@@ -26,7 +26,7 @@ action :install do
       [ "$?" == "1" ] && echo "/sbin/modprobe acpiphp" >> $guest_root/etc/rc.local
       set -e
 
-      chroot $guest_root yum -y install grub
+      yum -c /tmp/yum.conf --installroot=$guest_root -y install grub
       ;;
     "ubuntu" )
       chroot $guest_root apt-get -y install grub
