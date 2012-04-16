@@ -86,7 +86,7 @@ bash "configure for openstack" do
     guest_root=#{guest_root}
 
     case "#{node[:rightimage][:platform]}" in
-    "centos")
+    "centos"|"rhel")
       # clean out packages
       chroot $guest_root yum -y clean all
 
@@ -95,8 +95,12 @@ bash "configure for openstack" do
       chroot $guest_root rpm --rebuilddb
 
       # enable console access
-      echo "2:2345:respawn:/sbin/mingetty tty2" >> $guest_root/etc/inittab
-      echo "tty2" >> $guest_root/etc/securetty
+      if [ -f $guest_root/etc/sysconfig/init ]; then
+        sed -i "s/ACTIVE_CONSOLES=.*/ACTIVE_CONSOLES=\\/dev\\/tty1/" $guest_root/etc/sysconfig/init
+      else
+        echo "2:2345:respawn:/sbin/mingetty tty2" >> $guest_root/etc/inittab
+        echo "tty2" >> $guest_root/etc/securetty
+      fi
 
       # configure dhcp timeout
       echo 'timeout 300;' > $guest_root/etc/dhclient.conf

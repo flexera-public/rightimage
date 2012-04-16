@@ -4,7 +4,7 @@ class Chef::Resource::RubyBlock
 end
 
 packages = case node[:platform]
-           when "centos" then
+           when "centos", "redhat" then
              if node[:platform_version].to_f >= 6.0
                %w(python-setuptools python-devel python-libs)
              else
