@@ -13,14 +13,14 @@ action :install do
       rm -f $guest_root/boot/initrd* $guest_root/initrd*
 
       case "#{node[:rightimage][:platform]}" in
-        "centos" )
+        "centos"|"rhel" )
           kernel_version=$(ls -t $guest_root/lib/modules|awk '{ printf "%s ", $0 }'|cut -d ' ' -f1-1)
     
           # Now rebuild ramdisk with xen drivers
           chroot $guest_root mkinitrd --with=mptbase --with=mptscsih --with=mptspi --with=scsi_transport_spi --with=ata_piix \
              --with=ext3 -v initrd-$kernel_version $kernel_version
           mv $guest_root/initrd-$kernel_version  $guest_root/boot/.
-          chroot $guest_root yum -y install grub
+          yum -c /tmp/yum.conf --installroot=$guest_root -y install grub
         ;;
         "ubuntu" )
           # These don't seem necessary.  Remove in the future?

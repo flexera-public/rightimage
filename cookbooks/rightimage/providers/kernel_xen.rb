@@ -16,10 +16,12 @@ action :install do
       guest_root=#{guest_root}
 
       case #{node[:rightimage][:platform]} in
-        "centos")
-          chroot $guest_root yum -y remove kernel
-          chroot $guest_root yum -y install kernel-xen kmod-xfs-xen 
-    
+        "centos"|"rhel")
+          if [ #{node[:rightimage][:release].to_i} -lt 6 ]; then
+            chroot $guest_root yum -y remove kernel
+            yum -c /tmp/yum.conf --installroot=$guest_root -y install kernel-xen kmod-xfs-xen
+          fi
+
           kernel_version=$(ls -t $guest_root/lib/modules|awk '{ printf "%s ", $0 }'|cut -d ' ' -f1-1)
      
           # Now rebuild ramdisk with xen drivers
