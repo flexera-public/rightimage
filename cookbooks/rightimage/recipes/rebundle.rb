@@ -39,7 +39,7 @@ end
 
 git BaseRhelConstants::REBUNDLE_SOURCE_PATH do
   repository "git@github.com:rightscale/rightimage_rebundle.git"
-  revision "700740a9c868a907305be7c1aeb9c937cefa05b8"
+  revision "12H1"
   action :sync
 end
 
