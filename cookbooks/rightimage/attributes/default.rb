@@ -96,7 +96,6 @@ case rightimage[:cloud]
         set[:rightimage][:fstab][:swap] = "defaults"
     end
   when "vmops", "openstack"
-    rightimage[:host_packages] << " python26-distribute python26-devel python26-libs" if rightimage[:cloud] == "openstack"
 
     case rightimage[:virtual_environment]
     when "xen"

@@ -7,11 +7,19 @@ package "python2.6-dev" do
   only_if { node[:platform] == "ubuntu" }
   action :install
 end
-
 package "python-setuptools" do
   only_if { node[:platform] == "ubuntu" }
   action :install
 end
+
+# work around bug, doesn't chef doesn't install noarch packages for centos without arch flag
+yum_package "python26-distribute" do
+  only_if { node[:platform] =~ /centos|redhat/ }
+  action :install
+  arch "noarch"
+end
+package "python26-libs"  if node[:platform] =~ /centos|redhat/
+package "python26-devel" if node[:platform] =~ /centos|redhat/
 
 bash "install python modules" do
   flags "-ex"
