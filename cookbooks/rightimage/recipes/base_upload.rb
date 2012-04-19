@@ -3,6 +3,12 @@ class Chef::Resource::Bash
   include RightScale::RightImage::Helper
 end
 
+r = gem_package "s3sync" do
+  gem_binary "/usr/bin/gem"
+  action :nothing
+end
+r.run_action(:install)
+
 bash "compress unpartitioned base image " do
   cwd build_root 
   flags "-ex"
