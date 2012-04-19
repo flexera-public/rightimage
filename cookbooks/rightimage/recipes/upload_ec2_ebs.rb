@@ -198,7 +198,8 @@ bash "register EBS snapshot" do
       --url #{node[:rightimage][:ec2_endpoint]} \
       --force
 
-    sleep 10
+## upped time, occassionally 10 seconds is not enough
+    sleep 20
 
 ## delete volume
     /home/ec2/bin/ec2-delete-volume $vol_id \

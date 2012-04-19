@@ -1,7 +1,7 @@
 rs_utils_marker :begin
 #
 # Cookbook Name:: rightimage
-# Recipe:: default
+# Recipe:: bootstrap_rhel
 #
 # Copyright 2011, RightScale, Inc.
 #
@@ -18,7 +18,5 @@ rs_utils_marker :begin
 # limitations under the License.
 #
 
-
-include_recipe "rightimage::clean"
-include_recipe "rightimage::rightscale_install"
+include_recipe "rightimage::bootstrap_centos"
 rs_utils_marker :end

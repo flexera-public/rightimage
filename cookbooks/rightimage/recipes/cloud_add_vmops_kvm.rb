@@ -12,9 +12,6 @@ end
 
 raise "ERROR: you must set your virtual_environment to kvm!"  if node[:rightimage][:virtual_environment] != "kvm"
 
-package "qemu"
-package "grub"
-
 # add fstab
 template "#{guest_root}/etc/fstab" do
   source "fstab.erb"
@@ -89,7 +86,7 @@ bash "configure for cloudstack" do
     guest_root=#{guest_root}
 
     case "#{node[:rightimage][:platform]}" in
-    "centos")
+    "centos"|"rhel")
       # following found on functioning CDC test image Centos 64bit using KVM hypervisor
       echo "alias scsi_hostadapter ata_piix"     > $guest_root/etc/modprobe.conf
       echo "alias scsi_hostadapter1 virtio_blk" >> $guest_root/etc/modprobe.conf
@@ -106,8 +103,12 @@ bash "configure for cloudstack" do
       chroot $guest_root rpm --rebuilddb
 
       # enable console access
-      echo "2:2345:respawn:/sbin/mingetty tty2" >> $guest_root/etc/inittab
-      echo "tty2" >> $guest_root/etc/securetty
+      if [ -f $guest_root/etc/sysconfig/init ]; then
+        sed -i "s/ACTIVE_CONSOLES=.*/ACTIVE_CONSOLES=\\/dev\\/tty1/" $guest_root/etc/sysconfig/init
+      else
+        echo "2:2345:respawn:/sbin/mingetty tty2" >> $guest_root/etc/inittab
+        echo "tty2" >> $guest_root/etc/securetty
+      fi
 
       # configure dns timeout 
       echo 'timeout 300;' > $guest_root/etc/dhclient.conf
@@ -122,9 +123,6 @@ bash "configure for cloudstack" do
       done
       ;;
     esac
-
-    mkdir -p $guest_root/etc/rightscale.d
-    echo "cloudstack" > $guest_root/etc/rightscale.d/cloud
 
     # set hwclock to UTC
     echo "UTC" >> $guest_root/etc/adjtime

@@ -10,12 +10,11 @@ recipe "rightimage::default", "starts builds image automatically at boot. See 'm
 recipe "rightimage::build_image", "build image based on host platform"
 recipe "rightimage::build_base", "build base image based on host platform"
 recipe "rightimage::clean", "cleans everything" 
-recipe "rightimage::base_ubuntu", "coordinate an ubuntu install" 
-recipe "rightimage::base_centos", "coordinate a centos install" 
-recipe "rightimage::base_sles", "coordinate a sles install"
+recipe "rightimage::base_common", "common image configuration" 
 recipe "rightimage::rebundle", "coordinate a rebundled image build (redhat on on ec2 or rackspace)"
 recipe "rightimage::bootstrap_ubuntu", "bootstraps a basic ubuntu image" 
 recipe "rightimage::bootstrap_centos", "bootstraps a basic centos image" 
+recipe "rightimage::bootstrap_rhel", "bootstraps a basic rhel image" 
 recipe "rightimage::bootstrap_sles", "bootstraps a basic sles image" 
 recipe "rightimage::bootstrap_common", "common configuration for linux base images"
 recipe "rightimage::bootstrap_common_debug", "common debug configuration for linux base images" 
@@ -308,6 +307,13 @@ attribute "rightimage/cloudstack/cdc_secret_key",
   :display_name => "CloudStack Secret Key",
   :description => "CloudStack secret key.",
   :required => "required",
+  :recipes => [ "rightimage::upload_vmops" ]
+
+attribute "rightimage/cloudstack/version",
+  :display_name => "CloudStack Version",
+  :description => "CloudStack version.",
+  :required => "required",
+  :choice => [ "2", "3" ],
   :recipes => [ "rightimage::upload_vmops" ]
 
 # RackSpace

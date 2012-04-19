@@ -303,7 +303,6 @@ EOF
       def setup_ec2_tools_env
         bash_snippet = <<-EOF
           . /etc/profile
-          export JAVA_HOME=/usr
           export PATH=$PATH:/usr/local/bin:/home/ec2/bin
           export EC2_HOME=/home/ec2
         EOF
@@ -324,6 +323,18 @@ EOF
         end
       end
 
+      def calc_md5sum(file)
+        require "digest/md5"
+        # read incrementally, files are large can cause out of memory exceptions
+        md5 = ::File.open(file, 'rb') do |io|
+          dig = ::Digest::MD5.new
+          buf = ""
+          dig.update(buf) while io.read(4096, buf)
+          dig
+        end
+        return md5
+      end
+
       def rebundle?
         if node[:rightimage][:cloud] == "ec2" and node[:rightimage][:platform] == "rhel"
           return true
@@ -331,6 +342,37 @@ EOF
           return true
         else
           return false
+        end
+      end
+
+      def rightlink_cloud
+        case node[:rightimage][:cloud]
+        when "euca"
+          "eucalyptus"
+        when "vmops"
+          "cloudstack"
+        else
+          node[:rightimage][:cloud]
+        end
+      end
+
+      def centos?
+        node[:rightimage][:platform] == "centos"
+      end
+
+      def rhel?
+        node[:rightimage][:platform] == "rhel"
+      end
+
+      def el?
+        centos? || rhel?
+      end
+
+      def epel_key_name
+        if node[:rightimage][:release].to_i >= 6
+          "-#{node[:rightimage][:release][0].chr}"
+        else
+          ""
         end
       end
     end

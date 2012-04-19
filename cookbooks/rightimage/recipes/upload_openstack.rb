@@ -3,14 +3,29 @@ class Chef::Resource::RubyBlock
   include RightScale::RightImage::Helper
 end
 
-package "python2.6-dev" do
-  only_if { node[:platform] == "ubuntu" }
-  action :install
+packages = case node[:platform]
+           when "centos", "redhat" then
+             if node[:platform_version].to_f >= 6.0
+               %w(python-setuptools python-devel python-libs)
+             else
+               %w(python26-devel python26-libs)
+             end
+           when "ubuntu" then
+             %w(python2.6-dev python-setuptools)
+           end
+
+packages.each do |p|
+  r = package p do
+    action :nothing
+  end
+  r.run_action(:install)
 end
 
-package "python-setuptools" do
-  only_if { node[:platform] == "ubuntu" }
+# work around bug, doesn't chef doesn't install noarch packages for centos without arch flag
+yum_package "python26-distribute" do
+  only_if { node[:platform] =~ /centos|redhat/ and node[:platform_version].to_f < 6.0 }
   action :install
+  arch "noarch"
 end
 
 bash "install python modules" do
