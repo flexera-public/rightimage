@@ -112,6 +112,11 @@ bash "do_depmod" do
   EOH
 end if node[:rightimage][:platform] == "centos"
 
+log "Add RightLink 5.6 backwards compatibility symlink"
+execute "chroot #{guest_root} ln -s /var/spool/cloud /var/spool/#{rightlink_cloud}" do
+  creates "#{guest_root}/var/spool/#{rightlink_cloud}"
+end
+
 bash "unmount proc & dev" do 
   flags "-ex"
   code <<-EOH
