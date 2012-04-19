@@ -8,7 +8,7 @@ packages = case node[:platform]
              if node[:platform_version].to_f >= 6.0
                %w(python-setuptools python-devel python-libs)
              else
-               %w(python26-distribute python26-devel python26-libs)
+               %w(python26-devel python26-libs)
              end
            when "ubuntu" then
              %w(python2.6-dev python-setuptools)
@@ -19,6 +19,13 @@ packages.each do |p|
     action :nothing
   end
   r.run_action(:install)
+end
+
+# work around bug, doesn't chef doesn't install noarch packages for centos without arch flag
+yum_package "python26-distribute" do
+  only_if { node[:platform] =~ /centos|redhat/ and node[:platform_version].to_f < 6.0 }
+  action :install
+  arch "noarch"
 end
 
 bash "install python modules" do
