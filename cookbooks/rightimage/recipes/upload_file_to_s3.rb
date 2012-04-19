@@ -24,33 +24,14 @@ end
 r.run_action(:install)
 Gem.clear_paths
 
-r = gem_package "formatador" do
+%w(formatador multi_json net-scp ruby-hmac).each do |package|
+r = gem_package package do
   gem_binary "/opt/rightscale/sandbox/bin/gem"
   action :nothing
 end
 r.run_action(:install)
 Gem.clear_paths
-
-r = gem_package "multi_json" do
-  gem_binary "/opt/rightscale/sandbox/bin/gem"
-  action :nothing
 end
-r.run_action(:install)
-Gem.clear_paths
-
-r = gem_package "net-scp" do
-  gem_binary "/opt/rightscale/sandbox/bin/gem"
-  action :nothing
-end
-r.run_action(:install)
-Gem.clear_paths
-
-r = gem_package "ruby-hmac" do
-  gem_binary "/opt/rightscale/sandbox/bin/gem"
-  action :nothing
-end
-r.run_action(:install)
-Gem.clear_paths
 
 r = gem_package "fog" do
   gem_binary "/opt/rightscale/sandbox/bin/gem"
