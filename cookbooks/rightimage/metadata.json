@@ -145,6 +145,20 @@
       "display_name": "Guest OS Release",
       "description": "The OS release/version to build into the virtual image."
     },
+    "rightimage/cloudstack/version": {
+      "required": "required",
+      "calculated": false,
+      "choice": [
+        "2",
+        "3"
+      ],
+      "type": "string",
+      "recipes": [
+        "rightimage::upload_vmops"
+      ],
+      "display_name": "CloudStack Version",
+      "description": "CloudStack version."
+    },
     "rightimage/euca/x509_key": {
       "required": "required",
       "calculated": false,
@@ -672,7 +686,6 @@
     "rightimage::cloud_add_vmops": "adds requirements for cloudstack based on hypervisor choice",
     "rightimage::rightscale_install": "installs rightscale",
     "rightimage::rebundle": "coordinate a rebundled image build (redhat on on ec2 or rackspace)",
-    "rightimage::base_sles": "coordinate a sles install",
     "rightimage::cloud_add_openstack": "adds requirements for openstack based on hypervisor choice",
     "rightimage::cloud_add_euca": "migrates the created image to eucalyptus",
     "rightimage::build_base": "build base image based on host platform",
@@ -684,7 +697,8 @@
     "rightimage::setup_loopback": "creates loopback file",
     "rightimage::bootstrap_sles": "bootstraps a basic sles image",
     "rightimage::bootstrap_ubuntu": "bootstraps a basic ubuntu image",
-    "rightimage::base_ubuntu": "coordinate an ubuntu install",
+    "rightimage::bootstrap_rhel": "bootstraps a basic rhel image",
+    "rightimage::base_common": "common image configuration",
     "rightimage::do_create_mci": "creates MCI for image(s) (only ec2 currently supported)",
     "rightimage::do_destroy_loopback": "unmounts loopback file",
     "rightimage::ec2_download_bundle": "Downloads bundled image from EC2 S3.",
@@ -695,7 +709,6 @@
     "rightimage::copy_image": "Creates non-partitioned image.",
     "rightimage::do_restore": "Restores image snapshot.",
     "rightimage::bootstrap_common": "common configuration for linux base images",
-    "rightimage::base_centos": "coordinate a centos install",
     "rightimage::do_force_reset": "Unmounts and deletes the attached block_device and volumes that were attached to the instance for this lineage.",
     "rightimage::bootstrap_centos": "bootstraps a basic centos image",
     "rightimage::base_upload": "compresses and uploads base image to s3",

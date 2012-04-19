@@ -36,10 +36,6 @@ bash "cleanup" do
   EOH
 end
 
-execute "echo -n #{node[:rightimage][:cloud]} > #{guest_root}/etc/rightscale.d/cloud" do 
-  creates "#{guest_root}/etc/rightscale.d/cloud"
-end
-
 #  - add fstab
 template "#{guest_root}/etc/fstab" do 
   source "fstab.erb" 
@@ -115,6 +111,11 @@ bash "do_depmod" do
   done
   EOH
 end if node[:rightimage][:platform] == "centos"
+
+log "Add RightLink 5.6 backwards compatibility symlink"
+execute "chroot #{guest_root} ln -s /var/spool/cloud /var/spool/#{rightlink_cloud}" do
+  creates "#{guest_root}/var/spool/#{rightlink_cloud}"
+end
 
 bash "unmount proc & dev" do 
   flags "-ex"

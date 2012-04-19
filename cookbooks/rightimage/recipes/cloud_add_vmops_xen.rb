@@ -76,15 +76,17 @@ bash "configure for cloudstack" do
     guest_root=#{guest_root}
 
     case "#{node[:rightimage][:platform]}" in
-    "centos" )
+    "centos"|"rhel" )
       # configure dns timeout 
       echo 'timeout 300;' > $guest_root/etc/dhclient.conf
       rm -f ${guest_root}/var/lib/rpm/__*
       chroot $guest_root rpm --rebuilddb
 
       # enable console access
-      echo "2:2345:respawn:/sbin/mingetty xvc0" >> $guest_root/etc/inittab
-      echo "xvc0" >> $guest_root/etc/securetty
+      if [ ! -f $guest_root/etc/sysconfig/init ]; then
+        echo "2:2345:respawn:/sbin/mingetty xvc0" >> $guest_root/etc/inittab
+        echo "xvc0" >> $guest_root/etc/securetty
+      fi
       ;;
     "ubuntu" )
       # enable console access
@@ -97,10 +99,6 @@ bash "configure for cloudstack" do
       done
       ;;  
     esac 
-
-
-    mkdir -p $guest_root/etc/rightscale.d
-    echo "cloudstack" > $guest_root/etc/rightscale.d/cloud
   EOH
 end
 

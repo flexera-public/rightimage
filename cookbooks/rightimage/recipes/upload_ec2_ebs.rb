@@ -53,7 +53,6 @@ end
 
 bash "create ebs volume" do 
   only_if { node[:rightimage][:cloud] == "ec2" }
-  not_if  { ::File.exists? "/var/tmp/ebs_volume_id" }
   flags "-e"
   code <<-EOH
     #{setup_ec2_tools_env}

@@ -1,8 +1,11 @@
 rs_utils_marker :begin
-class Chef::Resource::Bash
+class Chef::Recipe
   include RightScale::RightImage::Helper
 end
-class Chef::Resource::RubyBlock
+class Chef::Resource
+  include RightScale::RightImage::Helper
+end
+class Erubis::Context
   include RightScale::RightImage::Helper
 end
 
@@ -14,7 +17,21 @@ template "/tmp/yum.conf" do
   })
 end
 
-directory "#{node[:rightimage][:mount_dir]}/tmp" do 
+remote_file "/etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL#{epel_key_name}" do
+   source "RPM-GPG-KEY-EPEL#{epel_key_name}"
+   backup false
+end
+
+directory "#{node[:rightimage][:mount_dir]}/etc/pki/rpm-gpg" do
+  recursive true
+end
+
+remote_file "#{node[:rightimage][:mount_dir]}/etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL#{epel_key_name}" do
+   source "RPM-GPG-KEY-EPEL#{epel_key_name}"
+   backup false
+end
+
+directory "#{node[:rightimage][:mount_dir]}/tmp" do
   recursive true
 end
 
@@ -98,10 +115,10 @@ if [ #{node[:rightimage][:release].to_i} -lt 6 ]; then
 
   echo 'hwcap 0 nosegneg' > #{node[:rightimage][:mount_dir]}/etc/ld.so.conf.d/libc6-xen.conf
   chroot #{node[:rightimage][:mount_dir]} /sbin/ldconfig -v
-
-  curl -o #{node[:rightimage][:mount_dir]}/etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL https://fedoraproject.org/static/217521F6.txt
 else
-  curl -o #{node[:rightimage][:mount_dir]}/etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-6 https://fedoraproject.org/static/0608B895.txt
+  set +e
+  chroot #{node[:rightimage][:mount_dir]} rpm -e --nodeps yum-plugin-fastestmirror
+  set -e
 
   # Disable ttys
   sed -i "s/ACTIVE_CONSOLES=.*/ACTIVE_CONSOLES=/" #{node[:rightimage][:mount_dir]}/etc/sysconfig/init
@@ -171,6 +188,9 @@ echo "Configuring Java Home"
 echo "export JAVA_HOME=/usr/java/default" >> #{node[:rightimage][:mount_dir]}/etc/profile.d/java.sh
 chmod +x #{node[:rightimage][:mount_dir]}/etc/profile.d/java.sh
 
+# Remove system java
+yum -y --installroot=#{guest_root} remove java
+
 #Disable FSCK on the image
 touch #{node[:rightimage][:mount_dir]}/fastboot
 
@@ -212,7 +232,12 @@ remote_file "#{node[:rightimage][:mount_dir]}/etc/profile.d/pkgconfig.sh" do
   backup false
 end
 
-template "#{node[:rightimage][:mount_dir]}/etc/yum.repos.d/CentOS-Base.repo" do 
+repo_file = case node[:rightimage][:platform]
+            when "centos" then "CentOS-Base"
+            when "rhel" then "Epel"
+            end
+
+template "#{node[:rightimage][:mount_dir]}/etc/yum.repos.d/#{repo_file}.repo" do
   source "yum.conf.erb"
   backup false
 end

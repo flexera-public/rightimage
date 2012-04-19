@@ -49,7 +49,6 @@ end
 # bundle and upload
 bash "bundle_upload_s3_image" do 
   only_if { node[:rightimage][:cloud] == "ec2" }
-  not_if { ::File.exists? "/var/tmp/image_id_s3" }
   flags "-e"
   code <<-EOH
     #{setup_ec2_tools_env}

@@ -19,7 +19,7 @@ rs_utils_marker :begin
 #
 
 include_recipe "rightimage::setup_loopback"
-include_recipe "rightimage::bootstrap_#{node[:platform].downcase}"
+include_recipe "rightimage::bootstrap_#{node[:rightimage][:platform].downcase}"
 include_recipe "rightimage::bootstrap_common"
 include_recipe "rightimage::copy_image"
 include_recipe "rightimage::do_destroy_loopback"
