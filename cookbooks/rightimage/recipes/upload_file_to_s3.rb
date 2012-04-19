@@ -45,6 +45,13 @@ end
 r.run_action(:install)
 Gem.clear_paths
 
+r = gem_package "nokogiri" do
+  gem_binary "/opt/rightscale/sandbox/bin/gem"
+  action :nothing
+end
+r.run_action(:install)
+Gem.clear_paths
+
 r = gem_package "ruby-hmac" do
   gem_binary "/opt/rightscale/sandbox/bin/gem"
   action :nothing
