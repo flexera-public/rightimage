@@ -54,8 +54,8 @@ when "ubuntu"
   set[:rightimage][:package_type] = "deb"
   rightimage[:guest_packages] << " euca2ools" if rightimage[:cloud] == "euca"
 
-when "centos" 
-  set[:rightimage][:guest_packages] = "wget mlocate nano logrotate ruby ruby-devel ruby-docs ruby-irb ruby-libs ruby-mode ruby-rdoc ruby-ri ruby-tcltk postfix openssl openssh openssh-askpass openssh-clients openssh-server curl gcc* zip unzip bison flex compat-libstdc++-296 cvs subversion autoconf automake libtool compat-gcc-34-g77 mutt sysstat rpm-build fping vim-common vim-enhanced rrdtool-1.2.27 rrdtool-devel-1.2.27 rrdtool-doc-1.2.27 rrdtool-perl-1.2.27 rrdtool-python-1.2.27 rrdtool-ruby-1.2.27 rrdtool-tcl-1.2.27 pkgconfig lynx screen yum-utils bwm-ng createrepo redhat-rpm-config redhat-lsb git nscd xfsprogs swig libarchive-devel tmux libxml2 libxml2-devel libxslt libxslt-dev"
+when "centos","rhel"
+  set[:rightimage][:guest_packages] = "wget mlocate nano logrotate ruby ruby-devel ruby-docs ruby-irb ruby-libs ruby-mode ruby-rdoc ruby-ri ruby-tcltk postfix openssl openssh openssh-askpass openssh-clients openssh-server curl gcc* zip unzip bison flex compat-libstdc++-296 cvs subversion autoconf automake libtool compat-gcc-34-g77 mutt sysstat rpm-build fping vim-common vim-enhanced rrdtool-1.2.27 rrdtool-devel-1.2.27 rrdtool-doc-1.2.27 rrdtool-perl-1.2.27 rrdtool-python-1.2.27 rrdtool-ruby-1.2.27 rrdtool-tcl-1.2.27 pkgconfig lynx screen yum-utils bwm-ng createrepo redhat-rpm-config redhat-lsb git nscd xfsprogs swig libarchive-devel tmux libxml2 libxml2-devel libxslt libxslt-devel"
 
   rightimage[:guest_packages] << " iscsi-initiator-utils" if rightimage[:cloud] == "vmops" 
 
@@ -73,16 +73,11 @@ case rightimage[:release]
     set[:rightimage][:guest_packages] = rightimage[:guest_packages] + " sysv-rc-conf debian-helper-scripts"
     rightimage[:host_packages] << " ubuntu-vm-builder"
   when "karmic"
-    rightimage[:guest_packages] << " linux-image-ec2"
-    #set[:rightimage][:guest_packages] = rightimage[:guest_packages] + " linux-image-ec2"
     rightimage[:host_packages] << " python-vm-builder-ec2"
   when "lucid"
     if rightimage[:cloud] == "ec2"
-      #set[:rightimage][:guest_packages] = rightimage[:guest_packages] + " linux-image-2.6.32-309-ec2 linux-image-2.6.32-308-ec2 linux-image-2.6.32-305-ec2" 
       rightimage[:host_packages] << " python-vm-builder-ec2 devscripts"
-      #set[:rightimage][:guest_packages] = rightimage[:guest_packages] + " linux-image-virtual-lts-backport-maverick linux-headers-virtual-lts-backport-maverick grub-legacy-ec2" 
     else
-      #set[:rightimage][:guest_packages] = rightimage[:guest_packages] + " linux-image-virtual-lts-backport-maverick linux-headers-virtual-lts-backport-maverick grub-legacy-ec2" 
       rightimage[:host_packages] << " devscripts"
     end
   when "maverick"
@@ -98,14 +93,19 @@ case rightimage[:cloud]
     set[:rightimage][:root_mount][:dump] = "0" 
     set[:rightimage][:root_mount][:fsck] = "0" 
     set[:rightimage][:fstab][:ephemeral] = true
-    set[:rightimage][:ephemeral_mount] = "/dev/sdb" 
+    # Might have to double check don't know if maverick should use kernel linux-image-ec2 or not
+    if rightimage[:platform] == "ubuntu" and rightimage[:release_number].to_f >= 10.10
+      set[:rightimage][:ephemeral_mount] = "/dev/xvdb" 
+    else
+      set[:rightimage][:ephemeral_mount] = "/dev/sdb" 
+    end
     set[:rightimage][:swap_mount] = "/dev/sda3"  unless rightimage[:arch]  == "x86_64"
     case rightimage[:platform]
       when "ubuntu" 
         set[:rightimage][:ephemeral_mount] = "/dev/xvdb" if release_number.to_f >= 12.04
         set[:rightimage][:fstab][:ephemeral_mount_opts] = "defaults,nobootwait"
         set[:rightimage][:fstab][:swap] = "defaults,nobootwait"
-      when "centos"
+      when "centos", "rhel"
         set[:rightimage][:fstab][:ephemeral_mount_opts] = "defaults"
         set[:rightimage][:fstab][:swap] = "defaults"
     end
@@ -153,7 +153,7 @@ case rightimage[:platform]
     set[:rightimage][:getsshkey_cmd] = "chroot $GUEST_ROOT update-rc.d getsshkey start 20 2 3 4 5 . stop 1 0 1 6 ."
     set[:rightimage][:mirror_file] = "sources.list.erb"
     set[:rightimage][:mirror_file_path] = "/etc/apt/sources.list"
-  when "centos"
+  when "centos", "rhel"
     set[:rightimage][:getsshkey_cmd] = "chroot $GUEST_ROOT chkconfig --add getsshkey && \
                chroot $GUEST_ROOT chkconfig --level 4 getsshkey on"
     set[:rightimage][:mirror_file] = "CentOS.repo.erb"

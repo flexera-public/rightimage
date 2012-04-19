@@ -32,6 +32,7 @@ end
 block_device ri_lineage do
   cloud "ec2"
   mount_point target_raw_root 
+  vg_data_percentage "50"
   max_snapshots "1000"
   keep_daily "1000"
   keep_weekly "1000"
