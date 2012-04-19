@@ -10,7 +10,7 @@ action :install do
     if node[:rightimage][:release_number].to_f <= 10.04
       ubuntu_kernel_packages = 'linux-image-ec2 linux-headers-ec2 grub-legacy-ec2'
     end
-
+    not_if { hvm? }
     code <<-EOH
       # Install to guest. 
       guest_root=#{guest_root}

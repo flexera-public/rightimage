@@ -373,6 +373,14 @@ EOF
           ""
         end
       end
+
+      def hvm?
+        if node[:rightimage][:cloud] == "ec2"
+          node[:ec2][:profile] == "default-hvm"
+        else
+          false
+        end
+      end
     end
   end
 end
