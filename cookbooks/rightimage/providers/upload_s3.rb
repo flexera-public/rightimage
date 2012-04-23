@@ -31,7 +31,7 @@ action :upload do
       require 'rubygems'
       require 'fog'
       Chef::Log.info("Init fog...")
-      storage = 
+      storage =
         Fog::Storage.new(
           :provider               => 'AWS',
           :host                   => 's3-us-west-1.amazonaws.com',
@@ -49,7 +49,7 @@ action :upload do
 #      `cd #{part_dir} && split -b 100m #{file}`
    
       Chef::Log::info('Initiating upload')
-      file = b.files.create(
+      created_file = b.files.create(
         :key    => s3_file,
         :body   => ::File.open(file),
         :public => true
@@ -87,10 +87,13 @@ action :upload do
 #      response = storage.list_multipart_uploads bucket_name
 #      Chef::Log::info(response.inspect)
 #
+
       Chef::Log::info('Checking the uploaded object')
-      response = storage.directories.get(bucket_name).files.get(s3_file)
-      Chef::Log::info(response.inspect)
+      aws_file = storage.directories.get(bucket_name).files.find {|f| f.key == s3_file}
+      md5sum = calc_md5sum(file)
+      raise "Could not find file [#{s3_file}] in bucket" unless aws_file
+      Chef::Log::info(aws_file)
+      raise "ETag[#{aws_file.etag}] and MD5[#{md5sum}] don't match" unless aws_file.etag.to_s == md5sum.to_s
     end
   end
 end
-      

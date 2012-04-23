@@ -9,7 +9,9 @@ end
 
 # Most of the heavy lifting, install the os from scratch
 rightimage_os node[:rightimage][:platform] do
-  provider "rightimage_os_#{node[:rightimage][:platform]}"
+  platform = node[:rightimage][:platform]
+  platform = "centos" if platform == "rhel"
+  provider "rightimage_os_#{platform}"
   action :install
 end
 

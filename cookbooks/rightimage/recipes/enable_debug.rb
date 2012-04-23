@@ -1,8 +1,5 @@
 rs_utils_marker :begin
-class Chef::Resource::Template
-  include RightScale::RightImage::Helper
-end
-class Chef::Resource::Bash
+class Chef::Resource
   include RightScale::RightImage::Helper
 end
 class Chef::Recipe
@@ -27,9 +24,8 @@ if node[:rightimage][:debug] == "true"
 
   bash "setup root password" do 
     only_if { ((node[:rightimage][:debug] == "true")  && (image_name =~ /Dev/))  }
+    flags "-ex"
     code <<-EOH
-      set -e
-      set -x
       ## set random root passwd 
       echo 'echo root:#{generate_persisted_passwd} | chpasswd' > #{guest_root}/tmp/chpasswd
       chmod +x #{guest_root}/tmp/chpasswd

@@ -59,6 +59,11 @@ execute "echo -n #{node[:rightimage][:cloud]} > #{guest_root}/etc/rightscale.d/c
   creates "#{guest_root}/etc/rightscale.d/cloud"
 end
 
+log "Add RightLink 5.6 backwards compatibility symlink"
+execute "chroot #{guest_root} ln -s /var/spool/cloud /var/spool/#{node[:rightimage][:cloud]}" do
+  creates "#{guest_root}/var/spool/#{node[:rightimage][:cloud]}"
+end
+
 include_recipe "rightimage::enable_debug" if node[:rightimage][:debug] == "true"
 
 # BEGIN cloud specific additions

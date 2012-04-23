@@ -1,7 +1,7 @@
 rs_utils_marker :begin
 #
 # Cookbook Name:: rightimage
-# Recipe:: default
+# Recipe:: base_common
 #
 # Copyright 2011, RightScale, Inc.
 #
@@ -17,8 +17,29 @@ rs_utils_marker :begin
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+class Chef::Resource
+  include RightScale::RightImage::Helper
+end
 class Chef::Recipe
   include RightScale::RightImage::Helper
+end
+class Erubis::Context
+  include RightScale::RightImage::Helper
+end
+
+template "/tmp/yum.conf" do
+  only_if { el? }
+  source "yum.conf.erb"
+  backup false
+  variables ({
+    :bootstrap => true
+  })
+end
+
+remote_file "/etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL#{epel_key_name}" do
+  only_if { el? }
+  source "RPM-GPG-KEY-EPEL#{epel_key_name}"
+  backup false
 end
 
 directory target_temp_root do
@@ -32,9 +53,9 @@ packages = case node[:platform]
            when "centos", /redhat/ then %w(libxml2-devel libxslt-devel)
            end
 
-packages.each do |p| 
-  r = package p do 
-    action :nothing 
+packages.each do |p|
+  r = package p do
+    action :nothing
   end
   r.run_action(:install)
 end
@@ -43,8 +64,9 @@ node[:rightimage][:host_packages].split.each { |p| package p }
 
 include_recipe "rightimage::clean"
 include_recipe "rightimage::rightscale_install"
-include_recipe "rightimage::cloud_add"
-include_recipe "rightimage::do_destroy_loopback"
-include_recipe "rightimage::cloud_package"
-#include_recipe "rightimage::upload_image_s3"
+
+log "Add RightLink cloud file"
+execute "echo -n #{rightlink_cloud} > #{guest_root}/etc/rightscale.d/cloud" do
+  creates "#{guest_root}/etc/rightscale.d/cloud"
+end
 rs_utils_marker :end

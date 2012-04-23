@@ -5,7 +5,7 @@ action :configure do
       guest_root=#{guest_root}
 
       case "#{node[:rightimage][:platform]}" in
-      "centos")
+      "centos"|"rhel")
         # clean out packages
         chroot $guest_root yum -y clean all
 
@@ -14,8 +14,12 @@ action :configure do
         chroot $guest_root rpm --rebuilddb
 
         # enable console access
-        echo "2:2345:respawn:/sbin/mingetty tty2" >> $guest_root/etc/inittab
-        echo "tty2" >> $guest_root/etc/securetty
+        if [ -f $guest_root/etc/sysconfig/init ]; then
+          sed -i "s/ACTIVE_CONSOLES=.*/ACTIVE_CONSOLES=\\/dev\\/tty1/" $guest_root/etc/sysconfig/init
+        else
+          echo "2:2345:respawn:/sbin/mingetty tty2" >> $guest_root/etc/inittab
+          echo "tty2" >> $guest_root/etc/securetty
+        fi
 
         # configure dhcp timeout
         echo 'timeout 300;' > $guest_root/etc/dhclient.conf
@@ -39,14 +43,29 @@ end
 
 
 action :upload do
-  package "python2.6-dev" do
-    only_if { node[:platform] == "ubuntu" }
-    action :install
+  packages = case node[:platform]
+             when "centos", "redhat" then
+               if node[:platform_version].to_f >= 6.0
+                 %w(python-setuptools python-devel python-libs)
+               else
+                 %w(python26-devel python26-libs)
+               end
+             when "ubuntu" then
+               %w(python2.6-dev python-setuptools)
+             end
+
+  packages.each do |p|
+    r = package p do
+      action :nothing
+    end
+    r.run_action(:install)
   end
 
-  package "python-setuptools" do
-    only_if { node[:platform] == "ubuntu" }
+  # work around bug, doesn't chef doesn't install noarch packages for centos without arch flag
+  yum_package "python26-distribute" do
+    only_if { node[:platform] =~ /centos|redhat/ and node[:platform_version].to_f < 6.0 }
     action :install
+    arch "noarch"
   end
 
   bash "install python modules" do

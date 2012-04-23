@@ -151,7 +151,6 @@ def upload_ebs(guest_root)
 
 
   bash "create ebs volume" do 
-    not_if  { ::File.exists? "/var/tmp/ebs_volume_id" }
     flags "-e"
     code <<-EOH
       #{setup_ec2_tools_env}
@@ -187,7 +186,7 @@ def upload_ebs(guest_root)
         --url #{node[:rightimage][:ec2_endpoint]} \
         --instance #{node[:ec2][:instance_id]} 
 
-      sleep 10
+      sleep 20
 
   ## loop and wait for volume to become available, up to 20 minutes
       for i in `seq 1 60`; do
