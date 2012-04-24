@@ -1,14 +1,11 @@
 rs_utils_marker :begin
-class Chef::Resource::Bash
+class Chef::Resource
   include RightScale::RightImage::Helper
 end
 class Chef::Recipe
   include RightScale::RightImage::Helper
 end
 class Erubis::Context
-  include RightScale::RightImage::Helper
-end
-class Chef::Resource::Execute
   include RightScale::RightImage::Helper
 end
 
@@ -23,8 +20,6 @@ bash "clean yum" do
     yum clean all
   EOH
 end
-
-package "grub"
 
 #  - add fstab
 template "#{guest_root}/etc/fstab" do
@@ -46,6 +41,11 @@ bash "mount proc & dev" do
   flags "-ex"
   code <<-EOH
     guest_root=#{guest_root}
+
+    umount -lf $guest_root/proc || true
+    umount -lf $guest_root/dev || true
+    umount -lf $guest_root/sys || true
+
     mount -t proc none $guest_root/proc
     mount --bind /dev $guest_root/dev
     mount --bind /sys $guest_root/sys
@@ -54,8 +54,6 @@ end
 
 rightimage_kernel "Install PV Kernel for Hypervisor" do
   provider "rightimage_kernel_#{node[:rightimage][:virtual_environment]}"
-  guest_root guest_root
-  version node[:rightimage][:kernel_id]
   action :install
 end
 
@@ -91,6 +89,7 @@ end
 
 bash "configure for eucalyptus" do
   flags "-ex"
+  only_if { node[:rightimage][:platform] == "centos" }
   code <<-EOH
     guest_root=#{guest_root}
 
@@ -136,16 +135,6 @@ bash "package guest image" do
     cp $guest_root/boot/initrd-$KERNEL_VERSION $package_dir/xen-kernel
     cp #{target_raw_path} $package_dir/$image_name.img
     tar czvf $image_name.tar.gz $image_name 
-  EOH
-end
-
-bash "unmount" do
-  flags "-x"
-  code <<-EOH
-    guest_root=#{guest_root}
-    loopdev=#{loop_dev}  
-    umount -lf $guest_root || true
-    losetup -d $loopdev
   EOH
 end
 rs_utils_marker :end
