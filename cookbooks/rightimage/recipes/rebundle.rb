@@ -93,8 +93,9 @@ bash "launch the remote instance" do
   flavor_opt = node[:rightimage][:cloud] == "ec2" ? "--flavor-id c1.medium" : ""
   zone = node[:rightimage][:datacenter].to_s.empty? ? "US" : node[:rightimage][:datacenter]
   name_opt   = node[:rightimage][:cloud] == "rackspace" ? "--hostname ri-rebundle-#{node[:rightimage][:platform]}-#{zone.downcase}" : ""
+  debug_opt = node[:rightimage][:debug] == "true" ? "--debug" : ""
   code <<-EOH
-  /opt/rightscale/sandbox/bin/ruby bin/launch --provider #{node[:rightimage][:cloud]} --image-id #{node[:rightimage][:rebundle_base_image_id]} #{region_opt} #{flavor_opt} #{name_opt} #{resize_opt} --no-auto
+  /opt/rightscale/sandbox/bin/ruby bin/launch --provider #{node[:rightimage][:cloud]} --image-id #{node[:rightimage][:rebundle_base_image_id]} #{region_opt} #{flavor_opt} #{name_opt} #{resize_opt} #{debug_opt} --no-auto
   EOH
 end
 
