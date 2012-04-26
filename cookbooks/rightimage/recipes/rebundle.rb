@@ -114,8 +114,9 @@ end
 bash "configure the remote instance" do
   flags "-ex"
   cwd BaseRhelConstants::REBUNDLE_SOURCE_PATH
+  debug_opt = node[:rightimage][:debug] == "true" ? "--debug" : ""
   code <<-EOH
-  /opt/rightscale/sandbox/bin/ruby bin/configure --rightlink #{node[:rightimage][:rightlink_version]}
+  /opt/rightscale/sandbox/bin/ruby bin/configure --rightlink #{node[:rightimage][:rightlink_version]} #{debug_opt}
   EOH
 end
 
