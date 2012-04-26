@@ -112,21 +112,6 @@
       "display_name": "Build number",
       "description": "Build number of this image.  Defaults to 0"
     },
-    "rightimage/rebundle_base_image_id": {
-      "required": "optional",
-      "calculated": false,
-      "choice": [
-
-      ],
-      "default": "",
-      "type": "string",
-      "recipes": [
-        "rightimage::default",
-        "rightimage::rebundle"
-      ],
-      "display_name": "Rebundle Base Image ID",
-      "description": "Cloud specific ID for the image to start with when building a rebundle image"
-    },
     "rightimage/release": {
       "required": "required",
       "calculated": false,
@@ -306,6 +291,21 @@
       ],
       "display_name": "Eucalyptus Access Key",
       "description": "The EC2_ACCESS_KEY value defined in your eucarc credentials file. User must have admin privileges."
+    },
+    "rightimage/rebundle/base_image_id": {
+      "required": "optional",
+      "calculated": false,
+      "choice": [
+
+      ],
+      "default": "",
+      "type": "string",
+      "recipes": [
+        "rightimage::default",
+        "rightimage::rebundle"
+      ],
+      "display_name": "Rebundle Base Image ID",
+      "description": "Cloud specific ID for the image to start with when building a rebundle image"
     },
     "rightimage/cloud": {
       "required": "recommended",
@@ -538,6 +538,21 @@
       ],
       "display_name": "Openstack Hostname",
       "description": "Hostname of Openstack Cloud Controller."
+    },
+    "rightimage/rebundle/revision": {
+      "required": "optional",
+      "calculated": false,
+      "choice": [
+
+      ],
+      "default": "master",
+      "type": "string",
+      "recipes": [
+        "rightimage::default",
+        "rightimage::rebundle"
+      ],
+      "display_name": "Rebundle revision",
+      "description": "Branch or tag of rebundle project to use"
     },
     "rightimage/mci_name": {
       "required": "optional",

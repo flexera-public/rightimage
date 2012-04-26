@@ -3,10 +3,11 @@ module RightScale
     module Helper
       def image_name
         raise "ERROR: you must specify an image_name!" unless node[:rightimage][:image_name] =~ /./
-      	name = node[:rightimage][:image_name].dup
-      	name << "_#{generate_persisted_passwd}" if node[:rightimage][:debug] == "true" && node[:rightimage][:build_mode] != "migrate"
-      	name
-      end   
+        name = node[:rightimage][:image_name].dup
+        name << "_#{generate_persisted_passwd}" if node[:rightimage][:debug] == "true" && node[:rightimage][:build_mode] != "migrate" && node[:rightimage][:cloud] != "rackspace"
+        name.gsub!("_","-") if node[:rightimage][:cloud] == "rackspace"
+        name
+      end
 
       def mci_base_name
         if node[:rightimage][:mci_name] =~ /./

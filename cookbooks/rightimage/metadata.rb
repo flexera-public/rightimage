@@ -158,7 +158,14 @@ attribute "rightimage/mci_name",
    :recipes => [ "rightimage::do_create_mci" ],
    :required => "optional"
 
-attribute "rightimage/rebundle_base_image_id",
+attribute "rightimage/rebundle/revision",
+  :display_name => "Rebundle revision",
+  :description => "Branch or tag of rebundle project to use",
+  :required => "optional",
+  :default => "master",
+  :recipes => [ "rightimage::default", "rightimage::rebundle"]
+
+attribute "rightimage/rebundle/base_image_id",
   :display_name => "Rebundle Base Image ID",
   :description => "Cloud specific ID for the image to start with when building a rebundle image",
   :required => "optional",
