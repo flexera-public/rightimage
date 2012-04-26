@@ -133,7 +133,7 @@ bash "bundle instance" do
   environment(cloud_credentials)
   certs_opt = node[:rightimage][:cloud] == "ec2" ? "--aws-cert /tmp/AWS_X509_CERT.pem --aws-key /tmp/AWS_X509_KEY.pem" : ""
   code <<-EOH
-  /opt/rightscale/sandbox/bin/ruby bin/bundle --name #{image_name} #{certs_opt}
+  /opt/rightscale/sandbox/bin/ruby bin/bundle --name #{node[:rightimage][:image_name]} #{certs_opt}
   EOH
 end
 #
