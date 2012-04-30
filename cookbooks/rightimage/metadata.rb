@@ -180,7 +180,7 @@ attribute "rightimage/ec2/image_type",
   :default => "InstanceStore",
   :recipes => ["rightimage::build_image", "rightimage::default", "rightimage::upload_image_cloud"],
   :choice => [ "InstanceStore", "EBS" ],
-  :required => "required"
+  :required => "recommended"
 
 attribute "rightimage/aws_account_number",
   :display_name => "aws_account_number",

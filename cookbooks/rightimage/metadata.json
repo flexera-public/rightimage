@@ -543,7 +543,7 @@
       "description": "Hostname of Openstack Cloud Controller."
     },
     "rightimage/ec2/image_type": {
-      "required": "required",
+      "required": "recommended",
       "calculated": false,
       "choice": [
         "InstanceStore",
