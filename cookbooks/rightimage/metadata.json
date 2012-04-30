@@ -329,7 +329,8 @@
         "vmops",
         "euca",
         "openstack",
-        "rackspace"
+        "rackspace",
+        "rackspace_managed"
       ],
       "type": "string",
       "recipes": [
