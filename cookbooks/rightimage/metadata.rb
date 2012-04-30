@@ -174,6 +174,14 @@ attribute "rightimage/mci_name",
 aws_x509_recipes = ["rightimage::upload_image_cloud", "rightimage::rebundle", "rightimage::default", "rightimage::ec2_download_bundle"]
 aws_api_recipes = aws_x509_recipes + ["rightimage::build_base", "rightimage::build_image", "rightimage::upload_image_s3", "rightimage::upload_base"]
 
+attribute "rightimage/ec2/image_type",
+  :display_name => "EC2 Image Type",
+  :description => "Type of EC2 Image upload_image_cloud recipe will create",
+  :default => "InstanceStore",
+  :recipes => ["rightimage::build_image", "rightimage::default", "rightimage::upload_image_cloud"],
+  :choice => [ "InstanceStore", "EBS" ],
+  :required => "required"
+
 attribute "rightimage/aws_account_number",
   :display_name => "aws_account_number",
   :description => "aws_account_number",

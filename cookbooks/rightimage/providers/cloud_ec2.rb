@@ -78,9 +78,9 @@ end
 
 action :upload do
   guest_root = new_resource.guest_root
-  is_ebs = new_resource.image_type =~ /ebs/i
+  is_ebs = new_resource.image_type =~ /ebs/i or new_resource.image_name =~ /_EBS/
   image_name = new_resource.image_name
-  image_name << "_EBS" if is_ebs
+  image_name << "_EBS" if is_ebs and image_name !~ /_EBS/
 
   # Clean up guest image
   rightimage guest_root do
