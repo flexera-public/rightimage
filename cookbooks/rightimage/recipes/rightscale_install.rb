@@ -2,9 +2,8 @@ rs_utils_marker :begin
 directory "#{node[:rightimage][:mount_dir]}/etc/rightscale.d" 
 
 # Install rightscale package based on revision number
-if node[:rightimage][:rightlink_version] =~ /4\.[0-9]*\.[0-9]*/
-  log "Building image with RunRightScripts package."
-  include_recipe "rightimage::rightscale_runrightscripts"
+if node[:rightimage][:rightlink_version] =~ /^4\.[0-9]*\.[0-9]*/
+  raise "rightlink versions < 5 not supported"
 else
   log "Building image with RightLink package."
   include_recipe "rightimage::rightscale_rightlink"
