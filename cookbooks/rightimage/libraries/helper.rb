@@ -334,8 +334,12 @@ EOF
         centos? || rhel?
       end
 
+      def el6?
+        (centos? || rhel?) and node[:platform_version].to_f >= 6.0
+      end
+
       def epel_key_name
-        if node[:rightimage][:release].to_i >= 6
+        if node[:rightimage][:release].to_i >= 6.0
           "-#{node[:rightimage][:release][0].chr}"
         else
           ""

@@ -1,6 +1,8 @@
 
 action :package do
-  package "qemu"
+  qemu_package = el6? ? "qemu-img" : "qemu"
+  package qemu_package
+
   bash "package image" do 
     cwd target_temp_root
     flags "-ex"

@@ -17,6 +17,9 @@ set[:rightimage][:root_mount][:label_dev] = "ROOT"
 set[:rightimage][:root_mount][:dev] = "LABEL=#{rightimage[:root_mount][:label_dev]}"
 set_unless[:rightimage][:image_source_bucket] = "rightscale-us-west-2"
 
+# if ubuntu then figure out the numbered name
+set[:rightimage][:release_number] = release_number
+
 if rightimage[:platform] == "ubuntu"
   set[:rightimage][:mirror_date] = "#{timestamp[0..3]}/#{timestamp[4..5]}/#{timestamp[6..7]}"
   set[:rightimage][:mirror_url] = "http://#{node[:rightimage][:mirror]}/ubuntu_daily/#{node[:rightimage][:mirror_date]}"
@@ -128,18 +131,6 @@ case rightimage[:cloud]
     end
 end
 
-case node[:rightimage][:cloud]
-when "vmops", "openstack"
-  case rightimage[:virtual_environment]
-  when "kvm", "esxi"
-    if (node[:platform] == "centos" || rhel?) && node[:platform_version].to_f >= 6.0
-      rightimage[:host_packages] << " qemu-img"
-    else
-      rightimage[:host_packages] << " qemu"
-    end
-  end
-end
-
 # set rightscale stuff
 set_unless[:rightimage][:rightlink_version] = ""
 set_unless[:rightimage][:sandbox_repo_tag] = "rightlink_package_#{rightimage[:rightlink_version]}"
@@ -159,97 +150,3 @@ case rightimage[:platform]
     set[:rightimage][:mirror_file_path] = "/etc/yum.repos.d/CentOS.repo"
 
 end
-
-# set default EC2 endpoint
-case rightimage[:region]
-  when "us-east"
-    set[:rightimage][:ec2_endpoint] = "https://ec2.us-east-1.amazonaws.com"
-  when "us-west"
-    set[:rightimage][:ec2_endpoint] = "https://ec2.us-west-1.amazonaws.com"
-  when "us-west-2"
-    set[:rightimage][:ec2_endpoint] = "https://ec2.us-west-2.amazonaws.com"
-  when "eu-west"
-    set[:rightimage][:ec2_endpoint] = "https://ec2.eu-west-1.amazonaws.com"
-  when "ap-southeast"
-    set[:rightimage][:ec2_endpoint] = "https://ec2.ap-southeast-1.amazonaws.com"
-  when "ap-northeast"
-    set[:rightimage][:ec2_endpoint] = "https://ec2.ap-northeast-1.amazonaws.com"
-  when "sa-east"
-    set[:rightimage][:ec2_endpoint] = "https://ec2.sa-east-1.amazonaws.com"
-  else
-    set[:rightimage][:ec2_endpoint] = "https://ec2.us-east-1.amazonaws.com"
-end #if rightimage[:cloud] == "ec2" 
-
-# if ubuntu then figure out the numbered name
-set[:rightimage][:release_number] = release_number
-
-
-case rightimage[:cloud]
-when "ec2"
-  # Using pvgrub kernels
-  case rightimage[:region]
-  when "us-east"
-    case rightimage[:arch]
-    when "i386" 
-      set[:rightimage][:aki_id] = "aki-805ea7e9"
-      set[:rightimage][:ramdisk_id] = nil
-    when "x86_64"
-      set[:rightimage][:aki_id] = "aki-825ea7eb"
-      set[:rightimage][:ramdisk_id] = nil
-    end
-  when "us-west"
-    case rightimage[:arch]
-    when "i386" 
-      set[:rightimage][:aki_id] = "aki-83396bc6"
-      set[:rightimage][:ramdisk_id] = nil
-    when "x86_64"
-      set[:rightimage][:aki_id] = "aki-8d396bc8"
-      set[:rightimage][:ramdisk_id] = nil
-    end
-  when "eu-west" 
-    case rightimage[:arch]
-    when "i386" 
-      set[:rightimage][:aki_id] = "aki-64695810"
-      set[:rightimage][:ramdisk_id] = nil
-    when "x86_64"
-      set[:rightimage][:aki_id] = "aki-62695816"
-      set[:rightimage][:ramdisk_id] = nil
-    end
-  when "ap-southeast"
-    case rightimage[:arch]
-    when "i386" 
-      set[:rightimage][:aki_id] = "aki-a4225af6"
-      set[:rightimage][:ramdisk_id] = nil
-    when "x86_64"
-      set[:rightimage][:aki_id] = "aki-aa225af8"
-      set[:rightimage][:ramdisk_id] = nil
-    end
-  when "ap-northeast"
-    case rightimage[:arch]
-    when "i386" 
-      set[:rightimage][:aki_id] = "aki-ec5df7ed"
-      set[:rightimage][:ramdisk_id] = nil
-    when "x86_64"
-      set[:rightimage][:aki_id] = "aki-ee5df7ef"
-      set[:rightimage][:ramdisk_id] = nil
-    end
-  when "us-west-2"
-    case rightimage[:arch]
-    when "i386" 
-      set[:rightimage][:aki_id] = "aki-c2e26ff2"
-      set[:rightimage][:ramdisk_id] = nil
-    when "x86_64"
-      set[:rightimage][:aki_id] = "aki-98e26fa8"
-      set[:rightimage][:ramdisk_id] = nil
-    end
-  when "sa-east"
-    case rightimage[:arch]
-    when "i386" 
-      set[:rightimage][:aki_id] = "aki-bc3ce3a1"
-      set[:rightimage][:ramdisk_id] = nil
-    when "x86_64"
-      set[:rightimage][:aki_id] = "aki-cc3ce3d1"
-      set[:rightimage][:ramdisk_id] = nil
-    end
-  end
-end # case rightimage[:cloud]

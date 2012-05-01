@@ -27,7 +27,6 @@ class Chef::Recipe
 end
 
 package "grub"
-package "qemu"
 
 rightimage_cloud node[:rightimage][:cloud] do
   provider "rightimage_cloud_#{node[:rightimage][:cloud]}"

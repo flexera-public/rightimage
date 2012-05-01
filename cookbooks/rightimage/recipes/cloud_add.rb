@@ -30,7 +30,6 @@ class Erubis::Context
 end
 
 package "grub"
-package "qemu"
 
 bash "mount proc & dev" do
   flags "-ex"
