@@ -91,6 +91,14 @@ action :upload do
     command "umount '#{guest_root}/proc' || true"
   end
 
+  bash "setup keyfiles" do
+    not_if { ::File.exists? "/tmp/AWS_X509_KEY.pem" }
+    code <<-EOH
+      echo "#{node[:rightimage][:aws_509_key]}" > /tmp/AWS_X509_KEY.pem
+      echo "#{node[:rightimage][:aws_509_cert]}" > /tmp/AWS_X509_CERT.pem
+    EOH
+  end
+
   bash "check that image doesn't exist" do
     flags "-e"
     code <<-EOH
@@ -103,14 +111,6 @@ action :upload do
         echo $images
         exit 1
       fi 
-    EOH
-  end
-
-  bash "setup keyfiles" do
-    not_if { ::File.exists? "/tmp/AWS_X509_KEY.pem" }
-    code <<-EOH
-      echo "#{node[:rightimage][:aws_509_key]}" > /tmp/AWS_X509_KEY.pem
-      echo "#{node[:rightimage][:aws_509_cert]}" > /tmp/AWS_X509_CERT.pem
     EOH
   end
 
