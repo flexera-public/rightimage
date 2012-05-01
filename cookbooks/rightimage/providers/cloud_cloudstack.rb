@@ -5,6 +5,20 @@ end
 
 
 action :configure do
+  bash "install guest packages" do 
+    flags '-ex'
+    code <<-EOH
+  case "#{node[:rightimage][:platform]}" in
+    "ubuntu")
+      chroot #{guest_root} apt-get -y install iscsi-initiator-utils"
+      ;;
+    "centos"|"rhel")
+      chroot #{guest_root} yum -y install iscsi-initiator-utils"
+      ;;
+  esac
+    EOH
+  end
+
   # insert grub conf, and link menu.lst to grub.conf
   directory "#{new_resource.guest_root}/boot/grub" do
     owner "root"
