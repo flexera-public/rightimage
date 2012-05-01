@@ -8,6 +8,18 @@ action :configure do
     end
   end
 
+  bash "install euca tools for ubuntu" do
+    only_if { node[:rightimage][:platform] == "ubuntu" }
+    flags "-ex"
+    code <<-EOH
+      # install on host
+      apt-get -y install euca2ools
+
+      #install on guest_root image
+      chroot #{guest_root} apt-get install -y euca2ools
+    EOH
+  end
+
   bash "clean yum" do
     only_if { node[:platform] == "centos" }
     flags "-x"
@@ -24,10 +36,6 @@ action :configure do
   remote_file "/tmp/euca2ools-#{euca_tools_version}-centos-x86_64.tar.gz" do 
     source "euca2ools-#{euca_tools_version}-centos-x86_64.tar.gz"
     backup false
-  end
-
-  package "euca2ools" do
-    only_if { node[:rightimage][:platform] == "ubuntu" }
   end
 
   bash "install euca tools for centos" do 
