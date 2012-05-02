@@ -24,10 +24,11 @@ class Chef::Recipe
 end
 class Chef::Resource
   include RightScale::RightImage::Helper
+  alias :helper_image_name :image_name
 end
 
 rightimage_cloud node[:rightimage][:cloud] do
-  image_name  ::RightScale::RightImage::Helper.image_name
+  image_name  helper_image_name
   image_type  node[:rightimage][:ec2][:image_type]
 
   hypervisor  node[:rightimage][:hypervisor]

@@ -21,6 +21,7 @@ rs_utils_marker :begin
 
 class Chef::Resource
   include RightScale::RightImage::Helper
+  alias :helper_image_name :image_name
 end
 class Chef::Recipe
   include RightScale::RightImage::Helper
@@ -75,7 +76,7 @@ rightimage_hypervisor node[:rightimage][:hypervisor] do
 end
 
 rightimage_cloud node[:rightimage][:cloud] do
-  image_name  ::RightScale::RightImage::Helper.image_name
+  image_name  helper_image_name
 
   hypervisor  node[:rightimage][:hypervisor]
   arch        node[:rightimage][:arch]
