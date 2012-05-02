@@ -32,7 +32,7 @@ module RightScale
       end
 
       def image_file_ext
-        case node[:rightimage][:virtual_environment]
+        case node[:rightimage][:hypervisor]
         when "xen"
           "vhd.bz2"
         when "kvm"
@@ -158,7 +158,7 @@ EOF
       
       def partition_number
         number = 0
-        number = 1 if partitioned? && is_ubuntu? && node[:rightimage][:virtual_environment] == "xen"
+        number = 1 if partitioned? && is_ubuntu? && node[:rightimage][:hypervisor] == "xen"
         number
       end
       
@@ -171,7 +171,7 @@ EOF
         when "ec2", "eucalyptus"
           return FALSE
         when "cloudstack"
-          case node[:rightimage][:virtual_environment]
+          case node[:rightimage][:hypervisor]
           when "xen"
             if is_ubuntu?
               return TRUE

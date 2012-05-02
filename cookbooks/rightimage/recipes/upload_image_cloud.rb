@@ -30,7 +30,7 @@ rightimage_cloud node[:rightimage][:cloud] do
   image_name  ::RightScale::RightImage::Helper.image_name
   image_type  node[:rightimage][:ec2][:image_type]
 
-  hypervisor  node[:rightimage][:virtual_environment]
+  hypervisor  node[:rightimage][:hypervisor]
   arch        node[:rightimage][:arch]
   platform    node[:rightimage][:platform]
   release     node[:rightimage][:release_number].to_f

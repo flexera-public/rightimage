@@ -66,20 +66,20 @@ end
 include_recipe "rightimage::enable_debug" if node[:rightimage][:debug] == "true"
 
 # BEGIN cloud specific additions
-rightimage_hypervisor node[:rightimage][:virtual_environment] do
-  provider "rightimage_hypervisor_#{node[:rightimage][:virtual_environment]}"
+rightimage_hypervisor node[:rightimage][:hypervisor] do
+  provider "rightimage_hypervisor_#{node[:rightimage][:hypervisor]}"
   action :install_kernel
 end
 
-rightimage_hypervisor node[:rightimage][:virtual_environment] do
-  provider "rightimage_hypervisor_#{node[:rightimage][:virtual_environment]}"
+rightimage_hypervisor node[:rightimage][:hypervisor] do
+  provider "rightimage_hypervisor_#{node[:rightimage][:hypervisor]}"
   action :install_tools
 end
 
 rightimage_cloud node[:rightimage][:cloud] do
   image_name  ::RightScale::RightImage::Helper.image_name
 
-  hypervisor  node[:rightimage][:virtual_environment]
+  hypervisor  node[:rightimage][:hypervisor]
   arch        node[:rightimage][:arch]
   platform    node[:rightimage][:platform]
   release     node[:rightimage][:release_number].to_f

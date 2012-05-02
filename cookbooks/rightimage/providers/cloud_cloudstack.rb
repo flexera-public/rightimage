@@ -8,7 +8,7 @@ action :configure do
   bash "install guest packages" do 
     flags '-ex'
     code <<-EOH
-  case "#{node[:rightimage][:platform]}" in
+  case "#{new_resource.platform}" in
     "ubuntu")
       chroot #{guest_root} apt-get -y install iscsi-initiator-utils"
       ;;
@@ -20,7 +20,7 @@ action :configure do
   end
 
   # insert grub conf, and link menu.lst to grub.conf
-  directory "#{new_resource.guest_root}/boot/grub" do
+  directory "#{guest_root}/boot/grub" do
     owner "root"
     group "root"
     mode "0750"
@@ -29,7 +29,7 @@ action :configure do
   end 
 
   # insert grub conf
-  template "#{new_resource.guest_root}/boot/grub/grub.conf" do 
+  template "#{guest_root}/boot/grub/grub.conf" do 
     source "menu.lst.erb"
     backup false 
   end
@@ -38,9 +38,9 @@ action :configure do
     flags "-ex"
     code <<-EOH
       target_raw_path="#{target_raw_path}"
-      guest_root="#{new_resource.guest_root}"
+      guest_root="#{guest_root}"
       
-      case "#{node[:rightimage][:platform]}" in
+      case "#{new_resource.platform}" in
         "ubuntu")
           chroot $guest_root cp -p /usr/lib/grub/x86_64-pc/* /boot/grub
           grub_command="/usr/sbin/grub"
@@ -72,11 +72,11 @@ action :configure do
   bash "configure for cloudstack" do
     flags "-ex" 
     code <<-EOH
-      guest_root=#{new_resource.guest_root}
+      guest_root=#{guest_root}
 
-      case "#{node[:rightimage][:platform]}" in
+      case "#{new_resource.platform}" in
       "ubuntu")
-        case "#{node[:rightimage][:virtual_environment]}" in
+        case "#{new_resource.hypervisor}" in
         "xen")
           # enable console access
           cp $guest_root/etc/init/tty1.conf* $guest_root/etc/init/hvc0.conf
@@ -105,7 +105,7 @@ action :configure do
         # configure dhcp timeout
         echo 'timeout 300;' > $guest_root/etc/dhclient.conf
 
-        case "#{node[:rightimage][:virtual_environment]}" in
+        case "#{new_resource.hypervisor}" in
         "xen")
           if [ ! -f $guest_root/etc/sysconfig/init ]; then
             echo "2:2345:respawn:/sbin/mingetty xvc0" >> $guest_root/etc/inittab
@@ -145,7 +145,6 @@ end
 
 action :package do
   rightimage_image node[:rightimage][:image_type] do
-    provider "rightimage_hypervisor_#{node[:rightimage][:image_type]}"
     action :package
   end
 end
@@ -177,14 +176,14 @@ action :upload do
       require "right_vmops"
       require "uri"
 
-      name = "#{image_name}_#{node[:rightimage][:virtual_environment].upcase}"
+      name = "#{image_name}_#{new_resource.hypervisor.upcase}"
       zoneId = node[:rightimage][:datacenter]
 
       case node[:rightimage][:cloudstack][:version]
       when "2"
-        case node[:rightimage][:platform]
+        case new_resource.platform
         when "centos"
-          if node[:rightimage][:release] == "5.4"
+          if new_resource.platform_version == 5.4
             osTypeId = 14 # CentOS 5.4 (64-bit)
           else
             osTypeId = 112 # CentOS 5.5 (64-bit)
@@ -195,11 +194,11 @@ action :upload do
           osTypeId = 126 # Ubuntu 10.04 (64-bit)
         end
       when "3"
-        case node[:rightimage][:platform]
+        case new_resource.platform
         when "centos"
-          if node[:rightimage][:release] == "5.4"
+          if new_resource.platform_version == 5.4
             osTypeId = "f288db0e-43a9-435e-b6f8-157dd4c7cdbb" # CentOS 5.4 (64-bit)
-          elsif node[:rightimage][:release].to_f >= 6.0
+          elsif new_resource.platform_version >= 6.0
             osTypeId = "60a8f583-8632-41aa-90bd-b44ec221f7e8" # CentOS 6.0 (64-bit)
           else
             osTypeId = "9a57e335-a6ae-4d4f-b077-de815e1b623b" # CentOS 5.5 (64-bit)
@@ -211,7 +210,7 @@ action :upload do
         end
       end
 
-      case node[:rightimage][:virtual_environment]
+      case new_resource.hypervisor
       when "esxi"
         format = "OVA"
         hypervisor = "VMware"

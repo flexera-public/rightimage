@@ -4,7 +4,7 @@ action :configure do
 
   ruby_block "check hypervisor" do
     block do
-      raise "ERROR: you must set your virtual_environment to xen!"  if node[:rightimage][:virtual_environment] != "xen"
+      raise "ERROR: you must set your hypervisor to xen!"  if node[:rightimage][:hypervisor] != "xen"
     end
   end
 

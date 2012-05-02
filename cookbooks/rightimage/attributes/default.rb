@@ -10,7 +10,7 @@ set[:rightimage][:lang] = "en_US.UTF-8"
 set_unless[:rightimage][:root_size_gb] = "10"
 set[:rightimage][:build_dir] = "/mnt/vmbuilder"
 set[:rightimage][:mount_dir] = "/mnt/image"
-set_unless[:rightimage][:virtual_environment] = "xen"
+set_unless[:rightimage][:hypervisor] = "xen"
 set[:rightimage][:mirror] = "cf-mirror.rightscale.com"
 set_unless[:rightimage][:cloud] = "raw"
 set[:rightimage][:root_mount][:label_dev] = "ROOT"
@@ -28,11 +28,11 @@ else
 end
 
 
-case node[:rightimage][:virtual_environment]
+case node[:rightimage][:hypervisor]
 when "xen" then set[:rightimage][:image_type] = "vhd"
 when "esxi" then set[:rightimage][:image_type] = "vmdk"
 when "kvm" then set[:rightimage][:image_type] = "qcow2"
-else raise ArgumentError, "don't know what image format to use for #{node[:rightimage][:virtual_environment]}!"
+else raise ArgumentError, "don't know what image format to use for #{node[:rightimage][:hypervisor]}!"
 end
 
 # set base os packages
@@ -40,7 +40,7 @@ case rightimage[:platform]
 when "ubuntu"   
   set[:rightimage][:guest_packages] = "ubuntu-standard binutils ruby1.8 curl unzip openssh-server ruby1.8-dev build-essential autoconf automake libtool logrotate rsync openssl openssh-server ca-certificates libopenssl-ruby1.8 subversion vim libreadline-ruby1.8 irb rdoc1.8 git-core liberror-perl libdigest-sha1-perl dmsetup emacs rake screen mailutils nscd bison ncurses-dev zlib1g-dev libreadline5-dev readline-common libxslt1-dev sqlite3 libxml2 libxml2-dev flex libshadow-ruby1.8 postfix sysstat iptraf syslog-ng libarchive-dev tmux"
 
-  node[:rightimage][:guest_packages] << " cloud-init" if node[:rightimage][:virtual_environment] == "ec2"
+  node[:rightimage][:guest_packages] << " cloud-init" if node[:rightimage][:hypervisor] == "ec2"
   set[:rightimage][:host_packages] = "openjdk-6-jre openssl ca-certificates"
 
 when "centos","rhel"
@@ -98,7 +98,7 @@ case rightimage[:cloud]
         end
     end
   when "cloudstack", "openstack"
-    case rightimage[:virtual_environment]
+    case rightimage[:hypervisor]
     when "xen"
       set[:rightimage][:fstab][:ephemeral_mount_opts] = "defaults"
       set[:rightimage][:fstab][:ephemeral] = false
@@ -123,7 +123,7 @@ case rightimage[:cloud]
       set[:rightimage][:root_mount][:dump] = "1" 
       set[:rightimage][:root_mount][:fsck] = "1" 
     else
-      raise "ERROR: unsupported virtual_environment #{node[:rightimage][:virtual_environment]} for cloudstack"
+      raise "ERROR: unsupported hypervisor #{node[:rightimage][:hypervisor]} for cloudstack"
     end
 end
 
