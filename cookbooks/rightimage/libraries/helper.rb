@@ -3,10 +3,11 @@ module RightScale
     module Helper
       def image_name
         raise "ERROR: you must specify an image_name!" unless node[:rightimage][:image_name] =~ /./
-      	name = node[:rightimage][:image_name].dup
-      	name << "_#{generate_persisted_passwd}" if node[:rightimage][:debug] == "true" && node[:rightimage][:build_mode] != "migrate"
-      	name
-      end   
+        name = node[:rightimage][:image_name].dup
+        name << "_#{generate_persisted_passwd}" if node[:rightimage][:debug] == "true" && node[:rightimage][:build_mode] != "migrate"
+        name << "_EBS" if node[:rightimage][:ec2][:image_type] =~ /ebs/i and name !~ /_EBS/
+        name
+      end
 
       def mci_base_name
         if node[:rightimage][:mci_name] =~ /./
@@ -308,17 +309,6 @@ EOF
           return true
         else
           return false
-        end
-      end
-
-      def rightlink_cloud
-        case node[:rightimage][:cloud]
-        when "euca"
-          "eucalyptus"
-        when "vmops"
-          "cloudstack"
-        else
-          node[:rightimage][:cloud]
         end
       end
 
