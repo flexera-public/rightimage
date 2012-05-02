@@ -49,7 +49,7 @@ Gem.clear_paths
 full_image_path = node[:rightimage][:target_temp_root]}+"/"+image_name+"."+image_file_ext
 
 hypervisor = node[:rightimage][:hypervisor]
-image_s3_path = hypervisor+"/"+guest_platform+"/"+release_number+"/"
+image_s3_path = hypervisor+"/"+guest_platform+"/"+platform_version+"/"
 
 image_upload_bucket = "rightscale-#{node[:rightimage][:cloud]}-dev"
 

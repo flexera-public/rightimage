@@ -1,15 +1,15 @@
-deb <%= node[:rightimage][:mirror_url] %> <%= node[:rightimage][:release] %> main restricted universe multiverse
-#deb-src http://archive.ubuntu.com/ubuntu/ <%= node[:rightimage][:release] %> main restricted universe multiverse
+deb <%= node[:rightimage][:mirror_url] %> <%= node[:rightimage][:platform_codename] %> main restricted universe multiverse
+#deb-src http://archive.ubuntu.com/ubuntu/ <%= node[:rightimage][:platform_codename] %> main restricted universe multiverse
 
 ## MAJOR BUG FIX UPDATES produced after the final release
-deb <%= node[:rightimage][:mirror_url] %> <%= node[:rightimage][:release] %>-updates main restricted universe multiverse
-#deb-src http://archive.ubuntu.com/ubuntu/ <%= node[:rightimage][:release] %>-updates main restricted universe multiverse
+deb <%= node[:rightimage][:mirror_url] %> <%= node[:rightimage][:platform_codename] %>-updates main restricted universe multiverse
+#deb-src http://archive.ubuntu.com/ubuntu/ <%= node[:rightimage][:platform_codename] %>-updates main restricted universe multiverse
 
 ## UBUNTU SECURITY UPDATES
-deb <%= node[:rightimage][:mirror_url] %>  <%= node[:rightimage][:release] %>-security main restricted universe multiverse
-#deb-src http://archive.ubuntu.com/ubuntu/ <%= node[:rightimage][:release] %>-security main restricted universe multiverse
+deb <%= node[:rightimage][:mirror_url] %>  <%= node[:rightimage][:platform_codename] %>-security main restricted universe multiverse
+#deb-src http://archive.ubuntu.com/ubuntu/ <%= node[:rightimage][:platform_codename] %>-security main restricted universe multiverse
 
 ## BACKPORTS REPOSITORY (Unsupported.  May contain illegal packages.  Use at own risk.)
-#deb <%= node[:rightimage][:mirror_url] %> <%= node[:rightimage][:release] %>-backports main restricted universe multiverse
-#deb-src http://archive.ubuntu.com/ubuntu/ <%= node[:rightimage][:release] %>-backports main restricted universe multiverse
+#deb <%= node[:rightimage][:mirror_url] %> <%= node[:rightimage][:platform_codename] %>-backports main restricted universe multiverse
+#deb-src http://archive.ubuntu.com/ubuntu/ <%= node[:rightimage][:platform_codename] %>-backports main restricted universe multiverse
 

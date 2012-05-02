@@ -34,7 +34,7 @@ rightimage_cloud node[:rightimage][:cloud] do
   hypervisor  node[:rightimage][:hypervisor]
   arch        node[:rightimage][:arch]
   platform    node[:rightimage][:platform]
-  release     node[:rightimage][:release_number].to_f
+  platform_version node[:rightimage][:platform_version].to_f
 
   action :package
 end

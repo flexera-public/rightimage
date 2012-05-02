@@ -38,7 +38,7 @@ action :install do
 
   # TODO: Need this to be hypervisor unspecific.  debootstrap?
   bootstrap_cmd = "/usr/bin/vmbuilder xen ubuntu -o \
-      --suite=#{node[:rightimage][:release]} \
+      --suite=#{node[:rightimage][:platform_codename]} \
       -d #{node[:rightimage][:build_dir]} \
       --rootsize=2048 \
       --install-mirror=#{node[:rightimage][:mirror_url]} \
@@ -77,7 +77,7 @@ action :install do
     
       modprobe dm-mod
 
-      if [ "#{node[:rightimage][:release]}" == "hardy" ]; then
+      if [ "#{node[:rightimage][:platform_codename]}" == "hardy" ]; then
         locale-gen en_US.UTF-8
         export LANG=en_US.UTF-8
         export LC_ALL=en_US.UTF-8
@@ -113,7 +113,7 @@ action :install do
       #{bootstrap_cmd} --exec=/tmp/configure_script
 
 
-      if ( [ "#{node[:rightimage][:release]}" == "lucid" ] || [ "#{node[:rightimage][:release]}" == "maverick" ] ) ; then
+      if ( [ "#{node[:rightimage][:platform_codename]}" == "lucid" ] || [ "#{node[:rightimage][:platform_codename]}" == "maverick" ] ) ; then
        kvm_image=`cat /mnt/vmbuilder/xen.conf  | grep xvda1 | grep -v root  | cut -c 25- | cut -c -9`
       else
        kvm_image=$image_name

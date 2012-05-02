@@ -8,7 +8,7 @@ action :install_kernel do
   bash "install xen kernel" do
     flags "-ex"
     ubuntu_kernel_packages = 'linux-image-virtual linux-headers-virtual grub-legacy-ec2'
-    if node[:rightimage][:release_number].to_f <= 10.04
+    if node[:rightimage][:platform_version].to_f <= 10.04
       ubuntu_kernel_packages = 'linux-image-ec2 linux-headers-ec2 grub-legacy-ec2'
     end
 
@@ -18,7 +18,7 @@ action :install_kernel do
 
       case #{node[:rightimage][:platform]} in
         "centos"|"rhel")
-          if [ #{node[:rightimage][:release].to_i} -lt 6 ]; then
+          if [ #{node[:rightimage][:platform_version].to_i} -lt 6 ]; then
             chroot $guest_root yum -y remove kernel
             chroot $guest_root yum -y install kernel-xen kmod-xfs-xen
             # reverting back to above line for refactor, NOTE TO SELF fix later -PS

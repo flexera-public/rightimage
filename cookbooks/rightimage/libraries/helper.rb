@@ -80,7 +80,7 @@ EOF
       end
 
       def ri_lineage
-        [guest_platform,release_number,arch,timestamp,build_number].join("_")
+        [guest_platform,platform_version,arch,timestamp,build_number].join("_")
       end
 
       # call this guest_platform, not platform, otherwise can introduce a 
@@ -89,31 +89,24 @@ EOF
         node[:rightimage][:platform]
       end
 
-      def release_number
+      def platform_codename
         if guest_platform == "ubuntu"
-          case release
-          when "hardy" 
-            "8.04"
-          when "intrepid" 
-            "8.10"
-          when "jaunty" 
-            "9.04"
-          when "karmic" 
-            "9.10"
-          when "lucid" 
-            "10.04"
-          when "maverick" 
-            "10.10" 
-          else 
-            raise "Unknown release"
+          case platform_version
+          when "8.04" then "hardy"
+          when "8.10" then "intrepid"
+          when "9.04" then "jaunty"
+          when "9.10" then "karmic"
+          when "10.04" then "lucid"
+          when "10.10" then "maverick"
+          else raise "Unknown Ubuntu version"
           end
         else 
-          release
+          return ""
         end
       end
 
-      def release
-        node[:rightimage][:release]
+      def platform_version
+        node[:rightimage][:platform_version]
       end
 
       def arch
@@ -141,7 +134,7 @@ EOF
       end
 
       def os_string
-        guest_platform + "_" + release_number + "_" + arch + "_" + timestamp + "_" + build_number
+        guest_platform + "_" + platform_version + "_" + arch + "_" + timestamp + "_" + build_number
       end
 
       def source_image
@@ -329,8 +322,8 @@ EOF
       end
 
       def epel_key_name
-        if node[:rightimage][:release].to_i >= 6.0
-          "-#{node[:rightimage][:release][0].chr}"
+        if node[:rightimage][:platform_version].to_i >= 6.0
+          "-#{node[:rightimage][:platform_version][0].chr}"
         else
           ""
         end

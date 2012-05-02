@@ -18,7 +18,7 @@ set[:rightimage][:root_mount][:dev] = "LABEL=#{rightimage[:root_mount][:label_de
 set_unless[:rightimage][:image_source_bucket] = "rightscale-us-west-2"
 
 # if ubuntu then figure out the numbered name
-set[:rightimage][:release_number] = release_number
+set[:rightimage][:platform_codename] = platform_codename
 
 if rightimage[:platform] == "ubuntu"
   set[:rightimage][:mirror_date] = "#{timestamp[0..3]}/#{timestamp[4..5]}/#{timestamp[6..7]}"
@@ -54,7 +54,7 @@ when "suse"
 end
 
 # set addtional release specific packages
-case rightimage[:release]
+case rightimage[:platform_codename]
   when "hardy"
     set[:rightimage][:guest_packages] = rightimage[:guest_packages] + " sysv-rc-conf debian-helper-scripts"
     rightimage[:host_packages] << " ubuntu-vm-builder"
@@ -77,7 +77,7 @@ case rightimage[:cloud]
     set[:rightimage][:root_mount][:fsck] = "0" 
     set[:rightimage][:fstab][:ephemeral] = true
     # Might have to double check don't know if maverick should use kernel linux-image-ec2 or not
-    if rightimage[:platform] == "ubuntu" and rightimage[:release_number].to_f >= 10.10
+    if rightimage[:platform] == "ubuntu" and rightimage[:platform_version].to_f >= 10.10
       set[:rightimage][:ephemeral_mount] = "/dev/xvdb" 
     else
       set[:rightimage][:ephemeral_mount] = "/dev/sdb" 
@@ -92,7 +92,7 @@ case rightimage[:cloud]
         set[:rightimage][:fstab][:swap] = "defaults"
 
         # CentOS 6.1 and above start SCSI device naming from e
-        if rightimage[:release].to_f >= 6.1
+        if rightimage[:platform_version].to_f >= 6.1
           set[:rightimage][:ephemeral_mount] = "/dev/xvdf"
           set[:rightimage][:swap_mount] = "/dev/xvde3"  unless rightimage[:arch]  == "x86_64"
         end

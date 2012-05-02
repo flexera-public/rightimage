@@ -111,7 +111,7 @@ action :install do
   rm -f #{node[:rightimage][:mount_dir]}/var/lib/rpm/__*
   chroot #{node[:rightimage][:mount_dir]} rpm --rebuilddb
 
-  if [ #{node[:rightimage][:release].to_i} -lt 6 ]; then
+  if [ #{node[:rightimage][:platform_version].to_i} -lt 6 ]; then
     ## Remove yum-fastestmirror plugin
     set +e
     chroot #{node[:rightimage][:mount_dir]} rpm -e --nodeps yum-fastestmirror
