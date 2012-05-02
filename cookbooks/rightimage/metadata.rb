@@ -132,7 +132,7 @@ attribute "rightimage/build_number",
   :default => "0",
   :required => "recommended"
 
-attribute "rightimage/virtual_environment",
+attribute "rightimage/hypervisor",
   :display_name => "Hypervisor",
   :description => "Which hypervisor is this image for?",
   :choice => [ "xen", "kvm", "esxi" ],
