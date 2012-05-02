@@ -1,10 +1,11 @@
 actions :upload
 
-# S3 bucket and path to upload file to. If the s3_path ends in a slash it will 
-# use that as a pathname and the basename of the file as the filename, else
-# it will rename the file 
-attribute :bucket, :kind_of => String
-attribute :s3_path, :kind_of => String
-# Full path to local file on disk
-attribute :file, :kind_of => String
+# pathname/bucket to upload the remote file to
+attribute :remote_path, :kind_of => String
 
+attribute :endpoint, :kind_of => String
+attribute :user, :kind_of => String
+attribute :pass, :kind_of => String
+
+# Full path to local file on disk
+attribute :file, :kind_of => String, :name_attribute => true
