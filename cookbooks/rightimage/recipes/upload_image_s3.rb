@@ -56,8 +56,7 @@ image_upload_bucket = "rightscale-#{node[:rightimage][:cloud]}-dev"
 rightimage_upload full_image_path do
   provider "rightimage_upload_s3"
   not_if { node[:rightimage][:cloud] == "ec2" }
-  s3_path image_s3_path
-  bucket image_upload_bucket
+  remote_path  "#{image_upload_bucket}/#{image_s3_path}"
   action :upload
 end
 rs_utils_marker :end

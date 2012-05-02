@@ -28,16 +28,14 @@ image_upload_bucket = "rightscale-rightimage-base-dev"
 # Upload partitioned image
 rightimage_upload "#{build_root}/#{target_type}0.raw.gz" do
   provider "rightimage_upload_s3"
-  s3_path image_s3_path
-  bucket image_upload_bucket
+  remote_path  "#{image_upload_bucket}/#{image_s3_path}"
   action :upload
 end
 
 # Upload unpartitioned image
 rightimage_upload "#{build_root}/#{target_type}.raw.gz" do
   provider "rightimage_upload_s3"
-  s3_path image_s3_path
-  bucket image_upload_bucket
+  remote_path  "#{image_upload_bucket}/#{image_s3_path}"
   action :upload
 end
 
