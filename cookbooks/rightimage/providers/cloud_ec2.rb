@@ -125,15 +125,17 @@ action :upload do
   end 
 
   ruby_block "store image id" do
+    id_file = is_ebs ? "/var/tmp/image_id_ebs" : "/var/tmp/image_id_s3"
+    image_type = is_ebs ? "EBS" : nil
     block do
       image_id = nil
       
       # read id which was written in previous stanza
-      ::File.open("/var/tmp/image_id_ebs", "r") { |f| image_id = f.read() }
+      ::File.open(id_file, "r") { |f| image_id = f.read() }
       
       # add to global id store for use by other recipes
       id_list = RightImage::IdList.new(Chef::Log)
-      id_list.add(image_id, "EBS")
+      id_list.add(image_id, image_type)
     end
   end
 end
