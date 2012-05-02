@@ -67,12 +67,10 @@ include_recipe "rightimage::enable_debug" if node[:rightimage][:debug] == "true"
 
 # BEGIN cloud specific additions
 rightimage_hypervisor node[:rightimage][:hypervisor] do
-  provider "rightimage_hypervisor_#{node[:rightimage][:hypervisor]}"
   action :install_kernel
 end
 
 rightimage_hypervisor node[:rightimage][:hypervisor] do
-  provider "rightimage_hypervisor_#{node[:rightimage][:hypervisor]}"
   action :install_tools
 end
 
