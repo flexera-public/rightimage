@@ -1,6 +1,4 @@
 action :configure do
-  guest_root = new_resource.guest_root
-
   # insert grub conf, and link menu.lst to grub.conf
   directory "#{guest_root}/boot/grub" do
     owner "root"
@@ -77,10 +75,7 @@ end
 
 
 action :upload do
-  guest_root = new_resource.guest_root
   is_ebs = new_resource.image_type =~ /ebs/i or new_resource.image_name =~ /_EBS/
-  image_name = new_resource.image_name
-  image_name << "_EBS" if is_ebs and image_name !~ /_EBS/
 
   # Clean up guest image
   rightimage guest_root do
@@ -115,9 +110,9 @@ action :upload do
   end
 
   if is_ebs
-    upload_ebs(guest_root,image_name)
+    upload_ebs()
   else
-    upload_s3(guest_root,image_name)
+    upload_s3()
   end
 
   bash "remove keys" do
@@ -143,7 +138,7 @@ action :upload do
   end
 end
 
-def upload_ebs(guest_root)
+def upload_ebs
   execute "mount loopback" do 
     not_if "mount | grep #{guest_root}"
     command "mount -o loop #{target_raw_path} #{guest_root}"
@@ -275,7 +270,7 @@ def upload_ebs(guest_root)
         --cert /tmp/AWS_X509_CERT.pem \
         --region $region \
         --url #{node[:rightimage][:ec2_endpoint]}\
-        --architecture #{node[:rightimage][:arch]} \
+        --architecture #{new_resource.arch} \
         --block-device-mapping "/dev/sdb=ephemeral0" \
         --description "#{image_name}" \
         --name "#{image_name}" \
@@ -315,7 +310,7 @@ def upload_ebs(guest_root)
 end
 
 
-def upload_s3(guest_root,image_name)
+def upload_s3()
   # bundle and upload
   bash "bundle_upload_s3_image" do 
     flags "-e"
@@ -339,7 +334,7 @@ def upload_s3(guest_root,image_name)
       mkdir -p "#{guest_root}"_temp
 
       echo "Bundling..."
-      /home/ec2/bin/ec2-bundle-image --privatekey /tmp/AWS_X509_KEY.pem --cert /tmp/AWS_X509_CERT.pem --user #{node[:rightimage][:aws_account_number]} --image #{target_raw_path} --prefix #{image_name} --destination "#{guest_root}"_temp --arch #{node[:rightimage][:arch]} $kernel_opt $ramdisk_opt -B "ami=sda1,root=/dev/sda1,ephemeral0=sdb,swap=sda3"
+      /home/ec2/bin/ec2-bundle-image --privatekey /tmp/AWS_X509_KEY.pem --cert /tmp/AWS_X509_CERT.pem --user #{node[:rightimage][:aws_account_number]} --image #{target_raw_path} --prefix #{image_name} --destination "#{guest_root}"_temp --arch #{new_resource.arch} $kernel_opt $ramdisk_opt -B "ami=sda1,root=/dev/sda1,ephemeral0=sdb,swap=sda3"
      
       echo "Uploading..." 
       echo y | /home/ec2/bin/ec2-upload-bundle -b #{node[:rightimage][:image_upload_bucket]} -m "#{guest_root}"_temp/#{image_name}.manifest.xml -a #{node[:rightimage][:aws_access_key_id]} -s #{node[:rightimage][:aws_secret_access_key]} --retry --batch
