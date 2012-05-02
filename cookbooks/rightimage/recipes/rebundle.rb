@@ -38,8 +38,8 @@ directory BaseRhelConstants::REBUNDLE_SOURCE_PATH do
 end
 
 git BaseRhelConstants::REBUNDLE_SOURCE_PATH do
-  repository "git@github.com:rightscale/rightimage_rebundle.git"
-  revision "sprint_12_4_42477_rax_sshd"
+  repository node[:rightimage][:rebundle_git_repository]
+  revision node[:rightimage][:rebundle_git_revision]
   action :sync
 end
 

@@ -164,6 +164,20 @@ attribute "rightimage/rebundle_base_image_id",
   :default => "",
   :recipes => [ "rightimage::default", "rightimage::rebundle"]
 
+attribute "rightimage/rebundle_git_repository",
+  :display_name => "Rebundle Git Repository",
+  :description => "Git repository to checkout from when building a rebundle image",
+  :required => "optional",
+  :default => "",
+  :recipes => [ "rightimage::default", "rightimage::rebundle"]
+
+attribute "rightimage/rebundle_git_revision",
+  :display_name => "Rebundle Git Revision",
+  :description => "Git repository revision to checkout from when building a rebundle image",
+  :required => "optional",
+  :default => "",
+  :recipes => [ "rightimage::default", "rightimage::rebundle"]
+
 attribute "rightimage/debug",
   :display_name => "Development Image?",
   :description => "If set, a random root password will be set for debugging purposes. NOTE: you must include 'Dev' in the image name or the build with fail.",

@@ -424,6 +424,21 @@
       "display_name": "Datacenter ID",
       "description": "Datacenter/Zone ID.  Defaults to 1.  Use UK for rackspace UK"
     },
+    "rightimage/rebundle_git_revision": {
+      "required": "optional",
+      "calculated": false,
+      "choice": [
+
+      ],
+      "default": "",
+      "type": "string",
+      "recipes": [
+        "rightimage::default",
+        "rightimage::rebundle"
+      ],
+      "display_name": "Rebundle Git Revision",
+      "description": "Git repository revision to checkout from when building a rebundle image"
+    },
     "rightimage/image_source_bucket": {
       "required": "optional",
       "calculated": false,
@@ -512,6 +527,21 @@
       ],
       "display_name": "Build timestamp and mirror freeze date",
       "description": "Initial build date of this image.  Also doubles as the archive date from which to pull packages. Expected format is YYYYMMDDHHMM"
+    },
+    "rightimage/rebundle_git_repository": {
+      "required": "optional",
+      "calculated": false,
+      "choice": [
+
+      ],
+      "default": "",
+      "type": "string",
+      "recipes": [
+        "rightimage::default",
+        "rightimage::rebundle"
+      ],
+      "display_name": "Rebundle Git Repository",
+      "description": "Git repository to checkout from when building a rebundle image"
     },
     "rightimage/arch": {
       "required": "required",
