@@ -10,19 +10,16 @@ action :configure do
 
   # Setup grub Version 1, ec2
   template "#{guest_root}/boot/grub/grub.conf" do 
-    not_if { node[:rightimage][:cloud] =~ /cloudstack|openstack/ } ### TBD, double check correct only if, see if we can delete this step
     source "menu.lst.erb"
     backup false 
   end
 
   file "#{guest_root}/boot/grub/menu.lst" do 
-    not_if { node[:rightimage][:cloud] =~ /cloudstack|openstack/ } ### TBD, double check correct only if, see if we can delete this step
     action :delete
     backup false
   end
 
   link "#{guest_root}/boot/grub/menu.lst" do 
-    not_if { node[:rightimage][:cloud] =~ /cloudstack|openstack/ } ### TBD, double check correct only if, see if we can delete this step
     to "#{guest_root}/boot/grub/grub.conf"
   end
 
