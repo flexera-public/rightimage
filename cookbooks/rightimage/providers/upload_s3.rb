@@ -16,15 +16,18 @@ action :upload do
 
   ruby_block "Upload image to s3" do
     file = new_resource.file
-    bucket_name = new_resource.bucket
-    s3_path = new_resource.s3_path
+    path_bits = new_resource.remote_path.split("/",2)
+    bucket_name = path_bits.shift
+    s3_path = path_bits.shift || ""
     s3_file = s3_path.dup
-    if s3_path =~ /\/$/
-      s3_file = s3_path + ::File.basename(file)
+
+    if s3_path =~ /./ && s3_path !~ /\/$/
+      s3_file << "/"
     end
+    s3_file << ::File.basename(file)
 
     Chef::Log.info("bucket: #{bucket_name}")
-    Chef::Log.info("s3_path: #{s3_path}")
+    Chef::Log.info("upload path: #{s3_path}")
     Chef::Log.info("file to upload: #{file}")
 
     block do 
