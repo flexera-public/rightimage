@@ -20,6 +20,21 @@
       "display_name": "Rackspace Account ID",
       "description": "Rackspace Account ID"
     },
+    "rightimage/hypervisor": {
+      "required": "required",
+      "calculated": false,
+      "choice": [
+        "xen",
+        "kvm",
+        "esxi"
+      ],
+      "type": "string",
+      "recipes": [
+
+      ],
+      "display_name": "Hypervisor",
+      "description": "Which hypervisor is this image for?"
+    },
     "rightimage/image_name": {
       "required": "required",
       "calculated": false,
@@ -122,24 +137,6 @@
       "display_name": "Rebundle Base Image ID",
       "description": "Cloud specific ID for the image to start with when building a rebundle image"
     },
-    "rightimage/release": {
-      "required": "required",
-      "calculated": false,
-      "choice": [
-        "5.4",
-        "5.6",
-        "5.8",
-        "6.2",
-        "lucid",
-        "maverick"
-      ],
-      "type": "string",
-      "recipes": [
-
-      ],
-      "display_name": "Guest OS Release",
-      "description": "The OS release/version to build into the virtual image."
-    },
     "rightimage/cloudstack/version": {
       "required": "required",
       "calculated": false,
@@ -149,7 +146,7 @@
       ],
       "type": "string",
       "recipes": [
-        "rightimage::upload_vmops"
+        "rightimage::upload_image_cloud"
       ],
       "display_name": "CloudStack Version",
       "description": "CloudStack version."
@@ -252,21 +249,6 @@
       ],
       "display_name": "aws_account_number",
       "description": "aws_account_number"
-    },
-    "rightimage/virtual_environment": {
-      "required": "required",
-      "calculated": false,
-      "choice": [
-        "xen",
-        "kvm",
-        "esxi"
-      ],
-      "type": "string",
-      "recipes": [
-
-      ],
-      "display_name": "Hypervisor",
-      "description": "Which hypervisor is this image for?"
     },
     "rightimage/build_mode": {
       "required": "required",
@@ -667,6 +649,24 @@
       ],
       "display_name": "EC2 Region",
       "description": "The EC2 region in which the image will reside"
+    },
+    "rightimage/platform_version": {
+      "required": "required",
+      "calculated": false,
+      "choice": [
+        "5.4",
+        "5.6",
+        "5.8",
+        "6.2",
+        "10.04",
+        "10.10"
+      ],
+      "type": "string",
+      "recipes": [
+
+      ],
+      "display_name": "Guest OS Version",
+      "description": "The OS version to build into the virtual image."
     }
   },
   "license": "Apache v2.0",
