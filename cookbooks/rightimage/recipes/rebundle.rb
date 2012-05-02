@@ -38,8 +38,8 @@ directory BaseRhelConstants::REBUNDLE_SOURCE_PATH do
 end
 
 git BaseRhelConstants::REBUNDLE_SOURCE_PATH do
-  repository "git@github.com:rightscale/rightimage_rebundle.git"
-  revision "12H1"
+  repository node[:rightimage][:rebundle_git_repository]
+  revision node[:rightimage][:rebundle_git_revision]
   action :sync
 end
 
@@ -84,7 +84,7 @@ bash "launch the remote instance" do
   cwd BaseRhelConstants::REBUNDLE_SOURCE_PATH
   region_opt = case node[:rightimage][:cloud]
                when "ec2" then "#{node[:ec2][:placement][:availability_zone].chop}"
-               when "rackspace" then "#{node[:rightimage][:datacenter]}"
+               when /rackspace/i then "#{node[:rightimage][:datacenter]}"
                else ""
                end
 
@@ -92,7 +92,7 @@ bash "launch the remote instance" do
   resize_opt = node[:rightimage][:cloud] == "ec2" ? "--resize #{node[:rightimage][:root_size_gb]}" : ""
   flavor_opt = node[:rightimage][:cloud] == "ec2" ? "--flavor-id c1.medium" : ""
   zone = node[:rightimage][:datacenter].to_s.empty? ? "US" : node[:rightimage][:datacenter]
-  name_opt   = node[:rightimage][:cloud] == "rackspace" ? "--hostname ri-rebundle-#{node[:rightimage][:platform]}-#{zone.downcase}" : ""
+  name_opt   = node[:rightimage][:cloud] =~ /rackspace/i ? "--hostname ri-rebundle-#{node[:rightimage][:platform]}-#{zone.downcase}" : ""
   code <<-EOH
   /opt/rightscale/sandbox/bin/ruby bin/launch --provider #{node[:rightimage][:cloud]} --image-id #{node[:rightimage][:rebundle_base_image_id]} #{region_opt} #{flavor_opt} #{name_opt} #{resize_opt} --no-auto
   EOH
@@ -114,8 +114,9 @@ end
 bash "configure the remote instance" do
   flags "-ex"
   cwd BaseRhelConstants::REBUNDLE_SOURCE_PATH
+  debug_opt = node[:rightimage][:debug] == "true" ? "--debug" : ""
   code <<-EOH
-  /opt/rightscale/sandbox/bin/ruby bin/configure --rightlink #{node[:rightimage][:rightlink_version]}
+  /opt/rightscale/sandbox/bin/ruby bin/configure --rightlink #{node[:rightimage][:rightlink_version]} #{debug_opt}
   EOH
 end
 
@@ -133,7 +134,7 @@ bash "bundle instance" do
   environment(cloud_credentials)
   certs_opt = node[:rightimage][:cloud] == "ec2" ? "--aws-cert /tmp/AWS_X509_CERT.pem --aws-key /tmp/AWS_X509_KEY.pem" : ""
   code <<-EOH
-  /opt/rightscale/sandbox/bin/ruby bin/bundle --name #{image_name} #{certs_opt}
+  /opt/rightscale/sandbox/bin/ruby bin/bundle --name #{node[:rightimage][:image_name]} #{certs_opt}
   EOH
 end
 #

@@ -117,7 +117,7 @@ attribute "rightimage/arch",
 attribute "rightimage/cloud",
   :display_name => "Target Cloud",
   :description => "The supported cloud for the virtual image. If unset, build a generic base image.",
-  :choice => [ "ec2", "vmops", "euca", "openstack", "rackspace" ],
+  :choice => [ "ec2", "vmops", "euca", "openstack", "rackspace", "rackspace_managed" ],
   :required => "recommended"
   
 attribute "rightimage/region",
@@ -160,6 +160,20 @@ attribute "rightimage/mci_name",
 attribute "rightimage/rebundle_base_image_id",
   :display_name => "Rebundle Base Image ID",
   :description => "Cloud specific ID for the image to start with when building a rebundle image",
+  :required => "optional",
+  :default => "",
+  :recipes => [ "rightimage::default", "rightimage::rebundle"]
+
+attribute "rightimage/rebundle_git_repository",
+  :display_name => "Rebundle Git Repository",
+  :description => "Git repository to checkout from when building a rebundle image",
+  :required => "optional",
+  :default => "",
+  :recipes => [ "rightimage::default", "rightimage::rebundle"]
+
+attribute "rightimage/rebundle_git_revision",
+  :display_name => "Rebundle Git Revision",
+  :description => "Git repository revision to checkout from when building a rebundle image",
   :required => "optional",
   :default => "",
   :recipes => [ "rightimage::default", "rightimage::rebundle"]
