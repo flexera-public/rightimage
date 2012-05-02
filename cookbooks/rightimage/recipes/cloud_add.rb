@@ -77,7 +77,13 @@ rightimage_hypervisor node[:rightimage][:virtual_environment] do
 end
 
 rightimage_cloud node[:rightimage][:cloud] do
-  provider "rightimage_cloud_#{node[:rightimage][:cloud]}"
+  image_name  ::RightScale::RightImage::Helper.image_name
+
+  hypervisor  node[:rightimage][:virtual_environment]
+  arch        node[:rightimage][:arch]
+  platform    node[:rightimage][:platform]
+  release     node[:rightimage][:release_number].to_f
+
   action :configure
 end
 # END cloud specific additions
