@@ -301,7 +301,7 @@ attribute "rightimage/cloudstack/version",
   :description => "CloudStack version.",
   :required => "required",
   :choice => [ "2", "3" ],
-  :recipes => [ "rightimage::upload_vmops" ]
+  :recipes => [ "rightimage::upload_image_cloud" ]
 
 # RackSpace
 attribute "rightimage/rackspace/account",
