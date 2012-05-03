@@ -20,6 +20,7 @@ action :configure do
   end
 
   link "#{guest_root}/boot/grub/menu.lst" do 
+    link_type :hard # soft symlinks don't work outside chrooted env
     to "#{guest_root}/boot/grub/grub.conf"
   end
 
