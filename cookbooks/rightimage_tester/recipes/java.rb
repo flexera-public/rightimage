@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: rightimage_tester
-# Recipe:: default
+# Recipe:: java
 #
 # Copyright 2011, RightScale, Inc.
 #
@@ -18,5 +18,13 @@
 #
 
 rs_utils_marker :begin
-include_recipe "rightimage_tester::sudo"
+
+rightimage_tester "Verify JAVA_HOME environment variable" do
+  cmd = value_for_platform(
+    "ubuntu" => { "default" => '[ "$JAVA_HOME" = "/usr/lib/jvm/java-6-sun" ]' },
+    "default" => '[ "$JAVA_HOME" = "/usr/java/default" ]'
+  )
+  command "source /etc/profile && echo JAVA_HOME is set to: $JAVA_HOME; #{cmd}"
+  action :test
+end
 rs_utils_marker :end

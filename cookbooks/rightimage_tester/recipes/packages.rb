@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: rightimage_tester
-# Recipe:: default
+# Recipe:: packages
 #
 # Copyright 2011, RightScale, Inc.
 #
@@ -18,5 +18,15 @@
 #
 
 rs_utils_marker :begin
-include_recipe "rightimage_tester::sudo"
+
+rightimage_tester "Verify packages install" do
+  cmd = value_for_platform(
+    "centos" => { "default" => 'yum install -y emacs' },
+    "rhel" => { "default" => 'yum install -y yum-arch' },
+    "ubuntu" => { "default" => 'apt-get clean && apt-get update && apt-get install -y nmap' },
+    "default" => 'echo "OS not supported." && exit 1'
+  )
+  command cmd
+  action :test
+end
 rs_utils_marker :end

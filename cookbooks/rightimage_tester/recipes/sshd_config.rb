@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: rightimage_tester
-# Recipe:: default
+# Recipe:: sshd_config
 #
 # Copyright 2011, RightScale, Inc.
 #
@@ -18,5 +18,10 @@
 #
 
 rs_utils_marker :begin
-include_recipe "rightimage_tester::sudo"
+
+rightimage_tester "Verify SSHd security settings" do
+  command "config=\"/etc/ssh/sshd_config\" && egrep -H \"^PermitRootLogin without-password\" $config && egrep -H \"^PasswordAuthentication no\" $config && egrep -H \"^IgnoreRhosts no\" $config"
+  action :test
+end
+
 rs_utils_marker :end

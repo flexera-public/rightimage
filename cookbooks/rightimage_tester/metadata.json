@@ -17,7 +17,17 @@
   "recommendations": {
   },
   "recipes": {
-    "rightimage_tester::default": ""
+    "rightimage_tester::dependencies": "Ensure dependencies are installed.",
+    "rightimage_tester::filesystem_size": "Check root filesystem size.",
+    "rightimage_tester::default": "",
+    "rightimage_tester::sudo": "Check sudo configuration.",
+    "rightimage_tester::modprobe": "Ensure modprobe runs.",
+    "rightimage_tester::packages": "Ensure packages can be installed.",
+    "rightimage_tester::ldconfig": "Ensure ldconfig runs.",
+    "rightimage_tester::java": "Check java installation.",
+    "rightimage_tester::filesystem_permissions": "Check filesystem permissions.",
+    "rightimage_tester::sshd_config": "Check sshd configuration.",
+    "rightimage_tester::rubygems": "Check rubygems installation."
   },
   "groupings": {
   },

@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: rightimage_tester
-# Recipe:: default
+# Recipe:: sudo
 #
 # Copyright 2011, RightScale, Inc.
 #
@@ -18,5 +18,10 @@
 #
 
 rs_utils_marker :begin
-include_recipe "rightimage_tester::sudo"
+
+rightimage_tester "Verify sudo permissions" do
+  command "[ -u `which sudo` ]"
+  action :test
+end
+
 rs_utils_marker :end

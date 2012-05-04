@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: rightimage_tester
-# Recipe:: default
+# Recipe:: java
 #
 # Copyright 2011, RightScale, Inc.
 #
@@ -18,5 +18,19 @@
 #
 
 rs_utils_marker :begin
-include_recipe "rightimage_tester::sudo"
+
+dependencies = %w{vim ssh cron}
+cmd = value_for_platform(
+  /suse/i => { "default" => 'zypper search -i' },
+  "ubuntu" => { "default" => 'dpkg-query -W' },
+  "default" => 'rpm -qa'
+)
+
+dependencies.each do |package|
+  rightimage_tester "Verify dependency installed: #{package}" do
+    command "#{cmd} *#{package}* | grep #{package}"
+    action :test
+  end
+end
+
 rs_utils_marker :end

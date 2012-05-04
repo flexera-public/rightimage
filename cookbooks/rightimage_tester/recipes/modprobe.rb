@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: rightimage_tester
-# Recipe:: default
+# Recipe:: modprobe
 #
 # Copyright 2011, RightScale, Inc.
 #
@@ -18,5 +18,10 @@
 #
 
 rs_utils_marker :begin
-include_recipe "rightimage_tester::sudo"
+
+rightimage_tester "Verify modules load" do
+  command "modprobe nfs"
+  action :test
+end
+
 rs_utils_marker :end

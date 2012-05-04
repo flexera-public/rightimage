@@ -19,13 +19,6 @@ set[:rightimage][:root_mount][:label_dev] = "ROOT"
 set[:rightimage][:root_mount][:dev] = "LABEL=#{rightimage[:root_mount][:label_dev]}"
 set_unless[:rightimage][:image_source_bucket] = "rightscale-us-west-2"
 
-if rightimage[:platform] == "ubuntu"
-  set[:rightimage][:mirror_date] = "#{timestamp[0..3]}/#{timestamp[4..5]}/#{timestamp[6..7]}"
-  set[:rightimage][:mirror_url] = "http://#{node[:rightimage][:mirror]}/ubuntu_daily/#{node[:rightimage][:mirror_date]}"
-else
-  set[:rightimage][:mirror_date] = timestamp[0..7]
-end
-
 # set base os packages
 case rightimage[:platform]
 when "ubuntu"   
