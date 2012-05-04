@@ -38,7 +38,7 @@ action :package do
   end
 
   bash "package XEN image" do 
-    cwd target_temp_root
+    cwd temp_root
     flags "-ex"
     code <<-EOH
       raw_image=$(basename #{loopback_file(partitioned?)})

@@ -21,7 +21,7 @@ class Chef::Recipe
   include RightScale::RightImage::Helper
 end
 
-directory target_temp_root do
+directory temp_root do
   owner "root"
   group "root"
   recursive true

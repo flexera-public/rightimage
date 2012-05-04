@@ -6,17 +6,17 @@ action :package do
   bash "cleanup working directories" do
     flags "-ex" 
     code <<-EOH
-      rm -rf /tmp/ovftool.sh /tmp/ovftool #{target_temp_root}/temp.ovf #{target_temp_root}/#{image_name}*
+      rm -rf /tmp/ovftool.sh /tmp/ovftool #{temp_root}/temp.ovf #{temp_root}/#{image_name}*
     EOH
   end
 
   bundled_image = "#{image_name}.vmdk"
   bash "convert raw image to VMDK flat file" do
-    cwd target_temp_root
+    cwd temp_root
     flags "-ex"
     code <<-EOH
       BUNDLED_IMAGE="#{bundled_image}"
-      BUNDLED_IMAGE_PATH="#{target_temp_root}/$BUNDLED_IMAGE"
+      BUNDLED_IMAGE_PATH="#{temp_root}/$BUNDLED_IMAGE"
 
       qemu-img convert -O vmdk #{loopback_file(partitioned?)} $BUNDLED_IMAGE_PATH
     EOH
@@ -41,7 +41,7 @@ action :package do
   ovf_capacity = node[:rightimage][:root_size_gb] 
   ovf_ostype = "other26xLinux64Guest"
 
-  template "#{target_temp_root}/temp.ovf" do
+  template "#{temp_root}/temp.ovf" do
     source "ovf.erb"
     variables({
       :ovf_filename => ovf_filename,
@@ -52,10 +52,10 @@ action :package do
   end
 
   bash "Create create vmdk and create ovf/ova files" do
-    cwd target_temp_root
+    cwd temp_root
     flags "-ex"
     code <<-EOH
-      /tmp/ovftool/ovftool #{target_temp_root}/temp.ovf #{target_temp_root}/#{bundled_image}.ovf  > /dev/null 2>&1
+      /tmp/ovftool/ovftool #{temp_root}/temp.ovf #{temp_root}/#{bundled_image}.ovf  > /dev/null 2>&1
       tar -cf #{bundled_image}.ova #{bundled_image}.ovf #{bundled_image}.mf #{image_name}.vmdk-disk*.vmdk
     EOH
   end

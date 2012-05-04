@@ -7,18 +7,18 @@ file_unpartitioned = loopback_filename(false)+".gz"
 file_partitioned  = loopback_filename(true)+".gz"
 
 bash "compress unpartitioned base image " do
-  cwd build_root 
+  cwd temp_root 
   flags "-ex"
-  creates "#{build_root}/#{file_unpartitioned}"
+  creates "#{temp_root}/#{file_unpartitioned}"
   code <<-EOH
     gzip -c #{loopback_file(false)} > #{file_unpartitioned}
   EOH
 end
 
 bash "compress partitioned base image" do
-  cwd build_root 
+  cwd temp_root 
   flags "-ex"
-  creates "#{build_root}/#{file_partitioned}"
+  creates "#{temp_root}/#{file_partitioned}"
   code <<-EOH
     gzip -c #{loopback_file(true)} > #{file_partitioned}
   EOH

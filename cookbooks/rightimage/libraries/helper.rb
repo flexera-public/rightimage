@@ -134,11 +134,7 @@ EOF
       end
 
       def build_root
-        if node[:rightimage][:cloud] == "raw"
-          node[:rightimage][:ebs_mount_dir]
-        else
-          "/mnt"
-        end
+        "/mnt"
       end
       
       def partition_number
@@ -191,8 +187,8 @@ EOF
         "#{ri_lineage}_hd0#{nibble}.raw"
       end
 
-      def target_temp_root
-        "#{build_root}/rightimage-temp"
+      def temp_root
+        "/mnt/rightimage-temp"
       end
 
       def image_source_bucket
@@ -206,11 +202,11 @@ EOF
       end
 
       def migrate_temp_bundled
-        "#{target_temp_root}/bundled"
+        "#{temp_root}/bundled"
       end
 
       def migrate_temp_unbundled
-        "#{target_temp_root}/unbundled"
+        "#{temp_root}/unbundled"
       end
 
 
