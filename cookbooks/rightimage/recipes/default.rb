@@ -20,6 +20,8 @@
 rs_utils_marker :begin
 # Load up prerequisites first
 include_recipe "loopback_fs"
+include_recipe "rs_utils"
+include_recipe "rs_tools"
 include_recipe "block_device"
 
 

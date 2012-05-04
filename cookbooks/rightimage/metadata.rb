@@ -3,9 +3,10 @@ maintainer_email "support@rightscale.com"
 description      "A cookbook for building RightImages"
 version          "0.1.0"
 
-depends "loopback"
-depends "block_device"
+depends "loopback_fs"
 depends "rs_utils"
+depends "rs_tools"
+depends "block_device"
 
 recipe "rightimage::default", "starts builds image automatically at boot. See 'manual_mode' input to enable." 
 recipe "rightimage::build_image", "build image based on host platform"

@@ -1,8 +1,9 @@
 {
   "dependencies": {
-    "loopback": ">= 0.0.0",
-    "rs_utils": ">= 0.0.0",
-    "block_device": ">= 0.0.0"
+    "loopback_fs": ">= 0.0.0",
+    "rs_tools": ">= 0.0.0",
+    "block_device": ">= 0.0.0",
+    "rs_utils": ">= 0.0.0"
   },
   "name": "rightimage",
   "maintainer_email": "support@rightscale.com",
