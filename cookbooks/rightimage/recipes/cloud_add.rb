@@ -87,16 +87,6 @@ rightimage_cloud node[:rightimage][:cloud] do
 end
 # END cloud specific additions
 
- 
-#bash "backup raw image" do 
-#  cwd target_raw_root
-#  code <<-EOH
-#    raw_image=$(basename #{target_raw_path})
-#    target_temp_root=#{target_temp_root}
-#    cp -v $raw_image $target_temp_root 
-#  EOH
-#end
-
 bash "unmount proc & dev" do
   flags "-ex"
   code <<-EOH
