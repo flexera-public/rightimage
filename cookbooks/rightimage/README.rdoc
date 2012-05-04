@@ -1,17 +1,20 @@
 = DESCRIPTION:
 
-Builds a RightImage on a loopback filesystem.  Creates base OS install and common utils then adds the cloud specific settings.  Also has the ability to upload and register the RightImage with corresponding cloud.
+Creation of RightImage can be broken up into two phases, creation of a base image on a loopback file system, and creation of the final RightImage from that base image.
+
+Base image creation involves creation of a vanilla distribution image layered with all non-cloud specific customizations, including software packages required by RightScale services.  This base image is then snapshotted in the cloud.
+
+Creation of the final RightImage includes installation of the RightLink software and cloud specific software and customizations on top of the base image.  The final RightImage is then uploaded and registered with the corresponding cloud.
 
 
 = CONVENTIONS:
 
-"base" recipes clean the base image and install RightLink.
-
-"bootstrap" recipes install a vanilla base image.
-
-"cloud" recipes add cloud specific settings to the guest image.
-
-"upload" recipes convert the raw guest image and upload to the cloud. 
+"build" recipes along with default are big picture and handle end to end builds of each phase described above.
+"base" recipes (and os providers) handle creation of the base image described above.
+"cloud" recipes and providers add cloud specific settings to the base image.
+"rightscale" recipes add RightLink software and final customizations.
+"loopback" recipes handle creation of the loopback fs the images are built on
+"block_device" recipes handle creation of a file system used as a container for the loopback fs, and also handles snapshotted and restoring this container from the cloud
 
 
 = USAGE:
@@ -22,10 +25,9 @@ Use the latest version of right_image_creator.
 
 Image:
 
-Select an image that matches the target guest platform:
+Select an image that matches the target guest platform and architecture
   * Centos 5.6 x64 builds x64 guest
-  * Centos 5.6 i386 builds i386 guest
-  * Ubuntu x64 builds both x64 and i386 guests
+  * Ubuntu x64 i386 builds i386 guest, etc
 
 Inputs:
 
@@ -109,20 +111,9 @@ An instance size of at least m1.small is required.
   3. Launch server in the region you wish to migrate to
   4. Once operational, start the migration using "rightimage::upload_ec2_s3" and/or "rightimage::upload_ec2_ebs" recipe
 
-= Future Improvements
+= FUTURE IMPROVEMENTS
 
-Stories to implement to for faster, simpler, lower cost MCI builds...
-
-  As a RightImage creator
-  I want to upload and register and EC2 S3 image from any region
-  So I can build and bundle once and
-  upload to all regions from a single VM
-  instead of launching a VM, building and bundling in every region
-
-  As a RightImage cookbook maintainer
-  I want to refactor all cloud_add recipes
-  So I can consolidate duplicate code into a single chef resource
-  instead of every cloud_add recipe being slightly different
+Remove dependence on cookbooks_premium when time comes
   
 == Maintainer
 
