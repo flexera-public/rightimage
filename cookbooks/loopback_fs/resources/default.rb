@@ -5,4 +5,4 @@ attribute :size_gb, :kind_of => Integer
 attribute :mount_point, :kind_of => String, :default => "/mnt/image"
 attribute :label, :kind_of => String, :default => "ROOT"
 attribute :device_number, :kind_of => Integer, :default => 0
-attribute :partitioned, :kind_of => Boolean, :default => true
+attribute :partitioned, :default => true
