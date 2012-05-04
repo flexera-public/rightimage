@@ -97,7 +97,7 @@ action :package do
       mkdir $package_dir/xen-kernel
       cp $guest_root/boot/vmlinuz-$KERNEL_VERSION $package_dir/xen-kernel
       cp $guest_root/boot/initrd-$KERNEL_VERSION $package_dir/xen-kernel
-      cp #{target_raw_path} $package_dir/$image_name.img
+      cp #{loopback_file(partitioned?)} $package_dir/$image_name.img
       tar czvf $image_name.tar.gz $image_name 
     EOH
   end

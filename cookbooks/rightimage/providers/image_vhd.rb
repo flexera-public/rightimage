@@ -41,7 +41,7 @@ action :package do
     cwd target_temp_root
     flags "-ex"
     code <<-EOH
-      raw_image=$(basename #{target_raw_path})
+      raw_image=$(basename #{loopback_file(partitioned?)})
       vhd_image=${raw_image}.vhd
       vhd-util convert -s 0 -t 1 -i $raw_image -o $vhd_image
       vhd-util convert -s 1 -t 2 -i $vhd_image -o #{image_name}.vhd

@@ -37,7 +37,6 @@ action :configure do
   bash "setup grub" do
     flags "-ex"
     code <<-EOH
-      target_raw_path="#{target_raw_path}"
       guest_root="#{guest_root}"
       
       case "#{new_resource.platform}" in
@@ -57,7 +56,7 @@ action :configure do
       echo "" >> $guest_root/boot/grub/device.map
 
       cat > device.map <<EOF
-  (hd0) #{target_raw_path}
+  (hd0) #{loopback_file(partitioned?)}
   EOF
 
     ${grub_command} --batch --device-map=device.map <<EOF
