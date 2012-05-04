@@ -1,6 +1,7 @@
 rs_utils_marker :begin
 
-loopback guest_root do
+loopback_fs loopback_file do
+  mount_point guest_root
   action :unmount
 end
 

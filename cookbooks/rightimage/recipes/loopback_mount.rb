@@ -8,7 +8,7 @@ end
 
 loopback_fs loopback_file do
   mount_point guest_root
-  partitioned partitioned?
+  partitioned true
   action :mount
 end
 

@@ -139,9 +139,10 @@ action :upload do
 end
 
 def upload_ebs
-  execute "mount loopback" do 
-    not_if "mount | grep #{guest_root}"
-    command "mount -o loop #{target_raw_path} #{guest_root}"
+  loopback_fs loopback_file(false) do
+    mount_point guest_root
+    partitioned false
+    action :mount
   end
 
 
@@ -302,9 +303,9 @@ def upload_ebs
     EOH
   end
 
-  execute "unmount guest root" do
-    only_if "mount | grep #{guest_root}"
-    command "umount -lf #{guest_root}"
+  loopback_fs loopback_file(false) do
+    mount_point guest_root
+    action :unmount
   end
 
 end
