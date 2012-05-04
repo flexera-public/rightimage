@@ -63,11 +63,9 @@ unless node[:rightimage][:manual_mode] == "true"
     if rebundle?
       include_recipe "rightimage::rebundle"
     else
-      include_recipe "rightimage::block_device_restore" unless mounted?
       include_recipe "rightimage::build_image"
     end
   when "base"
-    include_recipe "rightimage::block_device_create" unless mounted?
     include_recipe "rightimage::build_base"
   when "migrate"
     include_recipe "rightimage::ec2_download_bundle"

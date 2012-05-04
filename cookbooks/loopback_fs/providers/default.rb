@@ -5,7 +5,7 @@ action :create do
       calc_mb="#{new_resource.size_gb*1024}"
       loop_dev="/dev/loop#{new_resource.device_number}"
       root_label="#{new_resource.label}"
-      mount_dir="#{new_resource.mount_dir}"
+      mount_point="#{new_resource.mount_point}"
       source="#{new_resource.source}"
 
       dd if=/dev/zero of=$source bs=1M count=$calc_mb
@@ -22,9 +22,9 @@ EOF
       fi
       mke2fs -F -j $loop_map
       tune2fs -L $root_label $loop_map
-      rm -rf $mount_dir
-      mkdir -p $mount_dir
-      mount $loop_map $mount_dir
+      rm -rf $mount_point
+      mkdir -p $mount_point
+      mount $loop_map $mount_point
     EOH
   end
 end
@@ -35,12 +35,12 @@ action :unmount do
     code <<-EOH
       loop_dev="/dev/loop#{new_resource.device_number}"
       loop_map="#{new_resource.loop_device}p1"
-      mount_dir="#{new_resource.mount_dir}"
+      mount_point="#{new_resource.mount_point}"
 
-      umount -lf $mount_dir/dev || true
-      umount -lf $mount_dir/proc || true
-      umount -lf $mount_dir/sys || true
-      umount -lf $mount_dir || true
+      umount -lf $mount_point/dev || true
+      umount -lf $mount_point/proc || true
+      umount -lf $mount_point/sys || true
+      umount -lf $mount_point || true
 
       [ -e "$loop_map" ] && kpartx -d $loop_dev
       set +e
@@ -59,7 +59,7 @@ action :mount do
     flags "-ex"
     code <<-EOH
       loop_dev="/dev/loop#{new_resource.device_number}"
-      mount_dir="#{new_resource.mount_dir}"
+      mount_point="#{new_resource.mount_point}"
       source="#{new_resource.source}"
 
       losetup $loop_dev $source
@@ -71,8 +71,8 @@ action :mount do
         loop_map=$loop_dev
       fi
 
-      mkdir -p $mount_dir
-      mount $loop_map $mount_dir
+      mkdir -p $mount_point
+      mount $loop_map $mount_point
     EOH
   end
 end

@@ -1,6 +1,6 @@
 actions :create, :unmount, :mount, :resize
 
-attribute :source, :kind_of => String, :required => true, :name_attribute => true
+attribute :source, :kind_of => String, :name_attribute => true
 attribute :size_gb, :kind_of => Integer
 attribute :mount_point, :kind_of => String, :default => "/mnt/image"
 attribute :label, :kind_of => String, :default => "ROOT"
