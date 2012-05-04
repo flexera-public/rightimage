@@ -133,10 +133,6 @@ EOF
         end
       end
 
-      def os_string
-        guest_platform + "_" + platform_version + "_" + arch + "_" + timestamp + "_" + build_number
-      end
-
       def build_root
         if node[:rightimage][:cloud] == "raw"
           node[:rightimage][:ebs_mount_dir]
@@ -175,15 +171,7 @@ EOF
         end
       end
 
-      def target_type
-        ret = "#{os_string}_hd0"
-        ret << "0" if node[:rightimage][:build_mode] == "full" && partitioned?
-
         ret
-      end
-
-      def base_root
-        "#{build_root}/#{target_type}"
       end
 
       def guest_root
@@ -194,13 +182,13 @@ EOF
         "/mnt/storage"
       end
 
-      def target_raw_file
-       "#{target_type}.raw"
+      def loopback_file(partitioned = true)
+        "#{target_raw_root}/#{loopback_filename(partitioned)}"
       end
 
-      def loopback_file(partitioned = true)
+      def loopback_filename(partitioned = true)
         nibble = partitioned ? "0" : ""
-        "#{target_raw_root}/#{os_string}_hd0#{nibble}.raw"
+        "#{ri_lineage}_hd0#{nibble}.raw"
       end
 
       def target_temp_root
