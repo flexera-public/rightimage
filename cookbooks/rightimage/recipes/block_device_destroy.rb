@@ -7,7 +7,9 @@ class Chef::Resource::BlockDevice
   include RightScale::RightImage::Helper
 end
 
-include_recipe "rightimage::do_destroy_loopback"
+loopback_fs loopback_file do
+  action :unmount
+end
 
 block_device ri_lineage do
   cloud "ec2"

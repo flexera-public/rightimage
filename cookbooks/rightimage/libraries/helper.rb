@@ -206,6 +206,11 @@ EOF
         "#{target_raw_root}/#{target_raw_file}" 
       end
 
+      def loopback_file(partitioned = true)
+        nibble = partitioned ? "0" : ""
+        "#{target_raw_root}/#{os_string}_hd0#{nibble}.raw"
+      end
+
       def target_raw_zip
         "#{target_type}.gz"
       end
@@ -240,21 +245,6 @@ EOF
         "#{target_temp_root}/unbundled"
       end
 
-      def loop_name
-        "loop0"
-      end
-
-      def loop_dev
-        "/dev/#{loop_name}"
-      end 
-
-      def loop_map
-        "/dev/mapper/#{loop_name}p1"
-      end
-
-      def calc_mb
-        node[:rightimage][:root_size_gb].to_i * 1024 
-      end
 
       def mounted?
         `mount`.grep(/#{target_raw_root}/).any?

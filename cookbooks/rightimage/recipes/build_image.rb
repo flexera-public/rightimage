@@ -44,7 +44,7 @@ node[:rightimage][:host_packages].split.each { |p| package p }
 include_recipe "rightimage::clean"
 include_recipe "rightimage::rightscale_install"
 include_recipe "rightimage::cloud_add"
-include_recipe "rightimage::do_destroy_loopback"
+include_recipe "rightimage::loopback_unmount"
 include_recipe "rightimage::cloud_package"
 #include_recipe "rightimage::upload_image_s3"
 rs_utils_marker :end

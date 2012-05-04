@@ -1,4 +1,4 @@
-actions :destroy_loopback, :sanitize
+actions :sanitize
 
 attribute :name, :kind_of => String
 

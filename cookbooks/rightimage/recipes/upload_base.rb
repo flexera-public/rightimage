@@ -22,7 +22,7 @@ bash "compress partitioned base image" do
 end
 
 
-image_s3_path = guest_platform+"/"+platform_version+"/"+arch+"/"+timestamp[0..3]]+"/"
+image_s3_path = guest_platform+"/"+platform_version+"/"+arch+"/"+timestamp[0..3]+"/"
 image_upload_bucket = "rightscale-rightimage-base-dev"
 
 # Upload partitioned image

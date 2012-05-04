@@ -18,10 +18,10 @@ rs_utils_marker :begin
 # limitations under the License.
 #
 
-include_recipe "rightimage::setup_loopback"
+include_recipe "rightimage::loopback_create"
 include_recipe "rightimage::bootstrap_os"
-include_recipe "rightimage::copy_image"
-include_recipe "rightimage::do_destroy_loopback"
-include_recipe "rightimage::do_backup"
+include_recipe "rightimage::loopback_copy"
+include_recipe "rightimage::loopback_unmount"
+include_recipe "rightimage::block_device_backup"
 include_recipe "rightimage::base_upload"
 rs_utils_marker :end
