@@ -133,16 +133,12 @@ EOF
         end
       end
 
-      def build_root
-        "/mnt"
-      end
-      
       def partition_number
         number = 0
         number = 1 if partitioned? && is_ubuntu? && node[:rightimage][:hypervisor] == "xen"
         number
       end
-      
+
       def is_ubuntu?
         node[:rightimage][:platform] == "ubuntu"
       end
