@@ -134,7 +134,7 @@ action :install do
       qemu-img convert -O raw /mnt/vmbuilder/$kvm_image $base_raw_path
       losetup $loop_dev $base_raw_path
 
-      guest_root=#{source_image}
+      guest_root=#{guest_root}
 
       random_dir=/tmp/rightimage-$RANDOM
       mkdir $random_dir
@@ -209,7 +209,7 @@ action :install do
   end
 
   # Modified version of syslog-ng.conf that will properly route recipe output to /var/log/messages
-  remote_file "#{source_image}/etc/syslog-ng/syslog-ng.conf" do
+  remote_file "#{guest_root}/etc/syslog-ng/syslog-ng.conf" do
     source "syslog-ng.conf"
   end
 
@@ -217,8 +217,8 @@ action :install do
   bash "dhcp timeout" do
     flags "-ex"
     code <<-EOH
-      sed -i "s/#timeout.*/timeout 300;/" #{source_image}/etc/dhcp3/dhclient.conf
-      rm -f #{source_image}/var/lib/dhcp3/*
+      sed -i "s/#timeout.*/timeout 300;/" #{guest_root}/etc/dhcp3/dhclient.conf
+      rm -f #{guest_root}/var/lib/dhcp3/*
     EOH
   end
 
@@ -226,7 +226,7 @@ action :install do
   bash "sysv upstart fix" do
     flags "-ex"
     code <<-EOH
-      sed -i "s/IFACE=/IFACE\!=/" #{source_image}/etc/init/rc-sysinit.conf
+      sed -i "s/IFACE=/IFACE\!=/" #{guest_root}/etc/init/rc-sysinit.conf
     EOH
   end
 
@@ -234,7 +234,7 @@ action :install do
   bash "apt config" do
     flags "-ex"
     code <<-EOH
-      echo "APT::Install-Recommends \"0\";" > #{source_image}/etc/apt/apt.conf
+      echo "APT::Install-Recommends \"0\";" > #{guest_root}/etc/apt/apt.conf
     EOH
   end
 
@@ -242,7 +242,7 @@ action :install do
   bash "apt config pipeline" do
     flags "-ex"
     code <<-EOH
-      echo "Acquire::http::Pipeline-Depth \"0\";" > #{source_image}/etc/apt/apt.conf.d/99-no-pipelining
+      echo "Acquire::http::Pipeline-Depth \"0\";" > #{guest_root}/etc/apt/apt.conf.d/99-no-pipelining
     EOH
   end
 
@@ -251,9 +251,9 @@ action :install do
     flags "-ex"
     code <<-EOH
 
-      chroot #{source_image} rm -rf /etc/init/plymouth* /etc/init/rsyslog.conf
-      chroot #{source_image} apt-get update
-      chroot #{source_image} apt-get clean
+      chroot #{guest_root} rm -rf /etc/init/plymouth* /etc/init/rsyslog.conf
+      chroot #{guest_root} apt-get update
+      chroot #{guest_root} apt-get clean
     EOH
   end
 end

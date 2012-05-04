@@ -137,10 +137,6 @@ EOF
         guest_platform + "_" + platform_version + "_" + arch + "_" + timestamp + "_" + build_number
       end
 
-      def source_image
-        node[:rightimage][:mount_dir]
-      end
-
       def build_root
         if node[:rightimage][:cloud] == "raw"
           node[:rightimage][:ebs_mount_dir]
@@ -191,7 +187,7 @@ EOF
       end
 
       def guest_root
-        source_image
+        node[:rightimage][:mount_dir]
       end
 
       def target_raw_root
