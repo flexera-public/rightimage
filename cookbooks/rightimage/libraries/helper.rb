@@ -313,7 +313,7 @@ EOF
           return {'AWS_CALLING_FORMAT' => 'SUBDOMAIN',
                   'AWS_ACCESS_KEY_ID'  => node[:rightimage][:aws_access_key_id],
                   'AWS_SECRET_ACCESS_KEY'=> node[:rightimage][:aws_secret_access_key]}
-        when "rackspace" 
+        when /rackspace/i
           return {'RACKSPACE_ACCOUNT' => node[:rightimage][:rackspace][:account],
                   'RACKSPACE_API_TOKEN' => node[:rightimage][:rackspace][:api_token]}
         else
@@ -336,7 +336,7 @@ EOF
       def rebundle?
         if node[:rightimage][:cloud] == "ec2" and node[:rightimage][:platform] == "rhel"
           return true
-        elsif node[:rightimage][:cloud] == "rackspace"
+        elsif node[:rightimage][:cloud] =~ /rackspace/i
           return true
         else
           return false
