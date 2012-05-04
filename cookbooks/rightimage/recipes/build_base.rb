@@ -18,7 +18,7 @@ rs_utils_marker :begin
 # limitations under the License.
 #
 
-include_recipe "rightimage::block_device_create" unless mounted?
+include_recipe "rightimage::block_device_create"
 include_recipe "rightimage::loopback_create"
 include_recipe "rightimage::bootstrap_os"
 include_recipe "rightimage::loopback_copy"

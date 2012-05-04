@@ -8,6 +8,7 @@ end
 
 
 block_device ri_lineage do
+  not_if { mounted? }
   cloud "ec2"
   lineage ri_lineage
   mount_point target_raw_root
