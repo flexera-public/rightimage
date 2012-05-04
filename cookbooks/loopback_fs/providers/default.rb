@@ -88,3 +88,4 @@ action :resize do
       resize2fs $source ${calc_mb}M
     EOH
   end
+end
