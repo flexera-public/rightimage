@@ -1,7 +1,7 @@
 maintainer       "RightScale, Inc."
 maintainer_email "support@rightscale.com"
 description      "A cookbook for building RightImages"
-version          "0.1.0"
+version          "1.0.0"
 
 depends "loopback_fs"
 depends "rs_utils"
@@ -22,9 +22,7 @@ recipe "rightimage::do_create_mci", "creates RightScale MultiCloudImage (MCI) fo
 recipe "rightimage::cloud_upload", "upload and register image with cloud"
 recipe "rightimage::upload_image_s3", "bundle and upload private cloud image to s3 bucket for distribution/download"
 recipe "rightimage::upload_base", "upload raw image to s3"
-recipe "rightimage::copy_image","Creates non-partitioned image."
 recipe "rightimage::ec2_download_bundle","Downloads bundled image from EC2 S3."
-
 
 # Block device recipes
 recipe "rightimage::block_device_create", "creates, formats, and mounts a brand new EBS volume"
@@ -34,6 +32,7 @@ recipe "rightimage::block_device_destroy", "unmounts, and deletes an attached EB
 
 # Loopback filesystem recipes
 recipe "rightimage::loopback_create", "creates and mounts loopback file system"
+recipe "rightimage::loopback_copy", "creates non-partitioned loopback fs image from a partitioned one"
 recipe "rightimage::loopback_unmount", "unmounts loopback file system"
 recipe "rightimage::loopback_mount", "mounts loopback file system"
 
@@ -47,7 +46,7 @@ attribute "rightimage/root_size_gb",
   :description => "Sets the size of the virtual image. Units are in GB.",
   :choice => [ "10", "4", "2" ],
   :default => "10",
-  :recipes => [ "rightimage::default", "rightimage::copy_image", "rightimage::block_device_restore", "rightimage::loopback_setup", "rightimage::cloud_add", "rightimage::cloud_package"]
+  :recipes => [ "rightimage::default", "rightimage::loopback_copy", "rightimage::block_device_restore", "rightimage::loopback_setup", "rightimage::cloud_add", "rightimage::cloud_package"]
 
 attribute "rightimage/manual_mode",
   :display_name => "Manual Mode",
