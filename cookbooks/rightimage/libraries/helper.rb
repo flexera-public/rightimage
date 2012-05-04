@@ -203,14 +203,6 @@ EOF
         "#{target_raw_root}/#{os_string}_hd0#{nibble}.raw"
       end
 
-      def target_raw_zip
-        "#{target_type}.gz"
-      end
-
-      def target_raw_zip_path
-        "#{build_root}/#{target_raw_zip}"
-      end
-
       def target_temp_root
         "#{build_root}/rightimage-temp"
       end
