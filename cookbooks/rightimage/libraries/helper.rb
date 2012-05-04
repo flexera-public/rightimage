@@ -202,10 +202,6 @@ EOF
        "#{target_type}.raw"
       end
 
-      def target_raw_path
-        "#{target_raw_root}/#{target_raw_file}" 
-      end
-
       def loopback_file(partitioned = true)
         nibble = partitioned ? "0" : ""
         "#{target_raw_root}/#{os_string}_hd0#{nibble}.raw"
@@ -221,10 +217,6 @@ EOF
 
       def target_temp_root
         "#{build_root}/rightimage-temp"
-      end
-
-      def target_temp_path
-        "#{target_temp_root}/#{target_raw_file}"
       end
 
       def image_source_bucket
