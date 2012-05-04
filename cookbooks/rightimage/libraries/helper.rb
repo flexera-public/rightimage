@@ -135,12 +135,8 @@ EOF
 
       def partition_number
         number = 0
-        number = 1 if partitioned? && is_ubuntu? && node[:rightimage][:hypervisor] == "xen"
+        number = 1 if partitioned? && ubuntu? && node[:rightimage][:hypervisor] == "xen"
         number
-      end
-
-      def is_ubuntu?
-        node[:rightimage][:platform] == "ubuntu"
       end
 
       def partitioned?
@@ -150,7 +146,7 @@ EOF
         when "cloudstack"
           case node[:rightimage][:hypervisor]
           when "xen"
-            if is_ubuntu?
+            if ubuntu?
               return TRUE
             else
               return FALSE
@@ -253,6 +249,10 @@ EOF
         else
           return false
         end
+      end
+
+      def ubuntu?
+        node[:rightimage][:platform] == "ubuntu"
       end
 
       def centos?
