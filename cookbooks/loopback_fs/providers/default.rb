@@ -1,5 +1,8 @@
+# TBD, don't use bash blocks, just execute the code w/err handling since we're in a provider already
+
 action :create do
   bash "create loopback fs" do
+    not_if { ::File.exists? new_resource.source }
     flags "-ex"
     code <<-EOH
       calc_mb="#{new_resource.size_gb*1024}"
@@ -34,7 +37,7 @@ action :unmount do
     flags "-ex"
     code <<-EOH
       loop_dev="/dev/loop#{new_resource.device_number}"
-      loop_map="#{new_resource.loop_device}p1"
+      loop_map="${loop_dev}p1"
       mount_point="#{new_resource.mount_point}"
 
       umount -lf $mount_point/dev || true
@@ -56,6 +59,7 @@ end
 
 action :mount do
   bash "mount loopback fs" do
+    not_if { `mount`.split("\n").any? {|line| line.include? new_resource.mount_point} }
     flags "-ex"
     code <<-EOH
       loop_dev="/dev/loop#{new_resource.device_number}"
@@ -79,13 +83,14 @@ end
 
 action :resize do
   bash "resize loopback fs" do
+    not_if do
+      source_size_gb = (::File.size(new_resource.source)/1024/1024/1024).to_f.round
+      new_resource.size_gb == source_size_gb
+    end
     flags "-x"
     code <<-EOH
-      calc_mb="#{new_resource.size_gb*1024}"
-      source="#{new_resource.source}"
-
-      e2fsck -cn -f $source
-      resize2fs $source ${calc_mb}M
+      e2fsck -cn -f #{new_resource.source}
+      resize2fs #{new_resource.source} #{new_resource.size_gb*1024}M
     EOH
   end
 end
