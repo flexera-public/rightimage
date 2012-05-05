@@ -17,9 +17,6 @@ set[:rightimage][:root_mount][:label_dev] = "ROOT"
 set[:rightimage][:root_mount][:dev] = "LABEL=#{rightimage[:root_mount][:label_dev]}"
 set_unless[:rightimage][:image_source_bucket] = "rightscale-us-west-2"
 
-# if ubuntu then figure out the numbered name
-set[:rightimage][:platform_codename] = platform_codename
-
 if rightimage[:platform] == "ubuntu"
   set[:rightimage][:mirror_date] = "#{timestamp[0..3]}/#{timestamp[4..5]}/#{timestamp[6..7]}"
   set[:rightimage][:mirror_url] = "http://#{node[:rightimage][:mirror]}/ubuntu_daily/#{node[:rightimage][:mirror_date]}"
@@ -53,20 +50,21 @@ when "suse"
   set[:rightimage][:host_packages] = "kiwi"
 end
 
+
 # set addtional release specific packages
-case rightimage[:platform_codename]
-  when "hardy"
+case node[:rightimage][:platform_version]
+  when "8.04"
     set[:rightimage][:guest_packages] = rightimage[:guest_packages] + " sysv-rc-conf debian-helper-scripts"
     rightimage[:host_packages] << " ubuntu-vm-builder"
-  when "karmic"
+  when "9.10"
     rightimage[:host_packages] << " python-vm-builder-ec2"
-  when "lucid"
+  when "10.04"
     if rightimage[:cloud] == "ec2"
       rightimage[:host_packages] << " python-vm-builder-ec2 devscripts"
     else
       rightimage[:host_packages] << " devscripts"
     end
-  when "maverick"
+  when "10.10"
     rightimage[:host_packages] << " devscripts"
 end if rightimage[:platform] == "ubuntu" 
 

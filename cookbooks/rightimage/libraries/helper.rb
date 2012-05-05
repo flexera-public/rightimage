@@ -89,19 +89,15 @@ EOF
         node[:rightimage][:platform]
       end
 
-      def platform_codename
-        if guest_platform == "ubuntu"
-          case platform_version
-          when "8.04" then "hardy"
-          when "8.10" then "intrepid"
-          when "9.04" then "jaunty"
-          when "9.10" then "karmic"
-          when "10.04" then "lucid"
-          when "10.10" then "maverick"
-          else raise "Unknown Ubuntu version"
-          end
-        else 
-          return ""
+      def platform_codename(platform_version = node[:rightimage][:platform_version])
+        case platform_version
+        when "8.04" then "hardy"
+        when "8.10" then "intrepid"
+        when "9.04" then "jaunty"
+        when "9.10" then "karmic"
+        when "10.04" then "lucid"
+        when "10.10" then "maverick"
+        else raise "Unknown Ubuntu version"
         end
       end
 
