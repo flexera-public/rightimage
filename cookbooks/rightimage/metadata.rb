@@ -12,7 +12,7 @@ recipe "rightimage::build_image", "build image based on host platform"
 recipe "rightimage::build_base", "build base image based on host platform"
 recipe "rightimage::clean", "cleans everything" 
 recipe "rightimage::rebundle", "coordinate a rebundled image build (redhat on on ec2 or rackspace)"
-recipe "rightimage::bootstrap_os", "bootstraps a base image"
+recipe "rightimage::base_os", "build a base image"
 recipe "rightimage::enable_debug", "enables a root login on image for debugging purposes"
 recipe "rightimage::rightscale_install", "installs rightscale"
 recipe "rightimage::cloud_add", "configures base os image for a specific cloud"
@@ -20,7 +20,7 @@ recipe "rightimage::cloud_package", "packages RightImage for a specific cloud"
 recipe "rightimage::do_create_mci", "creates RightScale MultiCloudImage (MCI) for image (only ec2 currently supported)"
 recipe "rightimage::cloud_upload", "upload and register image with cloud"
 recipe "rightimage::upload_image_s3", "bundle and upload private cloud image to s3 bucket for distribution/download"
-recipe "rightimage::upload_base", "upload raw image to s3"
+recipe "rightimage::base_upload", "upload raw image to s3"
 recipe "rightimage::ec2_download_bundle","Downloads bundled image from EC2 S3."
 
 # Block device recipes
@@ -100,7 +100,7 @@ attribute "rightimage/image_upload_bucket",
   :display_name => "Image Upload Bucket",
   :description => "The bucket to upload the image to.",
   :required => "required",
-  :recipes => [ "rightimage::upload_base", "rightimage::build_base", "rightimage::default", "rightimage::build_image" , "rightimage::upload_image_s3", "rightimage::ec2_download_bundle", "rightimage::cloud_upload", "rightimage::upload_image_s3" ]
+  :recipes => [ "rightimage::base_upload", "rightimage::build_base", "rightimage::default", "rightimage::build_image" , "rightimage::upload_image_s3", "rightimage::ec2_download_bundle", "rightimage::cloud_upload", "rightimage::upload_image_s3" ]
 
 attribute "rightimage/image_source_bucket",
   :display_name => "Image Source Bucket",
@@ -179,7 +179,7 @@ attribute "rightimage/mci_name",
 
 # AWS
 aws_x509_recipes = ["rightimage::cloud_upload", "rightimage::rebundle", "rightimage::default", "rightimage::ec2_download_bundle"]
-aws_api_recipes = aws_x509_recipes + ["rightimage::build_base", "rightimage::build_image", "rightimage::upload_image_s3", "rightimage::upload_base"]
+aws_api_recipes = aws_x509_recipes + ["rightimage::build_base", "rightimage::build_image", "rightimage::upload_image_s3", "rightimage::base_upload"]
 
 attribute "rightimage/ec2/image_type",
   :display_name => "EC2 Image Type",

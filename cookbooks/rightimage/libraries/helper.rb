@@ -159,9 +159,6 @@ EOF
         end
       end
 
-        ret
-      end
-
       def guest_root
         node[:rightimage][:mount_dir]
       end
@@ -192,15 +189,6 @@ EOF
       def image_source_cloud
         "us-west-2"
       end
-
-      def migrate_temp_bundled
-        "#{temp_root}/bundled"
-      end
-
-      def migrate_temp_unbundled
-        "#{temp_root}/unbundled"
-      end
-
 
       def mounted?
         `mount`.grep(/#{target_raw_root}/).any?

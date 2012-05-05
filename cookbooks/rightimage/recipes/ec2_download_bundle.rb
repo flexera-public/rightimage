@@ -39,6 +39,8 @@ end
 directory target_raw_root do
   action :create
 end 
+migrate_temp_bundled = "#{temp_root}/bundled"
+migrate_temp_unbundled = "#{temp_root}/unbundled"
 directory migrate_temp_bundled do
   recursive true
   action :create
