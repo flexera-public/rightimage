@@ -1,4 +1,4 @@
-rs_utils_marker :begin
+rightscale_marker :begin
 class Chef::Resource::Bash
   include RightScale::RightImage::Helper
 end
@@ -19,4 +19,4 @@ loopback_fs loopback_file(partitioned?) do
   action :mount
 end
 
-rs_utils_marker :end
+rightscale_marker :end

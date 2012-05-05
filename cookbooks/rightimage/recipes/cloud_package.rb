@@ -17,7 +17,7 @@
 # limitations under the License.
 #
 
-rs_utils_marker :begin
+rightscale_marker :begin
 
 class Chef::Resource
   include RightScale::RightImage::Helper
@@ -40,4 +40,4 @@ rightimage_cloud node[:rightimage][:cloud] do
   action :package
 end
 
-rs_utils_marker :end
+rightscale_marker :end

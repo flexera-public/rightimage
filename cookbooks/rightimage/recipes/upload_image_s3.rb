@@ -1,4 +1,4 @@
-rs_utils_marker :begin
+rightscale_marker :begin
 
 class Chef::Resource
   include RightScale::RightImage::Helper
@@ -59,4 +59,4 @@ rightimage_upload full_image_path do
   remote_path  "#{image_upload_bucket}/#{image_s3_path}"
   action :upload
 end
-rs_utils_marker :end
+rightscale_marker :end

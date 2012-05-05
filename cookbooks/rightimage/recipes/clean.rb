@@ -1,4 +1,4 @@
-rs_utils_marker :begin
+rightscale_marker :begin
 execute "umount -lf  #{node[:rightimage][:build_dir]}/proc || true"
 execute "umount -lf  #{node[:rightimage][:mount_dir]}/proc || true"
 
@@ -14,4 +14,4 @@ ruby_block "delete image id list" do
     id_list.clear
   end
 end
-rs_utils_marker :end
+rightscale_marker :end

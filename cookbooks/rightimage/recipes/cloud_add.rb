@@ -17,7 +17,7 @@
 # limitations under the License.
 #
 
-rs_utils_marker :begin
+rightscale_marker :begin
 
 class Chef::Resource
   include RightScale::RightImage::Helper
@@ -107,4 +107,4 @@ bash "sync fs" do
   code "sync"
 end
 
-rs_utils_marker :end
+rightscale_marker :end

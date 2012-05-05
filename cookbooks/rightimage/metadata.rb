@@ -4,8 +4,7 @@ description      "A cookbook for building RightImages"
 version          "1.0.0"
 
 depends "loopback_fs"
-depends "rs_utils"
-depends "rs_tools"
+depends "rightscale"
 depends "block_device"
 
 recipe "rightimage::default", "starts builds image automatically at boot. See 'manual_mode' input to enable." 

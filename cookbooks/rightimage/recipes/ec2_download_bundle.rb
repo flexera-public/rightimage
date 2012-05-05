@@ -17,7 +17,7 @@
 # limitations under the License.
 #
 
-rs_utils_marker :begin
+rightscale_marker :begin
 class Chef::Resource::Bash
   include RightScale::RightImage::Helper
 end
@@ -64,4 +64,4 @@ bash "download bundle" do
     rm -f /tmp/AWS_X509_CERT.pem
   EOH
 end
-rs_utils_marker :end
+rightscale_marker :end

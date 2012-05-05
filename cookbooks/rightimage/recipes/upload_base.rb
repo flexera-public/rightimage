@@ -1,4 +1,4 @@
-rs_utils_marker :begin
+rightscale_marker :begin
 class Chef::Resource::Bash
   include RightScale::RightImage::Helper
 end
@@ -42,4 +42,4 @@ rightimage_upload file_unpartitioned do
   action :upload
 end
 
-rs_utils_marker :end
+rightscale_marker :end

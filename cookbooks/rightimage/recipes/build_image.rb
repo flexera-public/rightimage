@@ -1,4 +1,4 @@
-rs_utils_marker :begin
+rightscale_marker :begin
 #
 # Cookbook Name:: rightimage
 # Recipe:: default
@@ -49,4 +49,4 @@ include_recipe "rightimage::cloud_add"
 include_recipe "rightimage::loopback_unmount"
 include_recipe "rightimage::cloud_package"
 #include_recipe "rightimage::upload_image_s3"
-rs_utils_marker :end
+rightscale_marker :end

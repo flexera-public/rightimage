@@ -17,11 +17,10 @@
 # limitations under the License.
 #
 
-rs_utils_marker :begin
+rightscale_marker :begin
 # Load up prerequisites first
 include_recipe "loopback_fs"
-include_recipe "rs_utils"
-include_recipe "rs_tools"
+include_recipe "rightscale::install_tools"
 include_recipe "block_device"
 
 
@@ -71,4 +70,4 @@ unless node[:rightimage][:manual_mode] == "true"
     include_recipe "rightimage::ec2_download_bundle"
   end
 end
-rs_utils_marker :end
+rightscale_marker :end

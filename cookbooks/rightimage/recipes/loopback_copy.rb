@@ -1,4 +1,4 @@
-rs_utils_marker :begin
+rightscale_marker :begin
 
 class Chef::Resource
   include RightScale::RightImage::Helper
@@ -21,4 +21,4 @@ loopback_fs loopback_file(false) do
   action :unmount
 end
 
-rs_utils_marker :end
+rightscale_marker :end

@@ -1,4 +1,4 @@
-rs_utils_marker :begin
+rightscale_marker :begin
 #
 # Copyright 2011, RightScale, Inc.
 #
@@ -167,4 +167,4 @@ bash "destroy instance" do
   code "/opt/rightscale/sandbox/bin/ruby bin/destroy"
 end  
 
-rs_utils_marker :end
+rightscale_marker :end

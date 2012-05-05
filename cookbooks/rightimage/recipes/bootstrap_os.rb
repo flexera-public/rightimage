@@ -1,4 +1,4 @@
-rs_utils_marker :begin
+rightscale_marker :begin
 
 class Chef::Resource
   include RightScale::RightImage::Helper
@@ -73,4 +73,4 @@ rightimage guest_root do
   action :sanitize
 end
 
-rs_utils_marker :end
+rightscale_marker :end

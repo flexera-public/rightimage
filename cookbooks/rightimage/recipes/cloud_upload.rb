@@ -17,7 +17,7 @@
 # limitations under the License.
 #
 
-rs_utils_marker :begin
+rightscale_marker :begin
 
 class Chef::Recipe
   include RightScale::RightImage::Helper
@@ -39,4 +39,4 @@ rightimage_cloud node[:rightimage][:cloud] do
   action :upload
 end
 
-rs_utils_marker :end
+rightscale_marker :end
