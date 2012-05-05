@@ -72,10 +72,10 @@ action :install do
   EOF
 
   ## make sure that proc is not mounted
-  umount -lf #{node.rightimage.mount_dir}/proc || true 
+  umount -lf #{guest_root}/proc || true 
 
   set -x
-  kiwi --force-new-root  --prepare #{kiwi_dir} --root #{node.rightimage.mount_dir} --logfile terminal
+  kiwi --force-new-root  --prepare #{kiwi_dir} --root #{guest_root} --logfile terminal
 
   EOS
   end

@@ -160,7 +160,7 @@ EOF
       end
 
       def guest_root
-        node[:rightimage][:mount_dir]
+        node[:rightimage][:guest_root]
       end
 
       def target_raw_root

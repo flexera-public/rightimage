@@ -30,10 +30,10 @@ template "#{guest_root}/etc/ssh/sshd_config" do
 end
 
 bash "install_rubygems" do 
-  not_if  "chroot #{node[:rightimage][:mount_dir]} which gem"
+  not_if  "chroot #{guest_root} which gem"
   flags "-ex"
   code <<-EOC
-ROOT=#{node[:rightimage][:mount_dir]}
+ROOT=#{guest_root}
 
 function get_rubygems {
   wget -O $ROOT/tmp/rubygems.tgz $2 

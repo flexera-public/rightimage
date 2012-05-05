@@ -1,6 +1,6 @@
 rightscale_marker :begin
 execute "umount -lf  #{node[:rightimage][:build_dir]}/proc || true"
-execute "umount -lf  #{node[:rightimage][:mount_dir]}/proc || true"
+execute "umount -lf  #{guest_root}/proc || true"
 
 directory node[:rightimage][:build_dir] do 
   action :delete
