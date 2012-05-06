@@ -23,15 +23,9 @@ action :install do
     remote_file "/tmp/python-vm-builder.deb" do
       source "python-vm-builder.deb"
     end
-    if node[:rightimage][:hypervisor] == "ec2" 
-      remote_file "/tmp/python-vm-builder-ec2.deb" do
-        source "python-vm-builder-ec2.deb"
-      end 
-    end
     ruby_block "install python-vm-builder debs with dependencies" do
       block do
         Chef::Log.info(`dpkg -i /tmp/python-vm-builder.deb`)
-        Chef::Log.info(`dpkg -i /tmp/python-vm-builder-ec2.deb`) if node[:rightimage][:hypervisor] == 'ec2'
         Chef::Log.info(`apt-get -fy install`)
       end
     end
