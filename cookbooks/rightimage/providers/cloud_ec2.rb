@@ -331,14 +331,14 @@ def upload_s3()
 
       echo "Doing S3 bundle"
     
-      rm -rf "#{guest_root}"_temp
-      mkdir -p "#{guest_root}"_temp
+      rm -rf "#{temp_root}/bundled"
+      mkdir -p "#{temp_root}/bundled"
 
       echo "Bundling..."
-      /home/ec2/bin/ec2-bundle-image --privatekey /tmp/AWS_X509_KEY.pem --cert /tmp/AWS_X509_CERT.pem --user #{node[:rightimage][:aws_account_number]} --image #{loopback_file(partitioned?)} --prefix #{image_name} --destination "#{guest_root}"_temp --arch #{new_resource.arch} $kernel_opt $ramdisk_opt -B "ami=sda1,root=/dev/sda1,ephemeral0=sdb,swap=sda3"
+      /home/ec2/bin/ec2-bundle-image --privatekey /tmp/AWS_X509_KEY.pem --cert /tmp/AWS_X509_CERT.pem --user #{node[:rightimage][:aws_account_number]} --image #{loopback_file(partitioned?)} --prefix #{image_name} --destination "#{temp_root}/bundled" --arch #{new_resource.arch} $kernel_opt $ramdisk_opt -B "ami=sda1,root=/dev/sda1,ephemeral0=sdb,swap=sda3"
      
       echo "Uploading..." 
-      echo y | /home/ec2/bin/ec2-upload-bundle -b #{node[:rightimage][:image_upload_bucket]} -m "#{guest_root}"_temp/#{image_name}.manifest.xml -a #{node[:rightimage][:aws_access_key_id]} -s #{node[:rightimage][:aws_secret_access_key]} --retry --batch
+      echo y | /home/ec2/bin/ec2-upload-bundle -b #{node[:rightimage][:image_upload_bucket]} -m "#{temp_root}/bundled/#{image_name}.manifest.xml" -a #{node[:rightimage][:aws_access_key_id]} -s #{node[:rightimage][:aws_secret_access_key]} --retry --batch
       
       echo registering... 
       image_out_s3=`/home/ec2/bin/ec2-register #{node[:rightimage][:image_upload_bucket]}/#{image_name}.manifest.xml -K  /tmp/AWS_X509_KEY.pem -C  /tmp/AWS_X509_CERT.pem -n "#{image_name}" --url #{node[:rightimage][:ec2_endpoint]} `
