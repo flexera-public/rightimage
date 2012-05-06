@@ -1,4 +1,3 @@
-rightscale_marker :begin
 #
 # Cookbook Name:: rightimage
 # Recipe:: build_base
@@ -17,6 +16,8 @@ rightscale_marker :begin
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+
+rightscale_marker :begin
 
 include_recipe "rightimage::block_device_create"
 include_recipe "rightimage::loopback_create"

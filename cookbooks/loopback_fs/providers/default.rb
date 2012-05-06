@@ -40,6 +40,7 @@ action :unmount do
       loop_map="${loop_dev}p1"
       mount_point="#{new_resource.mount_point}"
 
+      sync
       umount -lf $mount_point/dev || true
       umount -lf $mount_point/proc || true
       umount -lf $mount_point/sys || true

@@ -75,15 +75,6 @@ end
 action :upload do
   is_ebs = new_resource.image_type =~ /ebs/i or new_resource.image_name =~ /_EBS/
 
-  # Clean up guest image
-  rightimage guest_root do
-    action :sanitize
-  end
-
-  execute "unset proc" do
-    command "umount '#{guest_root}/proc' || true"
-  end
-
   bash "setup keyfiles" do
     not_if { ::File.exists? "/tmp/AWS_X509_KEY.pem" }
     code <<-EOH
