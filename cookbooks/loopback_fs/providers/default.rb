@@ -19,7 +19,7 @@ action :create do
 EOF
       if [ "#{new_resource.partitioned}" == "true" ]; then
         kpartx -a $loop_dev
-        loop_map="${loop_dev}p1"
+        loop_map="/dev/mapper/loop#{new_resource.device_number}p1"
       else
         loop_map=$loop_dev
       fi
@@ -37,7 +37,7 @@ action :unmount do
     flags "-ex"
     code <<-EOH
       loop_dev="/dev/loop#{new_resource.device_number}"
-      loop_map="${loop_dev}p1"
+      loop_map="/dev/mapper/loop#{new_resource.device_number}p1"
       mount_point="#{new_resource.mount_point}"
 
       sync
@@ -71,7 +71,7 @@ action :mount do
 
       if [ "#{new_resource.partitioned}" == "true" ]; then
         kpartx -a $loop_dev
-        loop_map="${loop_dev}p1"
+        loop_map="/dev/mapper/loop#{new_resource.device_number}p1"
       else
         loop_map=$loop_dev
       fi
