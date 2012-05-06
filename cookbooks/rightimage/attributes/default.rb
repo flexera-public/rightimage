@@ -12,7 +12,7 @@ set[:rightimage][:build_dir] = "/mnt/vmbuilder"
 set[:rightimage][:guest_root] = "/mnt/image"
 set_unless[:rightimage][:hypervisor] = "xen"
 set[:rightimage][:mirror] = "cf-mirror.rightscale.com"
-set_unless[:rightimage][:cloud] = "raw"
+set_unless[:rightimage][:cloud] = "ec2"
 set[:rightimage][:root_mount][:label_dev] = "ROOT"
 set[:rightimage][:root_mount][:dev] = "LABEL=#{rightimage[:root_mount][:label_dev]}"
 set_unless[:rightimage][:image_source_bucket] = "rightscale-us-west-2"
@@ -127,9 +127,6 @@ end
 
 # set rightscale stuff
 set_unless[:rightimage][:rightlink_version] = ""
-set_unless[:rightimage][:sandbox_repo_tag] = "rightlink_package_#{rightimage[:rightlink_version]}"
-set_unless[:rightimage][:aws_access_key_id] = nil
-set_unless[:rightimage][:aws_secret_access_key] = nil
 
 # generate command to install getsshkey init script 
 case rightimage[:platform]

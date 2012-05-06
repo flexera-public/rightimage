@@ -1,3 +1,8 @@
+# In case it doesn't get set
+set_unless[:rightimage][:ec2][:image_type] = "InstanceStore"
+set_unless[:rightimage][:aws_access_key_id] = nil
+set_unless[:rightimage][:aws_secret_access_key] = nil
+
 # set default EC2 endpoint
 case rightimage[:region]
   when "us-east"
