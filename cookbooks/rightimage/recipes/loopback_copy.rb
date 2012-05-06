@@ -4,6 +4,7 @@ class Chef::Resource
   include RightScale::RightImage::Helper
 end
 
+
 loopback_fs loopback_file(false) do
   mount_point guest_root+"2"
   device_number 1
@@ -14,7 +15,7 @@ end
 
 bash "copy loopback fs" do
   flags "-e"
-  code "rsync -a #{guest_root} #{guest_root+'2'}"
+  code "rsync -a #{guest_root}/ #{guest_root+'2'}"
 end
 
 loopback_fs loopback_file(false) do
