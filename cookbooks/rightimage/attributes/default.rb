@@ -69,22 +69,23 @@ case node[:rightimage][:platform_version]
 end if rightimage[:platform] == "ubuntu" 
 
 # set cloud stuff
+# TBD Refactor this block to use consistent naming, figure out how to move logic into cloud providers
 case rightimage[:cloud]
   when "ec2", "eucalyptus" 
     set[:rightimage][:root_mount][:dump] = "0" 
     set[:rightimage][:root_mount][:fsck] = "0" 
     set[:rightimage][:fstab][:ephemeral] = true
     # Might have to double check don't know if maverick should use kernel linux-image-ec2 or not
-    if rightimage[:platform] == "ubuntu" and rightimage[:platform_version].to_f >= 10.10
-      set[:rightimage][:ephemeral_mount] = "/dev/xvdb" 
-    else
-      set[:rightimage][:ephemeral_mount] = "/dev/sdb" 
-    end
-    set[:rightimage][:swap_mount] = "/dev/sda3"  unless rightimage[:arch]  == "x86_64"
+    set[:rightimage][:swap_mount] = "/dev/sda3" unless rightimage[:arch]  == "x86_64"
+    set[:rightimage][:ephemeral_mount] = "/dev/sdb" 
     case rightimage[:platform]
       when "ubuntu" 
         set[:rightimage][:fstab][:ephemeral_mount_opts] = "defaults,nobootwait"
         set[:rightimage][:fstab][:swap] = "defaults,nobootwait"
+        if rightimage[:platform_version].to_f >= 10.10
+          set[:rightimage][:ephemeral_mount] = "/dev/xvdb"
+          set[:rightimage][:swap_mount] = "/dev/xvda3" unless rightimage[:arch]  == "x86_64"
+        end
       when "centos", "rhel"
         set[:rightimage][:fstab][:ephemeral_mount_opts] = "defaults"
         set[:rightimage][:fstab][:swap] = "defaults"
@@ -98,14 +99,13 @@ case rightimage[:cloud]
   when "cloudstack", "openstack"
     case rightimage[:hypervisor]
     when "xen"
-      set[:rightimage][:fstab][:ephemeral_mount_opts] = "defaults"
       set[:rightimage][:fstab][:ephemeral] = false
-      set[:rightimage][:root_mount][:dump] = "1" 
-      set[:rightimage][:root_mount][:fsck] = "1" 
       set[:rightimage][:ephemeral_mount] = nil
       set[:rightimage][:fstab][:ephemeral_mount_opts] = nil
+      set[:rightimage][:grub][:root_device] = "/dev/xvda"
+      set[:rightimage][:root_mount][:dump] = "1" 
+      set[:rightimage][:root_mount][:fsck] = "1" 
     when "kvm"
-      rightimage[:host_packages] << " grub"
       set[:rightimage][:fstab][:ephemeral] = false
       set[:rightimage][:ephemeral_mount] = "/dev/vdb"
       set[:rightimage][:fstab][:ephemeral_mount_opts] = "defaults"
@@ -113,7 +113,6 @@ case rightimage[:cloud]
       set[:rightimage][:root_mount][:dump] = "1" 
       set[:rightimage][:root_mount][:fsck] = "1" 
     when "esxi"
-      rightimage[:host_packages] << " grub"
       set[:rightimage][:ephemeral_mount] = nil
       set[:rightimage][:fstab][:ephemeral_mount_opts] = nil
       set[:rightimage][:fstab][:ephemeral] = false

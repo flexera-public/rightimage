@@ -28,13 +28,25 @@ action :configure do
     recursive true
   end 
 
-  # insert grub conf
+  # insert grub conf, and symlink
   template "#{guest_root}/boot/grub/grub.conf" do 
     source "menu.lst.erb"
     backup false 
   end
 
+  file "#{guest_root}/boot/grub/menu.lst" do 
+    action :delete
+    backup false
+  end
+
+  link "#{guest_root}/boot/grub/menu.lst" do 
+    link_type :hard # soft symlinks don't work outside chrooted env
+    to "#{guest_root}/boot/grub/grub.conf"
+  end
+
+
   bash "setup grub" do
+    not_if { new_resource.hypervisor == "xen" }
     flags "-ex"
     code <<-EOH
       guest_root="#{guest_root}"
@@ -50,22 +62,19 @@ action :configure do
           ;;
       esac
 
-      chroot $guest_root ln -sf /boot/grub/grub.conf /boot/grub/menu.lst
-
       echo "(hd0) #{node[:rightimage][:grub][:root_device]}" > $guest_root/boot/grub/device.map
       echo "" >> $guest_root/boot/grub/device.map
 
       cat > device.map <<EOF
-  (hd0) #{loopback_file(partitioned?)}
-  EOF
+(hd0) #{loopback_file(partitioned?)}
+EOF
 
     ${grub_command} --batch --device-map=device.map <<EOF
-  root (hd0,0)
-  setup (hd0)
-  quit
-  EOF 
-
-    EOH
+root (hd0,0)
+setup (hd0)
+quit
+EOF
+EOH
   end
 
   bash "configure for cloudstack" do
@@ -93,6 +102,7 @@ action :configure do
           done
           ;;
         esac
+        ;;
       "centos"|"rhel")
         # clean out packages
         chroot $guest_root yum -y clean all
@@ -143,6 +153,13 @@ action :configure do
 end
 
 action :package do
+  bash "backup raw image" do
+    cwd ::File::dirname(loopback_file)
+    code <<-EOH
+      mkdir -p #{temp_root}
+      cp -v #{loopback_file(partitioned?)} #{temp_root}
+    EOH
+  end
   rightimage_image node[:rightimage][:image_type] do
     action :package
   end
