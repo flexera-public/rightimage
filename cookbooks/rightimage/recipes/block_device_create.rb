@@ -29,21 +29,26 @@ class Chef::Resource::BlockDevice
   include RightScale::RightImage::Helper
 end
 
-block_device ri_lineage do
-  not_if { mounted? }
-  cloud "ec2"
-  mount_point target_raw_root 
-  vg_data_percentage "50"
-  max_snapshots "1000"
-  keep_daily "1000"
-  keep_weekly "1000"
-  keep_monthly "1000"
-  keep_yearly "1000"
-  volume_size "42"
-  stripe_count "1"
-  lineage ri_lineage
-  action :create
-  persist true
+# the mounted? check can't be in a not_if, it errors out Marshal.dump->node 
+# when the persist flag is set because its can't serialize the Proc
+if mounted?
+  Chef::Log::info("Block device already mounted")
+else
+  block_device ri_lineage do
+    cloud "ec2"
+    mount_point target_raw_root
+    vg_data_percentage "50"
+    max_snapshots "1000"
+    keep_daily "1000"
+    keep_weekly "1000"
+    keep_monthly "1000"
+    keep_yearly "1000"
+    volume_size "42"
+    stripe_count "1"
+    lineage ri_lineage
+    action :create
+    persist true
+  end
 end
 
 rightscale_marker :end
