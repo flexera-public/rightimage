@@ -12,7 +12,7 @@ action :install_kernel do
 
       rm -f $guest_root/boot/initrd* $guest_root/initrd*
 
-      case "#{node[:rightimage][:platform]}" in
+      case "#{new_resource.platform}" in
         "centos"|"rhel" )
           kernel_version=$(ls -t $guest_root/lib/modules|awk '{ printf "%s ", $0 }'|cut -d ' ' -f1-1)
     
@@ -46,7 +46,7 @@ action :install_tools do
       TMP_DIR=/tmp/vmware_tools
 
   # TODO: THIS NEEDS TO BE CLEANED UP
-    case "#{node[:rightimage][:platform]}" in 
+    case "#{new_resource.platform}" in 
       "centos"|"rhel")
         chroot $guest_root mkdir -p $TMP_DIR
         chroot $guest_root curl --fail http://packages.vmware.com/tools/keys/VMWARE-PACKAGING-GPG-DSA-KEY.pub -o $TMP_DIR/dsa.pub
