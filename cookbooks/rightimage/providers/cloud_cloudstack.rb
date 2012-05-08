@@ -246,7 +246,7 @@ action :upload do
       md5sum = calc_md5sum(local_file)
 
       aws_url  = "rightscale-cloudstack-dev.s3.amazonaws.com"
-      aws_path = s3_path_full
+      aws_path = new_resource.hypervisor+"/"+new_resource.platform+"/"+new_resource.platform_version.to_s
       image_url = "http://#{aws_url}/#{aws_path}/#{filename}"
       Chef::Log::info("Downloading from: #{image_url}...")
      
