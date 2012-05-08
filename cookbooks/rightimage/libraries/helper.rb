@@ -90,13 +90,13 @@ EOF
       end
 
       def platform_codename(platform_version = node[:rightimage][:platform_version])
-        case platform_version
-        when "8.04" then "hardy"
-        when "8.10" then "intrepid"
-        when "9.04" then "jaunty"
-        when "9.10" then "karmic"
-        when "10.04" then "lucid"
-        when "10.10" then "maverick"
+        case platform_version.to_f
+        when 8.04  then "hardy"
+        when 8.10  then "intrepid"
+        when 9.04  then "jaunty"
+        when 9.10  then "karmic"
+        when 10.04 then "lucid"
+        when 10.10 then "maverick"
         else raise "Unknown Ubuntu version"
         end
       end
