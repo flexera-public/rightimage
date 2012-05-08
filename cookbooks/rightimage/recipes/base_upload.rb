@@ -4,7 +4,9 @@ class Chef::Resource::Bash
 end
 
 file_unpartitioned = loopback_filename(false)+".gz"
-file_partitioned  = loopback_filename(true)+".gz"
+file_partitioned   = loopback_filename(true)+".gz"
+
+directory temp_root { recursive true }
 
 bash "compress unpartitioned base image " do
   cwd temp_root 
