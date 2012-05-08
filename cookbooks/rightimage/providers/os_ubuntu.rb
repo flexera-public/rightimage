@@ -82,28 +82,28 @@ action :install do
       fi
 
       cat <<-EOS > /tmp/configure_script
-  #!/bin/bash -x
+#!/bin/bash -x
 
-  set -e 
-  set -x
+set -e 
+set -x
 
-  chroot \\$1 localedef -i en_US -c -f UTF-8 en_US.UTF-8
-  chroot \\$1 cp /usr/share/zoneinfo/UTC /etc/timezone
-  chroot \\$1 userdel -r ubuntu
-  chroot \\$1 rm -rf /home/ubuntu
-  chroot \\$1 rm -f /etc/hostname
-  chroot \\$1 touch /fastboot
-  chroot \\$1 apt-get remove -y apparmor apparmor-utils 
-  chroot \\$1 shadowconfig on
-  chroot \\$1  sed -i s/root::/root:*:/ /etc/shadow
-  chroot \\$1 ln -s /usr/bin/env /bin/env
-  chroot \\$1 rm -f /etc/rc?.d/*hwclock*
-  chroot \\$1 rm -f /etc/event.d/tty[2-6]
-  if [ ! -e \\$1/usr/bin/ruby ]; then 
-    chroot \\$1 ln -s /usr/bin/ruby1.8 /usr/bin/ruby
-  fi
+chroot \\$1 localedef -i en_US -c -f UTF-8 en_US.UTF-8
+chroot \\$1 cp /usr/share/zoneinfo/UTC /etc/timezone
+chroot \\$1 userdel -r ubuntu
+chroot \\$1 rm -rf /home/ubuntu
+chroot \\$1 rm -f /etc/hostname
+chroot \\$1 touch /fastboot
+chroot \\$1 apt-get remove -y apparmor apparmor-utils 
+chroot \\$1 shadowconfig on
+chroot \\$1  sed -i s/root::/root:*:/ /etc/shadow
+chroot \\$1 ln -s /usr/bin/env /bin/env
+chroot \\$1 rm -f /etc/rc?.d/*hwclock*
+chroot \\$1 rm -f /etc/event.d/tty[2-6]
+if [ ! -e \\$1/usr/bin/ruby ]; then 
+  chroot \\$1 ln -s /usr/bin/ruby1.8 /usr/bin/ruby
+fi
 
-  EOS
+EOS
       chmod +x /tmp/configure_script
       #{bootstrap_cmd} --exec=/tmp/configure_script
 
@@ -199,9 +199,9 @@ action :install do
       mv /tmp/java/jdk1.6.0_$java_ver/* $guest_root${java_home}
 
       cat >$guest_root/etc/profile.d/java.sh <<EOF
-  JAVA_HOME=$java_home
-  export JAVA_HOME
-  EOF
+JAVA_HOME=$java_home
+export JAVA_HOME
+EOF
 
       chmod 775 $guest_root/etc/profile.d/java.sh
     EOH
