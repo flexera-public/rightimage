@@ -20,6 +20,7 @@ action :upload do
     bucket_name = path_bits.shift
     s3_path = path_bits.shift || ""
     s3_file = s3_path.dup
+    endpoint = new_resource.endpoint || 's3-us-west-1.amazonaws.com'
 
     if s3_path =~ /./ && s3_path !~ /\/$/
       s3_file << "/"
@@ -29,6 +30,7 @@ action :upload do
     Chef::Log.info("bucket: #{bucket_name}")
     Chef::Log.info("upload path: #{s3_path}")
     Chef::Log.info("file to upload: #{file}")
+    Chef::Log.info("endpoint: #{endpoint}")
 
     block do 
       require 'rubygems'
@@ -37,7 +39,7 @@ action :upload do
       storage =
         Fog::Storage.new(
           :provider               => 'AWS',
-          :host                   => 's3-us-west-1.amazonaws.com',
+          :host                   => endpoint,
           :aws_secret_access_key  => node[:rightimage][:aws_secret_access_key],
           :aws_access_key_id      => node[:rightimage][:aws_access_key_id],
           :persistent => false
