@@ -20,7 +20,7 @@ end
 bash "compress partitioned base image" do
   cwd temp_root
   flags "-ex"
-  creates "#{temp_root}/#{file_partitioned}"
+  creates file_partitioned
   code "gzip -c #{loopback_file(true)} > #{file_partitioned}"
 end
 
@@ -31,7 +31,7 @@ image_upload_bucket = "rightscale-rightimage-base-dev"
 # Upload partitioned image
 rightimage_upload file_partitioned do
   provider "rightimage_upload_s3"
-  endpoint 's3.amazonaws.com' #us-east-1
+  endpoint 's3-us-west-2.amazonaws.com'
   remote_path  "#{image_upload_bucket}/#{image_s3_path}"
   action :upload
 end
@@ -39,7 +39,7 @@ end
 # Upload unpartitioned image
 rightimage_upload file_unpartitioned do
   provider "rightimage_upload_s3"
-  endpoint 's3-us-east-1.amazonaws.com'
+  endpoint 's3-us-west-2.amazonaws.com'
   remote_path  "#{image_upload_bucket}/#{image_s3_path}"
   action :upload
 end
