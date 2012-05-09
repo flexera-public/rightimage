@@ -33,7 +33,7 @@ module RightScale
       def image_file_ext
         case node[:rightimage][:virtual_environment]
         when "xen"
-          "vhd.bz2"
+          (node[:rightimage][:cloud] == "euca" ? "tar.gz":"vhd.bz2")
         when "kvm"
           "qcow2.bz2"
         when "esxi"
