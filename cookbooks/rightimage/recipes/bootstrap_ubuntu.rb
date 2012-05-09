@@ -28,7 +28,7 @@ mount_dir = node[:rightimage][:mount_dir]
 node[:rightimage][:host_packages].split.each { |p| package p} 
 
 #create bootstrap command
-if node[:lsb][:codename] == "maverick" || node[:lsb][:codename] == "lucid"
+if node[:lsb][:codename] =~ /lucid|maverick|precise/
   package "python-boto"
 
   # install vmbuilder from deb files

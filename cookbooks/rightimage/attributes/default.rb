@@ -44,13 +44,6 @@ when "ubuntu"
   node[:rightimage][:guest_packages] << " cloud-init" if node[:rightimage][:virtual_environment] == "ec2"
   set[:rightimage][:host_packages] = "openjdk-6-jre openssl ca-certificates"
 
-  case node[:lsb][:codename]
-    when "maverick"
-      rightimage[:host_packages] << " apt-cacher"
-    else
-      rightimage[:host_packages] << " apt-proxy"
-  end
-
   set[:rightimage][:package_type] = "deb"
   rightimage[:guest_packages] << " euca2ools" if rightimage[:cloud] == "euca"
 
