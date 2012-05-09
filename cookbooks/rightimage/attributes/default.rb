@@ -75,7 +75,10 @@ case rightimage[:release]
     end
   when "maverick"
     rightimage[:host_packages] << " devscripts"
-    set[:rightimage][:guest_packages] = rightimage[:guest_packages] + " linux-image-virtual grub-legacy-ec2"
+    rightimage[:guest_packages] << " linux-image-virtual"
+  when "precise"
+    rightimage[:host_packages] << " devscripts liburi-perl"
+    rightimage[:guest_packages] << " linux-image-virtual"
   else
      rightimage[:host_packages] << " devscripts"
 end if rightimage[:platform] == "ubuntu" 
