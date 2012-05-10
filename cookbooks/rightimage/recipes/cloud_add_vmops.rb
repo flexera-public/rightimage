@@ -17,6 +17,18 @@ rs_utils_marker :begin
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+class Chef::Recipe
+  include RightScale::RightImage::Helper
+end
+class Chef::Resource
+  include RightScale::RightImage::Helper
+end
+
+log "Add DHCP symlink for RightLink"
+execute "chroot #{guest_root} ln -s /var/lib/dhcp /var/lib/dhcp3" do
+  only_if { File.exists?"#{guest_root}/var/lib/dhcp" }
+  creates "#{guest_root}/var/lib/dhcp3"
+end
 
 include_recipe "rightimage::cloud_add_vmops_#{node[:rightimage][:virtual_environment]}" 
 rs_utils_marker :end

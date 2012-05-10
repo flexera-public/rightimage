@@ -121,7 +121,8 @@
         "5.8",
         "6.2",
         "lucid",
-        "maverick"
+        "maverick",
+        "precise"
       ],
       "type": "string",
       "recipes": [

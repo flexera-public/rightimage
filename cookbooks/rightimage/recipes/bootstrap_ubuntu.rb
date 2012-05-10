@@ -28,26 +28,29 @@ mount_dir = node[:rightimage][:mount_dir]
 node[:rightimage][:host_packages].split.each { |p| package p} 
 
 #create bootstrap command
-if node[:lsb][:codename] == "maverick" || node[:lsb][:codename] == "lucid"
+if node[:lsb][:codename] =~ /lucid|maverick|precise/
+  package "python-boto"
+
   # install vmbuilder from deb files
   remote_file "/tmp/python-vm-builder.deb" do
-    source "python-vm-builder.deb"
-  end
-  if node[:rightimage][:virtual_environment] == "ec2" 
-    remote_file "/tmp/python-vm-builder-ec2.deb" do
-      source "python-vm-builder-ec2.deb"
-    end 
+    source "python-vm-builder_0.12.4+bzr477-0ubuntu1_all.deb"
   end
   ruby_block "install python-vm-builder debs with dependencies" do
     block do
       Chef::Log.info(`dpkg -i /tmp/python-vm-builder.deb`)
-      Chef::Log.info(`dpkg -i /tmp/python-vm-builder-ec2.deb`) if node[:rightimage][:virtual_environment] == 'ec2'
       Chef::Log.info(`apt-get -fy install`)
     end
   end
 end
 
-# TODO: Need this to be hypervisor unspecific.  debootstrap?
+bash "cleanup" do
+  flags "-ex"
+  code <<-EOH
+    umount -lf /dev/loop1 || true
+    losetup -d /dev/loop1 || true
+  EOH
+end
+
 bootstrap_cmd = "/usr/bin/vmbuilder xen ubuntu -o \
     --suite=#{node[:rightimage][:release]} \
     -d #{node[:rightimage][:build_dir]} \
@@ -71,9 +74,8 @@ log "Configuring Image..."
 # vmbuilder is defaulting to ext4 and I couldn't find any options to force the filesystem type so I just hacked this.
 # we restore it back to normal later.  
 bash "Comment out ext4 in /etc/mke2fs.conf" do
+  flags "-ex"
   code <<-EOH
-    set -e
-    set -x
     sed -i '/ext4/,/}/ s/^/#/' /etc/mke2fs.conf 
   EOH
 end
@@ -109,13 +111,13 @@ chroot \\$1 userdel -r ubuntu
 chroot \\$1 rm -rf /home/ubuntu
 chroot \\$1 rm -f /etc/hostname
 chroot \\$1 touch /fastboot
-chroot \\$1 apt-get remove -y apparmor apparmor-utils 
+chroot \\$1 apt-get purge -y apparmor apparmor-utils
 chroot \\$1 shadowconfig on
 chroot \\$1  sed -i s/root::/root:*:/ /etc/shadow
 chroot \\$1 ln -s /usr/bin/env /bin/env
 chroot \\$1 rm -f /etc/rc?.d/*hwclock*
 chroot \\$1 rm -f /etc/event.d/tty[2-6]
-if [ ! -e \\$1/usr/bin/ruby ]; then 
+if [ ! -L \\$1/usr/bin/ruby ]; then
   chroot \\$1 ln -s /usr/bin/ruby1.8 /usr/bin/ruby
 fi
 
@@ -124,10 +126,10 @@ EOS
     #{bootstrap_cmd} --exec=/tmp/configure_script
 
 
-    if ( [ "#{node[:rightimage][:release]}" == "lucid" ] || [ "#{node[:rightimage][:release]}" == "maverick" ] ) ; then
-     kvm_image=`cat /mnt/vmbuilder/xen.conf  | grep xvda1 | grep -v root  | cut -c 25- | cut -c -9`
+    if [ "#{node[:rightimage][:release]}" == "hardy" ] ; then
+      image_temp=$image_name
     else
-     kvm_image=$image_name
+      image_temp=`cat /mnt/vmbuilder/xen.conf  | grep xvda1 | grep -v root  | cut -c 25- | cut -c -9`
     fi
 
     loop_name="loop1"
@@ -136,13 +138,14 @@ EOS
     base_raw_path="/mnt/vmbuilder/root.img"
 
     sync
+    umount -lf $loop_dev || true
     # Cleanup loopback stuff
     set +e
     losetup -a | grep $loop_name
     [ "$?" == "0" ] && losetup -d $loop_dev
     set -e
 
-    qemu-img convert -O raw /mnt/vmbuilder/$kvm_image $base_raw_path
+    qemu-img convert -O raw /mnt/vmbuilder/$image_temp $base_raw_path
     losetup $loop_dev $base_raw_path
 
     guest_root=#{source_image}
@@ -169,9 +172,8 @@ template "#{guest_root}/#{node[:rightimage][:mirror_file_path]}" do
 end 
 
 bash "Restore original ext4 in /etc/mke2fs.conf" do
+  flags "-ex"
   code <<-EOH
-    set -e
-    set -x
     sed -i '/ext4/,/}/ s/^#//' /etc/mke2fs.conf 
   EOH
 end
@@ -228,13 +230,19 @@ end
 bash "dhcp timeout" do
   flags "-ex"
   code <<-EOH
-    sed -i "s/#timeout.*/timeout 300;/" #{source_image}/etc/dhcp3/dhclient.conf
-    rm -f #{source_image}/var/lib/dhcp3/*
+    if [ "#{release_number.to_f < 12.04}" == "true" ]; then
+      dhcp_ver="3"
+    else
+      dhcp_ver=""
+    fi
+    sed -i "s/#timeout.*/timeout 300;/" #{source_image}/etc/dhcp$dhcp_ver/dhclient.conf
+    rm -f #{source_image}/var/lib/dhcp$dhcp_ver/*
   EOH
 end
 
 # Don't let SysV init start until more than lo0 is ready
 bash "sysv upstart fix" do
+  only_if { node[:rightimage][:release] == "lucid" }
   flags "-ex"
   code <<-EOH
     sed -i "s/IFACE=/IFACE\!=/" #{source_image}/etc/init/rc-sysinit.conf
@@ -267,4 +275,5 @@ bash "cleanup" do
     chroot #{source_image} apt-get clean
   EOH
 end
+
 rs_utils_marker :end
