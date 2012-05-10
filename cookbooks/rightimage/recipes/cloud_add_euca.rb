@@ -97,15 +97,23 @@ bash "configure for eucalyptus" do
     ## insert cloud file
     mkdir -p $guest_root/etc/rightscale.d
     echo -n "eucalyptus" > $guest_root/etc/rightscale.d/cloud
+  EOH
+end
 
+bash "clean out yum cache" do
+  only_if { node[:platform] == "centos" }
+  flags "-ex"
+  code <<-EOH
+    guest_root=#{guest_root}
     # clean out packages
     chroot $guest_root yum -y clean all
     
     rm ${guest_root}/var/lib/rpm/__*
     chroot $guest_root rpm --rebuilddb
-
   EOH
 end
+
+execute "sync"
 
 bash "unmount proc & dev" do
   flags "-ex"
@@ -131,13 +139,14 @@ bash "package guest image" do
     cloud_package_root=#{target_temp_root}
     package_dir=$cloud_package_root/$image_name
     KERNEL_VERSION=$(ls -t $guest_root/lib/modules|awk '{ printf "%s ", $0 }'|cut -d ' ' -f1-1)
+    INITRD=#{node[:rightimage][:platform] == "ubuntu" ? "initrd.img" : "initrd"}
 
     rm -rf $package_dir
     mkdir -p $package_dir
     cd $cloud_package_root
     mkdir $package_dir/xen-kernel
     cp $guest_root/boot/vmlinuz-$KERNEL_VERSION $package_dir/xen-kernel
-    cp $guest_root/boot/initrd-$KERNEL_VERSION $package_dir/xen-kernel
+    cp $guest_root/boot/$INITRD-$KERNEL_VERSION $package_dir/xen-kernel
     cp #{target_raw_path} $package_dir/$image_name.img
     tar czvf $image_name.tar.gz $image_name 
   EOH
