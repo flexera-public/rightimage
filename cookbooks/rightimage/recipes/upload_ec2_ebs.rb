@@ -74,7 +74,6 @@ end
 
 bash "attach ebs volume" do 
   only_if { node[:rightimage][:cloud] == "ec2" }
-  not_if "cat /proc/partitions | grep sdj"
   flags "-e"
   code <<-EOH
     #{setup_ec2_tools_env}
@@ -104,7 +103,6 @@ end
 
 bash "create EBS snapshot" do 
   only_if { node[:rightimage][:cloud] == "ec2" }
-  not_if  { ::File.exists? "/var/tmp/ebs_snapshot_id" }
   flags "-e"
   code <<-EOH
     #{setup_ec2_tools_env}
@@ -143,7 +141,6 @@ end
 
 bash "register EBS snapshot" do 
   only_if { node[:rightimage][:cloud] == "ec2" }
-  not_if { ::File.exists? "/var/tmp/image_id_ebs" }
   flags "-e"
   code <<-EOH
     #{setup_ec2_tools_env}

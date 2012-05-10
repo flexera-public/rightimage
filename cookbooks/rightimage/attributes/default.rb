@@ -22,17 +22,19 @@ set_unless[:rightimage][:image_source_bucket] = "rightscale-us-west-2"
 # set base os packages
 case rightimage[:platform]
 when "ubuntu"   
-  set[:rightimage][:guest_packages] = "ubuntu-standard binutils ruby1.8 curl unzip openssh-server ruby1.8-dev build-essential autoconf automake libtool logrotate rsync openssl openssh-server ca-certificates libopenssl-ruby1.8 subversion vim libreadline-ruby1.8 irb rdoc1.8 git-core liberror-perl libdigest-sha1-perl dmsetup emacs rake screen mailutils nscd bison ncurses-dev zlib1g-dev libreadline5-dev readline-common libxslt1-dev sqlite3 libxml2 libxml2-dev flex libshadow-ruby1.8 postfix sysstat iptraf syslog-ng libarchive-dev tmux"
+  set[:rightimage][:guest_packages] = "ubuntu-standard binutils ruby1.8 curl unzip openssh-server ruby1.8-dev build-essential autoconf automake libtool logrotate rsync openssl openssh-server ca-certificates libopenssl-ruby1.8 subversion vim libreadline-ruby1.8 irb rdoc1.8 git-core liberror-perl dmsetup emacs rake screen mailutils nscd bison ncurses-dev zlib1g-dev readline-common libxslt1-dev sqlite3 libxml2 libxml2-dev flex libshadow-ruby1.8 postfix sysstat iptraf syslog-ng libarchive-dev tmux dhcp3-client"
+
+  case rightimage[:release]
+  when "hardy"
+  when "lucid"
+  when "maverick"
+    rightimage[:guest_packages] << " libreadline5-dev libdigest-sha1-perl linux-headers-virtual"
+  else
+    rightimage[:guest_packages] << " libreadline-gplv2-dev"
+  end
 
   node[:rightimage][:guest_packages] << " cloud-init" if node[:rightimage][:virtual_environment] == "ec2"
   set[:rightimage][:host_packages] = "openjdk-6-jre openssl ca-certificates"
-
-  case node[:lsb][:codename]
-    when "maverick"
-      rightimage[:host_packages] << " apt-cacher"
-    else
-      rightimage[:host_packages] << " apt-proxy"
-  end
 
   set[:rightimage][:package_type] = "deb"
   rightimage[:guest_packages] << " euca2ools" if rightimage[:cloud] == "euca"
@@ -65,6 +67,12 @@ case rightimage[:release]
     end
   when "maverick"
     rightimage[:host_packages] << " devscripts"
+    rightimage[:guest_packages] << " linux-image-virtual"
+  when "precise"
+    rightimage[:host_packages] << " devscripts liburi-perl"
+    rightimage[:guest_packages] << " linux-image-virtual"
+  else
+     rightimage[:host_packages] << " devscripts"
 end if rightimage[:platform] == "ubuntu" 
 
 # set cloud stuff
@@ -82,6 +90,7 @@ case rightimage[:cloud]
     set[:rightimage][:swap_mount] = "/dev/sda3"  unless rightimage[:arch]  == "x86_64"
     case rightimage[:platform]
       when "ubuntu" 
+        set[:rightimage][:ephemeral_mount] = "/dev/xvdb" if release_number.to_f >= 12.04
         set[:rightimage][:fstab][:ephemeral_mount_opts] = "defaults,nobootwait"
         set[:rightimage][:fstab][:swap] = "defaults,nobootwait"
       when "centos", "rhel"

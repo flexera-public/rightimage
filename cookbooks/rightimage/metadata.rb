@@ -105,7 +105,7 @@ attribute "rightimage/platform",
 attribute "rightimage/release",
   :display_name => "Guest OS Release",
   :description => "The OS release/version to build into the virtual image.",
-  :choice => [ "5.4", "5.6", "5.8", "6.2", "lucid", "maverick" ],
+  :choice => [ "5.4", "5.6", "5.8", "6.2", "lucid", "maverick", "precise" ],
   :required => "required"
   
 attribute "rightimage/arch",
