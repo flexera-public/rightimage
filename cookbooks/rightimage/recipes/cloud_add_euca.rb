@@ -88,18 +88,27 @@ bash "install euca tools for centos" do
 end
 
 bash "configure for eucalyptus" do
-  only_if { node[:platform] == "centos" }
   flags "-ex"
   only_if { node[:rightimage][:platform] == "centos" }
   code <<-EOH
     guest_root=#{guest_root}
 
+    ## insert cloud file
+    mkdir -p $guest_root/etc/rightscale.d
+    echo -n "eucalyptus" > $guest_root/etc/rightscale.d/cloud
+  EOH
+end
+
+bash "clean out yum cache" do
+  only_if { node[:platform] == "centos" }
+  flags "-ex"
+  code <<-EOH
+    guest_root=#{guest_root}
     # clean out packages
     chroot $guest_root yum -y clean all
     
     rm ${guest_root}/var/lib/rpm/__*
     chroot $guest_root rpm --rebuilddb
-
   EOH
 end
 
