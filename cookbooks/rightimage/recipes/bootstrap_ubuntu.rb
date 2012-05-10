@@ -276,13 +276,4 @@ bash "cleanup" do
   EOH
 end
 
-bash "hijack sources.list" do
-  flags "-ex"
-  code <<-EOH
-    mkdir -p #{source_image}/etc/apt/sources.list.d
-    new_path=#{source_image}/etc/apt/sources.list.d/rightscale.sources.list
-    mv #{source_image}/etc/apt/sources.list $new_path
-    chattr +i $new_path
-  EOH
-end
 rs_utils_marker :end
