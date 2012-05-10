@@ -224,7 +224,8 @@ EOF
       end
 
       def target_temp_root
-        "#{build_root}/rightimage-temp"
+#        "#{build_root}/rightimage-temp"
+        target_raw_root
       end
 
       def target_temp_path
