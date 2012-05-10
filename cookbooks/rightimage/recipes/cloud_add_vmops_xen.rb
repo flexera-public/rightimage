@@ -64,8 +64,8 @@ file "#{guest_root}/boot/grub/menu.lst" do
   backup false
 end
 
-link "#{guest_root}/boot/grub/menu.lst" do 
-  to "#{guest_root}/boot/grub/grub.conf"
+execute "chroot #{guest_root} ln -s /boot/grub/grub.conf /boot/grub/menu.lst" do
+  creates "#{guest_root}/boot/grub/menu.lst"
 end
 
 include_recipe "rightimage::bootstrap_common_debug"
