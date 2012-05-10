@@ -6,6 +6,6 @@ hiddenmenu
 <% kern = ::File.basename(Dir.glob("#{guest_root}/boot/vmlinuz*").sort_by { |f| File.mtime(f) }.last) %>
 <% initrd = ::File.basename(Dir.glob("#{guest_root}/boot/initrd*").sort_by { |f| File.mtime(f) }.last) %>
 title           <%= node[:rightimage][:platform] %> <%= node[:rightimage][:release] %> (<%= kern %>) (<%= node[:rightimage][:virtual_environment] %>) 
-root            (hd0<%= ((ec2)?"":",#{partition_number}") %>)
+root            (hd0<%= ((partitioned?)?",#{partition_number}":"") %>)
 kernel          /boot/<%= kern %> root=<%= node[:rightimage][:root_mount][:dev] %> ro <%= ((node[:rightimage][:virtual_environment] == "xen")?"console=hvc0":"") %> consoleblank=0
 initrd          /boot/<%= initrd %>
