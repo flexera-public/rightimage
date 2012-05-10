@@ -43,13 +43,6 @@ when "ubuntu"
   node[:rightimage][:guest_packages] << " cloud-init" if node[:rightimage][:virtual_environment] == "ec2"
   set[:rightimage][:host_packages] = "openjdk-6-jre openssl ca-certificates"
 
-  case node[:lsb][:codename]
-    when "maverick"
-      rightimage[:host_packages] << " apt-cacher"
-    else
-      rightimage[:host_packages] << " apt-proxy"
-  end
-
   set[:rightimage][:package_type] = "deb"
   rightimage[:guest_packages] << " euca2ools" if rightimage[:cloud] == "euca"
 
@@ -81,7 +74,10 @@ case rightimage[:release]
     end
   when "maverick"
     rightimage[:host_packages] << " devscripts"
-    set[:rightimage][:guest_packages] = rightimage[:guest_packages] + " linux-image-virtual grub-legacy-ec2"
+    rightimage[:guest_packages] << " linux-image-virtual"
+  when "precise"
+    rightimage[:host_packages] << " devscripts liburi-perl"
+    rightimage[:guest_packages] << " linux-image-virtual"
   else
      rightimage[:host_packages] << " devscripts"
 end if rightimage[:platform] == "ubuntu" 
