@@ -20,6 +20,7 @@
 rightscale_marker :begin
 
 rightimage_tester "Verify SSHd security settings" do
+  only_if { node[:rightimage_tester][:test_ssh_security] == "true" }
   command "config=\"/etc/ssh/sshd_config\" && egrep -H \"^PermitRootLogin without-password\" $config && egrep -H \"^PasswordAuthentication no\" $config && egrep -H \"^IgnoreRhosts no\" $config"
   action :test
 end

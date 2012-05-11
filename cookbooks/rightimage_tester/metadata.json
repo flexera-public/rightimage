@@ -5,6 +5,21 @@
   "name": "rightimage_tester",
   "maintainer_email": "support@rightscale.com",
   "attributes": {
+    "rightimage_tester/test_ssh_security": {
+      "required": "optional",
+      "calculated": false,
+      "choice": [
+        "true",
+        "false"
+      ],
+      "default": "true",
+      "type": "string",
+      "recipes": [
+
+      ],
+      "display_name": "Test SSH Security?",
+      "description": "If set, checks various SSHd security settings.  Should be set to false on Rackspace Managed or Dev images."
+    }
   },
   "license": "Apache v2.0",
   "suggestions": {
