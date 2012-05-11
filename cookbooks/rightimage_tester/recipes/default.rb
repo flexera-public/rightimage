@@ -17,6 +17,5 @@
 # limitations under the License.
 #
 
-rs_utils_marker :begin
-include_recipe "rightimage_tester::sudo"
-rs_utils_marker :end
+rightscale_marker :begin
+rightscale_marker :end

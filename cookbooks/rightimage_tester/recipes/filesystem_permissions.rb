@@ -17,7 +17,7 @@
 # limitations under the License.
 #
 
-rs_utils_marker :begin
+rightscale_marker :begin
 
 rightimage_tester "Verify postfix permissions" do
   cmd = value_for_platform(
@@ -41,4 +41,4 @@ rightimage_tester "Verify resolv.conf permissions = #{resolv_perms}" do
   action :test
 end
 
-rs_utils_marker :end
+rightscale_marker :end

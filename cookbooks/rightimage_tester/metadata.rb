@@ -3,7 +3,7 @@ maintainer_email "support@rightscale.com"
 description      "A cookbook for testing RightImages"
 version          "0.1.0"
 
-depends "rs_utils"
+depends "rightscale"
 
 recipe "rightimage_tester::default", ""
 recipe "rightimage_tester::dependencies", "Ensure dependencies are installed."

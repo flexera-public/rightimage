@@ -17,7 +17,7 @@
 # limitations under the License.
 #
 
-rs_utils_marker :begin
+rightscale_marker :begin
 
 rightimage_tester "Verify JAVA_HOME environment variable" do
   cmd = value_for_platform(
@@ -27,4 +27,4 @@ rightimage_tester "Verify JAVA_HOME environment variable" do
   command "source /etc/profile && echo JAVA_HOME is set to: $JAVA_HOME; #{cmd}"
   action :test
 end
-rs_utils_marker :end
+rightscale_marker :end

@@ -17,10 +17,10 @@
 # limitations under the License.
 #
 
-rs_utils_marker :begin
+rightscale_marker :begin
 
 rightimage_tester "Verify rubygems are installed" do
   command "gem sources"
   action :test
 end
-rs_utils_marker :end
+rightscale_marker :end

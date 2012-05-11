@@ -17,11 +17,11 @@
 # limitations under the License.
 #
 
-rs_utils_marker :begin
+rightscale_marker :begin
 
 rightimage_tester "Verify modules load" do
   command "modprobe nfs"
   action :test
 end
 
-rs_utils_marker :end
+rightscale_marker :end

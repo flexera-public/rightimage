@@ -17,11 +17,11 @@
 # limitations under the License.
 #
 
-rs_utils_marker :begin
+rightscale_marker :begin
 
 rightimage_tester "Verify ldconfig runs" do
   command "ldconfig"
   action :test
 end
 
-rs_utils_marker :end
+rightscale_marker :end

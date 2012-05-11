@@ -17,11 +17,11 @@
 # limitations under the License.
 #
 
-rs_utils_marker :begin
+rightscale_marker :begin
 
 rightimage_tester "Verify SSHd security settings" do
   command "config=\"/etc/ssh/sshd_config\" && egrep -H \"^PermitRootLogin without-password\" $config && egrep -H \"^PasswordAuthentication no\" $config && egrep -H \"^IgnoreRhosts no\" $config"
   action :test
 end
 
-rs_utils_marker :end
+rightscale_marker :end

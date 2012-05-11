@@ -17,11 +17,11 @@
 # limitations under the License.
 #
 
-rs_utils_marker :begin
+rightscale_marker :begin
 
 rightimage_tester "Verify root filesystem size is between 9GB and 11GB" do
   command "size=`df -P /|grep /|awk '{print $2}'` && echo \"SIZE: $size\" && [ \"$size\" -ge 9000000 ] && [ \"$size\" -le 11000000 ]"
   action :test
 end
 
-rs_utils_marker :end
+rightscale_marker :end
