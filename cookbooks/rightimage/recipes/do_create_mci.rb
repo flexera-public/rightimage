@@ -1,4 +1,4 @@
-rs_utils_marker :begin
+rightscale_marker :begin
 class Chef::Resource::RubyBlock
   include RightScale::RightImage::Helper
 end
@@ -41,4 +41,4 @@ ruby_block "Create MCI or Add to MCI" do
     end
   end
 end
-rs_utils_marker :end
+rightscale_marker :end

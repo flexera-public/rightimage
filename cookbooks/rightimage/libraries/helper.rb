@@ -4,8 +4,9 @@ module RightScale
       def image_name
         raise "ERROR: you must specify an image_name!" unless node[:rightimage][:image_name] =~ /./
         name = node[:rightimage][:image_name].dup
-        name << "_#{generate_persisted_passwd}" if node[:rightimage][:debug] == "true" && node[:rightimage][:build_mode] != "migrate" && node[:rightimage][:cloud] != "rackspace"
-        name.gsub!("_","-") if node[:rightimage][:cloud] == "rackspace"
+        name << "_#{generate_persisted_passwd}" if node[:rightimage][:debug] == "true" && node[:rightimage][:build_mode] != "migrate" && node[:rightimage][:cloud] !~ /rackspace/
+        name << "_EBS" if node[:rightimage][:ec2][:image_type] =~ /ebs/i and name !~ /_EBS/
+        name.gsub!("_","-") if node[:rightimage][:cloud] == /rackspace/
         name
       end
 
@@ -32,7 +33,7 @@ module RightScale
       end
 
       def image_file_ext
-        case node[:rightimage][:virtual_environment]
+        case node[:rightimage][:hypervisor]
         when "xen"
           (node[:rightimage][:cloud] == "euca" ? "tar.gz":"vhd.bz2")
         when "kvm"
@@ -80,7 +81,7 @@ EOF
       end
 
       def ri_lineage
-        [guest_platform,release_number,arch,timestamp,build_number].join("_")
+        [guest_platform,platform_version,arch,timestamp,build_number].join("_")
       end
 
       # call this guest_platform, not platform, otherwise can introduce a 
@@ -89,33 +90,21 @@ EOF
         node[:rightimage][:platform]
       end
 
-      def release_number
-        if guest_platform == "ubuntu"
-          case release
-          when "hardy" 
-            "8.04"
-          when "intrepid" 
-            "8.10"
-          when "jaunty" 
-            "9.04"
-          when "karmic" 
-            "9.10"
-          when "lucid" 
-            "10.04"
-          when "maverick" 
-            "10.10"
-          when "precise"
-            "12.04"
-          else 
-            raise "Unknown release"
-          end
-        else 
-          release
+      def platform_codename(platform_version = node[:rightimage][:platform_version])
+        case platform_version.to_f
+        when 8.04  then "hardy"
+        when 8.10  then "intrepid"
+        when 9.04  then "jaunty"
+        when 9.10  then "karmic"
+        when 10.04 then "lucid"
+        when 10.10 then "maverick"
+        when 12.04 then "precise"
+        else raise "Unknown Ubuntu version"
         end
       end
 
-      def release
-        node[:rightimage][:release]
+      def platform_version
+        node[:rightimage][:platform_version]
       end
 
       def arch
@@ -142,40 +131,20 @@ EOF
         end
       end
 
-      def os_string
-        guest_platform + "_" + release_number + "_" + arch + "_" + timestamp + "_" + build_number
-      end
-
-      def source_image
-        node[:rightimage][:mount_dir]
-      end
-
-      def build_root
-        if node[:rightimage][:cloud] == "raw"
-          node[:rightimage][:ebs_mount_dir]
-        else
-          "/mnt"
-        end
-      end
-      
       def partition_number
         number = 0
-        number = 1 if partitioned? && is_ubuntu? && node[:rightimage][:virtual_environment] == "xen"
+        number = 1 if partitioned? && ubuntu? && node[:rightimage][:hypervisor] == "xen"
         number
-      end
-      
-      def is_ubuntu?
-        node[:rightimage][:platform] == "ubuntu"
       end
 
       def partitioned?
         case node[:rightimage][:cloud]
-        when "ec2", "euca"
+        when "ec2", "eucalyptus"
           return FALSE
-        when "vmops"
-          case node[:rightimage][:virtual_environment]
+        when "cloudstack"
+          case node[:rightimage][:hypervisor]
           when "xen"
-            if is_ubuntu?
+            if ubuntu?
               return TRUE
             else
               return FALSE
@@ -188,80 +157,25 @@ EOF
         end
       end
 
-      def target_type
-        ret = "#{os_string}_hd0"
-        ret << "0" if node[:rightimage][:build_mode] == "full" && partitioned?
-
-        ret
-      end
-
-      def base_root
-        "#{build_root}/#{target_type}"
-      end
-
       def guest_root
-        source_image
+        node[:rightimage][:guest_root]
       end
 
       def target_raw_root
         "/mnt/storage"
       end
 
-      def target_raw_file
-       "#{target_type}.raw"
+      def loopback_file(partitioned = true)
+        "#{target_raw_root}/#{loopback_filename(partitioned)}"
       end
 
-      def target_raw_path
-        "#{target_raw_root}/#{target_raw_file}" 
+      def loopback_filename(partitioned = true)
+        nibble = partitioned ? "0" : ""
+        "#{ri_lineage}_hd0#{nibble}.raw"
       end
 
-      def target_raw_zip
-        "#{target_type}.gz"
-      end
-
-      def target_raw_zip_path
-        "#{build_root}/#{target_raw_zip}"
-      end
-
-      def target_temp_root
-#        "#{build_root}/rightimage-temp"
-        target_raw_root
-      end
-
-      def target_temp_path
-        "#{target_temp_root}/#{target_raw_file}"
-      end
-
-      def full_image_path
-        target_temp_root+"/"+image_name+"."+image_file_ext
-      end
-
-      def s3_path_base
-        [guest_platform,release_number,arch,timestamp[0..3]].join("/")
-      end
-
-      def s3_path_full
-        hypervisor = node[:rightimage][:virtual_environment]
-        [hypervisor,guest_platform,release_number].join("/")
-      end
-
-      def base_image_upload_bucket
-        "rightscale-rightimage-base-dev"
-      end
-
-      def full_image_upload_bucket
-        case node[:rightimage][:cloud]
-        when "vmops"
-          "rightscale-cloudstack-dev"
-        when "euca"
-          "rightscale-eucalyptus-dev"
-        when "openstack"
-          "rightscale-openstack-dev"
-        when "rackspace"
-          "rightscale-rackspace-dev"
-        when "ec2"
-          "rightscale-"+node[:rightimage][:region]
-        end
+      def temp_root
+        "/mnt/rightimage-temp"
       end
 
       def image_source_bucket
@@ -272,30 +186,6 @@ EOF
 
       def image_source_cloud
         "us-west-2"
-      end
-
-      def migrate_temp_bundled
-        "#{target_temp_root}/bundled"
-      end
-
-      def migrate_temp_unbundled
-        "#{target_temp_root}/unbundled"
-      end
-
-      def loop_name
-        "loop0"
-      end
-
-      def loop_dev
-        "/dev/#{loop_name}"
-      end 
-
-      def loop_map
-        "/dev/mapper/#{loop_name}p1"
-      end
-
-      def calc_mb
-        node[:rightimage][:root_size_gb].to_i * 1024 
       end
 
       def mounted?
@@ -347,15 +237,8 @@ EOF
         end
       end
 
-      def rightlink_cloud
-        case node[:rightimage][:cloud]
-        when "euca"
-          "eucalyptus"
-        when "vmops"
-          "cloudstack"
-        else
-          node[:rightimage][:cloud]
-        end
+      def ubuntu?
+        node[:rightimage][:platform] == "ubuntu"
       end
 
       def centos?
@@ -370,9 +253,13 @@ EOF
         centos? || rhel?
       end
 
+      def el6?
+        (centos? || rhel?) and node[:platform_version].to_f >= 6.0
+      end
+
       def epel_key_name
-        if node[:rightimage][:release].to_i >= 6
-          "-#{node[:rightimage][:release][0].chr}"
+        if node[:rightimage][:platform_version].to_i >= 6.0
+          "-#{node[:rightimage][:platform_version][0].chr}"
         else
           ""
         end

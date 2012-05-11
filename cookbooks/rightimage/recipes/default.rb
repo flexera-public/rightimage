@@ -17,7 +17,13 @@
 # limitations under the License.
 #
 
-rs_utils_marker :begin
+rightscale_marker :begin
+# Load up prerequisites first
+include_recipe "loopback_fs"
+include_recipe "rightscale::install_tools"
+include_recipe "block_device"
+
+
 class Chef::Recipe
   include RightScale::RightImage::Helper
 end
@@ -63,14 +69,12 @@ unless node[:rightimage][:manual_mode] == "true"
     if rebundle?
       include_recipe "rightimage::rebundle"
     else
-      include_recipe "rightimage::do_restore" unless mounted?
       include_recipe "rightimage::build_image"
     end
   when "base"
-    include_recipe "rightimage::setup_block_device" unless mounted?
     include_recipe "rightimage::build_base"
   when "migrate"
     include_recipe "rightimage::ec2_download_bundle"
   end
 end
-rs_utils_marker :end
+rightscale_marker :end

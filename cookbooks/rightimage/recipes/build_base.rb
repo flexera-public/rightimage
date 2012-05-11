@@ -1,4 +1,3 @@
-rs_utils_marker :begin
 #
 # Cookbook Name:: rightimage
 # Recipe:: build_base
@@ -18,11 +17,13 @@ rs_utils_marker :begin
 # limitations under the License.
 #
 
-include_recipe "rightimage::setup_loopback"
-include_recipe "rightimage::bootstrap_#{node[:rightimage][:platform].downcase}"
-include_recipe "rightimage::bootstrap_common"
-include_recipe "rightimage::copy_image"
-include_recipe "rightimage::do_destroy_loopback"
-include_recipe "rightimage::do_backup"
+rightscale_marker :begin
+
+include_recipe "rightimage::block_device_create"
+include_recipe "rightimage::loopback_create"
+include_recipe "rightimage::base_os"
+include_recipe "rightimage::loopback_copy"
+include_recipe "rightimage::loopback_unmount"
+include_recipe "rightimage::block_device_backup"
 include_recipe "rightimage::base_upload"
-rs_utils_marker :end
+rightscale_marker :end

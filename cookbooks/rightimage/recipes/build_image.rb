@@ -1,4 +1,4 @@
-rs_utils_marker :begin
+rightscale_marker :begin
 #
 # Cookbook Name:: rightimage
 # Recipe:: default
@@ -21,8 +21,32 @@ class Chef::Recipe
   include RightScale::RightImage::Helper
 end
 
-include_recipe "rightimage::base_common"
-include_recipe "rightimage::cloud_add_#{node.rightimage.cloud.downcase}" if node.rightimage.cloud 
-include_recipe "rightimage::do_destroy_loopback" unless rebundle?
-include_recipe "rightimage::upload_file_to_s3"
-rs_utils_marker :end
+directory temp_root do
+  owner "root"
+  group "root"
+  recursive true
+end
+
+packages = case node[:platform]
+           when "ubuntu" then %w(libxml2-dev libxslt1-dev)
+           when "centos", /redhat/ then %w(libxml2-devel libxslt-devel)
+           end
+
+packages.each do |p| 
+  r = package p do 
+    action :nothing 
+  end
+  r.run_action(:install)
+end
+
+node[:rightimage][:host_packages].split.each { |p| package p }
+
+include_recipe "rightimage::block_device_restore"
+include_recipe "rightimage::loopback_mount"
+include_recipe "rightimage::clean"
+include_recipe "rightimage::rightscale_install"
+include_recipe "rightimage::cloud_add"
+include_recipe "rightimage::loopback_unmount"
+include_recipe "rightimage::cloud_package"
+#include_recipe "rightimage::upload_image_s3"
+rightscale_marker :end

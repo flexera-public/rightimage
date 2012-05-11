@@ -1,77 +1,41 @@
 maintainer       "RightScale, Inc."
 maintainer_email "support@rightscale.com"
 description      "A cookbook for building RightImages"
-version          "0.1.0"
+version          "1.0.0"
 
+depends "loopback_fs"
+depends "rightscale"
 depends "block_device"
-depends "rs_utils"
 
 recipe "rightimage::default", "starts builds image automatically at boot. See 'manual_mode' input to enable." 
 recipe "rightimage::build_image", "build image based on host platform"
 recipe "rightimage::build_base", "build base image based on host platform"
 recipe "rightimage::clean", "cleans everything" 
-recipe "rightimage::base_common", "common image configuration" 
 recipe "rightimage::rebundle", "coordinate a rebundled image build (redhat on on ec2 or rackspace)"
-recipe "rightimage::bootstrap_ubuntu", "bootstraps a basic ubuntu image" 
-recipe "rightimage::bootstrap_centos", "bootstraps a basic centos image" 
-recipe "rightimage::bootstrap_rhel", "bootstraps a basic rhel image" 
-recipe "rightimage::bootstrap_sles", "bootstraps a basic sles image" 
-recipe "rightimage::bootstrap_common", "common configuration for linux base images"
-recipe "rightimage::bootstrap_common_debug", "common debug configuration for linux base images" 
+recipe "rightimage::base_os", "build a base image"
+recipe "rightimage::enable_debug", "enables a root login on image for debugging purposes"
 recipe "rightimage::rightscale_install", "installs rightscale"
-recipe "rightimage::cloud_add_ec2", "migrates the created image to ec2"
-recipe "rightimage::cloud_add_euca", "migrates the created image to eucalyptus" 
-recipe "rightimage::cloud_add_vmops", "adds requirements for cloudstack based on hypervisor choice"
-recipe "rightimage::cloud_add_openstack", "adds requirements for openstack based on hypervisor choice"
-recipe "rightimage::setup_loopback", "creates loopback file"
-recipe "rightimage::do_destroy_loopback", "unmounts loopback file"
-recipe "rightimage::install_vhd-util", "install the vhd-util tool"
-recipe "rightimage::do_create_mci", "creates MCI for image(s) (only ec2 currently supported)"
-recipe "rightimage::upload_ec2_s3", "bundle and upload s3 image (ec2 only)"
-recipe "rightimage::upload_ec2_ebs", "create EBS image snapshot (ec2 only)"
-recipe "rightimage::upload_vmops", "setup http server for download to test cloud"
-recipe "rightimage::upload_euca", "bundle and upload euca kernel, ramdisk and image"
-recipe "rightimage::upload_openstack", "bundle and upload openstack kernel, ramdisk and image"
-recipe "rightimage::upload_file_to_s3", "upload specified file to s3"
-recipe "rightimage::base_upload", "compresses and uploads base image to s3"
-recipe "rightimage::setup_block_device", "Creates, formats and mounts a brand new block_device volume stripe on the instance."
-recipe "rightimage::do_backup", "Backup image snapshot."
-recipe "rightimage::do_restore", "Restores image snapshot."
-recipe "rightimage::do_force_reset", "Unmounts and deletes the attached block_device and volumes that were attached to the instance for this lineage."
-recipe "rightimage::copy_image","Creates non-partitioned image."
+recipe "rightimage::cloud_add", "configures base os image for a specific cloud"
+recipe "rightimage::cloud_package", "packages RightImage for a specific cloud"
+recipe "rightimage::do_create_mci", "creates RightScale MultiCloudImage (MCI) for image (only ec2 currently supported)"
+recipe "rightimage::cloud_upload", "upload and register image with cloud"
+recipe "rightimage::upload_image_s3", "bundle and upload private cloud image to s3 bucket for distribution/download"
+recipe "rightimage::base_upload", "upload raw image to s3"
 recipe "rightimage::ec2_download_bundle","Downloads bundled image from EC2 S3."
 
-# Add each cloud name to an array to use for common inputs on each cloud.
-cloud_add = []
-cloud_upload = []
+# Block device recipes
+recipe "rightimage::block_device_create", "creates, formats, and mounts a brand new EBS volume"
+recipe "rightimage::block_device_backup", "creates an EBS snapshot from attached EBS volume"
+recipe "rightimage::block_device_restore", "creates a new EBS volume by restoring from an EBS snapshot"
+recipe "rightimage::block_device_destroy", "unmounts, and deletes an attached EBS volume"
 
-['euca', 'vmops', 'openstack'].each do |cloud|
-  cloud_add << "rightimage::cloud_add_#{cloud}"
-  cloud_upload << "rightimage::upload_#{cloud}"
-end
-
-cloud_add << "rightimage::cloud_add_ec2"
-cloud_upload_ec2 = [ "rightimage::upload_ec2_s3", "rightimage::upload_ec2_ebs", "rightimage::ec2_download_bundle" ]
-cloud_upload << cloud_upload_ec2 
-
-attribute "rest_connection/user",
-  :display_name => "API User",
-  :description => "RightScale API username. Ex. you@rightscale.com",
-  :recipes => [ "rightimage::do_create_mci" ],
-  :required => true
+# Loopback filesystem recipes
+recipe "rightimage::loopback_create", "creates and mounts loopback file system"
+recipe "rightimage::loopback_copy", "creates non-partitioned loopback fs image from a partitioned one"
+recipe "rightimage::loopback_unmount", "unmounts loopback file system"
+recipe "rightimage::loopback_mount", "mounts loopback file system"
 
 
-attribute "rest_connection/pass",
-  :display_name => "API Password",
-  :description => "Rightscale API password.",
-  :recipes => [ "rightimage::do_create_mci" ],
-  :required => true
- 
-attribute "rest_connection/api_url",
-  :display_name => "API URL",
-  :description => "The rightscale account specific api url to use.  Ex. https://my.rightscale.com/api/acct/1234 (where 1234 is your account id)",
-  :recipes => [ "rightimage::do_create_mci" ],
-  :required => true
 
 #
 # required
@@ -81,7 +45,7 @@ attribute "rightimage/root_size_gb",
   :description => "Sets the size of the virtual image. Units are in GB.",
   :choice => [ "10", "4", "2" ],
   :default => "10",
-  :recipes => [ "rightimage::default", "rightimage::copy_image", "rightimage::do_restore", "rightimage::setup_loopback" ]
+  :recipes => [ "rightimage::default", "rightimage::build_base", "rightimage::build_image", "rightimage::loopback_copy", "rightimage::block_device_restore", "rightimage::loopback_create", "rightimage::cloud_add", "rightimage::cloud_package"]
 
 attribute "rightimage/manual_mode",
   :display_name => "Manual Mode",
@@ -102,10 +66,10 @@ attribute "rightimage/platform",
   :choice => [ "centos", "ubuntu", "suse", "rhel" ],
   :required => "required"
   
-attribute "rightimage/release",
-  :display_name => "Guest OS Release",
-  :description => "The OS release/version to build into the virtual image.",
-  :choice => [ "5.4", "5.6", "5.8", "6.2", "lucid", "maverick", "precise" ],
+attribute "rightimage/platform_version",
+  :display_name => "Guest OS Version",
+  :description => "The OS version to build into the virtual image.",
+  :choice => [ "5.4", "5.6", "5.8", "6.2", "10.04", "10.10", "12.04" ],
   :required => "required"
   
 attribute "rightimage/arch",
@@ -117,7 +81,7 @@ attribute "rightimage/arch",
 attribute "rightimage/cloud",
   :display_name => "Target Cloud",
   :description => "The supported cloud for the virtual image. If unset, build a generic base image.",
-  :choice => [ "ec2", "vmops", "euca", "openstack", "rackspace", "rackspace_managed" ],
+  :choice => [ "ec2", "cloudstack", "eucalyptus", "openstack", "rackspace", "rackspace_managed" ],
   :required => "recommended"
   
 attribute "rightimage/region",
@@ -136,7 +100,7 @@ attribute "rightimage/image_upload_bucket",
   :display_name => "Image Upload Bucket",
   :description => "The bucket to upload the image to.",
   :required => "required",
-  :recipes => [ "rightimage::base_upload", "rightimage::build_base", "rightimage::default", "rightimage::build_image" , "rightimage::upload_file_to_s3", "rightimage::ec2_download_bundle"] | cloud_upload
+  :recipes => [ "rightimage::base_upload", "rightimage::build_base", "rightimage::default", "rightimage::build_image" , "rightimage::upload_image_s3", "rightimage::ec2_download_bundle", "rightimage::cloud_upload", "rightimage::upload_image_s3" ]
 
 attribute "rightimage/image_source_bucket",
   :display_name => "Image Source Bucket",
@@ -157,14 +121,8 @@ attribute "rightimage/mci_name",
    :recipes => [ "rightimage::do_create_mci" ],
    :required => "optional"
 
-attribute "rightimage/rebundle/revision",
-  :display_name => "Rebundle revision",
-  :description => "Branch or tag of rebundle project to use",
-  :required => "optional",
-  :default => "master",
-  :recipes => [ "rightimage::default", "rightimage::rebundle"]
 
-attribute "rightimage/rebundle/base_image_id",
+attribute "rightimage/rebundle_base_image_id",
   :display_name => "Rebundle Base Image ID",
   :description => "Cloud specific ID for the image to start with when building a rebundle image",
   :required => "optional",
@@ -203,7 +161,7 @@ attribute "rightimage/build_number",
   :default => "0",
   :required => "recommended"
 
-attribute "rightimage/virtual_environment",
+attribute "rightimage/hypervisor",
   :display_name => "Hypervisor",
   :description => "Which hypervisor is this image for?",
   :choice => [ "xen", "kvm", "esxi" ],
@@ -213,81 +171,118 @@ attribute "rightimage/datacenter",
   :display_name => "Datacenter ID",
   :description => "Datacenter/Zone ID.  Defaults to 1.  Use UK for rackspace UK",
   :default => "1",
-  :required => "optional"
+  :required => "recommended"
+
+# Optional, parameters for auto creation of mci
+attribute "rest_connection/user",
+  :display_name => "API User",
+  :description => "RightScale API username. Ex. you@rightscale.com",
+  :recipes => [ "rightimage::do_create_mci" ],
+  :required => true
+
+attribute "rest_connection/pass",
+  :display_name => "API Password",
+  :description => "Rightscale API password.",
+  :recipes => [ "rightimage::do_create_mci" ],
+  :required => true
+ 
+attribute "rest_connection/api_url",
+  :display_name => "API URL",
+  :description => "The rightscale account specific api url to use.  Ex. https://my.rightscale.com/api/acct/1234 (where 1234 is your account id)",
+  :recipes => [ "rightimage::do_create_mci" ],
+  :required => true
+
+attribute "rightimage/mci_name",
+   :display_name => "MCI Name",
+   :description => "MCI to add this image to. If empty, use Image Name",
+   :default => "",
+   :recipes => [ "rightimage::do_create_mci" ],
+   :required => "optional"
 
 # AWS
+aws_x509_recipes = ["rightimage::cloud_upload", "rightimage::rebundle", "rightimage::default", "rightimage::ec2_download_bundle"]
+aws_api_recipes = aws_x509_recipes + ["rightimage::build_base", "rightimage::build_image", "rightimage::upload_image_s3", "rightimage::base_upload"]
+
+attribute "rightimage/ec2/image_type",
+  :display_name => "EC2 Image Type",
+  :description => "Type of EC2 Image cloud_upload recipe will create",
+  :default => "InstanceStore",
+  :recipes => ["rightimage::build_image", "rightimage::default", "rightimage::cloud_upload"],
+  :choice => [ "InstanceStore", "EBS" ],
+  :required => "recommended"
+
 attribute "rightimage/aws_account_number",
   :display_name => "aws_account_number",
   :description => "aws_account_number",
   :required => "required",
-  :recipes => [ "rightimage::build_base", "rightimage::default", "rightimage::build_image" , "rightimage::rebundle", "rightimage::base_upload", "rightimage::upload_file_to_s3" ] | cloud_upload_ec2
+  :recipes => aws_api_recipes
   
 attribute "rightimage/aws_access_key_id",
   :display_name => "aws_access_key_id",
   :description => "aws_access_key_id",
   :required => "required",
-  :recipes => [ "rightimage::build_base", "rightimage::default", "rightimage::build_image" , "rightimage::rebundle", "rightimage::base_upload", "rightimage::upload_file_to_s3" ] | cloud_upload_ec2
+  :recipes => aws_api_recipes
   
 attribute "rightimage/aws_secret_access_key",
   :display_name => "aws_secret_access_key",
   :description => "aws_secret_access_key",
   :required => "required",
-  :recipes => [ "rightimage::build_base", "rightimage::default", "rightimage::build_image" , "rightimage::rebundle", "rightimage::base_upload", "rightimage::upload_file_to_s3" ] | cloud_upload_ec2
+  :recipes => aws_api_recipes
   
 attribute "rightimage/aws_509_key",
   :display_name => "aws_509_key",
   :description => "aws_509_key",
   :required => "required",
-  :recipes => [ "rightimage::build_base", "rightimage::default", "rightimage::build_image" , "rightimage::rebundle", "rightimage::base_upload", "rightimage::upload_file_to_s3" ] | cloud_upload_ec2
+  :recipes => aws_x509_recipes
   
 attribute "rightimage/aws_509_cert",
   :display_name => "aws_509_cert",
   :description => "aws_509_cert",
   :required => "required",
-  :recipes => [ "rightimage::build_base", "rightimage::default", "rightimage::build_image" , "rightimage::rebundle", "rightimage::base_upload", "rightimage::upload_file_to_s3" ] | cloud_upload_ec2
+  :recipes => aws_x509_recipes
 
 # Eucalyptus
 attribute "rightimage/euca/user_id",
   :display_name => "Eucalyptus User ID",
   :description => "The EC2_USER_ID value defined in your eucarc credentials file. User must have admin privileges.",
   :required => "required",
-  :recipes => [ "rightimage::upload_euca" ]
+  :recipes => [ "rightimage::cloud_upload" ]
   
 attribute "rightimage/euca/euca_url",
   :display_name => "Eucalyptus URL",
   :description => "Base URL to your Eucalyptus Cloud Controller. Don't include port. (Ex. http://<server_ip>)",
   :required => "required",
-  :recipes => [ "rightimage::upload_euca" ]
+  :recipes => [ "rightimage::cloud_upload" ]
 
 attribute "rightimage/euca/access_key_id",
   :display_name => "Eucalyptus Access Key",
   :description => "The EC2_ACCESS_KEY value defined in your eucarc credentials file. User must have admin privileges.",
   :required => "required",
-  :recipes => [ "rightimage::upload_euca" ]
+  :recipes => [ "rightimage::cloud_upload" ]
 
 attribute "rightimage/euca/secret_access_key",
   :display_name => "Eucalyptus Secret Access Key",
   :description => "The EC2_SECRET_KEY value defined in your eucarc credentials file. User must have admin privileges.",
   :required => "required",
-  :recipes => [ "rightimage::upload_euca" ]
+  :recipes => [ "rightimage::cloud_upload" ]
 
 attribute "rightimage/euca/x509_key",
   :display_name => "Eucalyptus x509 Private Key",
   :description => "The contents of the file pointed to by the EC2_PRIVATE_KEY value defined in your eucarc credentials file.",
   :required => "required",
-  :recipes => [ "rightimage::upload_euca" ]
+  :recipes => [ "rightimage::cloud_upload" ]
 
 attribute "rightimage/euca/x509_cert",
   :display_name => "Eucalyptus x509 Certificate",
   :description => "The contents of the file pointed to by the EC2_CERT value defined in your eucarc credentials file.",
   :required => "required",
-  :recipes => [ "rightimage::upload_euca" ]
+  :recipes => [ "rightimage::cloud_upload" ]
 
 attribute "rightimage/euca/euca_cert",
   :display_name => "Eucalyptus Cloud Certificate",
   :description => "The contents of the file pointed to by the EUCALYPTUS_CERT value defined in your eucarc credentials file.",
   :required => "required",
-  :recipes => [ "rightimage::upload_euca" ]
+  :recipes => [ "rightimage::cloud_upload" ]
 
 # Openstack
 attribute "rightimage/openstack/hostname",
@@ -295,47 +290,47 @@ attribute "rightimage/openstack/hostname",
   :description => "Hostname of Openstack Cloud Controller.",
   :required => "optional",
   :default => "",
-  :recipes => [ "rightimage::upload_openstack" ]
+  :recipes => [ "rightimage::cloud_upload" ]
 
 attribute "rightimage/openstack/user",
   :display_name => "Openstack User",
   :description => "User to access API of Openstack Cloud Controller.",
   :required => "optional",
   :default => "",
-  :recipes => [ "rightimage::upload_openstack" ]
+  :recipes => [ "rightimage::cloud_upload" ]
 
 attribute "rightimage/openstack/password",
   :display_name => "Openstack Password",
   :description => "Password for user to access API of Openstack Cloud Controller.",
   :required => "optional",
   :default => "",
-  :recipes => [ "rightimage::upload_openstack" ]
+  :recipes => [ "rightimage::cloud_upload" ]
 
 # CloudStack
 attribute "rightimage/cloudstack/cdc_url",
   :display_name => "CloudStack API URL",
   :description => "URL to your CloudStack Cloud Controller. (Ex. http://<server_ip>:8080/client/api)",
   :required => "required",
-  :recipes => [ "rightimage::upload_vmops" ]
+  :recipes => [ "rightimage::cloud_upload" ]
 
 attribute "rightimage/cloudstack/cdc_api_key",
   :display_name => "CloudStack API Key",
   :description => "CloudStack API key.",
   :required => "required",
-  :recipes => [ "rightimage::upload_vmops" ]
+  :recipes => [ "rightimage::cloud_upload" ]
 
 attribute "rightimage/cloudstack/cdc_secret_key",
   :display_name => "CloudStack Secret Key",
   :description => "CloudStack secret key.",
   :required => "required",
-  :recipes => [ "rightimage::upload_vmops" ]
+  :recipes => [ "rightimage::cloud_upload" ]
 
 attribute "rightimage/cloudstack/version",
   :display_name => "CloudStack Version",
   :description => "CloudStack version.",
   :required => "required",
   :choice => [ "2", "3" ],
-  :recipes => [ "rightimage::upload_vmops" ]
+  :recipes => [ "rightimage::cloud_upload" ]
 
 # RackSpace
 attribute "rightimage/rackspace/account",

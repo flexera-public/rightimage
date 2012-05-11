@@ -17,7 +17,7 @@
 # limitations under the License.
 #
 
-rs_utils_marker :begin
+rightscale_marker :begin
 class Chef::Resource::Bash
   include RightScale::RightImage::Helper
 end
@@ -39,6 +39,8 @@ end
 directory target_raw_root do
   action :create
 end 
+migrate_temp_bundled = "#{temp_root}/bundled"
+migrate_temp_unbundled = "#{temp_root}/unbundled"
 directory migrate_temp_bundled do
   recursive true
   action :create
@@ -57,11 +59,11 @@ bash "download bundle" do
 
     /home/ec2/bin/ec2-download-bundle -b #{node[:rightimage][:image_source_bucket]} -a #{node[:rightimage][:aws_access_key_id]} -s #{node[:rightimage][:aws_secret_access_key]} -p #{node[:rightimage][:image_name]} -k /tmp/AWS_X509_CERT.pem --debug --retry -d #{migrate_temp_bundled}
     /home/ec2/bin/ec2-unbundle -m #{migrate_temp_bundled}/#{node[:rightimage][:image_name]}.manifest.xml -k /tmp/AWS_X509_KEY.pem -d #{migrate_temp_unbundled} -s #{migrate_temp_bundled}
-    ln -s #{migrate_temp_unbundled}/#{node[:rightimage][:image_name]} #{target_raw_path}
+    ln -s #{migrate_temp_unbundled}/#{node[:rightimage][:image_name]} #{loopback_file(partitioned?)}
 
     #remove keys
     rm -f /tmp/AWS_X509_KEY.pem
     rm -f /tmp/AWS_X509_CERT.pem
   EOH
 end
-rs_utils_marker :end
+rightscale_marker :end

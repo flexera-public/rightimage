@@ -1,43 +1,47 @@
-rs_utils_marker :begin
+rightscale_marker :begin
 class Chef::Resource::Bash
   include RightScale::RightImage::Helper
 end
 
+gem_package_fog
+
+file_unpartitioned = ::File.join(temp_root, loopback_filename(false)+".gz")
+file_partitioned   = ::File.join(temp_root, loopback_filename(true)+".gz")
+
+directory temp_root { recursive true }
+
 bash "compress unpartitioned base image " do
-  cwd build_root 
+  cwd temp_root
   flags "-ex"
-  creates "#{build_root}/#{target_type}.raw.gz"
-  code <<-EOH
-    gzip -c #{target_raw_root}/#{target_type}.raw > #{target_type}.raw.gz
-  EOH
+  creates file_unpartitioned
+  code "gzip -c #{loopback_file(false)} > #{file_unpartitioned}"
 end
 
 bash "compress partitioned base image" do
-  cwd build_root 
+  cwd temp_root
   flags "-ex"
-  creates "#{build_root}/#{target_type}0.raw.gz"
-  code <<-EOH
-    gzip -c #{target_raw_root}/#{target_type}0.raw > #{target_type}0.raw.gz
-  EOH
+  creates file_partitioned
+  code "gzip -c #{loopback_file(true)} > #{file_partitioned}"
 end
 
-bash "upload unpartitioned base image" do
-  cwd build_root 
-  not_if {`curl -o /dev/null --head --connect-timeout 10 --fail --silent --write-out %{http_code} http://#{base_image_upload_bucket}.s3.amazonaws.com/#{s3_path_base}/#{target_type}.raw.gz`.strip == "200" }
-  flags "-ex"
-  environment(cloud_credentials("ec2"))
-  code <<-EOH
-    s3cmd put #{base_image_upload_bucket}:#{s3_path_base}/#{target_type}.raw.gz #{target_type}.raw.gz x-amz-acl:public-read
-  EOH
+
+image_s3_path = guest_platform+"/"+platform_version+"/"+arch+"/"+timestamp[0..3]+"/"
+image_upload_bucket = "rightscale-rightimage-base-dev"
+
+# Upload partitioned image
+rightimage_upload file_partitioned do
+  provider "rightimage_upload_s3"
+  endpoint 's3-us-west-2.amazonaws.com'
+  remote_path  "#{image_upload_bucket}/#{image_s3_path}"
+  action :upload
 end
 
-bash "upload partitioned base image" do
-  cwd build_root 
-  not_if {`curl -o /dev/null --head --connect-timeout 10 --fail --silent --write-out %{http_code} http://#{base_image_upload_bucket}.s3.amazonaws.com/#{s3_path_base}/#{target_type}0.raw.gz`.strip == "200" }
-  flags "-ex"
-  environment(cloud_credentials("ec2"))
-  code <<-EOH
-    s3cmd put #{base_image_upload_bucket}:#{s3_path_base}/#{target_type}0.raw.gz #{target_type}0.raw.gz x-amz-acl:public-read
-  EOH
+# Upload unpartitioned image
+rightimage_upload file_unpartitioned do
+  provider "rightimage_upload_s3"
+  endpoint 's3-us-west-2.amazonaws.com'
+  remote_path  "#{image_upload_bucket}/#{image_s3_path}"
+  action :upload
 end
-rs_utils_marker :end
+
+rightscale_marker :end
