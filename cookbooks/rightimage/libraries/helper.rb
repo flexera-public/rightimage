@@ -119,10 +119,6 @@ EOF
         node[:rightimage][:timestamp]
       end
 
-      def install_mirror_date
-        timestamp[0..7]
-      end
-
       def build_number
         if node[:rightimage][:build_number] =~ /./
           node[:rightimage][:build_number]

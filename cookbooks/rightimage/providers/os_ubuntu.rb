@@ -155,8 +155,8 @@ EOS
   end
 
   #  - configure mirrors
-  template "#{guest_root}/#{node[:rightimage][:mirror_file_path]}" do 
-    source node[:rightimage][:mirror_file] 
+  template "#{guest_root}/etc/apt/sources.list" do 
+    source "sources.list.erb"
     variables(
       :mirror_url => node[:rightimage][:mirror_url], 
       :platform_codename => platform_codename

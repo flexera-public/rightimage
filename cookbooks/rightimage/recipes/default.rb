@@ -56,13 +56,6 @@ r.run_action(:install)
 
 Gem.clear_paths
 
-if rightimage[:platform] == "ubuntu"
-  set[:rightimage][:mirror_date] = "#{timestamp[0..3]}/#{timestamp[4..5]}/#{timestamp[6..7]}"
-  set[:rightimage][:mirror_url] = "http://#{node[:rightimage][:mirror]}/ubuntu_daily/#{node[:rightimage][:mirror_date]}"
-else
-  set[:rightimage][:mirror_date] = timestamp[0..7]
-end
-
 unless node[:rightimage][:manual_mode] == "true"
   case node[:rightimage][:build_mode] 
   when "full"

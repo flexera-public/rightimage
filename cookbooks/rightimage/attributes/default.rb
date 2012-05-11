@@ -17,11 +17,15 @@ set[:rightimage][:root_mount][:label_dev] = "ROOT"
 set[:rightimage][:root_mount][:dev] = "LABEL=#{rightimage[:root_mount][:label_dev]}"
 set_unless[:rightimage][:image_source_bucket] = "rightscale-us-west-2"
 
-if rightimage[:platform] == "ubuntu"
-  set[:rightimage][:mirror_date] = "#{timestamp[0..3]}/#{timestamp[4..5]}/#{timestamp[6..7]}"
-  set[:rightimage][:mirror_url] = "http://#{node[:rightimage][:mirror]}/ubuntu_daily/#{node[:rightimage][:mirror_date]}"
+if timestamp
+  if rightimage[:platform] == "ubuntu"
+    set[:rightimage][:mirror_date] = "#{timestamp[0..3]}/#{timestamp[4..5]}/#{timestamp[6..7]}"
+    set[:rightimage][:mirror_url] = "http://#{node[:rightimage][:mirror]}/ubuntu_daily/#{node[:rightimage][:mirror_date]}"
+  else
+    set[:rightimage][:mirror_date] = timestamp[0..7]
+  end
 else
-  set[:rightimage][:mirror_date] = timestamp[0..7]
+  set[:rightimage][:mirror_date] = nil
 end
 
 
@@ -144,12 +148,8 @@ set_unless[:rightimage][:rightlink_version] = ""
 case rightimage[:platform]
   when "ubuntu" 
     set[:rightimage][:getsshkey_cmd] = "chroot $GUEST_ROOT update-rc.d getsshkey start 20 2 3 4 5 . stop 1 0 1 6 ."
-    set[:rightimage][:mirror_file] = "sources.list.erb"
-    set[:rightimage][:mirror_file_path] = "/etc/apt/sources.list"
   when "centos", "rhel"
     set[:rightimage][:getsshkey_cmd] = "chroot $GUEST_ROOT chkconfig --add getsshkey && \
                chroot $GUEST_ROOT chkconfig --level 4 getsshkey on"
-    set[:rightimage][:mirror_file] = "CentOS.repo.erb"
-    set[:rightimage][:mirror_file_path] = "/etc/yum.repos.d/CentOS.repo"
 
 end
