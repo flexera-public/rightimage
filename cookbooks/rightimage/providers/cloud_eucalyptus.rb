@@ -63,7 +63,7 @@ action :configure do
   end
 
   # Need to cleanup for ubuntu?
-  bash "configure for eucalyptus" do
+  bash "clean up yum cache" do
     flags "-ex"
     only_if { node[:rightimage][:platform] == "centos" }
     code <<-EOH
@@ -90,13 +90,14 @@ action :package do
       cloud_package_root=#{temp_root}
       package_dir=$cloud_package_root/$image_name
       KERNEL_VERSION=$(ls -t $guest_root/lib/modules|awk '{ printf "%s ", $0 }'|cut -d ' ' -f1-1)
+      INITRD=#{new_resource.platform == "ubuntu" ? "initrd.img" : "initrd"}
 
       rm -rf $package_dir
       mkdir -p $package_dir
       cd $cloud_package_root
       mkdir $package_dir/xen-kernel
       cp $guest_root/boot/vmlinuz-$KERNEL_VERSION $package_dir/xen-kernel
-      cp $guest_root/boot/initrd-$KERNEL_VERSION $package_dir/xen-kernel
+      cp $guest_root/boot/$INITRD-$KERNEL_VERSION $package_dir/xen-kernel
       cp #{loopback_file(partitioned?)} $package_dir/$image_name.img
       tar czvf $image_name.tar.gz $image_name 
     EOH
@@ -185,22 +186,25 @@ action :upload do
     #
     kernel_bucket=$image_name
     
-    # upload kernel
-    echo `euca-bundle-image -i $kernel_path --kernel true`
-    echo `euca-upload-bundle -b $kernel_bucket -m /tmp/$kernel_name.manifest.xml`  
-    kernel_output=`euca-register $kernel_bucket/$kernel_name.manifest.xml`
-    echo $kernel_output
-    
-    # upload ramdisk
-    echo `euca-bundle-image -i $ramdisk_path --ramdisk true`
-    echo `euca-upload-bundle -b $kernel_bucket -m /tmp/$ramdisk_name.manifest.xml`  
-    ramdisk_output=`euca-register $kernel_bucket/$ramdisk_name.manifest.xml`
-    echo $ramdisk_output
-      
-    ## collect kernel and ramdisk id's
-    EKI=`echo -n $kernel_output | awk '{ print $2 }'`
-    ERI=`echo -n $ramdisk_output | awk '{ print $2 }'`
-
+# Skip uploading kernel and ramdisk while we are testing on a partner cloud.
+#
+#  # upload kernel
+#  echo `euca-bundle-image -i $kernel_path --kernel true`
+#  echo `euca-upload-bundle -b $kernel_bucket -m /tmp/$kernel_name.manifest.xml`
+#  kernel_output=`euca-register $kernel_bucket/$kernel_name.manifest.xml`
+#  echo $kernel_output
+#
+#  # upload ramdisk
+#  echo `euca-bundle-image -i $ramdisk_path --ramdisk true`
+#  echo `euca-upload-bundle -b $kernel_bucket -m /tmp/$ramdisk_name.manifest.xml`
+#  ramdisk_output=`euca-register $kernel_bucket/$ramdisk_name.manifest.xml`
+#  echo $ramdisk_output
+#
+#  ## collect kernel and ramdisk id's
+#  EKI=`echo -n $kernel_output | awk '{ print $2 }'`
+#  ERI=`echo -n $ramdisk_output | awk '{ print $2 }'`
+  EKI="eki-7D253A7E"
+  ERI="eri-EE93379B"
 
     # 
     # Upload image. 

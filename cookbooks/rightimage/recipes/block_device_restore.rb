@@ -17,6 +17,7 @@ else
     lineage ri_lineage
     mount_point target_raw_root
     vg_data_percentage "50"
+    persist true
 
     action :primary_restore
   end

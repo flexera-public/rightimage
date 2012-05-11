@@ -69,7 +69,7 @@ attribute "rightimage/platform",
 attribute "rightimage/platform_version",
   :display_name => "Guest OS Version",
   :description => "The OS version to build into the virtual image.",
-  :choice => [ "5.4", "5.6", "5.8", "6.2", "10.04", "10.10" ],
+  :choice => [ "5.4", "5.6", "5.8", "6.2", "10.04", "10.10", "12.04" ],
   :required => "required"
   
 attribute "rightimage/arch",
@@ -81,7 +81,7 @@ attribute "rightimage/arch",
 attribute "rightimage/cloud",
   :display_name => "Target Cloud",
   :description => "The supported cloud for the virtual image. If unset, build a generic base image.",
-  :choice => [ "ec2", "cloudstack", "eucalyptus", "openstack", "rackspace" ],
+  :choice => [ "ec2", "cloudstack", "eucalyptus", "openstack", "rackspace", "rackspace_managed" ],
   :required => "recommended"
   
 attribute "rightimage/region",
@@ -114,9 +114,31 @@ attribute "rightimage/image_name",
    :description => "The name you want to give this new image.",
    :required => "required"
 
+attribute "rightimage/mci_name",
+   :display_name => "MCI Name",
+   :description => "MCI to add this image to. If empty, use Image Name",
+   :default => "",
+   :recipes => [ "rightimage::do_create_mci" ],
+   :required => "optional"
+
+
 attribute "rightimage/rebundle_base_image_id",
   :display_name => "Rebundle Base Image ID",
   :description => "Cloud specific ID for the image to start with when building a rebundle image",
+  :required => "optional",
+  :default => "",
+  :recipes => [ "rightimage::default", "rightimage::rebundle"]
+
+attribute "rightimage/rebundle_git_repository",
+  :display_name => "Rebundle Git Repository",
+  :description => "Git repository to checkout from when building a rebundle image",
+  :required => "optional",
+  :default => "",
+  :recipes => [ "rightimage::default", "rightimage::rebundle"]
+
+attribute "rightimage/rebundle_git_revision",
+  :display_name => "Rebundle Git Revision",
+  :description => "Git repository revision to checkout from when building a rebundle image",
   :required => "optional",
   :default => "",
   :recipes => [ "rightimage::default", "rightimage::rebundle"]

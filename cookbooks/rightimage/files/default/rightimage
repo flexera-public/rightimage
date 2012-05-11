@@ -189,7 +189,7 @@ function get_cloud_userdata() {
     #be our DHCP server. Scrape the DHCP leases file and query the DHCP server
     #for metadata.
     cloudstack*)
-      for candidate in [ /var/lib/dhcp3/dhclient.eth0.leases /var/lib/dhclient/dhclient-eth0.leases /var/lib/dhclient-eth0.leases ]; do
+      for candidate in [ /var/lib/dhcp/dhclient.eth0.leases /var/lib/dhcp3/dhclient.eth0.leases /var/lib/dhclient/dhclient-eth0.leases /var/lib/dhclient-eth0.leases ]; do
         if [ -f $candidate ]; then
           leases_file=$candidate
         fi

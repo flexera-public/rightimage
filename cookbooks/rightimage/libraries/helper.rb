@@ -4,8 +4,9 @@ module RightScale
       def image_name
         raise "ERROR: you must specify an image_name!" unless node[:rightimage][:image_name] =~ /./
         name = node[:rightimage][:image_name].dup
-        name << "_#{generate_persisted_passwd}" if node[:rightimage][:debug] == "true" && node[:rightimage][:build_mode] != "migrate"
+        name << "_#{generate_persisted_passwd}" if node[:rightimage][:debug] == "true" && node[:rightimage][:build_mode] != "migrate" && node[:rightimage][:cloud] != "rackspace"
         name << "_EBS" if node[:rightimage][:ec2][:image_type] =~ /ebs/i and name !~ /_EBS/
+        name.gsub!("_","-") if node[:rightimage][:cloud] == "rackspace"
         name
       end
 
@@ -34,7 +35,7 @@ module RightScale
       def image_file_ext
         case node[:rightimage][:hypervisor]
         when "xen"
-          "vhd.bz2"
+          (node[:rightimage][:cloud] == "euca" ? "tar.gz":"vhd.bz2")
         when "kvm"
           "qcow2.bz2"
         when "esxi"
@@ -97,6 +98,7 @@ EOF
         when 9.10  then "karmic"
         when 10.04 then "lucid"
         when 10.10 then "maverick"
+        when 12.04 then "precise"
         else raise "Unknown Ubuntu version"
         end
       end
@@ -205,7 +207,7 @@ EOF
           return {'AWS_CALLING_FORMAT' => 'SUBDOMAIN',
                   'AWS_ACCESS_KEY_ID'  => node[:rightimage][:aws_access_key_id],
                   'AWS_SECRET_ACCESS_KEY'=> node[:rightimage][:aws_secret_access_key]}
-        when "rackspace" 
+        when /rackspace/i
           return {'RACKSPACE_ACCOUNT' => node[:rightimage][:rackspace][:account],
                   'RACKSPACE_API_TOKEN' => node[:rightimage][:rackspace][:api_token]}
         else
@@ -228,7 +230,7 @@ EOF
       def rebundle?
         if node[:rightimage][:cloud] == "ec2" and node[:rightimage][:platform] == "rhel"
           return true
-        elsif node[:rightimage][:cloud] == "rackspace"
+        elsif node[:rightimage][:cloud] =~ /rackspace/i
           return true
         else
           return false

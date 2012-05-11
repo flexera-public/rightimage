@@ -35,7 +35,16 @@ end
 # set base os packages
 case rightimage[:platform]
 when "ubuntu"   
-  set[:rightimage][:guest_packages] = "ubuntu-standard binutils ruby1.8 curl unzip openssh-server ruby1.8-dev build-essential autoconf automake libtool logrotate rsync openssl openssh-server ca-certificates libopenssl-ruby1.8 subversion vim libreadline-ruby1.8 irb rdoc1.8 git-core liberror-perl libdigest-sha1-perl dmsetup emacs rake screen mailutils nscd bison ncurses-dev zlib1g-dev libreadline5-dev readline-common libxslt1-dev sqlite3 libxml2 libxml2-dev flex libshadow-ruby1.8 postfix sysstat iptraf syslog-ng libarchive-dev tmux"
+  set[:rightimage][:guest_packages] = "ubuntu-standard binutils ruby1.8 curl unzip openssh-server ruby1.8-dev build-essential autoconf automake libtool logrotate rsync openssl openssh-server ca-certificates libopenssl-ruby1.8 subversion vim libreadline-ruby1.8 irb rdoc1.8 git-core liberror-perl dmsetup emacs rake screen mailutils nscd bison ncurses-dev zlib1g-dev readline-common libxslt1-dev sqlite3 libxml2 libxml2-dev flex libshadow-ruby1.8 postfix sysstat iptraf syslog-ng libarchive-dev tmux dhcp3-client"
+
+  case rightimage[:release]
+  when "hardy"
+  when "lucid"
+  when "maverick"
+    rightimage[:guest_packages] << " libreadline5-dev libdigest-sha1-perl linux-headers-virtual"
+  else
+    rightimage[:guest_packages] << " libreadline-gplv2-dev"
+  end
 
   set[:rightimage][:host_packages] = "openjdk-6-jre openssl ca-certificates"
 when "centos","rhel"
@@ -64,6 +73,12 @@ case node[:rightimage][:platform_version]
     end
   when "10.10"
     rightimage[:host_packages] << " devscripts"
+    rightimage[:guest_packages] << " linux-image-virtual"
+  when "precise"
+    rightimage[:host_packages] << " devscripts liburi-perl"
+    rightimage[:guest_packages] << " linux-image-virtual"
+  else
+     rightimage[:host_packages] << " devscripts"
 end if rightimage[:platform] == "ubuntu" 
 
 # set cloud stuff
@@ -78,6 +93,7 @@ case rightimage[:cloud]
     set[:rightimage][:ephemeral_mount] = "/dev/sdb" 
     case rightimage[:platform]
       when "ubuntu" 
+        set[:rightimage][:ephemeral_mount] = "/dev/xvdb" if release_number.to_f >= 12.04
         set[:rightimage][:fstab][:ephemeral_mount_opts] = "defaults,nobootwait"
         set[:rightimage][:fstab][:swap] = "defaults,nobootwait"
         if rightimage[:platform_version].to_f >= 10.10

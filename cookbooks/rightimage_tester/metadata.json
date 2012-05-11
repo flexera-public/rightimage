@@ -1,0 +1,41 @@
+{
+  "dependencies": {
+    "rs_utils": ">= 0.0.0"
+  },
+  "name": "rightimage_tester",
+  "maintainer_email": "support@rightscale.com",
+  "attributes": {
+  },
+  "license": "Apache v2.0",
+  "suggestions": {
+  },
+  "platforms": {
+  },
+  "maintainer": "RightScale, Inc.",
+  "long_description": "",
+  "version": "0.1.0",
+  "recommendations": {
+  },
+  "recipes": {
+    "rightimage_tester::dependencies": "Ensure dependencies are installed.",
+    "rightimage_tester::filesystem_size": "Check root filesystem size.",
+    "rightimage_tester::default": "",
+    "rightimage_tester::sudo": "Check sudo configuration.",
+    "rightimage_tester::modprobe": "Ensure modprobe runs.",
+    "rightimage_tester::packages": "Ensure packages can be installed.",
+    "rightimage_tester::ldconfig": "Ensure ldconfig runs.",
+    "rightimage_tester::java": "Check java installation.",
+    "rightimage_tester::filesystem_permissions": "Check filesystem permissions.",
+    "rightimage_tester::sshd_config": "Check sshd configuration.",
+    "rightimage_tester::rubygems": "Check rubygems installation."
+  },
+  "groupings": {
+  },
+  "conflicting": {
+  },
+  "replacing": {
+  },
+  "description": "A cookbook for testing RightImages",
+  "providing": {
+  }
+}
