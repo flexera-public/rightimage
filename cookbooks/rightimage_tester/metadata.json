@@ -19,6 +19,32 @@
       ],
       "display_name": "Test SSH Security?",
       "description": "If set, checks various SSHd security settings.  Should be set to false on Rackspace Managed or Dev images."
+    },
+    "rightimage_tester/aws_secret_access_key": {
+      "required": "required",
+      "calculated": false,
+      "choice": [
+
+      ],
+      "type": "string",
+      "recipes": [
+        "rightimage_tester::special_strings"
+      ],
+      "display_name": "AWS Secret Access Key",
+      "description": "AWS Secret Access Key"
+    },
+    "rightimage_tester/aws_access_key_id": {
+      "required": "required",
+      "calculated": false,
+      "choice": [
+
+      ],
+      "type": "string",
+      "recipes": [
+        "rightimage_tester::special_strings"
+      ],
+      "display_name": "AWS Access Key ID",
+      "description": "AWS Access Key ID"
     }
   },
   "license": "Apache v2.0",
@@ -32,6 +58,7 @@
   "recommendations": {
   },
   "recipes": {
+    "rightimage_tester::special_strings": "Check for special strings.",
     "rightimage_tester::dependencies": "Ensure dependencies are installed.",
     "rightimage_tester::filesystem_size": "Check root filesystem size.",
     "rightimage_tester::default": "",
