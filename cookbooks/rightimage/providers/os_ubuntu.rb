@@ -18,7 +18,7 @@ end
 action :install do
   platform_codename = platform_codename(new_resource.platform_version)
   #create bootstrap command
-  if node[:lsb][:codename] =~ /lucid|maverick|precise/
+  if node[:platform_version].to_f >= 10.04
     package "python-boto"
     # install vmbuilder from deb files
     cookbook_file "/tmp/python-vm-builder.deb" do

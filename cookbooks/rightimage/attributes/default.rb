@@ -37,10 +37,10 @@ case rightimage[:platform]
 when "ubuntu"   
   set[:rightimage][:guest_packages] = "ubuntu-standard binutils ruby1.8 curl unzip openssh-server ruby1.8-dev build-essential autoconf automake libtool logrotate rsync openssl openssh-server ca-certificates libopenssl-ruby1.8 subversion vim libreadline-ruby1.8 irb rdoc1.8 git-core liberror-perl dmsetup emacs rake screen mailutils nscd bison ncurses-dev zlib1g-dev readline-common libxslt1-dev sqlite3 libxml2 libxml2-dev flex libshadow-ruby1.8 postfix sysstat iptraf syslog-ng libarchive-dev tmux dhcp3-client"
 
-  case rightimage[:release]
-  when "hardy"
-  when "lucid"
-  when "maverick"
+  case rightimage[:platform_version]
+  when "8.04"
+  when "10.04"
+  when "10.10"
     rightimage[:guest_packages] << " libreadline5-dev libdigest-sha1-perl linux-headers-virtual"
   else
     rightimage[:guest_packages] << " libreadline-gplv2-dev"
@@ -89,11 +89,10 @@ case rightimage[:cloud]
     set[:rightimage][:root_mount][:fsck] = "0" 
     set[:rightimage][:fstab][:ephemeral] = true
     # Might have to double check don't know if maverick should use kernel linux-image-ec2 or not
-    set[:rightimage][:swap_mount] = "/dev/sda3" unless rightimage[:arch]  == "x86_64"
+    set[:rightimage][:swap_mount] = "/dev/sda3" unless rightimage[:arch] == "x86_64"
     set[:rightimage][:ephemeral_mount] = "/dev/sdb" 
     case rightimage[:platform]
       when "ubuntu" 
-        set[:rightimage][:ephemeral_mount] = "/dev/xvdb" if release_number.to_f >= 12.04
         set[:rightimage][:fstab][:ephemeral_mount_opts] = "defaults,nobootwait"
         set[:rightimage][:fstab][:swap] = "defaults,nobootwait"
         if rightimage[:platform_version].to_f >= 10.10
