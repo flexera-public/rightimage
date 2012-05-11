@@ -1,44 +1,50 @@
 rightscale_marker :begin
-class Chef::Resource::RubyBlock
+
+class Chef::Resource
   include RightScale::RightImage::Helper
 end
 
+
 SANDBOX_BIN_DIR = "/opt/rightscale/sandbox/bin"
+# Not necesary, rightimage_tools install in default should take care
+# of all this
+##{SANBDBOX_BIN_DIR}/gem install rest_connection -v 0.1.9
+##{SANBDBOX_BIN_DIR}/gem install rightimage_tools -v 0.2.2
 
-# Newer rest connection gem, have to set mirror freeze date to too old a value
-# for the rest connection we want
-RC_VERSION = "0.1.2"
-RC_GEM = ::File.join(::File.dirname(__FILE__), "..", "files", "default", "rest_connection-#{RC_VERSION}.gem")
-
-r = gem_package RC_GEM do
-  gem_binary "#{SANDBOX_BIN_DIR}/gem"
-  version RC_VERSION
-  action :nothing
+# Lay down the RightScale API credentials
+directory "/root/.rest_connection"
+template "/root/.rest_connection/rest_api_config.yaml" do
+  source "rest_api_config.yaml.erb"
+  variables(
+    :user => node[:rest_connection][:user],
+    :password => node[:rest_connection][:pass],
+    :api_url => node[:rest_connection][:api_url]
+  )
+  backup false
 end
-r.run_action(:install)
-
-Gem.clear_paths
-
 
 # Create MCI from image
-ruby_block "Create MCI or Add to MCI" do
-  block do
-    config_rest_connection
+script "Create MCI or Add to MCI" do
+  interpreter "#{SANDBOX_BIN_DIR}/ruby"
+  code <<-EOF
+    require 'rubygems'
+    require 'rest_connection'
     require 'rightimage_tools'
-    mci_tool = ::RightImageTools::MCI.new(:logger=>Chef::Log)
 
-    images = RightImage::IdList.new(Chef::Log).to_hash
+    mci_tool = RightImageTools::MCI.new()
+
+    images = RightImage::IdList.new.to_hash
     raise "FATAL: no image ids found. aborting." if images.empty?
     images.each do |id, params|
-      mci_name = mci_base_name.dup
+      mci_name = '#{mci_base_name}'
       if params["storage_type"] == "EBS"
-        mci_name << "_EBS"
+        mci_name << "_EBS" unless mci_name =~ /_EBS/
       end
       mci_tool.add_image_to_mci(
-        :cloud_id=>cloud_id,
+        :cloud_id=>#{cloud_id},
         :image_id=>id,
         :name=>mci_name)
     end
-  end
+  EOF
 end
 rightscale_marker :end
