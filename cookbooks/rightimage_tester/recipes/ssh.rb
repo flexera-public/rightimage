@@ -26,13 +26,13 @@ directory "/root/.ssh" do
   action :create
 end 
 
-cookbook_file "/tmp/id_rsa" do
+cookbook_file "/root/.ssh/id_rsa" do
   source "id_rsa"
   mode 0600
   backup false
 end
 
-cookbook_file "/tmp/id_rsa.pub" do
+cookbook_file "/root/.ssh/id_rsa.pub" do
   source "id_rsa.pub"
   mode 0600
   backup false
@@ -42,7 +42,7 @@ bash "Test ssh" do
   flags "-ex"
   code <<-EOH
     echo "" >> /root/.ssh/authorized_keys # Ensure new-line before adding
-    cat /tmp/id_rsa.pub >> /root/.ssh/authorized_keys
+    cat /root/.ssh/id_rsa.pub >> /root/.ssh/authorized_keys
     ssh -t -t -o StrictHostKeyChecking=no localhost tty
   EOH
 end
