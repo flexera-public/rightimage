@@ -33,12 +33,13 @@ end
 
 cookbook_file "/tmp/grep/grep.rpm" do
   only_if { el }
-  source "grep-2.5.3-1.i386.rpm"
+  source "grep-2.5.3-1.x86_64.rpm"
   backup false
 end
 
 execute "rpm2cpio /tmp/grep/grep.rpm | cpio -id" do
   only_if { el }
+  cwd "/tmp/grep"
   creates "/tmp/grep/bin/grep"
 end
 
@@ -78,6 +79,7 @@ skip_dirs=(
 /usr/lib64
 /usr/share/doc
 /var/cache/rightscale
+/var/lib/rightscale/right_link/certs
 /var/lib/ureadahead
 )
 
