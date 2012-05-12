@@ -66,6 +66,16 @@ end
 
 include_recipe "rightimage::enable_debug" if node[:rightimage][:debug] == "true"
 
+# Bit of a cludge, needed for hypervisor installation,
+template "/tmp/yum.conf" do 
+  source "yum.conf.erb"
+  only_if { el? }
+  backup false
+  variables ({
+    :bootstrap => true
+  })
+end
+
 # BEGIN cloud specific additions
 rightimage_hypervisor node[:rightimage][:hypervisor] do
   platform          node[:rightimage][:platform]

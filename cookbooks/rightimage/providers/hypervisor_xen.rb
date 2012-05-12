@@ -20,9 +20,7 @@ action :install_kernel do
         "centos"|"rhel")
           if [ #{new_resource.platform_version.to_i} -lt 6 ]; then
             chroot $guest_root yum -y remove kernel
-            chroot $guest_root yum -y install kernel-xen kmod-xfs-xen
-            # reverting back to above line for refactor, NOTE TO SELF fix later -PS
-            #yum -c /tmp/yum.conf --installroot=$guest_root -y install kernel-xen kmod-xfs-xen
+            yum -c /tmp/yum.conf --installroot=$guest_root -y install kernel-xen kmod-xfs-xen
           fi
 
           kernel_version=$(ls -t $guest_root/lib/modules|awk '{ printf "%s ", $0 }'|cut -d ' ' -f1-1)
