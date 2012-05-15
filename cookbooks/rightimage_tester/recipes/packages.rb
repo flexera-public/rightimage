@@ -22,7 +22,7 @@ rightscale_marker :begin
 rightimage_tester "Verify packages install" do
   cmd = value_for_platform(
     "centos" => { "default" => 'yum install -y emacs' },
-    "rhel" => { "default" => 'yum install -y yum-arch' },
+    "redhat" => { "default" => 'yum install -y yum-arch' },
     "ubuntu" => { "default" => 'apt-get clean && apt-get update && apt-get install -y nmap' },
     "default" => "echo \"OS #{node[:platform]} not supported.\" && exit 1"
   )
