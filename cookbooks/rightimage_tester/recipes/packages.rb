@@ -24,7 +24,7 @@ rightimage_tester "Verify packages install" do
     "centos" => { "default" => 'yum install -y emacs' },
     "rhel" => { "default" => 'yum install -y yum-arch' },
     "ubuntu" => { "default" => 'apt-get clean && apt-get update && apt-get install -y nmap' },
-    "default" => 'echo "OS not supported." && exit 1'
+    "default" => "echo \"OS #{node[:platform]} not supported.\" && exit 1"
   )
   command cmd
   action :test
