@@ -19,9 +19,15 @@
 
 rightscale_marker :begin
 
-rightimage_tester "Verify root filesystem size is between 9GB and 11GB" do
-  command "size=`df -P /|grep /|awk '{print $2}'` && echo \"SIZE: $size\" && [ \"$size\" -ge 9000000 ] && [ \"$size\" -le 11000000 ]"
-  action :test
+# EBS images end up at 7.9GB due to adding a swap partition
+bash "Verify root filesystem size is between 8GB and 11GB" do
+  flags "-ex"
+  code <<-EOH
+    size=$(df -P /|grep /|awk '{print $2}')
+    echo "SIZE: $size"
+
+   [ "$size" -ge 8000000 ] && [ "$size" -le 11000000 ]
+  EOH
 end
 
 rightscale_marker :end
