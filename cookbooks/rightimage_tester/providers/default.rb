@@ -7,7 +7,7 @@ action :test do
       end
 
       logit("\n\nTEST: #{new_resource.name}\nCOMMAND: #{new_resource.command}")
-      result = `#{new_resource.command}`
+      result = `bash -c '#{new_resource.command}'`
       logit("[RESULT] TEXT: #{result} CODE: #{$?.exitstatus}")
       raise "TEST FAILED" unless ($?.success? && new_resource.fail == true) || new_resource.fail == false
 
