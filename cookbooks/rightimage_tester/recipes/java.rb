@@ -24,7 +24,7 @@ rightimage_tester "Verify JAVA_HOME environment variable" do
     "ubuntu" => { "default" => '[ "$JAVA_HOME" = "/usr/lib/jvm/java-6-sun" ]' },
     "default" => '[ "$JAVA_HOME" = "/usr/java/default" ]'
   )
-  command "source /etc/profile && echo JAVA_HOME is set to: $JAVA_HOME; #{cmd}"
+  command ". /etc/profile && echo JAVA_HOME is set to: $JAVA_HOME; #{cmd}"
   action :test
 end
 rightscale_marker :end
