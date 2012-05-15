@@ -111,6 +111,13 @@ action :upload do
 
   ## copy the generic image 
   bash "copy_image" do
+    if new_resource.platform == "centos"
+      eri = 'eri-0C573969'
+      eki = 'eki-B68E3694'
+    else #ubuntu
+      eri = 'eri-D8673679'
+      eki = 'eki-357F3D7F'
+    end
     flags "-ex"
     code <<-EOC
     image_name=#{image_name}
@@ -203,8 +210,11 @@ action :upload do
 #  ## collect kernel and ramdisk id's
 #  EKI=`echo -n $kernel_output | awk '{ print $2 }'`
 #  ERI=`echo -n $ramdisk_output | awk '{ print $2 }'`
-  EKI="eki-7D253A7E"
-  ERI="eri-EE93379B"
+#  home3 euca centos
+#  EKI="eki-7D253A7E"
+#  ERI="eri-EE93379B"
+  EKI=#{eki}
+  ERI=#{eri}
 
     # 
     # Upload image. 
