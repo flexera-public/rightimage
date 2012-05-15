@@ -63,6 +63,7 @@ BEGIN RSA PRIVATE KEY|\
 # List of directories to ignore.
 skip_dirs=(
 /dev
+/etc/pki/entitlement
 /etc/ssh
 /etc/ssl
 /lib
