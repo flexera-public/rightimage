@@ -78,7 +78,7 @@ case node[:rightimage][:platform_version]
   when "10.10"
     rightimage[:host_packages] << " devscripts"
     rightimage[:guest_packages] << " linux-image-virtual"
-  when "precise"
+  when "12.04"
     rightimage[:host_packages] << " devscripts liburi-perl"
     rightimage[:guest_packages] << " linux-image-virtual"
   else

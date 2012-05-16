@@ -17,6 +17,8 @@ else
     lineage ri_lineage
     mount_point target_raw_root
     vg_data_percentage "50"
+    volume_size "42"
+    stripe_count "1"
     persist true
 
     action :primary_restore
