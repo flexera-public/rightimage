@@ -549,7 +549,7 @@
       "choice": [
 
       ],
-      "default": "master",
+      "default": "12H1",
       "type": "string",
       "recipes": [
         "rightimage::default",

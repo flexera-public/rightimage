@@ -162,7 +162,7 @@ attribute "rightimage/rebundle/revision",
   :display_name => "Rebundle revision",
   :description => "Branch or tag of rebundle project to use",
   :required => "optional",
-  :default => "master",
+  :default => "12H1",
   :recipes => [ "rightimage::default", "rightimage::rebundle"]
 
 attribute "rightimage/rebundle/base_image_id",
