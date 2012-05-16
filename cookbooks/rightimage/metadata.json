@@ -341,6 +341,7 @@
         "rightimage::block_device_restore",
         "rightimage::loopback_create",
         "rightimage::cloud_add",
+        "rightimage::cloud_upload",
         "rightimage::cloud_package"
       ],
       "display_name": "Root Size GB",
