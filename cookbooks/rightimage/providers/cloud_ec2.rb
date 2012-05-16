@@ -139,6 +139,7 @@ def upload_ebs
 
   bash "create ebs volume" do 
     flags "-e"
+    creates "/var/tmp/ebs_volume_id"
     code <<-EOH
       #{setup_ec2_tools_env}
       set -x
@@ -157,8 +158,21 @@ def upload_ebs
     EOH
   end
 
+  # So in newer versions of software, devices are named xvdX, but amazon still 
+  # expects the api calls for the devices to be named sdX, which the OS then 
+  # remaps to xvdx.  In CentOS/RHEL case, remapping bumps up letter by 4. See 
+  # https://bugzilla.redhat.com/show_bug.cgi?id=729586 for explanation - PS
+  local_device = "/dev/sdj"
+  case new_resource.platform
+  when "centos", "rhel"
+    local_device = "/dev/xvdn" if new_resource.platform_version.to_f >= 6.1
+  when "ubuntu"
+    local_device = "/dev/xvdj" if new_resource.platform_version.to_f >= 10.10
+  end
+
+
   bash "attach ebs volume" do 
-#    not_if "cat /proc/partitions | grep sdj"
+    not_if "cat /proc/partitions | grep #{local_device}"
     flags "-e"
     code <<-EOH
       #{setup_ec2_tools_env}
@@ -198,10 +212,10 @@ def upload_ebs
       image_mount=#{guest_root}
 
   ## format and mount volume
-      mkfs.ext3 -F /dev/sdj
+      mkfs.ext3 -F #{local_device}
       root_label="#{node[:rightimage][:root_mount][:label_dev]}"
-      tune2fs -L $root_label /dev/sdj
-      mount /dev/sdj $ebs_mount
+      tune2fs -L $root_label #{local_device}
+      mount #{local_device} $ebs_mount
 
   ## mount EBS volume, rsync, and unmount ebs volume
       rsync -a $image_mount/ $ebs_mount/ --exclude '/proc'
