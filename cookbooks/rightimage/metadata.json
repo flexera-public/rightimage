@@ -336,9 +336,13 @@
       "type": "string",
       "recipes": [
         "rightimage::default",
+        "rightimage::build_image",
+        "rightimage::cloud_add_vmops",
+        "rightimage::upload_ec2_ebs",
         "rightimage::copy_image",
         "rightimage::do_restore",
-        "rightimage::setup_loopback"
+        "rightimage::setup_loopback",
+        "rightimage::rebundle"
       ],
       "display_name": "Root Size GB",
       "description": "Sets the size of the virtual image. Units are in GB."

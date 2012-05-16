@@ -62,7 +62,7 @@ bash "create ebs volume" do
     vol_out=`/home/ec2/bin/ec2-create-volume \
       --private-key /tmp/AWS_X509_KEY.pem \
       --cert /tmp/AWS_X509_CERT.pem \
-      --size 8 \
+      --size #{node[:rightimage][:root_size_gb]} \
       --url #{node[:rightimage][:ec2_endpoint]} \
       --availability-zone #{node[:ec2][:placement][:availability_zone]}`
 
