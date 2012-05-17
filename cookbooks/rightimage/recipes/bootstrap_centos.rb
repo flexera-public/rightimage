@@ -81,6 +81,8 @@ chroot #{node[:rightimage][:mount_dir]} authconfig --enableshadow --useshadow --
 yum -c /tmp/yum.conf -y clean all
 yum -c /tmp/yum.conf -y makecache
 yum -c /tmp/yum.conf -y install #{node[:rightimage][:guest_packages]}
+# Install postfix separately, don't want to use centosplus version which bundles mysql
+yum -c /tmp/yum.conf --installroot=#{node[:rightimage][:mount_dir]} -y install postfix --disablerepo=centosplus
 # install the guest packages in the chroot
 yum -c /tmp/yum.conf --installroot=#{node[:rightimage][:mount_dir]} -y install  #{node[:rightimage][:guest_packages]}
 yum -c /tmp/yum.conf --installroot=#{node[:rightimage][:mount_dir]} -y remove bluez* gnome-bluetooth*
