@@ -13,7 +13,7 @@ action :package do
     when "ubuntu"
       vhd_util_deps=%w{mercurial libncurses5-dev bin86 bcc iasl libsdl1.2debian-all libsdl1.2-dev python-dev libgcrypt11-dev uuid-dev libssl-dev gettext}
     else
-      raise "ERROR: plaform #{node[:platform]} not supported. Please feel free to add support ;) "
+      raise "ERROR: platform #{node[:platform]} not supported. Please feel free to add support ;) "
   end
 
   vhd_util_deps.each { |p| package p }
