@@ -77,10 +77,7 @@ action :configure do
 
     EOH
   end
-end
 
-
-action :package do
   bash "package guest image for eucalyptus" do 
     cwd "/mnt"
     flags "-ex"
@@ -104,7 +101,8 @@ action :package do
   end
 end
 
-
+action :package do
+end
 
 action :upload do
   tmp_creds_dir = "#{target_raw_root}/temp/euca_upload_creds"
