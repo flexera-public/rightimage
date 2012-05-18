@@ -1,7 +1,10 @@
 # TBD, don't use bash blocks, just execute the code w/err handling since we're in a provider already
 
 action :create do
-  bash "create loopback fs" do
+  # Subtle bug: chef will reuse resources based on the string passed in, so 
+  # add in new_resource.source into the bash block name to make it unique
+  # TBD: get away from unnecessary bash blocks
+  bash "create loopback fs #{new_resource.source}" do
     not_if { ::File.exists? new_resource.source }
     flags "-ex"
     code <<-EOH
@@ -33,7 +36,7 @@ EOF
 end
 
 action :unmount do
-  bash "unmount loopback fs" do
+  bash "unmount loopback fs #{new_resource.source}" do
     flags "-ex"
     code <<-EOH
       loop_dev="/dev/loop#{new_resource.device_number}"
@@ -59,7 +62,7 @@ action :unmount do
 end
 
 action :mount do
-  bash "mount loopback fs" do
+  bash "mount loopback fs #{new_resource.source}" do
     not_if { `mount`.split("\n").any? {|line| line.include? new_resource.mount_point} }
     flags "-ex"
     code <<-EOH
@@ -83,7 +86,7 @@ action :mount do
 end
 
 action :resize do
-  bash "resize loopback fs" do
+  bash "resize loopback fs #{new_resource.source}" do
     not_if do
       source_size_gb = (::File.size(new_resource.source)/1024/1024/1024).to_f.round
       new_resource.size_gb == source_size_gb

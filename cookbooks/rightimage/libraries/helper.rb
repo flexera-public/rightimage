@@ -60,25 +60,6 @@ module RightScale
         end
         id
       end
-      
-      def config_rest_connection
-        restcondir = ::File.join(::File.expand_path("~"), ".rest_connection")
-        require 'fileutils'
-
-restcon_config =<<EOF
----
-:pass: #{node[:rest_connection][:pass]}
-:user: #{node[:rest_connection][:user]}
-:api_url: #{node[:rest_connection][:api_url]}
-:common_headers: 
-  X_API_VERSION: "1.0"
-EOF
-        ENV['REST_CONNECTION_LOG'] = "/tmp/rest_connection.log"
-        FileUtils.mkdir_p(restcondir)
-        ::File.open(File.join(restcondir, "rest_api_config.yaml"),"w") {|f| f.write(restcon_config)}
-        require 'rubygems'
-        require 'rest_connection'
-      end
 
       def ri_lineage
         [guest_platform,platform_version,arch,timestamp,build_number].join("_")
@@ -99,7 +80,7 @@ EOF
         when 10.04 then "lucid"
         when 10.10 then "maverick"
         when 12.04 then "precise"
-        else raise "Unknown Ubuntu version"
+        else raise "Unknown Ubuntu version #{platform_version}"
         end
       end
 
