@@ -16,13 +16,19 @@ else
     cloud "ec2"
     lineage ri_lineage
     mount_point target_raw_root
-    vg_data_percentage "50"
-    volume_size "42"
+    vg_data_percentage "95"
+    volume_size "23"
     stripe_count "1"
     persist true
 
     action :primary_restore
   end
+end
+
+# Delete unneeded loopback file to save disk space.
+file loopback_file(!partitioned?) do
+  backup false
+  action :delete
 end
 
 rightscale_marker :end

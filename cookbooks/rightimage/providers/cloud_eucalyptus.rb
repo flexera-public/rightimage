@@ -87,7 +87,7 @@ action :package do
     code <<-EOH
       guest_root=#{guest_root}
       image_name=#{image_name}
-      cloud_package_root=#{temp_root}
+      cloud_package_root=#{target_raw_root}
       package_dir=$cloud_package_root/$image_name
       KERNEL_VERSION=$(ls -t $guest_root/lib/modules|awk '{ printf "%s ", $0 }'|cut -d ' ' -f1-1)
       INITRD=#{new_resource.platform == "ubuntu" ? "initrd.img" : "initrd"}
@@ -107,7 +107,7 @@ end
 
 
 action :upload do
-  tmp_creds_dir = "#{temp_root}/temp/euca_upload_creds"
+  tmp_creds_dir = "#{target_raw_root}/temp/euca_upload_creds"
 
   ## copy the generic image 
   bash "copy_image" do
@@ -127,7 +127,7 @@ action :upload do
     # 
     # Get paths to deliverables
     #
-    package_dir=#{temp_root}
+    package_dir=#{target_raw_root}
 
     image_path=$package_dir/$image_name/$image_name.img
     if [ -a $image_path ]; then 

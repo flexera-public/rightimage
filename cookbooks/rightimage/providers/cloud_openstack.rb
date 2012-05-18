@@ -84,7 +84,7 @@ action :upload do
     block do
       require 'json'
       filename = "#{image_name}.qcow2"
-      local_file = "#{temp_root}/#{filename}"
+      local_file = "#{target_raw_root}/#{filename}"
 
       openstack_user = node[:rightimage][:openstack][:user]
       openstack_password = node[:rightimage][:openstack][:password]
