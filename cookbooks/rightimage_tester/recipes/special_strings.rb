@@ -58,40 +58,45 @@ grep_bin=#{grep_bin}
 # to | the strings
 regexp="\
 BEGIN RSA PRIVATE KEY|\
-#{node[:rightimage_tester][:aws_access_key_id]}|#{node[:rightimage_tester][:aws_secret_access_key]}"
+BEGIN CERTIFICATE|\
+#{node[:rightimage_tester][:aws_access_key_id]}|\
+#{node[:rightimage_tester][:aws_secret_access_key]}"
 
 # List of directories to ignore.
 skip_dirs=(
-/dev
-/etc/pki/entitlement
-/etc/ssh
-/etc/ssl
-/lib
-/lib64
-/opt/rightscale/certs
-/opt/rightscale/right_link/certs
-/opt/rightscale/sandbox/lib/ruby/gems/1.8/gems
-/opt/rightscale/sandbox/man
-/proc
-/root/.ssh
-/sys
-/tmp/rubygems/test
-/usr/lib
-/usr/lib64
-/usr/share/doc
-/var/cache/rightscale
-/var/lib/rightscale/right_link/certs
-/var/lib/ureadahead
+#{node[:rightimage_tester][:root]}/dev
+#{node[:rightimage_tester][:root]}/etc/pki/entitlement
+#{node[:rightimage_tester][:root]}/etc/ssh
+#{node[:rightimage_tester][:root]}/etc/ssl
+#{node[:rightimage_tester][:root]}/lib
+#{node[:rightimage_tester][:root]}/lib64
+#{node[:rightimage_tester][:root]}/opt/rightscale/certs
+#{node[:rightimage_tester][:root]}/opt/rightscale/right_link/certs
+#{node[:rightimage_tester][:root]}/opt/rightscale/sandbox/lib/ruby/gems/1.8/gems
+#{node[:rightimage_tester][:root]}/opt/rightscale/sandbox/man
+#{node[:rightimage_tester][:root]}/proc
+#{node[:rightimage_tester][:root]}/root/.ssh
+#{node[:rightimage_tester][:root]}/sys
+#{node[:rightimage_tester][:root]}/tmp/rubygems/test
+#{node[:rightimage_tester][:root]}/usr/lib
+#{node[:rightimage_tester][:root]}/usr/lib64
+#{node[:rightimage_tester][:root]}/usr/share/doc
+#{node[:rightimage_tester][:root]}/var/cache/rightscale
+#{node[:rightimage_tester][:root]}/var/lib/rightscale/right_link/certs
+#{node[:rightimage_tester][:root]}/var/lib/ureadahead
+#{node[:rightimage_tester][:root]}/usr/share
+#{node[:rightimage_tester][:root]}/home/ec2
 )
 
 # List of files to ignore.
 skip_files=(
-/tmp/id_rsa
-/var/log/decommission
-/var/log/install
-/var/log/messages
-/var/log/syslog
-/var/log/user.log
+#{node[:rightimage_tester][:root]}/tmp/id_rsa
+#{node[:rightimage_tester][:root]}/var/log/decommission
+#{node[:rightimage_tester][:root]}/var/log/install
+#{node[:rightimage_tester][:root]}/var/log/messages
+#{node[:rightimage_tester][:root]}/var/log/syslog
+#{node[:rightimage_tester][:root]}/var/log/user.log
+#{node[:rightimage_tester][:root]}/var/log/bootstrap.log
 )
 
 # Ignore this script during the search
@@ -107,7 +112,7 @@ do
  skip_file="$skip_file --exclude=`basename ${skip_files[$i]}`"
 done
 
-logger -s -t RightScale "Going to search entire file system for $regexp, but \
+echo "Going to search entire file system for $regexp, but \
 ${skip_dirs[@]} ${skip_files[@]}"
 
 set +ex
@@ -120,23 +125,20 @@ set +ex
 #   assumes that a binary file does not match so skips it.
 $grep_bin -E --ignore-case --files-with-matches --devices=skip \
       --directories=recurse --no-messages $skip_dir $skip_file \
-      --binary-files=without-match --regexp="$regexp" / > /tmp/badfiles
-[ "$?" == "127" ] && logger -st RightScale "grep didn't run" && exit 1
+      --binary-files=without-match --regexp="$regexp" #{node[:rightimage_tester][:root]}/ > /tmp/badfiles
+[ "$?" == "127" ] && echo "grep didn't run" && exit 1
 
 if [ -s /tmp/badfiles ]; then
-  logger -s -t RightScale "Warning: found suspicious strings. Output in /tmp/badfiles"
+  echo "Warning: found suspicious strings. Output in /tmp/badfiles"
   cat /tmp/badfiles
-  if [ "$CONTINUE_ON_FAILURE" == "true" ]; then
-    exit 0
+  if [ "#{node[:rightimage_tester][:run_static_tests]}" == "true" ]; then
+    exit 1
   fi
-  exit 1
+  exit 0
 else
-  logger -s -t RightScale "No suspicious strings found."
+  echo "No suspicious strings found."
   exit 0
 fi
-
-logger -s -t RightScale "/tmp/badfiles doesn't exist.. hmm?"
-exit 1
   EOH
 end
 

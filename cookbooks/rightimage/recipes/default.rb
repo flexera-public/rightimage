@@ -19,6 +19,7 @@
 
 rightscale_marker :begin
 # Load up prerequisites first
+include_recipe "rightimage_tester"
 include_recipe "loopback_fs"
 include_recipe "rightscale::install_tools"
 include_recipe "block_device"
