@@ -41,6 +41,11 @@ action :configure do
   end
 end
 
+action :package do
+  rightimage_image node[:rightimage][:image_type] do
+    action :package
+  end
+end
 
 action :upload do
   packages = case node[:platform]
