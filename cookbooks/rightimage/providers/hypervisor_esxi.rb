@@ -54,12 +54,12 @@ action :install_tools do
         chroot $guest_root rpm --import $TMP_DIR/dsa.pub
         chroot $guest_root rpm --import $TMP_DIR/rsa.pub
         cat > $guest_root/etc/yum.repos.d/vmware-tools.repo <<EOF
-  [vmware-tools] 
-  name=VMware Tools 
-  baseurl=http://packages.vmware.com/tools/esx/5.0/rhel5/x86_64
-  enabled=1 
-  gpgcheck=1
-  EOF
+[vmware-tools]
+name=VMware Tools
+baseurl=http://packages.vmware.com/tools/esx/5.0/rhel5/x86_64
+enabled=1
+gpgcheck=1
+EOF
      chroot $guest_root yum -y clean all
      chroot $guest_root yum -y install vmware-tools-esx-nox
      rm -f $guest_root/etc/yum.repos.d/vmware-tools.repo
