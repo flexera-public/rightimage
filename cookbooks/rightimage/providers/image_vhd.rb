@@ -9,6 +9,7 @@ action :package do
   case node[:platform]
     when "centos", /redhat/i
       vhd_util_deps=%w{mercurial git ncurses-devel dev86 iasl SDL python-devel libgcrypt-devel uuid-devel openssl-devel}
+      vhd_util_deps << (el6? ? "libuuid-devel" : "e2fsprogs-devel")
     when "ubuntu"
       vhd_util_deps=%w{mercurial libncurses5-dev bin86 bcc iasl libsdl1.2debian-all libsdl1.2-dev python-dev libgcrypt11-dev uuid-dev libssl-dev gettext}
     else
