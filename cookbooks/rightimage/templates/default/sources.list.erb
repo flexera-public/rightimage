@@ -13,3 +13,5 @@ deb <%= @mirror_url %>  <%= @platform_codename %>-security main restricted unive
 #deb <%= @mirror_url %> <%= @platform_codename %>-backports main restricted universe multiverse
 #deb-src http://archive.ubuntu.com/ubuntu/ <%= @platform_codename %>-backports main restricted universe multiverse
 
+## RIGHTSCALE REPOSITORY
+deb http://<%=node[:rightimage][:mirror]%>/rightscale_software_ubuntu/<%=node[:rightimage][:mirror_date]%> <%= @platform_codename %> main

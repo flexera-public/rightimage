@@ -214,6 +214,11 @@ action :install do
   EOF
   end
 
+  cookbook_file "#{guest_root}/etc/pki/rpm-gpg/RPM-GPG-KEY-RightScale" do
+    source "GPG-KEY-RightScale"
+    backup false
+  end
+
   remote_file "#{guest_root}/root/.bash_profile" do 
     source "bash_profile" 
     backup false

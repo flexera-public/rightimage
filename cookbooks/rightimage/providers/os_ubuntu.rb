@@ -258,6 +258,18 @@ EOF
     EOH
   end
 
+  cookbook_file "#{guest_root}/tmp/GPG-KEY-RightScale" do
+    source "GPG-KEY-RightScale"
+    backup false
+  end
+
+  log "Adding rightscale gpg key to keyring"
+  bash "install rightscale gpg key" do
+    flags "-ex"
+    code "chroot #{guest_root} apt-key add /tmp/GPG-KEY-RightScale"
+  end
+
+
   # TODO: Add cleanup
   bash "cleanup" do
     flags "-ex"
