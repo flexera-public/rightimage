@@ -5,4 +5,4 @@
 :backtrace: false
 :bulk_threshold: 1000
 :sources:
-- http://<%= node[:rightimage][:mirror] %>/rubygems/archive/<%= node[:rightimage][:timestamp][0..7] %>/
+- http://<%=@mirror_base_url%>/rubygems/archive/<%=@mirror_freeze_date%>/
