@@ -257,6 +257,17 @@ bash "apt config pipeline" do
   EOH
 end
 
+cookbook_file "#{source_image}/tmp/GPG-KEY-RightScale" do
+  source "GPG-KEY-RightScale"
+  backup false
+end
+
+log "Adding rightscale gpg key to keyring"
+bash "install rightscale gpg key" do
+  flags "-ex"
+  code "chroot #{source_image} apt-key add /tmp/GPG-KEY-RightScale"
+end
+
 # TODO: Add cleanup
 bash "cleanup" do
   flags "-ex"

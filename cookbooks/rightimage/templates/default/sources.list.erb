@@ -13,3 +13,5 @@ deb <%= node[:rightimage][:mirror_url] %>  <%= node[:rightimage][:release] %>-se
 #deb <%= node[:rightimage][:mirror_url] %> <%= node[:rightimage][:release] %>-backports main restricted universe multiverse
 #deb-src http://archive.ubuntu.com/ubuntu/ <%= node[:rightimage][:release] %>-backports main restricted universe multiverse
 
+## RIGHTSCALE REPOSITORY
+deb http://<%=node[:rightimage][:mirror]%>/rightscale_software_ubuntu/<%=node[:rightimage][:mirror_date]%> <%= node[:rightimage][:release] %> main

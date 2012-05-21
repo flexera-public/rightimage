@@ -192,6 +192,11 @@ chroot #{node[:rightimage][:mount_dir]} /sbin/chkconfig ip6tables off
 EOF
 end
 
+cookbook_file "#{node[:rightimage][:mount_dir]}/etc/pki/rpm-gpg/RPM-GPG-KEY-RightScale" do
+  source "GPG-KEY-RightScale"
+  backup false
+end
+
 remote_file "#{node[:rightimage][:mount_dir]}/root/.bash_profile" do 
   source "bash_profile" 
   backup false
@@ -223,7 +228,7 @@ template "#{node[:rightimage][:mount_dir]}/root/.gemrc" do
   # Issue: gem install segfaults with a buffer overflow error in the syck (yaml parsing)
   # code (compiled into ruby) for ruby 1.8.5 with mirror beyond this date.  one of rubygems
   # yaml files probably changed format slightly in incompatable way
-  freeze_date = timestamp[0..7]
+  freeze_date = node[:rightimage][:timestamp][0..7]
   if freeze_date > "20120514"
     freeze_date = "20120514"
   end
@@ -234,6 +239,7 @@ template "#{node[:rightimage][:mount_dir]}/root/.gemrc" do
   source "gemrc.erb"
   backup false
 end
+
 
 bash "clean_db" do 
   code <<-EOH
