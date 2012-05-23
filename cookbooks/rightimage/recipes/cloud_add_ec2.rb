@@ -70,6 +70,7 @@ end
 
 template "#{guest_root}/boot/grub/menu.lst" do
   source "menu.lst.erb"
+  backup false
 end
 
 include_recipe "rightimage::bootstrap_common_debug"

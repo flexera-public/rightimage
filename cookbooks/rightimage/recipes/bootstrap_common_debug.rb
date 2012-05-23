@@ -16,6 +16,7 @@ if node[:rightimage][:debug] == "true"
   template "#{guest_root}/etc/ssh/sshd_config" do
     only_if { ((node[:rightimage][:debug] == "true") && (image_name =~ /Dev/))  }
     source "sshd_config.erb"
+    backup false
     variables({
       :permit_root_login => "yes",
       :password_authentication => "yes"

@@ -37,6 +37,7 @@ end
 
 cookbook_file "#{node[:rightimage][:mount_dir]}/etc/init.d/rightimage" do
   source "rightimage"
+  backup false
   mode "0755"
 end
 
