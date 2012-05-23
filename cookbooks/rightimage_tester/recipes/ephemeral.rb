@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: rightimage_tester
-# Recipe:: default
+# Recipe:: ephemeral 
 #
 # Copyright 2011, RightScale, Inc.
 #
@@ -18,4 +18,17 @@
 #
 
 rightscale_marker :begin
+
+ruby_block "ensure ephemeral mounted" do
+  only_if { node[:cloud][:provider] == "ec2" && node[:ec2][:instance_type] != "t1.micro" && node[:platform] != /suse/ }
+  block do
+    unless `mount | grep " on /mnt "` =~ /\/dev\/(sd|xvd)/
+      Chef::Log.info "***********************************************************"
+      Chef::Log.info "*** ERROR: do not see the ephemeral 0 drive mounted on /mnt"
+      Chef::Log.info "***********************************************************"
+      exit 1
+    end
+  end
+end
+
 rightscale_marker :end

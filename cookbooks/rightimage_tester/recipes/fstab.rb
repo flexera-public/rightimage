@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: rightimage_tester
-# Recipe:: default
+# Recipe:: fstab
 #
 # Copyright 2011, RightScale, Inc.
 #
@@ -18,4 +18,18 @@
 #
 
 rightscale_marker :begin
+
+ruby_block "Verify fstab has a newline" do
+  block do
+    fstab = `tail -n 1 /etc/fstab`
+    
+    unless fstab[-1] == 10
+      Chef::Log.info "************************************************"
+      Chef::Log.info "*** ERROR: /etc/fstab does not end in a newline!!!"
+      Chef::Log.info "************************************************"
+      exit 1 
+    end
+  end
+end
+
 rightscale_marker :end

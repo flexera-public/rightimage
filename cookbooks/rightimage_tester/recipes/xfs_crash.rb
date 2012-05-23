@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: rightimage_tester
-# Recipe:: default
+# Recipe:: xfs_crash
 #
 # Copyright 2011, RightScale, Inc.
 #
@@ -18,4 +18,41 @@
 #
 
 rightscale_marker :begin
+
+bash "XFS crash bug detect" do
+  only_if { node[:platform] == "centos" && node[:cloud][:provider] == "ec2" }
+  flags "-ex"
+  code <<-EOH
+
+device=/dev/loop0
+loopback_file=/root/loopfile
+test_dir=/mnt/xfs_test
+
+dd if=/dev/zero of=$loopback_file bs=1024 count=30720
+
+set +e
+losetup -d $device
+set -e
+
+losetup $device $loopback_file
+mkfs.xfs -l version=2 -f $device
+
+[ ! -d $test_dir ] && mkdir $test_dir
+
+echo "Attempting to mount and test an xfs volume-- may trigger panic"
+
+mount $device $test_dir
+cd $test_dir
+touch file
+rm file
+cd /
+
+umount $test_dir
+rm -f $loopback_file
+rm -rf $test_dir
+losetup -d $device
+
+  EOH
+end
+
 rightscale_marker :end

@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: rightimage_tester
-# Recipe:: default
+# Recipe:: reboot 
 #
 # Copyright 2011, RightScale, Inc.
 #
@@ -18,4 +18,32 @@
 #
 
 rightscale_marker :begin
+
+bash "Test reboot" do
+  flags "-ex"
+  code <<-EOH
+#set up a script to wait and reboot
+cat << EOF > /root/reboot.sh
+#!/bin/bash 
+sleep 30
+init 6
+EOF
+chmod +x /root/reboot.sh
+
+if test -e /root/reboot2 ; then
+  echo already rebooted twice. Continuing...
+else 
+  if test -e /root/reboot1 ; then
+    echo already rebooted once. Rebooting again...
+    touch /root/reboot2
+    nohup /root/reboot.sh &
+  else
+    echo About to reboot for the first time...
+    touch /root/reboot1
+    nohup /root/reboot.sh &
+  fi
+fi
+  EOH
+end
+
 rightscale_marker :end

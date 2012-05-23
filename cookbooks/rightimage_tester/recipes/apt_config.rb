@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: rightimage_tester
-# Recipe:: default
+# Recipe:: apt_config 
 #
 # Copyright 2011, RightScale, Inc.
 #
@@ -18,4 +18,16 @@
 #
 
 rightscale_marker :begin
+
+bash "apt config" do
+  only_if { node[:platform] == "ubuntu" }
+  flags "-ex"
+  code <<-EOH
+    opt=0
+    eval $(apt-config shell opt APT::Install-Recommends)
+    if [ -z $opt ]; then echo "Invalid options: APT::Install-Recommends"; exit 1; fi
+    if [ $opt -eq 1 ]; then echo "ERROR: wrong setting for APT::Install-Recommends"; exit 1; fi
+  EOH
+end
+
 rightscale_marker :end

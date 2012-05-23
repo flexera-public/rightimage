@@ -17,16 +17,16 @@
 # limitations under the License.
 #
 
-rs_utils_marker :begin
+rightscale_marker :begin
 
 rightimage_tester "Verify packages install" do
   cmd = value_for_platform(
     "centos" => { "default" => 'yum install -y emacs' },
-    "rhel" => { "default" => 'yum install -y yum-arch' },
+    "redhat" => { "default" => 'yum install -y yum-arch' },
     "ubuntu" => { "default" => 'apt-get clean && apt-get update && apt-get install -y nmap' },
-    "default" => 'echo "OS not supported." && exit 1'
+    "default" => "echo \"OS #{node[:platform]} not supported.\" && exit 1"
   )
   command cmd
   action :test
 end
-rs_utils_marker :end
+rightscale_marker :end

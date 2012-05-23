@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: rightimage_tester
-# Recipe:: default
+# Recipe:: blank_passwords 
 #
 # Copyright 2011, RightScale, Inc.
 #
@@ -18,4 +18,23 @@
 #
 
 rightscale_marker :begin
+
+ruby_block "Ensure no blank passwords" do
+  block do
+    def error_and_exit(user)
+      Chef::Log.info "######################"
+      Chef::Log.info "User: #{user} does not have a password set!!!"
+      Chef::Log.info "######################"
+      Kernel.exit 1
+    end
+    
+    File.open("/etc/shadow","r") do |shadow_file|
+      while line = shadow_file.gets
+        line_array = line.split ":"
+        error_and_exit line_array[0] if line_array[1] == ""    
+      end
+    end
+  end
+end
+
 rightscale_marker :end

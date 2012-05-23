@@ -17,11 +17,11 @@
 # limitations under the License.
 #
 
-rs_utils_marker :begin
+rightscale_marker :begin
 
 rightimage_tester "Verify sudo permissions" do
   command "[ -u `which sudo` ]"
   action :test
 end
 
-rs_utils_marker :end
+rightscale_marker :end

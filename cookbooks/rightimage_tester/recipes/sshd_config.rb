@@ -17,11 +17,19 @@
 # limitations under the License.
 #
 
-rs_utils_marker :begin
+rightscale_marker :begin
+
+config = "/etc/ssh/sshd_config"
 
 rightimage_tester "Verify SSHd security settings" do
-  command "config=\"/etc/ssh/sshd_config\" && egrep -H \"^PermitRootLogin without-password\" $config && egrep -H \"^PasswordAuthentication no\" $config && egrep -H \"^IgnoreRhosts no\" $config"
+  only_if { node[:rightimage_tester][:test_ssh_security] == "true" }
+  command "config=\"#{config}\" && egrep -H \"^PermitRootLogin without-password\" $config && egrep -H \"^PasswordAuthentication no\" $config"
   action :test
 end
 
-rs_utils_marker :end
+rightimage_tester "Verify SSHd security settings - Rhosts" do
+  command "config=\"#{config}\" && egrep -H \"^IgnoreRhosts no\" $config && exit 1 || exit 0"
+  action :test
+end
+
+rightscale_marker :end

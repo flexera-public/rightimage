@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: rightimage_tester
-# Recipe:: default
+# Recipe:: banned_packages 
 #
 # Copyright 2011, RightScale, Inc.
 #
@@ -18,4 +18,11 @@
 #
 
 rightscale_marker :begin
+
+rightimage_tester "Ensure no banned packages installed" do
+  only_if { node[:platform] == "centos" }
+  command 'output=$(rpm -qa mysql*); [ -z "$output" ]'
+  action :test
+end
+
 rightscale_marker :end

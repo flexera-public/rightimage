@@ -17,7 +17,7 @@
 # limitations under the License.
 #
 
-rs_utils_marker :begin
+rightscale_marker :begin
 
 dependencies = %w{vim ssh cron}
 cmd = value_for_platform(
@@ -33,4 +33,4 @@ dependencies.each do |package|
   end
 end
 
-rs_utils_marker :end
+rightscale_marker :end

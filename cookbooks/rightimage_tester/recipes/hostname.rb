@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: rightimage_tester
-# Recipe:: default
+# Recipe:: hostname 
 #
 # Copyright 2011, RightScale, Inc.
 #
@@ -18,4 +18,17 @@
 #
 
 rightscale_marker :begin
+
+ruby_block "Verify hostname set" do
+  only_if { node[:cloud][:provider] == "ec2" }
+  block do
+    hostname = `hostname -f`.chomp
+    internal_hostname = node[:ec2][:local_hostname]
+    unless hostname == internal_hostname
+      Chef::Log.info "Hostname is not configured correctly!!! Exiting..."
+      exit 1
+    end
+  end
+end
+
 rightscale_marker :end
