@@ -37,13 +37,13 @@ else
   block_device ri_lineage do
     cloud "ec2"
     mount_point target_raw_root
-    vg_data_percentage "50"
+    vg_data_percentage "95"
     max_snapshots "1000"
     keep_daily "1000"
     keep_weekly "1000"
     keep_monthly "1000"
     keep_yearly "1000"
-    volume_size "42"
+    volume_size "23"
     stripe_count "1"
     lineage ri_lineage
     action :create

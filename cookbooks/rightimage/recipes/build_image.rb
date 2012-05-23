@@ -48,5 +48,5 @@ include_recipe "rightimage::rightscale_install"
 include_recipe "rightimage::cloud_add"
 include_recipe "rightimage::loopback_unmount"
 include_recipe "rightimage::cloud_package"
-#include_recipe "rightimage::upload_image_s3"
+include_recipe "rightimage::upload_image_s3"
 rightscale_marker :end

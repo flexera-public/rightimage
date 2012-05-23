@@ -153,13 +153,6 @@ EOH
 end
 
 action :package do
-  bash "backup raw image" do
-    cwd ::File::dirname(loopback_file)
-    code <<-EOH
-      mkdir -p #{temp_root}
-      cp -v #{loopback_file(partitioned?)} #{temp_root}
-    EOH
-  end
   rightimage_image node[:rightimage][:image_type] do
     action :package
   end
