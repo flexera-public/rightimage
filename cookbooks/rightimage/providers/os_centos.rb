@@ -98,11 +98,11 @@ action :install do
   # install guest packages on CentOS 5.2 i386 host to work around yum problem
   yum -c /tmp/yum.conf -y clean all
   yum -c /tmp/yum.conf -y makecache
-  yum -c /tmp/yum.conf -y install #{node[:rightimage][:guest_packages]}
+  yum -c /tmp/yum.conf -y install #{node[:rightimage][:guest_packages]} --exclude gcc-java
   # Install postfix separately, don't want to use centosplus version which bundles mysql
   yum -c /tmp/yum.conf --installroot=#{guest_root} -y install postfix --disablerepo=centosplus
   # install the guest packages in the chroot
-  yum -c /tmp/yum.conf --installroot=#{guest_root} -y install  #{node[:rightimage][:guest_packages]}
+  yum -c /tmp/yum.conf --installroot=#{guest_root} -y install #{node[:rightimage][:guest_packages]} --exclude gcc-java
   yum -c /tmp/yum.conf --installroot=#{guest_root} -y remove bluez* gnome-bluetooth*
   yum -c /tmp/yum.conf --installroot=#{guest_root} -y clean all
 
