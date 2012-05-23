@@ -29,6 +29,7 @@ bash "Check for bad files" do
 # Don't forget to put -or between the checks and a space after each line
 # before the breakline char (apart from the last line).
 bad_files="\
+-name *.chef* -or \
 -name *.deb -or \
 -name *.swp -or \
 -name *.git -or \
