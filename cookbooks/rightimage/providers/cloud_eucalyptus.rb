@@ -28,12 +28,12 @@ action :configure do
     EOH
   end
 
-  remote_file "/tmp/euca2ools-#{euca_tools_version}-centos-i386.tar.gz" do 
+  cookbook_file "/tmp/euca2ools-#{euca_tools_version}-centos-i386.tar.gz" do 
     source "euca2ools-#{euca_tools_version}-centos-i386.tar.gz"
     backup false
   end
 
-  remote_file "/tmp/euca2ools-#{euca_tools_version}-centos-x86_64.tar.gz" do 
+  cookbook_file "/tmp/euca2ools-#{euca_tools_version}-centos-x86_64.tar.gz" do 
     source "euca2ools-#{euca_tools_version}-centos-x86_64.tar.gz"
     backup false
   end

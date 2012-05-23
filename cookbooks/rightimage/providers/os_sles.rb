@@ -30,7 +30,7 @@ action :install do
   rpm_handle = 'http://devs-us-west.s3.amazonaws.com/martin/sles_rpms.tgz'
   rpm_package = 'sles_rpms.tgz'
 
-  remote_file "/root/#{rpm_package}"  do
+  cookbook_file "/root/#{rpm_package}"  do
     source rom_handle
     mode "0644"
     checksum "abfd99cb841553b7b40f7b70f69fc6f57cca2797" # A SHA256 (or portion thereof) of the file.

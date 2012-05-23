@@ -18,7 +18,7 @@ action :package do
 
   vhd_util_deps.each { |p| package p }
 
-  remote_file "/tmp/vhd-util-patch" do 
+  cookbook_file "/tmp/vhd-util-patch" do 
     source "vhd-util-patch"
   end
 

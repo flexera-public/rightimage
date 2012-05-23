@@ -18,7 +18,7 @@ action :install do
     })
   end
 
-  remote_file "/etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL#{epel_key_name}" do
+  cookbook_file "/etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL#{epel_key_name}" do
      source "RPM-GPG-KEY-EPEL#{epel_key_name}"
      backup false
   end
@@ -27,7 +27,7 @@ action :install do
     recursive true
   end
 
-  remote_file "#{guest_root}/etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL#{epel_key_name}" do
+  cookbook_file "#{guest_root}/etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL#{epel_key_name}" do
      source "RPM-GPG-KEY-EPEL#{epel_key_name}"
      backup false
   end
@@ -36,7 +36,7 @@ action :install do
     recursive true
   end
 
-  remote_file "#{guest_root}/tmp/chkconfig" do 
+  cookbook_file "#{guest_root}/tmp/chkconfig" do 
      source "chkconfig"  
      backup false
   end
@@ -49,12 +49,12 @@ action :install do
     recursive true
   end
 
-  remote_file "#{guest_root}/etc/sysconfig/network" do 
+  cookbook_file "#{guest_root}/etc/sysconfig/network" do 
     source "network" 
     backup false
   end
 
-  remote_file "#{guest_root}/etc/sysconfig/network-scripts/ifcfg-eth0" do 
+  cookbook_file "#{guest_root}/etc/sysconfig/network-scripts/ifcfg-eth0" do 
     source "ifcfg-eth0" 
     backup false
   end
@@ -219,23 +219,23 @@ action :install do
     backup false
   end
 
-  remote_file "#{guest_root}/root/.bash_profile" do 
+  cookbook_file "#{guest_root}/root/.bash_profile" do 
     source "bash_profile" 
     backup false
   end
 
-  remote_file "#{guest_root}/root/.bash_logout" do 
+  cookbook_file "#{guest_root}/root/.bash_logout" do 
     source "bash_logout" 
     backup false
   end
 
-  remote_file "#{guest_root}/etc/motd" do 
+  cookbook_file "#{guest_root}/etc/motd" do 
     source "motd" 
     backup false
   end
 
 
-  remote_file "#{guest_root}/etc/profile.d/pkgconfig.sh" do 
+  cookbook_file "#{guest_root}/etc/profile.d/pkgconfig.sh" do 
     source "pkgconfig.sh" 
     mode "0755"
     backup false

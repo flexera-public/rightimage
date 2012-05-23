@@ -22,7 +22,7 @@ action :package do
     EOH
   end
 
-  remote_file "/tmp/ovftool.sh" do
+  cookbook_file "/tmp/ovftool.sh" do
     source "VMware-ovftool-2.0.1-260188-lin.x86_64.sh"
     mode "0744"
   end
