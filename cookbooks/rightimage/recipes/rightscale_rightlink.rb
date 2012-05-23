@@ -46,6 +46,7 @@ end
 
 cookbook_file "#{guest_root}/etc/init.d/rightimage" do
   source "rightimage"
+  backup false
   mode "0755"
 end
 

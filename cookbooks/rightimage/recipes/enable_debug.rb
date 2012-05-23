@@ -13,6 +13,7 @@ raise "ERROR: you must add 'Dev' in image name #{image_name} to enable debug mod
 
 template "#{guest_root}/etc/ssh/sshd_config" do
   source "sshd_config.erb"
+  backup false
   variables({
     :permit_root_login => "yes",
     :password_authentication => "yes"

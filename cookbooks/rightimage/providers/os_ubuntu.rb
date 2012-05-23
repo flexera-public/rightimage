@@ -215,8 +215,9 @@ EOF
   end
 
   # Modified version of syslog-ng.conf that will properly route recipe output to /var/log/messages
-  remote_file "#{guest_root}/etc/syslog-ng/syslog-ng.conf" do
+  cookbook_file "#{guest_root}/etc/syslog-ng/syslog-ng.conf" do
     source "syslog-ng.conf"
+    backup false
   end
 
   # Set DHCP timeout

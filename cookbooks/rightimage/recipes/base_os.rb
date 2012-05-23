@@ -26,6 +26,7 @@ end
 
 template "#{guest_root}/etc/ssh/sshd_config" do
   source "sshd_config.erb"
+  backup false
   variables({
     :permit_root_login => "without-password",
     :password_authentication => "no"
