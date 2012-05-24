@@ -139,6 +139,9 @@ sed -i s/root::/root:*:/ #{node[:rightimage][:mount_dir]}/etc/shadow
 echo "127.0.0.1   localhost   localhost.localdomain" > #{node[:rightimage][:mount_dir]}/etc/hosts
 echo "NOZEROCONF=true" >> #{node[:rightimage][:mount_dir]}/etc/sysconfig/network
 
+# Start rsyslog on startup
+chroot #{node[:rightimage][:mount_dir]} chkconfig --level 234 rsyslog on
+
 #Install the JDK from S3.
 if [ "#{node[:rightimage][:arch]}" == x86_64 ] ; then 
   java_arch="amd64"
