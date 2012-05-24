@@ -139,14 +139,8 @@ sed -i s/root::/root:*:/ #{node[:rightimage][:mount_dir]}/etc/shadow
 echo "127.0.0.1   localhost   localhost.localdomain" > #{node[:rightimage][:mount_dir]}/etc/hosts
 echo "NOZEROCONF=true" >> #{node[:rightimage][:mount_dir]}/etc/sysconfig/network
 
-#install syslog-ng
-chroot #{node[:rightimage][:mount_dir]} rpm -e rsyslog --nodeps || true #remove rsyslog if it exists 
-if [ "#{node[:rightimage][:arch]}" == i386 ] ; then 
-  rpm --force --root #{node[:rightimage][:mount_dir]} -Uvh http://s3.amazonaws.com/rightscale_scripts/syslog-ng-1.6.12-1.el5.centos.i386.rpm
-else 
-  rpm --force --root #{node[:rightimage][:mount_dir]} -Uvh http://s3.amazonaws.com/rightscale_scripts/syslog-ng-1.6.12-1.x86_64.rpm
-fi
-chroot #{node[:rightimage][:mount_dir]} chkconfig --level 234 syslog-ng on
+# Start rsyslog on startup
+chroot #{node[:rightimage][:mount_dir]} chkconfig --level 234 rsyslog on
 
 #Install the JDK from S3.
 if [ "#{node[:rightimage][:arch]}" == x86_64 ] ; then 

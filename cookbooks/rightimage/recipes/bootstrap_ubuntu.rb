@@ -219,12 +219,6 @@ EOF
   EOH
 end
 
-# Modified version of syslog-ng.conf that will properly route recipe output to /var/log/messages
-cookbook_file "#{source_image}/etc/syslog-ng/syslog-ng.conf" do
-  source "syslog-ng.conf"
-  backup false
-end
-
 # Set DHCP timeout
 bash "dhcp timeout" do
   flags "-ex"
@@ -274,7 +268,7 @@ bash "cleanup" do
   flags "-ex"
   code <<-EOH
 
-    chroot #{source_image} rm -rf /etc/init/plymouth* /etc/init/rsyslog.conf
+    chroot #{source_image} rm -rf /etc/init/plymouth*
     chroot #{source_image} apt-get update
     chroot #{source_image} apt-get clean
   EOH
