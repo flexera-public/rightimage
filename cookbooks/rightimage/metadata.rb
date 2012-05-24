@@ -116,14 +116,6 @@ attribute "rightimage/image_name",
    :description => "The name you want to give this new image.",
    :required => "required"
 
-attribute "rightimage/mci_name",
-   :display_name => "MCI Name",
-   :description => "MCI to add this image to. If empty, use Image Name",
-   :default => "",
-   :recipes => [ "rightimage::do_create_mci" ],
-   :required => "optional"
-
-
 attribute "rightimage/rebundle_base_image_id",
   :display_name => "Rebundle Base Image ID",
   :description => "Cloud specific ID for the image to start with when building a rebundle image",
@@ -176,27 +168,33 @@ attribute "rightimage/datacenter",
   :required => "recommended"
 
 # Optional, parameters for auto creation of mci
-attribute "rest_connection/user",
+attribute "rightscale/api_user",
   :display_name => "API User",
   :description => "RightScale API username. Ex. you@rightscale.com",
   :recipes => [ "rightimage::do_create_mci" ],
-  :required => true
+  :recommended => true
 
-attribute "rest_connection/pass",
+attribute "rightscale/api_password",
   :display_name => "API Password",
   :description => "Rightscale API password.",
   :recipes => [ "rightimage::do_create_mci" ],
-  :required => true
+  :recommended => true
  
-attribute "rest_connection/api_url",
+attribute "rightscale/api_url",
   :display_name => "API URL",
   :description => "The rightscale account specific api url to use.  Ex. https://my.rightscale.com/api/acct/1234 (where 1234 is your account id)",
   :recipes => [ "rightimage::do_create_mci" ],
-  :required => true
+  :recommended => true
 
-attribute "rightimage/mci_name",
+attribute "rightscale/cloud_id",
+  :display_name => "RightScale Cloud ID (integer)",
+  :description => "The numeric ID in RightScale for the cloud we should add this mci to. For example, 6 = AWS Oregon, 232 = Rackspace",
+  :recipes => [ "rightimage::do_create_mci" ],
+  :recommended => true
+
+attribute "rightscale/mci_name",
    :display_name => "MCI Name",
-   :description => "MCI to add this image to. If empty, use Image Name",
+   :description => "MCI to add this image to. If empty, use image_name attribute",
    :default => "",
    :recipes => [ "rightimage::do_create_mci" ],
    :required => "optional"

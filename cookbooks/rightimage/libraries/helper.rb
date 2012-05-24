@@ -10,15 +10,6 @@ module RightScale
         name
       end
 
-      def mci_base_name
-        if node[:rightimage][:mci_name] =~ /./
-          return node[:rightimage][:mci_name]
-        else
-          raise "ERROR: you must specify a mci_name or an image_name!" unless node[:rightimage][:image_name] =~ /./
-          return node[:rightimage][:image_name]
-        end
-      end
-
       def generate_persisted_passwd
         length = 14
         pw = nil
@@ -41,24 +32,6 @@ module RightScale
         when "esxi"
           "vmdk.ova"
         end
-      end
-
-      def cloud_id
-        cloud_names = { 
-          "us-east" => "1", 
-          "eu-west" => "2", 
-          "us-west" => "3",
-          "ap-southeast" => "4",
-          "ap-northeast" => "5", 
-          "us-west-2" => "6",
-          "sa-east" => "7",
-          "cloudstack-xen" => "850"
-        }
-        id = nil
-        cloud_names.each do |cloud_name, cloud_id|
-          id = cloud_id if node[:rightimage][:region] == (cloud_name)
-        end
-        id
       end
 
       def ri_lineage
