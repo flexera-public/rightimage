@@ -225,13 +225,7 @@ template "#{node[:rightimage][:mount_dir]}/etc/yum.repos.d/CentOS-Base.repo" do
 end
 
 template "#{node[:rightimage][:mount_dir]}/root/.gemrc" do 
-  # Issue: gem install segfaults with a buffer overflow error in the syck (yaml parsing)
-  # code (compiled into ruby) for ruby 1.8.5 with mirror beyond this date.  one of rubygems
-  # yaml files probably changed format slightly in incompatable way
   freeze_date = node[:rightimage][:timestamp][0..7]
-  if freeze_date > "20120514"
-    freeze_date = "20120514"
-  end
   variables(
     :mirror_base_url => node[:rightimage][:mirror],
     :mirror_freeze_date => freeze_date
