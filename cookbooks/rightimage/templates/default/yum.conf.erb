@@ -13,7 +13,15 @@ exactarch=1
 reposdir=/dev/null
 metadata_expire=1800
 <% end -%>
+<% if @bootstrap -%>
+[ruby_custom]
+name=none
+baseurl=http://mirror.hep.wisc.edu/upstream/rbel/el5/x86_64
+failovermethod=priority
+gpgcheck=0
+enabled=1
 
+<% end -%>
 [base]
 name = none
 baseurl = http://<%= node[:rightimage][:mirror] %>/centos/<%= node[:rightimage][:release][0].chr %>/os/<%= node[:rightimage][:arch] %>/archive/<%= node[:rightimage][:mirror_date] %>/
