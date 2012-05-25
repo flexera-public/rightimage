@@ -45,11 +45,11 @@ when "ubuntu"
   rightimage[:guest_packages] << " euca2ools" if rightimage[:cloud] == "euca"
 
 when "centos","rhel"
-  set[:rightimage][:guest_packages] = "wget mlocate nano logrotate openssh openssh-askpass openssh-clients openssh-server curl gcc* zip unzip bison flex compat-libstdc++-296 cvs subversion autoconf automake libtool compat-gcc-34-g77 mutt sysstat rpm-build fping vim-common vim-enhanced rrdtool-1.2.27 rrdtool-devel-1.2.27 rrdtool-doc-1.2.27 rrdtool-perl-1.2.27 rrdtool-python-1.2.27 rrdtool-tcl-1.2.27 pkgconfig lynx screen yum-utils bwm-ng createrepo redhat-rpm-config redhat-lsb git nscd xfsprogs swig libarchive-devel tmux libxml2 libxml2-devel libxslt libxslt-devel"
+  set[:rightimage][:guest_packages] = "wget mlocate nano logrotate openssl openssh openssh-askpass openssh-clients openssh-server curl gcc* zip unzip bison flex compat-libstdc++-296 cvs subversion autoconf automake libtool compat-gcc-34-g77 mutt sysstat rpm-build fping vim-common vim-enhanced rrdtool-1.2.27 rrdtool-devel-1.2.27 rrdtool-doc-1.2.27 rrdtool-perl-1.2.27 rrdtool-python-1.2.27 rrdtool-tcl-1.2.27 pkgconfig lynx screen yum-utils bwm-ng createrepo redhat-rpm-config redhat-lsb git nscd xfsprogs swig libarchive-devel tmux libxml2 libxml2-devel libxslt libxslt-devel ruby-docs ruby-mode ruby-tcltk rrdtool-ruby-1.2.27"
 
-  # Ruby packages, we're installing a custom ruby (1.8.7)
-  # This should automatically be handled by the package manager though
-  rightimage[:guest_packages] << " ruby ruby-devel ruby-docs ruby-irb ruby-libs ruby-mode ruby-rdoc ruby-ri ruby-tcltk openssl rrdtool-ruby-1.2.27"
+  # Ruby packages, we're installing a custom ruby (1.8.7). These are the packages available on the rbel upstream mirror
+  # separate out into own variable so we can isolate install
+  set[:rightimage][:ruby_packages] = "ruby ruby-devel ruby-irb ruby-libs ruby-rdoc ruby-ri"
   rightimage[:guest_packages] << " iscsi-initiator-utils" if rightimage[:cloud] == "vmops" 
 
   set[:rightimage][:host_packages] = "swig"

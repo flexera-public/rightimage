@@ -80,10 +80,12 @@ chroot #{node[:rightimage][:mount_dir]} authconfig --enableshadow --useshadow --
 # install guest packages on CentOS 5.2 i386 host to work around yum problem
 yum -c /tmp/yum.conf -y clean all
 yum -c /tmp/yum.conf -y makecache
-yum -c /tmp/yum.conf -y install #{node[:rightimage][:guest_packages]}
+# Install ruby 1.8.7 and base separately
+yum -c /tmp/yum.conf --disablerepo=ruby_custom -y install #{node[:rightimage][:guest_packages]}
 # Install postfix separately, don't want to use centosplus version which bundles mysql
 yum -c /tmp/yum.conf --installroot=#{node[:rightimage][:mount_dir]} -y install postfix --disablerepo=centosplus
 # install the guest packages in the chroot
+yum -c /tmp/yum.conf --installroot=#{node[:rightimage][:mount_dir]} --exclude='*.i386' -y install #{node[:rightimage][:ruby_packages]}
 yum -c /tmp/yum.conf --installroot=#{node[:rightimage][:mount_dir]} -y install  #{node[:rightimage][:guest_packages]}
 yum -c /tmp/yum.conf --installroot=#{node[:rightimage][:mount_dir]} -y remove bluez* gnome-bluetooth*
 yum -c /tmp/yum.conf --installroot=#{node[:rightimage][:mount_dir]} -y clean all
