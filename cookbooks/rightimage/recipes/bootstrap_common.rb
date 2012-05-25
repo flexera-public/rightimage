@@ -32,18 +32,19 @@ bash "install_rubygems" do
 ROOT=#{node[:rightimage][:mount_dir]}
 
 function get_rubygems {
-  wget -O $ROOT/tmp/rubygems.tgz $2 
+  # Don't use wget -- Old versions have unreliable return codes (such as on CentOS 5)
+  curl -o $ROOT/tmp/rubygems.tgz --fail --silent http://s3.amazonaws.com/rightscale_software/rubygems-$1.tgz
   tar -xzvf $ROOT/tmp/rubygems.tgz  -C $ROOT/tmp
   mv $ROOT/tmp/rubygems-$1 $ROOT/tmp/rubygems
 }
 
 ruby_ver=`chroot $ROOT ruby --version`
 if [[ $ruby_ver == *1.8.5* ]] ; then
-  get_rubygems 1.3.3 http://rubyforge.org/frs/download.php/56227/rubygems-1.3.3.tgz
+  get_rubygems 1.3.3
   # Newer versions of rake will not work with older versions of Ruby
   rake_ver="-v 0.9.2";
 else
-  get_rubygems 1.3.7 http://rubyforge.org/frs/download.php/70696/rubygems-1.3.7.tgz
+  get_rubygems 1.3.7
   rake_ver="";
 fi
 
