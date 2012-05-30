@@ -95,10 +95,12 @@ action :install do
                 
   # Shadow file needs to be setup prior install additional packages
   chroot #{guest_root} authconfig --enableshadow --useshadow --enablemd5 --updateall
-  # install guest packages on CentOS 5.2 i386 host to work around yum problem
   yum -c /tmp/yum.conf -y clean all
   yum -c /tmp/yum.conf -y makecache
-  yum -c /tmp/yum.conf -y install #{node[:rightimage][:guest_packages]} --exclude gcc-java
+  # used to install a full set of packages on local os, it screws up if you want to use a freezedate
+  # that's older than the host os.  its probably not even necessary anymore, so comment out for now - PS
+  #  old comment re this was: "install guest packages on CentOS 5.2 i386 host to work around yum problem"
+  # yum -c /tmp/yum.conf -y install #{node[:rightimage][:guest_packages]} --exclude gcc-java
   # Install postfix separately, don't want to use centosplus version which bundles mysql
   yum -c /tmp/yum.conf --installroot=#{guest_root} -y install postfix --disablerepo=centosplus
   # install the guest packages in the chroot
