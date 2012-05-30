@@ -83,7 +83,7 @@ attribute "rightimage/arch",
 attribute "rightimage/cloud",
   :display_name => "Target Cloud",
   :description => "The supported cloud for the virtual image. If unset, build a generic base image.",
-  :choice => [ "ec2", "cloudstack", "eucalyptus", "openstack", "rackspace", "rackspace_managed" ],
+  :choice => [ "ec2", "cloudstack", "eucalyptus", "openstack", "rackspace", "rackspace_managed", "azure" ],
   :required => "recommended"
   
 attribute "rightimage/region",
@@ -166,7 +166,7 @@ attribute "rightimage/build_number",
 attribute "rightimage/hypervisor",
   :display_name => "Hypervisor",
   :description => "Which hypervisor is this image for?",
-  :choice => [ "xen", "kvm", "esxi" ],
+  :choice => [ "xen", "kvm", "esxi", "hyperv" ],
   :required => "required"
 
 attribute "rightimage/datacenter",
