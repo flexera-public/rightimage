@@ -46,7 +46,6 @@ action :configure do
   end
 
   bash "setup grub" do
-    not_if { new_resource.hypervisor == "xen" }
     flags "-ex"
     code <<-EOH
       guest_root="#{guest_root}"
