@@ -230,6 +230,11 @@ function get_cloud_userdata() {
         CLOUD_USERDATA=`cat $userdata_file`
       done
       ;;
+    azure*)
+      # Currently we do not currently parse user data for RS_src values on this cloud, this means that
+      # rs_agent_dev:package tag will not be honored and only the rightlink package that is present on
+      # the image will be installed. (w-4626)
+      ;;
     *)
       logger -st RightScale "Unable to query user data - unknown cloud family $RS_CLOUD. Cannot continue."
       exit 1

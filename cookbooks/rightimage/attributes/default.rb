@@ -33,6 +33,7 @@ case node[:rightimage][:hypervisor]
 when "xen" then set[:rightimage][:image_type] = "vhd"
 when "esxi" then set[:rightimage][:image_type] = "vmdk"
 when "kvm" then set[:rightimage][:image_type] = "qcow2"
+when "hyperv" then set[:rightimage][:image_type] = "msvhd"
 else raise ArgumentError, "don't know what image format to use for #{node[:rightimage][:hypervisor]}!"
 end
 
@@ -117,7 +118,7 @@ case rightimage[:cloud]
           set[:rightimage][:swap_mount] = "/dev/xvde3"  unless rightimage[:arch]  == "x86_64"
         end
     end
-  when "cloudstack", "openstack"
+  else 
     case rightimage[:hypervisor]
     when "xen"
       set[:rightimage][:fstab][:ephemeral] = false
@@ -133,7 +134,7 @@ case rightimage[:cloud]
       set[:rightimage][:grub][:root_device] = "/dev/vda"
       set[:rightimage][:root_mount][:dump] = "1" 
       set[:rightimage][:root_mount][:fsck] = "1" 
-    when "esxi"
+    when "esxi", "hyperv"
       set[:rightimage][:ephemeral_mount] = nil
       set[:rightimage][:fstab][:ephemeral_mount_opts] = nil
       set[:rightimage][:fstab][:ephemeral] = false

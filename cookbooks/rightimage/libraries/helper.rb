@@ -34,7 +34,7 @@ module RightScale
 
       def image_file_ext
         case node[:rightimage][:hypervisor]
-        when "xen"
+        when "xen", "hyperv"
           (node[:rightimage][:cloud] == "euca" ? "tar.gz":"vhd.bz2")
         when "kvm"
           "qcow2.bz2"
