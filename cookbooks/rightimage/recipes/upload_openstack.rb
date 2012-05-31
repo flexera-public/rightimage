@@ -21,11 +21,17 @@ end
 package "python26-libs"  if node[:platform] =~ /centos|redhat/
 package "python26-devel" if node[:platform] =~ /centos|redhat/
 
+# Switched from easy_install to pip for most stuff, easy_install seems to be
+# crapping out complaining about fetching from git urls while pip handles them fine
+# Also pip handles all the dependencies better - PS
 bash "install python modules" do
   flags "-ex"
   code <<-EOH
-    easy_install-2.6 sqlalchemy eventlet routes webob paste pastedeploy glance argparse xattr httplib2 kombu iso8601
+    easy_install-2.6 pip
+    easy_install-2.6 -U distribute
+    pip-2.6 install glance
   EOH
+#   easy_install  sqlalchemy eventlet routes webob paste pastedeploy glance argparse xattr httplib2 kombu iso8601
 end
 
 ruby_block "upload to cloud" do
