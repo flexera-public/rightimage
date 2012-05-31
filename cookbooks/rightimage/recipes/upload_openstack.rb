@@ -26,12 +26,12 @@ package "python26-devel" if node[:platform] =~ /centos|redhat/
 # Also pip handles all the dependencies better - PS
 bash "install python modules" do
   flags "-ex"
+  pip_cmd = (node[:platform] =~ /centos|redhat/) ? 'pip-2.6' : 'pip'
   code <<-EOH
     easy_install-2.6 pip
     easy_install-2.6 -U distribute
-    pip-2.6 install glance
+    #{pip_cmd} install glance
   EOH
-#   easy_install  sqlalchemy eventlet routes webob paste pastedeploy glance argparse xattr httplib2 kombu iso8601
 end
 
 ruby_block "upload to cloud" do
