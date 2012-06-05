@@ -10,52 +10,66 @@ end
 
 rightlink_file="rightscale_#{node[:rightimage][:rightlink_version]}-#{node[:rightimage][:platform]}_#{node[:rightimage][:platform_version]}-" + ((node[:rightimage][:platform] == "ubuntu") && (node[:rightimage][:arch] == "x86_64") ? "amd64" : node[:rightimage][:arch]) + "." + (node[:rightimage][:platform] =~ /centos|rhel/ ? "rpm" : "deb")
 
-bash "download_rightlink" do
-  flags "-x"
-  location1 ="#{node[:rightimage][:rightlink_version]}/#{rightlink_file}"
-  location2 ="#{node[:rightimage][:rightlink_version]}/#{node[:rightimage][:platform]}/#{rightlink_file}"
-  code <<-EOC
-    mkdir -p #{guest_root}/root/.rightscale
-    
-    buckets=( rightscale_rightlink rightscale_rightlink_dev )
-    locations=( #{location1} #{location2})
-    
-    for bucket in ${buckets[@]}
-    do
-      for location in ${locations[@]}
-      do
-        code=$(curl -o #{guest_root}/root/.rightscale/#{rightlink_file} --connect-timeout 10 --fail --silent --write-out %{http_code} http://s3.amazonaws.com/$bucket/$location)
-        return=$?
-        echo "BUCKET: $bucket LOCATION: $location RETURN: $return CODE: $code"
-        [[ "$return" -eq "0" && "$code" -eq "200" ]] && break 2
-      done
-    done
-
-    if test -f #{guest_root}/root/.rightscale/#{rightlink_file}; then
-      exit 0
-    else
-      echo "Failed to download RightLink.  Place the #{rightlink_file} in the S3 bucket and re-run"
-      exit 1
-    fi
-  EOC
+directory "#{guest_root}/root/.rightscale/" do
+  owner "root"
+  group "root"
+  mode "0770"
+  recursive true
 end
+
+# FIXME: Super-secret verion of gc rightlink in google storage for now.
+remote_file "#{guest_root}/root/.rightscale/#{rightlink_file}" do
+  source "http://commondatastorage.googleapis.com/rightlink-dev/rightscale_5.7.16-ubuntu_10.04-amd64.deb"
+  mode "0440"
+  owner "root"
+  group "root"
+end
+
+# bash "download_rightlink" do
+#   flags "-x"
+#   location1 ="#{node[:rightimage][:rightlink_version]}/#{rightlink_file}"
+#   location2 ="#{node[:rightimage][:rightlink_version]}/#{node[:rightimage][:platform]}/#{rightlink_file}"
+#   code <<-EOC
+#     buckets=( rightscale_rightlink rightscale_rightlink_dev )
+#     locations=( #{location1} #{location2})
+#     
+#     for bucket in ${buckets[@]}
+#     do
+#       for location in ${locations[@]}
+#       do
+#         code=$(curl -o #{guest_root}/root/.rightscale/#{rightlink_file} --connect-timeout 10 --fail --silent --write-out %{http_code} http://s3.amazonaws.com/$bucket/$location)
+#         return=$?
+#         echo "BUCKET: $bucket LOCATION: $location RETURN: $return CODE: $code"
+#         [[ "$return" -eq "0" && "$code" -eq "200" ]] && break 2
+#       done
+#     done
+# 
+#     if test -f #{guest_root}/root/.rightscale/#{rightlink_file}; then
+#       exit 0
+#     else
+#       echo "Failed to download RightLink.  Place the #{rightlink_file} in the S3 bucket and re-run"
+#       exit 1
+#     fi
+#   EOC
+# end
 
 execute "insert_rightlink_version" do 
   command  "echo -n " + node[:rightimage][:rightlink_version] + " > " + guest_root + "/etc/rightscale.d/rightscale-release"
 end
 
+log "Place rightlink seed script into image"
 cookbook_file "#{guest_root}/etc/init.d/rightimage" do
   source "rightimage"
   backup false
   mode "0755"
 end
 
+log "Setup seed script to run on boot"
 bash "install_rightlink" do 
   flags "-ex"
   code <<-EOC
     rm -rf #{guest_root}/opt/rightscale/
 
-    chmod 0770 #{guest_root}/root/.rightscale
     chmod 0440 #{guest_root}/root/.rightscale/*
 
     case "#{node[:rightimage][:platform]}" in 
@@ -68,4 +82,5 @@ bash "install_rightlink" do
     esac
   EOC
 end
+
 rightscale_marker :end
