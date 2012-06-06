@@ -215,22 +215,17 @@ function get_cloud_userdata() {
     rackspace*)
       #wait for userdata to appear
       userdata_file="/var/spool/rackspace/user-data.txt"
-      while [ ! -e $userdata_file ]; do
-        logger -st RightScale "Waiting for user-data file ($userdata_file)..."
-        sleep 10
-      done
-
-      #wait for userdata to settle (don't want to read a half written file)
-      CLOUD_USERDATA_OLD=""
-      CLOUD_USERDATA=""
-      while [ "$CLOUD_USERDATA_OLD" != "$CLOUD_USERDATA" ] && [ "$CLOUD_USERDATA" == "" ]; do
-        sleep 1
-        CLOUD_USERDATA_OLD=`cat $userdata_file`
-        sleep 1
-        CLOUD_USERDATA=`cat $userdata_file`
-      done
+      wait_for_userdata_file $userdata_file
+      CLOUD_USERDATA=`cat $userdata_file`
       ;;
     azure*)
+      userdata_file='/var/lib/waagent/Certificates.pem'
+      wait_for_userdata_file $userdata_file
+      CLOUD_USERDATA=$(\
+        openssl x509 -in $userdata_file -subject -noout | \
+        awk '{ sub(/subject=[ ]*\/CN=/,""); gsub(/\\x0A/,""); print }' | \
+        base64 --decode)
+
       # Currently we do not currently parse user data for RS_src values on this cloud, this means that
       # rs_agent_dev:package tag will not be honored and only the rightlink package that is present on
       # the image will be installed. (w-4626)
@@ -240,6 +235,23 @@ function get_cloud_userdata() {
       exit 1
       ;;
   esac
+}
+
+function wait_for_userdata_file () {
+  while [ ! -e $1 ]; do
+    logger -st RightScale "Waiting for user-data file ($1)..."
+    sleep 10
+  done
+
+  #wait for userdata to settle (don't want to read a half written file)
+  DATA_OLD=""
+  DATA=""
+  while [ "$DATA_OLD" != "$DATA" ] || [ "$DATA" == "" ]; do
+    logger -st RightScale "Waiting for user-data ($1)..."
+    DATA_OLD=`cat $1`
+    sleep 1
+    DATA=`cat $1`
+  done
 }
 
 RS_VERSION=
