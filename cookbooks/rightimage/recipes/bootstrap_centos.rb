@@ -81,9 +81,12 @@ chroot #{node[:rightimage][:mount_dir]} authconfig --enableshadow --useshadow --
 yum -c /tmp/yum.conf -y clean all
 yum -c /tmp/yum.conf -y makecache
 # Install ruby 1.8.7 and base separately
-yum -c /tmp/yum.conf --disablerepo=ruby_custom -y install #{node[:rightimage][:guest_packages]}
+# Make sure to install postfix before guest_packages.  guest packages needs 
+# an MTA to satisfy dependencies and will use sendmail, which causes issues
+# for templates as sendmail gets configured incorrectly.  
 # Install postfix separately, don't want to use centosplus version which bundles mysql
 yum -c /tmp/yum.conf --installroot=#{node[:rightimage][:mount_dir]} -y install postfix --disablerepo=centosplus
+yum -c /tmp/yum.conf --disablerepo=ruby_custom --exclude sendmail -y install #{node[:rightimage][:guest_packages]}
 # install the guest packages in the chroot
 yum -c /tmp/yum.conf --installroot=#{node[:rightimage][:mount_dir]} --exclude='*.i386' -y install #{node[:rightimage][:ruby_packages]}
 yum -c /tmp/yum.conf --installroot=#{node[:rightimage][:mount_dir]} -y install  #{node[:rightimage][:guest_packages]}
