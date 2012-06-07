@@ -45,6 +45,9 @@ EOF
       chmod +x $lis_dir_host/run.sh
       chroot $guest_root $lis_dir_guest/run.sh
       
+      # Agent install attempts to use kernel on host instead of the guest
+      rm -f $guest_root/initr* $guest_root/boot/initr*$(uname -r)*
+
       touch $lis_dir_host/kernel_already_installed
     EOH
   end
