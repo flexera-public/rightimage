@@ -48,6 +48,9 @@ EOF
       # Agent install attempts to use kernel on host instead of the guest
       rm -f $guest_root/initr* $guest_root/boot/initr*$(uname -r)*
 
+      # Kill services started automatically during package installs
+      killall hv_kvp_daemon
+
       touch $lis_dir_host/kernel_already_installed
     EOH
   end
