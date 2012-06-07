@@ -9,14 +9,14 @@ action :configure do
   bash "install guest packages" do 
     flags '-ex'
     code <<-EOH
-  case "#{new_resource.platform}" in
-    "ubuntu")
-      chroot #{guest_root} apt-get -y install grub iscsi-initiator-utils"
-      ;;
-    "centos"|"rhel")
-      chroot #{guest_root} yum -y install grub iscsi-initiator-utils"
-      ;;
-  esac
+      case "#{new_resource.platform}" in
+      "ubuntu")
+        chroot #{guest_root} apt-get -y install grub iscsi-initiator-utils
+        ;;
+      "centos"|"rhel")
+        chroot #{guest_root} yum -y install grub iscsi-initiator-utils
+        ;;
+      esac
     EOH
   end
 
