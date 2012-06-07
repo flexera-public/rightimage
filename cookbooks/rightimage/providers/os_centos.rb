@@ -103,8 +103,11 @@ action :install do
   # yum -c /tmp/yum.conf -y install #{node[:rightimage][:guest_packages]} --exclude gcc-java
   # Install postfix separately, don't want to use centosplus version which bundles mysql
   yum -c /tmp/yum.conf --installroot=#{guest_root} -y install postfix --disablerepo=centosplus
+  yum -c /tmp/yum.conf --installroot=#{guest_root} -y remove sendmail
+
   # install the guest packages in the chroot
   yum -c /tmp/yum.conf --installroot=#{guest_root} -y install #{node[:rightimage][:guest_packages]} --exclude gcc-java
+
   yum -c /tmp/yum.conf --installroot=#{guest_root} -y remove bluez* gnome-bluetooth*
   yum -c /tmp/yum.conf --installroot=#{guest_root} -y clean all
 
