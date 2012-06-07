@@ -59,12 +59,7 @@ action :upload do
                %w(python2.6-dev python-setuptools)
              end
 
-  packages.each do |p|
-    r = package p do
-      action :nothing
-    end
-    r.run_action(:install)
-  end
+  packages.each { package p }
 
   # work around bug, doesn't chef doesn't install noarch packages for centos without arch flag
   yum_package "python26-distribute" do
@@ -73,10 +68,16 @@ action :upload do
     arch "noarch"
   end
 
+  # Switched from easy_install to pip for most stuff, easy_install seems to be
+  # crapping out complaining about fetching from git urls while pip handles them fine
+  # Also pip handles all the dependencies better - PS
   bash "install python modules" do
     flags "-ex"
+    pip_cmd = (node[:platform] =~ /centos|redhat/) ? 'pip-2.6' : 'pip'
     code <<-EOH
-      easy_install-2.6 sqlalchemy eventlet routes webob paste pastedeploy glance argparse xattr httplib2 kombu iso8601
+      easy_install-2.6 pip
+      easy_install-2.6 -U distribute
+      #{pip_cmd} install glance
     EOH
   end
 
