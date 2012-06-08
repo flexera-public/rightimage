@@ -232,7 +232,7 @@ action :upload do
       end
 
       filename = "#{new_resource.image_name}.#{image_file_ext}"
-      local_file = "#{temp_root}/#{filename}"
+      local_file = "#{target_raw_root}/#{filename}"
       md5sum = calc_md5sum(local_file)
 
       aws_url  = "rightscale-cloudstack-dev.s3.amazonaws.com"
