@@ -10,7 +10,7 @@ action :configure do
     code <<-EOH
   case "#{new_resource.platform}" in
     "centos"|"rhel")
-      chroot #{guest_root} yum -y install iscsi-initiator-utils"
+      chroot #{guest_root} yum -y install iscsi-initiator-utils
       ;;
   esac
     EOH
