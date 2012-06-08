@@ -56,7 +56,7 @@ action :upload do
                  %w(python26-devel python26-libs)
                end
              when "ubuntu" then
-               %w(python2.6-dev python-setuptools)
+               %w(python-dev python-setuptools)
              end
 
   packages.each { package p }
@@ -73,11 +73,14 @@ action :upload do
   # Also pip handles all the dependencies better - PS
   bash "install python modules" do
     flags "-ex"
-    pip_cmd = (node[:platform] =~ /centos|redhat/) ? 'pip-2.6' : 'pip'
+    cmd_append = ""
+    if node[:platform] =~ /centos|rhel/ && node[:platform_version].to_f < 6.0
+      cmd_append = "-2.6"
+    end
     code <<-EOH
-      easy_install-2.6 pip
-      easy_install-2.6 -U distribute
-      #{pip_cmd} install glance
+      easy_install#{cmd_append} pip
+      easy_install#{cmd_append} -U distribute
+      pip#{cmd_append} install glance
     EOH
   end
 
