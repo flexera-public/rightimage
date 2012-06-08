@@ -9,9 +9,6 @@ action :configure do
     flags '-ex'
     code <<-EOH
   case "#{new_resource.platform}" in
-    "ubuntu")
-      chroot #{guest_root} apt-get -y install iscsi-initiator-utils"
-      ;;
     "centos"|"rhel")
       chroot #{guest_root} yum -y install iscsi-initiator-utils"
       ;;
