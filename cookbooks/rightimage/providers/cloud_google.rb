@@ -84,7 +84,7 @@ action :configure do
       chroot $guest_root easy_install pip
       chroot $guest_root pip install https://dl.google.com/dl/compute/gcompute.tar.gz
 
-      case "#{node[:rightimage][:platform]}" in
+      case "#{new_resource.platform}" in
       "centos")
         # TODO
         ;;
