@@ -15,7 +15,7 @@ action :configure do
       action :create
       backup false
     end
-  elsif new_resource.platform =~ /centos|rhel/ && new_resource.platform_version.to_f >= 6 }
+  elsif new_resource.platform =~ /centos|rhel/ && new_resource.platform_version.to_f >= 6
     # Add google init script for centos (6+ only)
     cookbook_file "#{guest_root}/etc/init/google.conf" do
       source "google.conf"
