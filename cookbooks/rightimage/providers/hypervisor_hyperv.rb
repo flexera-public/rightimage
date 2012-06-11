@@ -44,7 +44,15 @@ EOF
       # run install
       chmod +x $lis_dir_host/run.sh
       chroot $guest_root $lis_dir_guest/run.sh
-      
+
+      # Erase currently installed kernels
+      for kernel in `rpm --root $guest_root -qa kernel`; do
+        rpm --root $guest_root --erase --nodeps $kernel
+      done
+
+      # Force-set kernel version due to incompatability with 2.6.32-220.17.1
+      yum -c /tmp/yum.conf --installroot=$guest_root -y install kernel-2.6.32-220.13.1.el6.x86_64
+
       # Agent install attempts to use kernel on host instead of the guest
       rm -f $guest_root/initr* $guest_root/boot/initr*$(uname -r)*
 
