@@ -2,6 +2,7 @@
   "dependencies": {
     "loopback_fs": ">= 0.0.0",
     "rightscale": ">= 0.0.0",
+    "rightimage_tester": ">= 0.0.0",
     "block_device": ">= 0.0.0"
   },
   "name": "rightimage",
@@ -196,7 +197,8 @@
         "rightimage::build_base",
         "rightimage::build_image",
         "rightimage::upload_image_s3",
-        "rightimage::base_upload"
+        "rightimage::base_upload",
+        "rightimage::image_tests"
       ],
       "display_name": "aws_secret_access_key",
       "description": "aws_secret_access_key"
@@ -246,7 +248,8 @@
         "rightimage::build_base",
         "rightimage::build_image",
         "rightimage::upload_image_s3",
-        "rightimage::base_upload"
+        "rightimage::base_upload",
+        "rightimage::image_tests"
       ],
       "display_name": "aws_account_number",
       "description": "aws_account_number"
@@ -485,7 +488,8 @@
         "rightimage::build_base",
         "rightimage::build_image",
         "rightimage::upload_image_s3",
-        "rightimage::base_upload"
+        "rightimage::base_upload",
+        "rightimage::image_tests"
       ],
       "display_name": "aws_access_key_id",
       "description": "aws_access_key_id"
@@ -737,6 +741,7 @@
     "rightimage::block_device_backup": "creates an EBS snapshot from attached EBS volume",
     "rightimage::base_upload": "upload raw image to s3",
     "rightimage::loopback_copy": "creates non-partitioned loopback fs image from a partitioned one",
+    "rightimage::image_tests": "run some basic tests on mounted image such as grepping for credentials",
     "rightimage::base_os": "build a base image",
     "rightimage::clean": "cleans everything"
   },
