@@ -4,6 +4,7 @@ end
 
 
 action :configure do
+  directory temp_root { recursive true }
 
   # Add google init script for ubuntu
   if new_resource.platform == "ubuntu"
@@ -79,21 +80,25 @@ action :configure do
     code <<-EOH
       guest_root=#{guest_root}
 
-      wget http://commondatastorage.googleapis.com/pub/gsutil.tar.gz
-      tar zxvf gsutil.tar.gz -C #{guest_root}/usr/local
-      chroot $guest_root easy_install pip
-      chroot $guest_root pip install https://dl.google.com/dl/compute/gcompute.tar.gz
-
       case "#{new_resource.platform}" in
-      "centos")
-        # TODO
+      "centos"|"rhel")
+        chroot $guest_root yum -y install python-setuptools python-devel python-libs
         ;;
-
       "ubuntu")
-        # TOOO
+        chroot $guest_root apt-get -y install python-dev python-setuptools
         chroot $guest_root apt-get -y install acpi dhcp3-client
         ;;
       esac
+      
+      #Install GCompute
+      chroot $guest_root easy_install pip
+      chroot $guest_root pip install boto
+      chroot $guest_root pip install https://dl.google.com/dl/compute/gcompute.tar.gz
+
+      # Install GSUtil
+      wget http://commondatastorage.googleapis.com/pub/gsutil.tar.gz
+      tar zxvf gsutil.tar.gz -C $guest_root/usr/local
+      echo 'export PATH=$PATH:/usr/local/gsutil' > $guest_root/etc/profile.d/gsutil.sh
 
       mkdir -p $guest_root/etc/rightscale.d
       echo "gc" > $guest_root/etc/rightscale.d/cloud
