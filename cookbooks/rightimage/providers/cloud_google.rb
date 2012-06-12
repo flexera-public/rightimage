@@ -109,7 +109,8 @@ end
 
 action :package do
   bash "zipping raw file" do 
-    code "gzip -c #{loopback_file(true)} > #{loopback_file(true)}.gz"
+    cwd target_raw_root
+    code "gzip -c #{loopback_file(true)} > #{new_resource.image_name}.image.tar.gz"
   end
 end
 
