@@ -23,6 +23,7 @@ el = ((node[:platform] == "centos" || node[:platform] == "redhatenterpriseserver
 grep_bin = (el ? "/tmp/grep/bin/grep" : "grep")
 
 file "/tmp/badfiles" do
+  backup false
   action :delete
 end
 
