@@ -7,6 +7,8 @@ module RightScale
         name << "_#{generate_persisted_passwd}" if node[:rightimage][:debug] == "true" && node[:rightimage][:build_mode] != "migrate" && node[:rightimage][:cloud] !~ /rackspace/
         name << "_EBS" if node[:rightimage][:ec2][:image_type] =~ /ebs/i and name !~ /_EBS/
         name.gsub!("_","-") if node[:rightimage][:cloud] =~ /rackspace|google/
+        name.gsub!(".","-") if node[:rightimage][:cloud] =~ /google/
+        name.downcase! if node[:rightimage][:cloud] =~ /google/
         name
       end
 

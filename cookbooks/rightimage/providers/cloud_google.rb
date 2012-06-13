@@ -108,14 +108,22 @@ action :configure do
 end
 
 action :package do
-  bash "zipping raw file" do 
+  file "#{target_raw_root}/disk.raw" do
+    action :delete
+    backup false
+  end
+  # Chef file resource doesn't do this correctly for some reason
+  bash "hard link to disk.raw" do
     cwd target_raw_root
-    code "gzip -c #{loopback_file(true)} > #{new_resource.image_name}.image.tar.gz"
+    code "ln #{loopback_file(true)} disk.raw"
+  end
+  bash "zipping raw file" do
+    cwd target_raw_root
+    code "tar zcvf #{new_resource.image_name}.tar.gz disk.raw"
   end
 end
 
 action :upload do
-  raise "Upload not supported -- please implement me!!"
 
   ruby_block "store id" do
     # add to global id store for use by other recipes
