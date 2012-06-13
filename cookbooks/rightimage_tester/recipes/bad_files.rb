@@ -44,10 +44,8 @@ bad_files_skip_dirs="\
 
 # List of directories to check for emptiness. The dir and its sub-dirs are
 # searched for files.
-# var/log used to be search but I had to take it out so tests would pass for now, since there's
-# lots of files are in /var/log which should be in there.  Fix at some later point - PS
-# #{node[:rightimage_tester][:root]}/var/log \
 empty_dirs="\
+#{node[:rightimage_tester][:root]}/var/log \
 #{node[:rightimage_tester][:root]}/var/spool/postfix \
 #{node[:rightimage_tester][:root]}/var/mail\
 "
