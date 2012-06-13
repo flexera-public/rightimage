@@ -67,7 +67,7 @@ echo "Going to check these dirs for emptiness: $empty_dirs"
 this_file=`basename $0`
 for current_dir in $empty_dirs
 do
-  find_results=`find $current_dir -type f ! -name "$this_file*"`
+  find_results=`find $current_dir -size +0 -type f ! -name "$this_file*"`
   if [ -n "$find_results" ]; then  
     echo "Warning: $current_dir is not empty, it has: \
       $find_results"
