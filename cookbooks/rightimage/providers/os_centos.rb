@@ -198,6 +198,9 @@ action :install do
   #Disable FSCK on the image
   touch #{guest_root}/fastboot
 
+  # Set timezone to UTC
+  chroot #{guest_root} ln -sf /usr/share/zoneinfo/UTC /etc/localtime
+
   # disable loading pata_acpi module - currently breaks acpid from discovering volumes attached to CDC KVM hypervisor
   echo "blacklist pata_acpi"          > #{guest_root}/etc/modprobe.d/disable-pata_acpi.conf
   echo "install pata_acpi /bin/true" >> #{guest_root}/etc/modprobe.d/disable-pata_acpi.conf
