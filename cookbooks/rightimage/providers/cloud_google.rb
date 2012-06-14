@@ -4,6 +4,12 @@ end
 
 
 action :configure do
+  ruby_block "check hypervisor" do
+    block do
+      raise "ERROR: you must set your hypervisor to kvm!" unless new_resource.hypervisor == "kvm"
+    end
+  end
+
   directory temp_root { recursive true }
 
   # Add google init script for ubuntu
@@ -79,6 +85,9 @@ action :configure do
     flags "-ex" 
     code <<-EOH
       guest_root=#{guest_root}
+
+      # Set HW clock to UTC
+      echo "UTC" >> $guest_root/etc/adjtime
 
       case "#{new_resource.platform}" in
       "centos"|"rhel")
