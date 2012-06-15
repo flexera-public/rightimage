@@ -104,7 +104,7 @@ set -e
 set -x
 
 chroot \\$1 localedef -i en_US -c -f UTF-8 en_US.UTF-8
-chroot \\$1 cp /usr/share/zoneinfo/UTC /etc/timezone
+chroot \\$1 ln -sf /usr/share/zoneinfo/UTC /etc/localtime
 chroot \\$1 userdel -r ubuntu
 chroot \\$1 rm -rf /home/ubuntu
 chroot \\$1 rm -f /etc/hostname
