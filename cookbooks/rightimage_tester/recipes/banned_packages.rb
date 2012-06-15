@@ -20,8 +20,11 @@
 rightscale_marker :begin
 
 rightimage_tester "Ensure no banned packages installed" do
-  only_if { node[:platform] == "centos" }
-  command 'output=$(rpm -qa mysql); [ -z "$output" ]'
+  cmd = value_for_platform(
+    "ubuntu" => { "default" => 'dpkg --get-selections' },
+    "default" => 'rpm -qa'
+  )
+  command "output=$(#{cmd} mysql php*); [ -z \"$output\" ]"
   action :test
 end
 
