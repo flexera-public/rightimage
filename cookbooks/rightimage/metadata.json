@@ -140,6 +140,19 @@
       "display_name": "Rebundle Base Image ID",
       "description": "Cloud specific ID for the image to start with when building a rebundle image"
     },
+    "rightimage/google/client_id": {
+      "required": "optional",
+      "calculated": false,
+      "choice": [
+
+      ],
+      "type": "string",
+      "recipes": [
+        "rightimage::cloud_upload"
+      ],
+      "display_name": "Client id",
+      "description": "OAuth2 credentials client id"
+    },
     "rightimage/cloudstack/version": {
       "required": "required",
       "calculated": false,
@@ -352,6 +365,19 @@
       ],
       "display_name": "Root Size GB",
       "description": "Sets the size of the virtual image. Units are in GB."
+    },
+    "rightimage/google/refresh_token": {
+      "required": "optional",
+      "calculated": false,
+      "choice": [
+
+      ],
+      "type": "string",
+      "recipes": [
+        "rightimage::cloud_upload"
+      ],
+      "display_name": "Client secret",
+      "description": "Refresh token value"
     },
     "rightimage/cloudstack/cdc_api_key": {
       "required": "required",
@@ -632,6 +658,19 @@
       ],
       "display_name": "Guest OS Platform",
       "description": "The operating system for the virtual image."
+    },
+    "rightimage/google/client_secret": {
+      "required": "optional",
+      "calculated": false,
+      "choice": [
+
+      ],
+      "type": "string",
+      "recipes": [
+        "rightimage::cloud_upload"
+      ],
+      "display_name": "Client secret",
+      "description": "OAuth2 credentials client secret"
     },
     "rightimage/openstack/password": {
       "required": "optional",

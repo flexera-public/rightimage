@@ -347,3 +347,21 @@ attribute "rightimage/rackspace/api_token",
   :required => "required",
   :recipes => [ "rightimage::rebundle", "rightimage::default" ]
 
+# Google
+attribute "rightimage/google/client_secret",
+  :display_name => "Client secret",
+  :description => "OAuth2 credentials client secret",
+  :required => "optional",
+  :recipes => [ "rightimage::cloud_upload" ]
+
+attribute "rightimage/google/client_id",
+  :display_name => "Client id",
+  :description => "OAuth2 credentials client id",
+  :required => "optional",
+  :recipes => [ "rightimage::cloud_upload" ]
+
+attribute "rightimage/google/refresh_token",
+  :display_name => "Client secret",
+  :description => "Refresh token value",
+  :required => "optional",
+  :recipes => [ "rightimage::cloud_upload" ]
