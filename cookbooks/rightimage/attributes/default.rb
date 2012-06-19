@@ -39,7 +39,7 @@ end
 # set base os packages
 case rightimage[:platform]
 when "ubuntu"   
-  set[:rightimage][:guest_packages] = "ubuntu-standard binutils ruby1.8 curl unzip openssh-server ruby1.8-dev build-essential autoconf automake libtool logrotate rsync openssl openssh-server ca-certificates libopenssl-ruby1.8 subversion vim libreadline-ruby1.8 irb rdoc1.8 git-core liberror-perl dmsetup emacs rake screen mailutils nscd bison ncurses-dev zlib1g-dev readline-common libxslt1-dev sqlite3 libxml2 libxml2-dev flex libshadow-ruby1.8 postfix sysstat iptraf syslog-ng libarchive-dev tmux dhcp3-client"
+  set[:rightimage][:guest_packages] = "ubuntu-standard binutils ruby1.8 curl unzip openssh-server ruby1.8-dev build-essential autoconf automake libtool logrotate rsync openssl openssh-server ca-certificates libopenssl-ruby1.8 subversion vim libreadline-ruby1.8 irb rdoc1.8 git-core liberror-perl dmsetup emacs rake screen mailutils nscd bison ncurses-dev zlib1g-dev readline-common libxslt1-dev sqlite3 libxml2 libxml2-dev flex libshadow-ruby1.8 postfix sysstat iptraf libarchive-dev tmux dhcp3-client"
 
   case rightimage[:platform_version]
   when "8.04"
