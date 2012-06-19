@@ -21,7 +21,7 @@ rightscale_marker :begin
 
 bash "Check for bad files" do
   # Avoid wildcard glob on bad_files
-  cwd node[:rightimage_tester][:root]
+  cwd "/tmp"
   code <<-EOH
 # No -x as the script outputs what it's doing
 # No -e as we want to control error exiting
