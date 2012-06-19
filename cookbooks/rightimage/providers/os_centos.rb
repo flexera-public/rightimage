@@ -163,14 +163,8 @@ action :install do
   echo "127.0.0.1   localhost   localhost.localdomain" > #{guest_root}/etc/hosts
   echo "NOZEROCONF=true" >> #{guest_root}/etc/sysconfig/network
 
-  #install syslog-ng
-  chroot #{guest_root} rpm -e rsyslog --nodeps || true #remove rsyslog if it exists 
-  if [ "#{node[:rightimage][:arch]}" == i386 ] ; then 
-    rpm --force --root #{guest_root} -Uvh http://s3.amazonaws.com/rightscale_scripts/syslog-ng-1.6.12-1.el5.centos.i386.rpm
-  else 
-    rpm --force --root #{guest_root} -Uvh http://s3.amazonaws.com/rightscale_scripts/syslog-ng-1.6.12-1.x86_64.rpm
-  fi
-  chroot #{guest_root} chkconfig --level 234 syslog-ng on
+  # Start rsyslog on startup
+  chroot #{guest_root} chkconfig --level 234 rsyslog on
 
   #Install the JDK from S3.
   if [ "#{node[:rightimage][:arch]}" == x86_64 ] ; then 
