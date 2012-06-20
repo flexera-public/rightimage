@@ -83,6 +83,7 @@ action :install do
   /sbin/MAKEDEV -d #{guest_root}/dev -x null
   /sbin/MAKEDEV -d #{guest_root}/dev -x zero
   /sbin/MAKEDEV -d #{guest_root}/dev ptmx
+  /sbin/MAKEDEV -d #{guest_root}/dev urandom
 
   mkdir -p #{guest_root}/dev/pts
   mkdir -p #{guest_root}/sys/block
