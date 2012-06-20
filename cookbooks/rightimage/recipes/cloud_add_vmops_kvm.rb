@@ -88,16 +88,13 @@ bash "configure for cloudstack" do
   code <<-EOH
     guest_root=#{guest_root}
 
+    # following found on functioning CDC test image Centos 64bit using KVM hypervisor
+    echo "alias scsi_hostadapter ata_piix"     > $guest_root/etc/modprobe.conf
+    echo "alias scsi_hostadapter1 virtio_blk" >> $guest_root/etc/modprobe.conf
+    echo "alias eth0 virtio_net"              >> $guest_root/etc/modprobe.conf
+
     case "#{node[:rightimage][:platform]}" in
     "centos")
-      # following found on functioning CDC test image Centos 64bit using KVM hypervisor
-      echo "alias scsi_hostadapter ata_piix"     > $guest_root/etc/modprobe.conf
-      echo "alias scsi_hostadapter1 virtio_blk" >> $guest_root/etc/modprobe.conf
-      echo "alias eth0 virtio_net"              >> $guest_root/etc/modprobe.conf
-
-      # modprobe acpiphp at startup - required for CDC KVM hypervisor to detect attaching/detaching volumes
-      echo "/sbin/modprobe acpiphp" >> $guest_root/etc/rc.local
-
       # clean out packages
       chroot $guest_root yum -y clean all
 
