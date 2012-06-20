@@ -162,6 +162,31 @@ EOS
 EOH
 end
 
+# - add in custom built libc packages, fixes "illegal instruction" core dump (w-12310)
+directory "#{guest_root}/tmp/packages"
+bash "install custom libc" do 
+  packages = %w(
+    libc-bin_2.11.1-0ubuntu7.11_amd64.deb
+    libc-dev-bin_2.11.1-0ubuntu7.11_amd64.deb
+    libc6-dbg_2.11.1-0ubuntu7.11_amd64.deb
+    libc6-dev-i386_2.11.1-0ubuntu7.11_amd64.deb
+    libc6-dev_2.11.1-0ubuntu7.11_amd64.deb
+    libc6-i386_2.11.1-0ubuntu7.11_amd64.deb
+    libc6_2.11.1-0ubuntu7.11_amd64.deb
+    nscd_2.11.1-0ubuntu7.11_amd64.deb
+  ).join(" ")
+  cwd "#{guest_root}/tmp/packages"
+  flags "-ex"
+  code <<-EOH
+    base_url=http://rightscale-rightimage-misc.s3.amazonaws.com/ubuntu/10.04/
+    for p in #{packages}
+    do
+      curl -s -S -f -L --retry 7 -O $base_url$p 
+      chroot #{guest_root} dpkg -i /tmp/packages/$p
+    done
+  EOH
+end
+
 #  - configure mirrors
 template "#{guest_root}/#{node[:rightimage][:mirror_file_path]}" do 
   source node[:rightimage][:mirror_file] 
