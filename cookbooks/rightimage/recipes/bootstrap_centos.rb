@@ -65,6 +65,7 @@ yum -c /tmp/yum.conf --installroot=#{node[:rightimage][:mount_dir]} -y groupinst
 /sbin/MAKEDEV -d #{node[:rightimage][:mount_dir]}/dev -x null
 /sbin/MAKEDEV -d #{node[:rightimage][:mount_dir]}/dev -x zero
 /sbin/MAKEDEV -d #{node[:rightimage][:mount_dir]}/dev ptmx
+/sbin/MAKEDEV -d #{node[:rightimage][:mount_dir]}/dev urandom
 
 mkdir -p #{node[:rightimage][:mount_dir]}/dev/pts
 mkdir -p #{node[:rightimage][:mount_dir]}/sys/block
