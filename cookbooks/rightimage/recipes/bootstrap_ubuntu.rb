@@ -162,6 +162,55 @@ EOS
 EOH
 end
 
+# disable loading pata_acpi module - currently breaks acpid from discovering volumes attached to CDC KVM hypervisor, from bootstrap_centos, should be applicable to ubuntu though
+bash "blacklist pata_acpi" do
+  code <<-EOF
+echo "blacklist pata_acpi"          > #{guest_root}/etc/modprobe.d/disable-pata_acpi.conf
+echo "install pata_acpi /bin/true" >> #{guest_root}/etc/modprobe.d/disable-pata_acpi.conf
+EOF
+end
+
+# - add in custom built libc packages, fixes "illegal instruction" core dump (w-12310)
+directory "#{guest_root}/tmp/packages"
+bash "install custom libc" do 
+  packages = %w(
+    libc-bin_2.11.1-0ubuntu7.11_amd64.deb
+    libc-dev-bin_2.11.1-0ubuntu7.11_amd64.deb
+    libc6-dbg_2.11.1-0ubuntu7.11_amd64.deb
+    libc6-dev-i386_2.11.1-0ubuntu7.11_amd64.deb
+    libc6-dev_2.11.1-0ubuntu7.11_amd64.deb
+    libc6-i386_2.11.1-0ubuntu7.11_amd64.deb
+    libc6_2.11.1-0ubuntu7.11_amd64.deb
+    nscd_2.11.1-0ubuntu7.11_amd64.deb
+  ).join(" ")
+  cwd "#{guest_root}/tmp/packages"
+  flags "-ex"
+  code <<-EOH
+    mount -t proc none #{guest_root}/proc
+    mount --bind /dev #{guest_root}/dev
+    mount --bind /sys #{guest_root}/sys
+    base_url=http://rightscale-rightimage-misc.s3.amazonaws.com/ubuntu/10.04/
+    for p in #{packages}
+    do
+      curl -s -S -f -L --retry 7 -O $base_url$p 
+    done
+
+    cat <<EOF>#{guest_root}/tmp/packages/install_debs.sh
+#!/bin/bash -ex
+cd /tmp/packages
+dpkg -i #{packages}
+EOF
+    chmod a+x #{guest_root}/tmp/packages/install_debs.sh
+    chroot #{guest_root} /tmp/packages/install_debs.sh
+    # nscd deb starts up second version, will prevent loopback fs from dismounting
+    killall nscd
+    umount -lf #{guest_root}/dev || true
+    umount -lf #{guest_root}/proc || true
+    umount -lf #{guest_root}/sys || true
+    service nscd start
+  EOH
+end
+
 #  - configure mirrors
 template "#{guest_root}/#{node[:rightimage][:mirror_file_path]}" do 
   source node[:rightimage][:mirror_file] 
