@@ -84,6 +84,15 @@ EOH
     code <<-EOH
       guest_root=#{guest_root}
 
+      case "#{new_resource.hypervisor}" in
+      "kvm")
+        # following found on functioning CDC test image Centos 64bit using KVM hypervisor
+        echo "alias scsi_hostadapter ata_piix"     > $guest_root/etc/modprobe.conf
+        echo "alias scsi_hostadapter1 virtio_blk" >> $guest_root/etc/modprobe.conf
+        echo "alias eth0 virtio_net"              >> $guest_root/etc/modprobe.conf
+        ;;
+      esac
+
       case "#{new_resource.platform}" in
       "ubuntu")
         case "#{new_resource.hypervisor}" in
@@ -128,13 +137,6 @@ EOH
           [ -f $guest_root/etc/sysconfig/init ] && sed -i "s/ACTIVE_CONSOLES=.*/ACTIVE_CONSOLES=\\/dev\\/tty1/" $guest_root/etc/sysconfig/init
           ;;
         "kvm")
-          # following found on functioning CDC test image Centos 64bit using KVM hypervisor
-          echo "alias scsi_hostadapter ata_piix"     > $guest_root/etc/modprobe.conf
-          echo "alias scsi_hostadapter1 virtio_blk" >> $guest_root/etc/modprobe.conf
-          echo "alias eth0 virtio_net"              >> $guest_root/etc/modprobe.conf
-
-          # modprobe acpiphp at startup - required for CDC KVM hypervisor to detect attaching/detaching volumes
-          echo "/sbin/modprobe acpiphp" >> $guest_root/etc/rc.local
 
           # enable console access
           if [ -f $guest_root/etc/sysconfig/init ]; then
