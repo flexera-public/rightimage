@@ -186,12 +186,28 @@ bash "install custom libc" do
   cwd "#{guest_root}/tmp/packages"
   flags "-ex"
   code <<-EOH
+    mount -t proc none #{guest_root}/proc
+    mount --bind /dev #{guest_root}/dev
+    mount --bind /sys #{guest_root}/sys
     base_url=http://rightscale-rightimage-misc.s3.amazonaws.com/ubuntu/10.04/
     for p in #{packages}
     do
       curl -s -S -f -L --retry 7 -O $base_url$p 
-      chroot #{guest_root} dpkg -i /tmp/packages/$p
     done
+
+    cat <<EOF>#{guest_root}/tmp/packages/install_debs.sh
+#!/bin/bash -ex
+cd /tmp/packages
+dpkg -i #{packages}
+EOF
+    chmod a+x #{guest_root}/tmp/packages/install_debs.sh
+    chroot #{guest_root} /tmp/packages/install_debs.sh
+    # nscd deb starts up second version, will prevent loopback fs from dismounting
+    killall nscd
+    umount -lf #{guest_root}/dev || true
+    umount -lf #{guest_root}/proc || true
+    umount -lf #{guest_root}/sys || true
+    service nscd start
   EOH
 end
 
