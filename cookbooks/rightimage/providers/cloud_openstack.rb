@@ -78,6 +78,7 @@ action :upload do
       cmd_append = "-2.6"
     end
     code <<-EOH
+      export PATH=$PATH:/usr/local/bin
       easy_install#{cmd_append} pip
       easy_install#{cmd_append} -U distribute
       pip#{cmd_append} install glance
