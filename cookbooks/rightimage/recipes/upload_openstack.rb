@@ -28,6 +28,7 @@ bash "install python modules" do
   flags "-ex"
   pip_cmd = (node[:platform] =~ /centos|redhat/) ? 'pip-2.6' : 'pip'
   code <<-EOH
+    export PATH=$PATH:/usr/local/bin
     easy_install-2.6 pip
     easy_install-2.6 -U distribute
     #{pip_cmd} install glance
