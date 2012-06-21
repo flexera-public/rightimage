@@ -8,12 +8,24 @@ action :install do
   code <<-EOH
     guest_root=#{guest_root}
     set +e
-    grep "acpiphp" $guest_root/etc/rc.local
-    [ "$?" == "1" ] && echo "/sbin/modprobe acpiphp" >> $guest_root/etc/rc.local
+    case "#{node[:rightimage][:platform]}" in 
+    "centos" )
+      grep "acpiphp" $guest_root/etc/rc.local
+      [ "$?" == "1" ] && echo "/sbin/modprobe acpiphp" >> $guest_root/etc/rc.local
 
-    grep "acpiphp" $guest_root/etc/rc.modules
-    [ "$?" == "2" -o "$?" == "1" ] && echo 'modules acpiphp' > $guest_root/etc/rc.modules
-    chmod 755 $guest_root/etc/rc.modules
+      grep "acpiphp" $guest_root/etc/rc.modules
+      [ "$?" == "2" -o "$?" == "1" ] && echo 'modules acpiphp' > $guest_root/etc/rc.modules
+      chmod 755 $guest_root/etc/rc.modules
+      ;;
+    "ubuntu" )
+      echo '#!/bin/sh -e' > $guest_root/etc/rc.local
+      echo "/sbin/modprobe acpiphp" >> $guest_root/etc/rc.local
+      echo "exit 0" >> $guest_root/etc/rc.local
+
+      echo "acpiphp" >> /etc/modules
+      ;;
+    esac
+
   EOH
  end
 
