@@ -154,6 +154,14 @@ EOS
   EOH
   end
 
+  # disable loading pata_acpi module - currently breaks acpid from discovering volumes attached to CDC KVM hypervisor, from bootstrap_centos, should be applicable to ubuntu though
+  bash "blacklist pata_acpi" do
+    code <<-EOF
+      echo "blacklist pata_acpi"          > #{guest_root}/etc/modprobe.d/disable-pata_acpi.conf
+      echo "install pata_acpi /bin/true" >> #{guest_root}/etc/modprobe.d/disable-pata_acpi.conf
+    EOF
+  end
+
   #  - configure mirrors
   template "#{guest_root}/etc/apt/sources.list" do 
     source "sources.list.erb"
