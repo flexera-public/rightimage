@@ -133,11 +133,79 @@ action :package do
 end
 
 action :upload do
+  packages =
+    case node[:platform]
+    when "centos", "redhat" then
+      %w(python-setuptools python-devel python-libs)
+    when "ubuntu" then
+      %w(python-dev python-setuptools)
+    end
 
-  ruby_block "store id" do
-    # add to global id store for use by other recipes
-    id_list = RightImage::IdList.new(Chef::Log)
-    id_list.add(image_id)
+  packages.each { package p }
+
+  execute "easy_install"
+  execute "easy_install pip"
+  execute "pip install boto"
+  execute "pip install https://dl.google.com/dl/compute/gcompute.tar.gz"
+
+  bash "install gsutil" do
+    creates "/usr/local/gsutil/gsutil"
+    code <<-EOF
+  wget http://commondatastorage.googleapis.com/pub/gsutil.tar.gz
+  tar zxvf gsutil.tar.gz -C /usr/local
+  echo 'export PATH=$PATH:/usr/local/gsutil' > /etc/profile.d/gsutil.sh
+  source /etc/profile.d/gsutil.sh
+EOF
   end
+ 
+  # TBD, replace this block. We use the gsutil/gcompute tools to do this, but we 
+  # need to generate the refresh_token on another computer (see rightimage_tools/google_token)
+  # We can skip this and use the api directly with the "service accounts" oauth method
+  # but these tools don't support that control flow and need to look into doing
+  # it with google-api-python or google-api-ruby separately. don't think those tools
+  # work yet either, revisit later 
+  template "/root/.gcompute_auth" do
+    source "gcompute_auth"
+    variables(
+      :client_id => node[:rightimage][:google][:client_id],
+      :client_secret  => node[:rightimage][:google][:client_secret],
+      :refresh_token => node[:rightimage][:google][:refresh_token]
+    )
+    backup false
+  end
+  
+  template "/root/.boto" do 
+    source "google_boto"
+    variables(
+      :refresh_token => node[:rightimage][:google][:refresh_token],
+      :project_id => node[:rightimage][:google][:gs_x_project_id]
+    )
+    backup false
+  end
+
+  bash "upload image" do
+    image = "#{target_raw_root}/#{new_resource.image_name}.tar.gz"
+    code <<-EOF
+      if [ ! -e  #{image} ]; then
+        echo "ERROR: file #{image} does not exist, aborting upload!"
+        exit 1
+      fi
+      gsutil cp #{image} gs://rightimage-dev"
+    EOF
+  end
+
+  bash "register image" do
+    code <<-EOF
+      gcompute addimage #{new_resource.image_name} \
+      "http://commondatastorage.googleapis.com/#{node[:rightimage][:upload_bucket]}/#{new_resource.image_name}.tar.gz \
+      --project_id=#{node[:rightimage][:google][:project_id]}
+    EOF
+  end
+
+#  ruby_block "store id" do
+    # add to global id store for use by other recipes
+#    id_list = RightImage::IdList.new(Chef::Log)
+#    id_list.add(image_id)
+#  end
 end
 
