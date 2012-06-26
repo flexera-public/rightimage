@@ -83,6 +83,7 @@ action :install do
   /sbin/MAKEDEV -d #{guest_root}/dev -x null
   /sbin/MAKEDEV -d #{guest_root}/dev -x zero
   /sbin/MAKEDEV -d #{guest_root}/dev ptmx
+  /sbin/MAKEDEV -d #{guest_root}/dev urandom
 
   mkdir -p #{guest_root}/dev/pts
   mkdir -p #{guest_root}/sys/block
@@ -95,14 +96,19 @@ action :install do
                 
   # Shadow file needs to be setup prior install additional packages
   chroot #{guest_root} authconfig --enableshadow --useshadow --enablemd5 --updateall
-  # install guest packages on CentOS 5.2 i386 host to work around yum problem
   yum -c /tmp/yum.conf -y clean all
   yum -c /tmp/yum.conf -y makecache
-  yum -c /tmp/yum.conf -y install #{node[:rightimage][:guest_packages]} --exclude gcc-java
+  # used to install a full set of packages on local os, it screws up if you want to use a freezedate
+  # that's older than the host os.  its probably not even necessary anymore, so comment out for now - PS
+  #  old comment re this was: "install guest packages on CentOS 5.2 i386 host to work around yum problem"
+  # yum -c /tmp/yum.conf -y install #{node[:rightimage][:guest_packages]} --exclude gcc-java
   # Install postfix separately, don't want to use centosplus version which bundles mysql
   yum -c /tmp/yum.conf --installroot=#{guest_root} -y install postfix --disablerepo=centosplus
+  yum -c /tmp/yum.conf --installroot=#{guest_root} -y remove sendmail
+
   # install the guest packages in the chroot
   yum -c /tmp/yum.conf --installroot=#{guest_root} -y install #{node[:rightimage][:guest_packages]} --exclude gcc-java
+
   yum -c /tmp/yum.conf --installroot=#{guest_root} -y remove bluez* gnome-bluetooth*
   yum -c /tmp/yum.conf --installroot=#{guest_root} -y clean all
 
@@ -158,14 +164,8 @@ action :install do
   echo "127.0.0.1   localhost   localhost.localdomain" > #{guest_root}/etc/hosts
   echo "NOZEROCONF=true" >> #{guest_root}/etc/sysconfig/network
 
-  #install syslog-ng
-  chroot #{guest_root} rpm -e rsyslog --nodeps || true #remove rsyslog if it exists 
-  if [ "#{node[:rightimage][:arch]}" == i386 ] ; then 
-    rpm --force --root #{guest_root} -Uvh http://s3.amazonaws.com/rightscale_scripts/syslog-ng-1.6.12-1.el5.centos.i386.rpm
-  else 
-    rpm --force --root #{guest_root} -Uvh http://s3.amazonaws.com/rightscale_scripts/syslog-ng-1.6.12-1.x86_64.rpm
-  fi
-  chroot #{guest_root} chkconfig --level 234 syslog-ng on
+  # Start rsyslog on startup
+  chroot #{guest_root} chkconfig --level 234 rsyslog on
 
   #Install the JDK from S3.
   if [ "#{node[:rightimage][:arch]}" == x86_64 ] ; then 
@@ -197,6 +197,9 @@ action :install do
 
   #Disable FSCK on the image
   touch #{guest_root}/fastboot
+
+  # Set timezone to UTC by default
+  chroot #{guest_root} ln -sf /usr/share/zoneinfo/UTC /etc/localtime
 
   # disable loading pata_acpi module - currently breaks acpid from discovering volumes attached to CDC KVM hypervisor
   echo "blacklist pata_acpi"          > #{guest_root}/etc/modprobe.d/disable-pata_acpi.conf
