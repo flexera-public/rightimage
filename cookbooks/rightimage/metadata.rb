@@ -360,6 +360,12 @@ attribute "rightimage/google/gc_secret_access_key",
   :required => "optional",
   :recipes => [ "rightimage::cloud_upload" ]
 
+attribute "rightimage/google/project_id",
+  :display_name => "Project ID",
+  :description => "Google project ID to register this image for",
+  :required => "optional",
+  :recipes => [ "rightimage::cloud_upload" ]
+
 attribute "rightimage/google/client_secret",
   :display_name => "Client secret",
   :description => "OAuth2 credentials client secret",

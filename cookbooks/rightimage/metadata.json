@@ -488,6 +488,19 @@
       "display_name": "Image Source Bucket",
       "description": "When migrating an image, where to download the image from."
     },
+    "rightimage/google/project_id": {
+      "required": "optional",
+      "calculated": false,
+      "choice": [
+
+      ],
+      "type": "string",
+      "recipes": [
+        "rightimage::cloud_upload"
+      ],
+      "display_name": "Project ID",
+      "description": "Google project ID to register this image for"
+    },
     "rightimage/rackspace/api_token": {
       "required": "required",
       "calculated": false,
