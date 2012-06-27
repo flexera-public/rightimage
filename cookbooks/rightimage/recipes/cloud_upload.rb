@@ -23,12 +23,6 @@ class Chef::Resource
   include RightScale::RightImage::Helper
 end
 
-log "Add DHCP symlink for RightLink"
-execute "chroot #{guest_root} ln -s /var/lib/dhcp /var/lib/dhcp3" do
-  only_if { File.exists?"#{guest_root}/var/lib/dhcp" }
-  creates "#{guest_root}/var/lib/dhcp3"
-end
-
 rightscale_marker :begin
 
 class Chef::Recipe

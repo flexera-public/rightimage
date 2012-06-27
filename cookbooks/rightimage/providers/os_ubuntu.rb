@@ -95,7 +95,7 @@ set -e
 set -x
 
 chroot \\$1 localedef -i en_US -c -f UTF-8 en_US.UTF-8
-chroot \\$1 cp /usr/share/zoneinfo/UTC /etc/timezone
+chroot \\$1 ln -sf /usr/share/zoneinfo/UTC /etc/localtime
 chroot \\$1 userdel -r ubuntu
 chroot \\$1 rm -rf /home/ubuntu
 chroot \\$1 rm -f /etc/hostname
@@ -152,6 +152,14 @@ EOS
       mkdir -p $guest_root/var/man
       chroot $guest_root chown -R man:root /var/man
   EOH
+  end
+
+  # disable loading pata_acpi module - currently breaks acpid from discovering volumes attached to CDC KVM hypervisor, from bootstrap_centos, should be applicable to ubuntu though
+  bash "blacklist pata_acpi" do
+    code <<-EOF
+      echo "blacklist pata_acpi"          > #{guest_root}/etc/modprobe.d/disable-pata_acpi.conf
+      echo "install pata_acpi /bin/true" >> #{guest_root}/etc/modprobe.d/disable-pata_acpi.conf
+    EOF
   end
 
   #  - configure mirrors
@@ -214,12 +222,6 @@ EOF
     EOH
   end
 
-  # Modified version of syslog-ng.conf that will properly route recipe output to /var/log/messages
-  cookbook_file "#{guest_root}/etc/syslog-ng/syslog-ng.conf" do
-    source "syslog-ng.conf"
-    backup false
-  end
-
   # Set DHCP timeout
   bash "dhcp timeout" do
     flags "-ex"
@@ -276,7 +278,7 @@ EOF
     flags "-ex"
     code <<-EOH
 
-      chroot #{guest_root} rm -rf /etc/init/plymouth* /etc/init/rsyslog.conf
+      chroot #{guest_root} rm -rf /etc/init/plymouth*
       chroot #{guest_root} apt-get update
       chroot #{guest_root} apt-get clean
     EOH

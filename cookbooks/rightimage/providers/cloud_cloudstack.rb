@@ -9,11 +9,8 @@ action :configure do
     flags '-ex'
     code <<-EOH
   case "#{new_resource.platform}" in
-    "ubuntu")
-      chroot #{guest_root} apt-get -y install iscsi-initiator-utils"
-      ;;
     "centos"|"rhel")
-      chroot #{guest_root} yum -y install iscsi-initiator-utils"
+      chroot #{guest_root} yum -y install iscsi-initiator-utils
       ;;
   esac
     EOH
@@ -44,6 +41,11 @@ action :configure do
     to "#{guest_root}/boot/grub/grub.conf"
   end
 
+  Chef::Log::info "Add DHCP symlink for RightLink"
+  execute "chroot #{guest_root} ln -s /var/lib/dhcp /var/lib/dhcp3" do
+    only_if { File.exists?"#{guest_root}/var/lib/dhcp" }
+    creates "#{guest_root}/var/lib/dhcp3"
+  end
 
   bash "setup grub" do
     not_if { new_resource.hypervisor == "xen" }
@@ -81,6 +83,15 @@ EOH
     flags "-ex" 
     code <<-EOH
       guest_root=#{guest_root}
+
+      case "#{new_resource.hypervisor}" in
+      "kvm")
+        # following found on functioning CDC test image Centos 64bit using KVM hypervisor
+        echo "alias scsi_hostadapter ata_piix"     > $guest_root/etc/modprobe.conf
+        echo "alias scsi_hostadapter1 virtio_blk" >> $guest_root/etc/modprobe.conf
+        echo "alias eth0 virtio_net"              >> $guest_root/etc/modprobe.conf
+        ;;
+      esac
 
       case "#{new_resource.platform}" in
       "ubuntu")
@@ -126,13 +137,6 @@ EOH
           [ -f $guest_root/etc/sysconfig/init ] && sed -i "s/ACTIVE_CONSOLES=.*/ACTIVE_CONSOLES=\\/dev\\/tty1/" $guest_root/etc/sysconfig/init
           ;;
         "kvm")
-          # following found on functioning CDC test image Centos 64bit using KVM hypervisor
-          echo "alias scsi_hostadapter ata_piix"     > $guest_root/etc/modprobe.conf
-          echo "alias scsi_hostadapter1 virtio_blk" >> $guest_root/etc/modprobe.conf
-          echo "alias eth0 virtio_net"              >> $guest_root/etc/modprobe.conf
-
-          # modprobe acpiphp at startup - required for CDC KVM hypervisor to detect attaching/detaching volumes
-          echo "/sbin/modprobe acpiphp" >> $guest_root/etc/rc.local
 
           # enable console access
           if [ -f $guest_root/etc/sysconfig/init ]; then
@@ -235,7 +239,7 @@ action :upload do
       end
 
       filename = "#{new_resource.image_name}.#{image_file_ext}"
-      local_file = "#{temp_root}/#{filename}"
+      local_file = "#{target_raw_root}/#{filename}"
       md5sum = calc_md5sum(local_file)
 
       aws_url  = "rightscale-cloudstack-dev.s3.amazonaws.com"
