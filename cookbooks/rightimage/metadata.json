@@ -153,6 +153,19 @@
       "display_name": "Client id",
       "description": "OAuth2 credentials client id"
     },
+    "rightimage/google/gc_secret_access_key": {
+      "required": "optional",
+      "calculated": false,
+      "choice": [
+
+      ],
+      "type": "string",
+      "recipes": [
+        "rightimage::cloud_upload"
+      ],
+      "display_name": "Google secret_access_key",
+      "description": "Google storage api (interoperable) secret access key"
+    },
     "rightimage/cloudstack/version": {
       "required": "required",
       "calculated": false,
@@ -282,6 +295,19 @@
       ],
       "display_name": "Build Mode",
       "description": "Build base image, full image, or migrate existing image."
+    },
+    "rightimage/google/gc_access_key_id": {
+      "required": "optional",
+      "calculated": false,
+      "choice": [
+
+      ],
+      "type": "string",
+      "recipes": [
+        "rightimage::cloud_upload"
+      ],
+      "display_name": "Google access_key_id",
+      "description": "Google storage api (interoperable) access key id"
     },
     "rightimage/cloudstack/cdc_secret_key": {
       "required": "required",

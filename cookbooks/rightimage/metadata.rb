@@ -348,6 +348,18 @@ attribute "rightimage/rackspace/api_token",
   :recipes => [ "rightimage::rebundle", "rightimage::default" ]
 
 # Google
+attribute "rightimage/google/gc_access_key_id",
+  :display_name => "Google access_key_id",
+  :description => "Google storage api (interoperable) access key id",
+  :required => "optional",
+  :recipes => [ "rightimage::cloud_upload" ]
+
+attribute "rightimage/google/gc_secret_access_key",
+  :display_name => "Google secret_access_key",
+  :description => "Google storage api (interoperable) secret access key",
+  :required => "optional",
+  :recipes => [ "rightimage::cloud_upload" ]
+
 attribute "rightimage/google/client_secret",
   :display_name => "Client secret",
   :description => "OAuth2 credentials client secret",

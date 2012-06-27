@@ -98,11 +98,11 @@ action :configure do
         chroot $guest_root apt-get -y install acpi dhcp3-client
         ;;
       esac
-      
-      #Install GCompute
+
+      # Install gcutil
       chroot $guest_root easy_install pip
       chroot $guest_root pip install boto
-      chroot $guest_root pip install https://dl.google.com/dl/compute/gcompute.tar.gz
+      chroot $guest_root pip install https://dl.google.com/dl/compute/gcutil.tar.gz
 
       # Install GSUtil
       wget http://commondatastorage.googleapis.com/pub/gsutil.tar.gz
@@ -143,10 +143,16 @@ action :upload do
 
   packages.each { package p }
 
-  execute "easy_install"
-  execute "easy_install pip"
-  execute "pip install boto"
-  execute "pip install https://dl.google.com/dl/compute/gcompute.tar.gz"
+  bash "install gcutil" do
+    flags "-ex"
+    code <<-EOF
+      export PATH=$PATH:/usr/local/bin
+      easy_install -U distribute
+      easy_install pip
+      pip install boto
+      pip install https://dl.google.com/dl/compute/gcutil.tar.gz
+    EOF
+  end
 
   bash "install gsutil" do
     creates "/usr/local/gsutil/gsutil"
@@ -158,27 +164,27 @@ action :upload do
 EOF
   end
  
-  # TBD, replace this block. We use the gsutil/gcompute tools to do this, but we 
+  # TBD, replace this block. We use the gsutil/gcutil tools to do this, but we 
   # need to generate the refresh_token on another computer (see rightimage_tools/google_token)
   # We can skip this and use the api directly with the "service accounts" oauth method
   # but these tools don't support that control flow and need to look into doing
   # it with google-api-python or google-api-ruby separately. don't think those tools
   # work yet either, revisit later 
-  template "/root/.gcompute_auth" do
-    source "gcompute_auth"
+  template "/root/.gcutil_auth" do
+    source "gcutil_auth.erb"
     variables(
       :client_id => node[:rightimage][:google][:client_id],
-      :client_secret  => node[:rightimage][:google][:client_secret],
+      :client_secret => node[:rightimage][:google][:client_secret],
       :refresh_token => node[:rightimage][:google][:refresh_token]
     )
     backup false
   end
-  
+
   template "/root/.boto" do 
-    source "google_boto"
+    source "google_boto.erb"
     variables(
-      :refresh_token => node[:rightimage][:google][:refresh_token],
-      :project_id => node[:rightimage][:google][:gs_x_project_id]
+      :gc_access_key_id     => node[:rightimage][:google][:gc_access_key_id],
+      :gc_secret_access_key => node[:rightimage][:google][:gc_secret_access_key]
     )
     backup false
   end
@@ -190,13 +196,13 @@ EOF
         echo "ERROR: file #{image} does not exist, aborting upload!"
         exit 1
       fi
-      gsutil cp #{image} gs://rightimage-dev"
+      gsutil cp #{image} gs://rightimage-dev/"
     EOF
   end
 
   bash "register image" do
     code <<-EOF
-      gcompute addimage #{new_resource.image_name} \
+      gcutil addimage #{new_resource.image_name} \
       "http://commondatastorage.googleapis.com/#{node[:rightimage][:upload_bucket]}/#{new_resource.image_name}.tar.gz \
       --project_id=#{node[:rightimage][:google][:project_id]}
     EOF

@@ -12,27 +12,13 @@
 
 [Credentials]
 
-# Google OAuth2 credentials (for "gs://" URIs):
-# The following OAuth2 token is authorized for scope(s):
-#     https://www.googleapis.com/auth/devstorage.full_control
-gs_oauth2_refresh_token = <%=@refresh_token%>
-
 # To add google credentials ("gs://" URIs), edit and uncomment the
 # following two lines:
-#gs_access_key_id = <your google access key ID>
-#gs_secret_access_key = <your google secret access key>
+gs_access_key_id = <%=@gs_access_key_id%>
+gs_secret_access_key = <%=@gs_access_key_id%>
 # The ability to specify an alternate storage host is primarily for cloud
 # storage service developers.
 #gs_host = <alternate storage host address>
-
-# To add aws credentials ("s3://" URIs), edit and uncomment the
-# following two lines:
-#aws_access_key_id = <your aws access key ID>
-#aws_secret_access_key = <your aws secret access key>
-# The ability to specify an alternate storage host is primarily for cloud
-# storage service developers.
-#s3_host = <alternate storage host address>
-
 
 [Boto]
 
@@ -118,14 +104,12 @@ https_validate_certificates = True
 
 # 'default_api_version' specifies the default Google Cloud Storage API
 # version to use. If not set below gsutil defaults to API version 1.
-default_api_version = 2
+default_api_version = 1
 
 # 'default_project_id' specifies the default Google Cloud Storage project ID to
 # use with the 'mb' and 'ls' commands. If defined it overrides the default value
 # you set in the API Console. Either of these defaults can be overridden
 # by specifying the -p option to the 'mb' and 'ls' commands.
-default_project_id = <%=@gs_x_project_id=>
-
 
 
 [OAuth2]
