@@ -163,7 +163,7 @@ attribute "rightimage/hypervisor",
 
 attribute "rightimage/datacenter",
   :display_name => "Datacenter ID",
-  :description => "Datacenter/Zone ID.  Defaults to 1.  Use UK for rackspace UK",
+  :description => "Datacenter/Zone ID.  Defaults to 1.  Use US/UK for rackspace US/UK",
   :default => "1",
   :required => "recommended"
 
@@ -188,7 +188,7 @@ attribute "rightscale/api_url",
 
 attribute "rightscale/cloud_id",
   :display_name => "RightScale Cloud ID (integer)",
-  :description => "The numeric ID in RightScale for the cloud we should add this mci to. For example, 6 = AWS Oregon, 232 = Rackspace",
+  :description => "The numeric ID in RightScale for the cloud which we will create this image for. For example, 6 = AWS Oregon, 232 = Rackspace",
   :recipes => [ "rightimage::do_create_mci" ],
   :recommended => true
 
