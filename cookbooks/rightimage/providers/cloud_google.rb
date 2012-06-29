@@ -92,6 +92,8 @@ action :configure do
       case "#{new_resource.platform}" in
       "centos"|"rhel")
         chroot $guest_root yum -y install python-setuptools python-devel python-libs
+        # google lists this as a customization in email they sent
+        chroot $guest_root yum -y install yum-cron
         ;;
       "ubuntu")
         chroot $guest_root apt-get -y install python-dev python-setuptools
@@ -123,7 +125,6 @@ action :configure do
       echo "gc" > $guest_root/etc/rightscale.d/cloud
     EOH
   end
-
 end
 
 action :package do
