@@ -99,6 +99,13 @@ action :configure do
         ;;
       esac
 
+      # Add metadata alias
+      grep -E 'metadata' /etc/hosts &> /dev/null
+      if ["$?" != "0"]; then
+        echo '169.254.169.254 metadata.google.internal metadata' >> $guest_root/etc/hosts
+      fi
+      set -e
+
       # Install Boto (for gsutil)
       chroot $guest_root easy_install pip
       chroot $guest_root pip install boto
