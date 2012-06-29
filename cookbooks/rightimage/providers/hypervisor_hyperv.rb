@@ -21,7 +21,7 @@ action :install_kernel do
   bash "install Linux Integration Services package" do
     flags "-ex"
     cwd LIS_DIR_HOST
-    not_if { ::File.exists?("#{LIS_DIR_HOST}/kernel_already_installed") }
+    not_if "rpm --root #{guest_root} -qa microsoft-hyper-v|grep microsoft"
     code <<-EOH
       guest_root=#{guest_root}
       lis_dir_host=#{LIS_DIR_HOST}
@@ -58,8 +58,6 @@ EOF
 
       # Kill services started automatically during package installs
       killall hv_kvp_daemon
-
-      touch $lis_dir_host/kernel_already_installed
     EOH
   end
  
@@ -74,11 +72,10 @@ action :install_tools do
   bash "install WAZ agent" do
     flags "-ex"
     cwd LIS_DIR_HOST
-    not_if { ::File.exists?("#{LIS_DIR_HOST}/agent_already_installed") }
+    not_if "rpm --root #{guest_root} -qa WALinuxAgent|grep WA"
     code <<-EOH
       guest_root=#{guest_root}
       yum -c /tmp/yum.conf --installroot=$guest_root -y install WALinuxAgent.rpm
-      touch $lis_dir_host/agent_already_installed
     EOH
   end
 end
