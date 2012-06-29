@@ -94,6 +94,19 @@ EOH
       esac
     EOH
   end
+
+  bash "install tools" do
+    flags "-x"
+    code <<-EOH
+      guest_root=#{guest_root}
+
+      # Ignore errors during install, for re-runability.  If you're missing something, it will fail anyway during npm install.
+      yum --installroot $guest_root -y --nogpgcheck install http://nodejs.tchol.org/repocfg/el/nodejs-stable-release.noarch.rpm
+      chroot $guest_root yum -y install nodejs-compat-symlinks npm
+      set -e
+      chroot $guest_root npm install azure -g
+    EOH
+  end
 end
 
 action :package do
@@ -103,7 +116,6 @@ action :package do
 end
 
 action :upload do
-  
   raise "Upload not supported -- please implement me!!"
 
   ruby_block "store id" do
