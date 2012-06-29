@@ -1,5 +1,5 @@
 default         0
-timeout         5
+timeout         <%= node[:rightimage][:cloud] == "azure" || node[:rightimage][:cloud] == "ec2" ? "0":"5" %>
 hiddenmenu
 
 <% kern = ::File.basename(Dir.glob("#{guest_root}/boot/vmlinuz*").sort_by { |f| File.mtime(f) }.last) %>
