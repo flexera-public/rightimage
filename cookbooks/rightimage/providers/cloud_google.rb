@@ -95,14 +95,17 @@ action :configure do
         ;;
       "ubuntu")
         chroot $guest_root apt-get -y install python-dev python-setuptools
-        chroot $guest_root apt-get -y install acpi dhcp3-client
+        chroot $guest_root apt-get -y install acpid dhcp3-client
         ;;
       esac
 
-      # Install gcutil
+      # Install Boto (for gsutil)
       chroot $guest_root easy_install pip
       chroot $guest_root pip install boto
-      chroot $guest_root pip install https://dl.google.com/dl/compute/gcutil.tar.gz
+
+      wget http://dl.google.com/dl/compute/gcutil.tar.gz
+      tar zxvf gcutil.tar.gz -C $guest_root/usr/local
+      echo 'export PATH=$PATH:/usr/local/gcutil' > $guest_root/etc/profile.d/gcutil.sh
 
       # Install GSUtil
       wget http://commondatastorage.googleapis.com/pub/gsutil.tar.gz
@@ -143,15 +146,25 @@ action :upload do
 
   packages.each { package p }
 
-  bash "install gcutil" do
+  # requirement for gsutil
+  bash "install boto" do
     flags "-ex"
     code <<-EOF
       export PATH=$PATH:/usr/local/bin
       easy_install -U distribute
       easy_install pip
       pip install boto
-      pip install https://dl.google.com/dl/compute/gcutil.tar.gz
     EOF
+  end
+
+  bash "install gcutil" do
+    creates "/usr/local/gcutil/gcutil"
+    code <<-EOF
+  wget http://dl.google.com/dl/compute/gcutil.tar.gz
+  tar zxvf gcutil.tar.gz -C /usr/local
+  echo 'export PATH=$PATH:/usr/local/gcutil' > /etc/profile.d/gcutil.sh
+  source /etc/profile.d/gcutil.sh
+EOF
   end
 
   bash "install gsutil" do
