@@ -39,6 +39,13 @@ r = gem_package "activesupport" do
 end
 r.run_action(:install)
 
+r = gem_package "nokogiri" do 
+  gem_binary "#{SANDBOX_BIN_DIR}/gem"
+  version "1.5.4"
+  action :nothing
+end
+r.run_action(:install)
+
 r = gem_package "net-ssh" do 
   gem_binary "#{SANDBOX_BIN_DIR}/gem"
   version "2.1.4"
