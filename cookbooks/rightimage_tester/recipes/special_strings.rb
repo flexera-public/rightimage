@@ -85,6 +85,7 @@ skip_dirs=(
 #{node[:rightimage_tester][:root]}/var/lib/rightscale/right_link/certs
 #{node[:rightimage_tester][:root]}/var/lib/ureadahead
 #{node[:rightimage_tester][:root]}/usr/local/gsutil
+#{node[:rightimage_tester][:root]}/usr/local/gcutil
 #{node[:rightimage_tester][:root]}/usr/share
 #{node[:rightimage_tester][:root]}/home/ec2
 )
