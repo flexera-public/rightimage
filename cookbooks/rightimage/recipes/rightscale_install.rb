@@ -27,28 +27,19 @@ bash "setup_motd" do
 end
 
 bash "insert_bashrc" do 
+  # note that ubuntu uses /etc/bash.bashrc and sources it automatically for us
+  # also note that .bashrc in /skel already has this code so it should work 
+  # normally for rightlink created users
+  flags "+e-x"
   code <<-EOS
-    # Move the current .bashrc out of the way if it exists
-    if [ -f #{guest_root}/root/.bashrc ]; then
-      mv  -f #{guest_root}/root/.bashrc  \
-             #{guest_root}/root/save_bashrc
-    fi
-    # Put the RS special sauce at the top of the bashrc
+    grep ". /etc/bashrc" #{guest_root}/root/.bashrc
+    if [ "$?" == "2" -o "$?" == "1" ]; then
 cat <<-BASHRC >> #{guest_root}/root/.bashrc
-
-export PATH=\\$PATH:/home/ec2/bin
-export EC2_HOME=/home/ec2
-
 # Source global definitions
 if [ -f /etc/bashrc ]; then
-        . /etc/bashrc
+  . /etc/bashrc
 fi
 BASHRC
-    if [ -f #{guest_root}/root/save_bashrc ]; then
-      # Append the existing bashrc to the one just created - if it exists
-      cat #{guest_root}/root/save_bashrc \
-              >>  #{guest_root}/root/.bashrc
-      rm -f #{guest_root}/root/save_bashrc
     fi
   EOS
 end
