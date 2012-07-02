@@ -116,12 +116,36 @@ action :package do
 end
 
 action :upload do
-  raise "Upload not supported -- please implement me!!"
+  bash "install tools on host" do
+    flags "-x"
+    code <<-EOH
+      # Ignore errors during install, for re-runability.  If you're missing something, it will fail anyway during npm install.
+      yum -y --nogpgcheck install http://nodejs.tchol.org/repocfg/el/nodejs-stable-release.noarch.rpm
+      yum -y install nodejs-compat-symlinks npm
+      npm -g ls | grep azure
+      if [ "$?" == "1" ]; then
+        set -e
+        npm install azure -g
+      fi
+    EOH
+  end
 
-  ruby_block "store id" do
-    # add to global id store for use by other recipes
-    id_list = RightImage::IdList.new(Chef::Log)
-    id_list.add(image_id)
+  template "/root/azure.publishsettings" do
+    source "azure.publishsettings.erb"
+    backup false
+  end
+
+  bash "upload image" do
+    flags "-ex"
+    cwd target_raw_root
+    code <<-EOH
+      settings=/root/azure.publishsettings
+      azure account import $settings
+      rm -f $settings
+      azure vm image create #{image_name} #{image_name}.vhd --os Linux --location "West US"
+      # Delete publishsettings
+      azure account clear
+    EOH
   end
 end
 
