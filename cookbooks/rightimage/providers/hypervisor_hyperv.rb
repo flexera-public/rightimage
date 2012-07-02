@@ -55,7 +55,7 @@ EOF
       package_list="kernel kernel-headers kernel-firmware"
       packages_to_install=""
       for package in $package_list; do
-        packages_to_install="$packages_to_install $package"
+        packages_to_install="$packages_to_install $package-$good_kernel"
       done
       yum -c /tmp/yum.conf --installroot=$guest_root -y install $packages_to_install
 
