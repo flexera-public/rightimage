@@ -140,6 +140,32 @@
       "display_name": "Rebundle Base Image ID",
       "description": "Cloud specific ID for the image to start with when building a rebundle image"
     },
+    "rightimage/azure/id": {
+      "required": "required",
+      "calculated": false,
+      "choice": [
+
+      ],
+      "type": "string",
+      "recipes": [
+        "rightimage::cloud_upload"
+      ],
+      "display_name": "Azure Subscription ID",
+      "description": "Azure Subscription ID"
+    },
+    "rightimage/azure/cert": {
+      "required": "required",
+      "calculated": false,
+      "choice": [
+
+      ],
+      "type": "string",
+      "recipes": [
+        "rightimage::cloud_upload"
+      ],
+      "display_name": "Azure Management Certificate",
+      "description": "Azure Management Certificate"
+    },
     "rightimage/cloudstack/version": {
       "required": "required",
       "calculated": false,

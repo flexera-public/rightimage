@@ -347,3 +347,15 @@ attribute "rightimage/rackspace/api_token",
   :required => "required",
   :recipes => [ "rightimage::rebundle", "rightimage::default" ]
 
+# Azure
+attribute "rightimage/azure/cert",
+  :display_name => "Azure Management Certificate",
+  :description => "Azure Management Certificate",
+  :required => "required",
+  :recipes => [ "rightimage::cloud_upload" ]
+
+attribute "rightimage/azure/id",
+  :display_name => "Azure Subscription ID",
+  :description => "Azure Subscription ID",
+  :required => "required",
+  :recipes => [ "rightimage::cloud_upload" ]

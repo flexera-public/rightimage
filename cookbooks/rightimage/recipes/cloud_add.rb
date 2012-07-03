@@ -59,6 +59,11 @@ execute "echo -n #{node[:rightimage][:cloud]} > #{guest_root}/etc/rightscale.d/c
   creates "#{guest_root}/etc/rightscale.d/cloud"
 end
 
+directory "#{guest_root}/var/spool/cloud" do
+  action :create
+  recursive true
+end
+
 log "Add RightLink 5.6 backwards compatibility symlink"
 execute "chroot #{guest_root} ln -s /var/spool/cloud /var/spool/#{node[:rightimage][:cloud]}" do
   creates "#{guest_root}/var/spool/#{node[:rightimage][:cloud]}"

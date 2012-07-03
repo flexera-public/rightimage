@@ -320,6 +320,7 @@ function download_package_or_tarball() {
   fi
 }
 
+NET_WAIT_COUNT=0
 DOWNLOADED_FILE_NAME=
 function download_file() {
   declare -a urls=("${!1}")
@@ -333,6 +334,17 @@ function download_file() {
       logger -st RightScale "Downloading $temp_filename from $url"
       CODE=`curl "${CURL_OPT[@]}" -w '%{http_code}' -o $output_file $url`
       logger -st RightScale "curl returned code: $CODE"
+      # 000 denotes network unreachable, wait up to 30 seconds for
+      # networking to be set up, but only once.  This works around
+      # a race condition for azure
+      if [ "$CODE" -eq "000" ] && [ $NET_WAIT_COUNT -lt 30 ]; then
+        logger -st RightScale "Networking not set yet, waiting up to 30 seconds for it to appear"
+      fi
+      while [ "$CODE" -eq "000" ] && [ $NET_WAIT_COUNT -lt 30 ]; do
+        sleep 1
+        NET_WAIT_COUNT=`expr $NET_WAIT_COUNT + 1`
+        CODE=`curl "${CURL_OPT[@]}" -w '%{http_code}' -o $output_file $url`
+      done
       final_filename=$(basename $url)
     done
 

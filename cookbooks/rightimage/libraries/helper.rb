@@ -6,7 +6,7 @@ module RightScale
         name = node[:rightimage][:image_name].dup
         name << "_#{generate_persisted_passwd}" if node[:rightimage][:debug] == "true" && node[:rightimage][:build_mode] != "migrate" && node[:rightimage][:cloud] !~ /rackspace/
         name << "_EBS" if node[:rightimage][:ec2][:image_type] =~ /ebs/i and name !~ /_EBS/
-        name.gsub!("_","-") if node[:rightimage][:cloud] == /rackspace/
+        name.gsub!("_","-") if node[:rightimage][:cloud] == /rackspace/ || node[:rightimage][:cloud] == "azure"
         name
       end
 
@@ -34,12 +34,14 @@ module RightScale
 
       def image_file_ext
         case node[:rightimage][:hypervisor]
-        when "xen", "hyperv"
+        when "xen"
           (node[:rightimage][:cloud] == "euca" ? "tar.gz":"vhd.bz2")
         when "kvm"
           "qcow2.bz2"
         when "esxi"
           "vmdk.ova"
+        when "hyperv"
+          "vhd"
         end
       end
 

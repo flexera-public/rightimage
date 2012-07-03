@@ -9,14 +9,14 @@ action :configure do
   bash "install guest packages" do 
     flags '-ex'
     code <<-EOH
-  case "#{new_resource.platform}" in
-    "ubuntu")
-      chroot #{guest_root} apt-get -y install grub iscsi-initiator-utils"
-      ;;
-    "centos"|"rhel")
-      chroot #{guest_root} yum -y install grub iscsi-initiator-utils"
-      ;;
-  esac
+      case "#{new_resource.platform}" in
+      "ubuntu")
+        chroot #{guest_root} apt-get -y install grub iscsi-initiator-utils
+        ;;
+      "centos"|"rhel")
+        chroot #{guest_root} yum -y install grub iscsi-initiator-utils
+        ;;
+      esac
     EOH
   end
 
@@ -76,6 +76,37 @@ EOF
 EOH
   end
 
+  bash "configure for azure" do
+    flags "-ex"
+    code <<-EOH
+      guest_root=#{guest_root}
+
+      # Disable all ttys except for tty1 (console)
+      case "#{new_resource.platform}" in
+      "ubuntu")
+        for i in `ls $guest_root/etc/init/tty[2-9].conf`; do
+          mv $i $i.disabled;
+        done
+        ;;
+      "centos"|"rhel")
+        sed -i "s/ACTIVE_CONSOLES=.*/ACTIVE_CONSOLES=\\/dev\\/tty1/" $guest_root/etc/sysconfig/init
+        ;;
+      esac
+    EOH
+  end
+
+  bash "install tools" do
+    flags "-x"
+    code <<-EOH
+      guest_root=#{guest_root}
+
+      # Ignore errors during install, for re-runability.  If you're missing something, it will fail anyway during npm install.
+      yum --installroot $guest_root -y --nogpgcheck install http://nodejs.tchol.org/repocfg/el/nodejs-stable-release.noarch.rpm
+      chroot $guest_root yum -y install nodejs-compat-symlinks npm
+      set -e
+      chroot $guest_root npm install azure -g
+    EOH
+  end
 end
 
 action :package do
@@ -85,13 +116,36 @@ action :package do
 end
 
 action :upload do
-  
-  raise "Upload not supported -- please implement me!!"
+  bash "install tools on host" do
+    flags "-x"
+    code <<-EOH
+      # Ignore errors during install, for re-runability.  If you're missing something, it will fail anyway during npm install.
+      yum -y --nogpgcheck install http://nodejs.tchol.org/repocfg/el/nodejs-stable-release.noarch.rpm
+      yum -y install nodejs-compat-symlinks npm
+      npm -g ls | grep azure
+      if [ "$?" == "1" ]; then
+        set -e
+        npm install azure -g
+      fi
+    EOH
+  end
 
-  ruby_block "store id" do
-    # add to global id store for use by other recipes
-    id_list = RightImage::IdList.new(Chef::Log)
-    id_list.add(image_id)
+  template "/root/azure.publishsettings" do
+    source "azure.publishsettings.erb"
+    backup false
+  end
+
+  bash "upload image" do
+    flags "-ex"
+    cwd target_raw_root
+    code <<-EOH
+      settings=/root/azure.publishsettings
+      azure account import $settings
+      rm -f $settings
+      azure vm image create #{image_name} #{image_name}.vhd --os Linux --location "West US"
+      # Delete publishsettings
+      azure account clear
+    EOH
   end
 end
 

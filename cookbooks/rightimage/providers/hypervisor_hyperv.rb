@@ -21,7 +21,7 @@ action :install_kernel do
   bash "install Linux Integration Services package" do
     flags "-ex"
     cwd LIS_DIR_HOST
-    not_if { ::File.exists?("#{LIS_DIR_HOST}/kernel_already_installed") }
+    not_if "rpm --root #{guest_root} -qa microsoft-hyper-v|grep microsoft"
     code <<-EOH
       guest_root=#{guest_root}
       lis_dir_host=#{LIS_DIR_HOST}
@@ -44,8 +44,40 @@ EOF
       # run install
       chmod +x $lis_dir_host/run.sh
       chroot $guest_root $lis_dir_guest/run.sh
-      
-      touch $lis_dir_host/kernel_already_installed
+
+      # Erase currently installed kernels and associated packages
+      for kernel_pkg in `rpm --root $guest_root -qa kernel kernel-*`; do
+        rpm --root $guest_root --erase --nodeps $kernel_pkg
+      done
+
+      # Force-set kernel version due to incompatibility with 2.6.32-220.17.1
+      good_kernel="2.6.32-220.13.1.el6.x86_64"
+      package_list="kernel kernel-headers kernel-firmware"
+      packages_to_install=""
+      for package in $package_list; do
+        packages_to_install="$packages_to_install $package-$good_kernel"
+      done
+      yum -c /tmp/yum.conf --installroot=$guest_root -y install $packages_to_install
+
+      # Exclude kernel packages from yum update
+      set +e
+      grep "exclude=kernel" $guest_root/etc/yum.conf
+      if [ "$?" == "1" ]; then
+        cat >> $guest_root/etc/yum.conf <<-EOF
+
+# Incompatibility with Azure storage modules - Hard drives not recognized.
+# Tested with 2.6.32-220.17.1 and 2.6.32-220.23.1
+# Works with 2.6.32-220.13.1
+exclude=kernel*
+EOF
+      fi
+      set -e
+
+      # Agent install attempts to use kernel on host instead of the guest
+      rm -f $guest_root/initr* $guest_root/boot/initr*$(uname -r)*
+
+      # Kill services started automatically during package installs
+      killall hv_kvp_daemon
     EOH
   end
  
@@ -60,11 +92,10 @@ action :install_tools do
   bash "install WAZ agent" do
     flags "-ex"
     cwd LIS_DIR_HOST
-    not_if { ::File.exists?("#{LIS_DIR_HOST}/agent_already_installed") }
+    not_if "rpm --root #{guest_root} -qa WALinuxAgent|grep WA"
     code <<-EOH
       guest_root=#{guest_root}
       yum -c /tmp/yum.conf --installroot=$guest_root -y install WALinuxAgent.rpm
-      touch $lis_dir_host/agent_already_installed
     EOH
   end
 end

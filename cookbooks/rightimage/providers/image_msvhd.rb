@@ -1,19 +1,19 @@
-
 action :package do
-  qemu_package = el6? ? "qemu-img" : "qemu"
-  package qemu_package
+  execute "virtualbox install" do
+    not_if "rpm -qa VirtualBox*|grep VirtualBox"
+    command "yum -y install http://download.virtualbox.org/virtualbox/4.1.18/VirtualBox-4.1-4.1.18_78361_rhel6-1.x86_64.rpm"
+  end
 
-  bash "package image" do 
-    cwd target_raw_root
+  bash "package image" do
     flags "-ex"
+    cwd target_raw_root
     code <<-EOH
-      
-      BUNDLED_IMAGE="#{image_name}.vhd"
-      BUNDLED_IMAGE_PATH="#{target_raw_root}/$BUNDLED_IMAGE"
-      
-      qemu-img convert -O vhd #{target_raw_root}/#{loopback_filename(partitioned?)} $BUNDLED_IMAGE_PATH
-      [ -f $BUNDLED_IMAGE_PATH.bz2 ] && rm -f $BUNDLED_IMAGE_PATH.bz2
-      bzip2 -k $BUNDLED_IMAGE_PATH
+      image="#{image_name}.vhd"
+
+      echo "Remove old image"
+      rm -f $image
+
+      VBoxManage convertfromraw #{loopback_filename(partitioned?)} $image --format VHD
     EOH
   end
 end
