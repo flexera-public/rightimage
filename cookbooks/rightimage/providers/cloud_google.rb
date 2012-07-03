@@ -96,7 +96,7 @@ action :configure do
         # Note that this comes after and replaces the /etc/rc.local written in KVM provider
         # will not work centos 5
         echo '#!/bin/bash' > $guest_root/etc/rc.local
-        echo 'initctl emit --no-wait google-rc-local-has-run' > $guest_root/etc/rc.local
+        echo 'initctl emit --no-wait google-rc-local-has-run' >> $guest_root/etc/rc.local
         chmod 755 $guest_root/etc/rc.local
         ;;
       "ubuntu")
@@ -105,7 +105,7 @@ action :configure do
         # Emit signal to run google_run_startup_scripts
         # Note that this comes after and replaces the /etc/rc.local written in KVM provider
         echo '#!/bin/bash' > $guest_root/etc/rc.local
-        echo 'initctl emit --no-wait google-rc-local-has-run' > $guest_root/etc/rc.local
+        echo 'initctl emit --no-wait google-rc-local-has-run' >> $guest_root/etc/rc.local
         chmod 755 $guest_root/etc/rc.local
         # Google disables loading of kernel modules
         echo '' > /etc/modules
