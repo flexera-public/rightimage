@@ -228,12 +228,13 @@ EOF
   end
 
   bash "register image" do
+    flags "-ex"
     code <<-EOF
 #      echo "Image registration not supported yet, register image with command: "
 #      echo "gcutil addimage #{new_resource.image_name} http://commondatastorage.googleapis.com/#{node[:rightimage][:image_upload_bucket]}/#{new_resource.image_name}.tar.gz --project_id=#{node[:rightimage][:google][:project_id]}"
 
-      gcutil addimage #{new_resource.image_name}
-      "http://commondatastorage.googleapis.com/#{node[:rightimage][:upload_bucket]}/#{new_resource.image_name}.tar.gz" \
+      gcutil addimage #{new_resource.image_name} \
+      "http://commondatastorage.googleapis.com/#{node[:rightimage][:image_upload_bucket]}/#{new_resource.image_name}.tar.gz" \
       --project_id=#{node[:rightimage][:google][:project_id]}
     EOF
   end
