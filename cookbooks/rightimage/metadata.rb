@@ -379,7 +379,7 @@ attribute "rightimage/google/client_id",
   :recipes => [ "rightimage::cloud_upload" ]
 
 attribute "rightimage/google/refresh_token",
-  :display_name => "Client secret",
+  :display_name => "OAuth2 credentials refresh token",
   :description => "Refresh token value",
   :required => "optional",
   :recipes => [ "rightimage::cloud_upload" ]

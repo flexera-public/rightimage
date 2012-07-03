@@ -402,7 +402,7 @@
       "recipes": [
         "rightimage::cloud_upload"
       ],
-      "display_name": "Client secret",
+      "display_name": "OAuth2 credentials refresh token",
       "description": "Refresh token value"
     },
     "rightimage/cloudstack/cdc_api_key": {
