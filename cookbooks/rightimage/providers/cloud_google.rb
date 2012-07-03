@@ -47,7 +47,7 @@ action :configure do
     end
 #    directory "#{guest_root}/usr/share" { recursive true }
     bash "untar google startup scripts" do
-      code "tar zxvf #{temp_root}/google_centos.tgz -C /usr/share"
+      code "tar zxvf #{temp_root}/google_centos.tgz -C #{guest_root}/usr/share"
     end
   else
     raise "Unsupported platform/version combination #{new_resource.platform} #{new_resource.platform_version}"
