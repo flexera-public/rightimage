@@ -92,8 +92,6 @@ action :configure do
       case "#{new_resource.platform}" in
       "centos"|"rhel")
         chroot $guest_root yum -y install python-setuptools python-devel python-libs
-        # google lists this as a customization in email they sent
-        chroot $guest_root yum -y install yum-cron
         ;;
       "ubuntu")
         chroot $guest_root apt-get -y install python-dev python-setuptools
@@ -152,15 +150,15 @@ action :package do
 end
 
 action :upload do
-  packages =
-    case node[:platform]
-    when "centos", "redhat" then
-      %w(python-setuptools python-devel python-libs)
-    when "ubuntu" then
-      %w(python-dev python-setuptools)
-    end
-
-  packages.each { package p }
+  case node[:platform]
+  when "centos", "redhat" then
+    # Need to use yum_package instead of package or else setuptools will error out
+    # with "no candidate found" because its a noarch package which package doesn't
+    # understand
+    %w(python-setuptools python-devel python-libs).each { |p| yum_package p }
+  when "ubuntu" then
+    %w(python-dev python-setuptools).each {|p| package p}
+  end
 
   # requirement for gsutil
   bash "install boto" do
@@ -221,22 +219,22 @@ EOF
   bash "upload image" do
     image = "#{target_raw_root}/#{new_resource.image_name}.tar.gz"
     code <<-EOF
-      if [ ! -e  #{image} ]; then
+      if [ ! -e #{image} ]; then
         echo "ERROR: file #{image} does not exist, aborting upload!"
         exit 1
       fi
-      gsutil cp #{image} gs://rightimage-dev/"
+      gsutil cp #{image} gs://#{node[:rightimage][:image_upload_bucket]}/
     EOF
   end
 
   bash "register image" do
     code <<-EOF
-      echo "Image registration not supported yet, register image with command: "
-      echo "gcutil addimage #{new_resource.image_name} http://commondatastorage.googleapis.com/rightimage-dev/#{new_resource.image_name}.tar.gz --project_id=#{node[:rightimage][:google][:project_id]}"
+#      echo "Image registration not supported yet, register image with command: "
+#      echo "gcutil addimage #{new_resource.image_name} http://commondatastorage.googleapis.com/#{node[:rightimage][:image_upload_bucket]}/#{new_resource.image_name}.tar.gz --project_id=#{node[:rightimage][:google][:project_id]}"
 
-#      gcutil addimage #{new_resource.image_name} 
-#      "http://commondatastorage.googleapis.com/#{node[:rightimage][:upload_bucket]}/#{new_resource.image_name}.tar.gz" \
-#      --project_id=#{node[:rightimage][:google][:project_id]}
+      gcutil addimage #{new_resource.image_name}
+      "http://commondatastorage.googleapis.com/#{node[:rightimage][:upload_bucket]}/#{new_resource.image_name}.tar.gz" \
+      --project_id=#{node[:rightimage][:google][:project_id]}
     EOF
   end
 
