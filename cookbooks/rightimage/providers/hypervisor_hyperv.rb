@@ -59,6 +59,20 @@ EOF
       done
       yum -c /tmp/yum.conf --installroot=$guest_root -y install $packages_to_install
 
+      # Exclude kernel packages from yum update
+      set +e
+      grep "exclude=kernel" $guest_root/etc/yum.conf
+      if [ "$?" == "1" ]; then
+        cat >> $guest_root/etc/yum.conf <<-EOF
+
+# Incompatibility with Azure storage modules - Hard drives not recognized.
+# Tested with 2.6.32-220.17.1 and 2.6.32-220.23.1
+# Works with 2.6.32-220.13.1
+exclude=kernel*
+EOF
+      fi
+      set -e
+
       # Agent install attempts to use kernel on host instead of the guest
       rm -f $guest_root/initr* $guest_root/boot/initr*$(uname -r)*
 
