@@ -336,14 +336,14 @@ function download_file() {
       logger -st RightScale "curl returned code: $CODE"
       # 000 denotes network unreachable, wait up to 30 seconds for
       # networking to be set up, but only once.  This works around
-      # an race condition for azure
+      # a race condition for azure
       if [ "$CODE" -eq "000" ] && [ $NET_WAIT_COUNT -lt 30 ]; then
-	logger -st RightScale "Networking not set yet, waiting up to 30 seconds for it to appear"
+        logger -st RightScale "Networking not set yet, waiting up to 30 seconds for it to appear"
       fi
       while [ "$CODE" -eq "000" ] && [ $NET_WAIT_COUNT -lt 30 ]; do
-	sleep 1
-	NET_WAIT_COUNT=`expr $NET_WAIT_COUNT + 1`
-	CODE=`curl "${CURL_OPT[@]}" -w '%{http_code}' -o $output_file $url`
+        sleep 1
+        NET_WAIT_COUNT=`expr $NET_WAIT_COUNT + 1`
+        CODE=`curl "${CURL_OPT[@]}" -w '%{http_code}' -o $output_file $url`
       done
       final_filename=$(basename $url)
     done
