@@ -229,7 +229,7 @@ EOF
         echo "ERROR: file #{image} does not exist, aborting upload!"
         exit 1
       fi
-      gsutil cp #{image} gs://#{node[:rightimage][:image_upload_bucket]}/
+      /usr/local/gsutil/gsutil cp #{image} gs://#{node[:rightimage][:image_upload_bucket]}/
     EOF
   end
 
