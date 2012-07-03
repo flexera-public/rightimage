@@ -228,6 +228,7 @@ function get_cloud_userdata() {
         CLOUD_USERDATA="${CLOUD_USERDATA}&$attr=$attr_val"
       done
       CLOUD_USERDATA=${CLOUD_USERDATA:1}
+      ;;
     azure*)
       userdata_file='/var/lib/waagent/Certificates.pem'
       wait_for_userdata_file $userdata_file
