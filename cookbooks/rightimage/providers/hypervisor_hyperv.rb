@@ -50,7 +50,7 @@ EOF
         rpm --root $guest_root --erase --nodeps $kernel_pkg
       done
 
-      # Force-set kernel version due to incompatability with 2.6.32-220.17.1
+      # Force-set kernel version due to incompatibility with 2.6.32-220.17.1
       good_kernel="2.6.32-220.13.1.el6.x86_64"
       package_list="kernel kernel-headers kernel-firmware"
       packages_to_install=""
