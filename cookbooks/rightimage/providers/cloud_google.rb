@@ -132,9 +132,6 @@ action :configure do
       wget http://commondatastorage.googleapis.com/pub/gsutil.tar.gz
       tar zxvf gsutil.tar.gz -C $guest_root/usr/local
       echo 'export PATH=$PATH:/usr/local/gsutil' > $guest_root/etc/profile.d/gsutil.sh
-
-      mkdir -p $guest_root/etc/rightscale.d
-      echo "gc" > $guest_root/etc/rightscale.d/cloud
     EOH
   end
 end
