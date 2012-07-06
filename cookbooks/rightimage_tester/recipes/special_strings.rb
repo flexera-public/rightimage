@@ -23,6 +23,7 @@ el = ((node[:platform] == "centos" || node[:platform] == "redhatenterpriseserver
 grep_bin = (el ? "/tmp/grep/bin/grep" : "grep")
 
 file "/tmp/badfiles" do
+  backup false
   action :delete
 end
 
@@ -65,38 +66,23 @@ BEGIN CERTIFICATE|\
 # List of directories to ignore.
 skip_dirs=(
 #{node[:rightimage_tester][:root]}/dev
-#{node[:rightimage_tester][:root]}/etc/pki/entitlement
+#{node[:rightimage_tester][:root]}/etc/pki
 #{node[:rightimage_tester][:root]}/etc/ssh
 #{node[:rightimage_tester][:root]}/etc/ssl
+#{node[:rightimage_tester][:root]}/home/ec2
 #{node[:rightimage_tester][:root]}/lib
 #{node[:rightimage_tester][:root]}/lib64
-#{node[:rightimage_tester][:root]}/opt/rightscale/certs
-#{node[:rightimage_tester][:root]}/opt/rightscale/right_link/certs
-#{node[:rightimage_tester][:root]}/opt/rightscale/sandbox/lib/ruby/gems/1.8/gems
-#{node[:rightimage_tester][:root]}/opt/rightscale/sandbox/man
 #{node[:rightimage_tester][:root]}/proc
-#{node[:rightimage_tester][:root]}/root/.ssh
 #{node[:rightimage_tester][:root]}/sys
-#{node[:rightimage_tester][:root]}/tmp/rubygems/test
+#{node[:rightimage_tester][:root]}/usr/java
 #{node[:rightimage_tester][:root]}/usr/lib
 #{node[:rightimage_tester][:root]}/usr/lib64
-#{node[:rightimage_tester][:root]}/usr/share/doc
-#{node[:rightimage_tester][:root]}/var/cache/rightscale
-#{node[:rightimage_tester][:root]}/var/lib/rightscale/right_link/certs
-#{node[:rightimage_tester][:root]}/var/lib/ureadahead
 #{node[:rightimage_tester][:root]}/usr/share
-#{node[:rightimage_tester][:root]}/home/ec2
+#{node[:rightimage_tester][:root]}/var/lib/ureadahead
 )
 
 # List of files to ignore.
 skip_files=(
-#{node[:rightimage_tester][:root]}/tmp/id_rsa
-#{node[:rightimage_tester][:root]}/var/log/decommission
-#{node[:rightimage_tester][:root]}/var/log/install
-#{node[:rightimage_tester][:root]}/var/log/messages
-#{node[:rightimage_tester][:root]}/var/log/syslog
-#{node[:rightimage_tester][:root]}/var/log/user.log
-#{node[:rightimage_tester][:root]}/var/log/bootstrap.log
 )
 
 # Ignore this script during the search
