@@ -150,8 +150,8 @@
       "recipes": [
         "rightimage::cloud_upload"
       ],
-      "display_name": "Client id",
-      "description": "OAuth2 credentials client id"
+      "display_name": "Google client id",
+      "description": "OAuth2 credentials client id for GCE. Pulled from gcutil conf"
     },
     "rightimage/google/gc_secret_access_key": {
       "required": "optional",
@@ -164,7 +164,7 @@
         "rightimage::cloud_upload"
       ],
       "display_name": "Google secret_access_key",
-      "description": "Google storage api (interoperable) secret access key"
+      "description": "Google storage (interoperable) secret access key"
     },
     "rightimage/cloudstack/version": {
       "required": "required",
@@ -307,7 +307,7 @@
         "rightimage::cloud_upload"
       ],
       "display_name": "Google access_key_id",
-      "description": "Google storage api (interoperable) access key id"
+      "description": "Google storage (interoperable) access key id"
     },
     "rightimage/cloudstack/cdc_secret_key": {
       "required": "required",
@@ -402,8 +402,8 @@
       "recipes": [
         "rightimage::cloud_upload"
       ],
-      "display_name": "OAuth2 credentials refresh token",
-      "description": "Refresh token value"
+      "display_name": "Google OAuth2 credentials refresh token",
+      "description": "Refresh token value for GCE. Pulled form gcutil conf"
     },
     "rightimage/cloudstack/cdc_api_key": {
       "required": "required",
@@ -498,8 +498,8 @@
       "recipes": [
         "rightimage::cloud_upload"
       ],
-      "display_name": "Project ID",
-      "description": "Google project ID to register this image for"
+      "display_name": "Google Project ID",
+      "description": "GCE Project ID to register this image for"
     },
     "rightimage/rackspace/api_token": {
       "required": "required",
@@ -708,8 +708,8 @@
       "recipes": [
         "rightimage::cloud_upload"
       ],
-      "display_name": "Client secret",
-      "description": "OAuth2 credentials client secret"
+      "display_name": "Google client secret",
+      "description": "OAuth2 credentials client secret for GCE. Pulled from gcutil conf"
     },
     "rightimage/openstack/password": {
       "required": "optional",
