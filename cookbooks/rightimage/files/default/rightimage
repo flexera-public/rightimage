@@ -218,7 +218,7 @@ function get_cloud_userdata() {
       wait_for_userdata_file $userdata_file
       CLOUD_USERDATA=`cat $userdata_file`
       ;;
-    gc*)
+    google*)
       metadata_server="http://metadata:80"
       attributes=`curl -s $metadata_server/0.1/meta-data/attributes/ | grep -v /`
       CLOUD_USERDATA=""
