@@ -106,22 +106,4 @@ rightimage guest_root do
   action :sanitize
 end
 
-# Truncate any files contained in the directory.
-bash "sanitize files" do
-  flags "-ex"
-  code <<-EOH
-    guest_root=#{guest_root}
-
-    # Truncate files in specified directories.
-    dirs="/var/log /var/mail /var/spool/postfix"
-
-    for dir in $dirs; do
-      echo "Sanitizing directory $dir"
-      for file in `find ${guest_root}$dir -size +0 -type f`; do
-        echo -n > $file;
-      done
-    done
-  EOH
-end
-
 rightscale_marker :end
