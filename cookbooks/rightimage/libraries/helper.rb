@@ -64,7 +64,7 @@ module RightScale
       end
 
       def ri_lineage
-        [guest_platform,platform_version,arch,timestamp,build_number].join("_")
+        ["base_image",guest_platform,platform_version,arch,timestamp,build_number].join("_")
       end
 
       # call this guest_platform, not platform, otherwise can introduce a 
