@@ -20,6 +20,7 @@
 rightscale_marker :begin
 
 rightimage_tester "Verify modules load" do
+  not_if { node[:cloud][:provider] == "google" }
   command "modprobe nfs"
   action :test
 end
