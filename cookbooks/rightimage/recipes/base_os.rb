@@ -73,6 +73,26 @@ chroot $ROOT /tmp/rubygems_install.sh > /dev/null
 EOC
 end
 
+# Method recommened by CentOS:
+# https://bugzilla.redhat.com/show_bug.cgi?id=641836#c17
+bash "disable IPv6" do
+  code <<-EOF
+    guest_root=#{guest_root}
+    file=$guest_root/etc/sysctl.conf
+    grep "net.ipv6.conf.all.disable_ipv6" $file
+
+    if [ "$?" == "1" ]; then
+      echo -n "Disabling IPv6"
+      cat <<-EOC >> $file
+net.ipv6.conf.all.disable_ipv6 = 1
+net.ipv6.conf.default.disable_ipv6 = 1
+EOC
+    else
+      echo -n "IPv6 already disabled"
+    fi
+  EOF
+end
+
 # Clean up GUEST_ROOT image
 rightimage guest_root do
   action :sanitize
