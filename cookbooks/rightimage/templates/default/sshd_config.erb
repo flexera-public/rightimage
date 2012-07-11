@@ -13,7 +13,7 @@
 #Port 22
 #Protocol 2,1
 Protocol 2
-#AddressFamily any
+AddressFamily inet
 #ListenAddress 0.0.0.0
 #ListenAddress ::
 
@@ -71,9 +71,7 @@ ChallengeResponseAuthentication no
 
 # GSSAPI options
 #GSSAPIAuthentication no
-GSSAPIAuthentication yes
 #GSSAPICleanupCredentials yes
-GSSAPICleanupCredentials yes
 
 # Set this to 'yes' to enable PAM authentication, account processing, 
 # and session processing. If this is enabled, PAM authentication will 
@@ -93,7 +91,6 @@ AcceptEnv LC_IDENTIFICATION LC_ALL
 #AllowTcpForwarding yes
 #GatewayPorts no
 #X11Forwarding no
-X11Forwarding yes
 #X11DisplayOffset 10
 #X11UseLocalhost yes
 #PrintMotd yes
@@ -103,7 +100,7 @@ X11Forwarding yes
 #UsePrivilegeSeparation yes
 #PermitUserEnvironment no
 #Compression delayed
-#ClientAliveInterval 0
+ClientAliveInterval 420
 #ClientAliveCountMax 3
 #ShowPatchLevel no
 UseDNS no
