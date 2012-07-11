@@ -277,7 +277,9 @@ function get_rs_version() {
   fi
 }
 
-RS_SRC=
+# We export this so /etc/init.d/rightscale startup script can see it and get
+# packages from the dev_bucket
+export RS_SRC=
 function get_rs_src() {
   if devsrc=`expr "$CLOUD_USERDATA" : '.*RS_src=\([-_.0-9a-z/]*\)'`; then
     RS_SRC=$devsrc
