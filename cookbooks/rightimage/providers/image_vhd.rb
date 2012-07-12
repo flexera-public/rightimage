@@ -28,9 +28,8 @@ action :package do
     code <<-EOF
       rm -rf /mnt/vhd && mkdir /mnt/vhd && cd /mnt/vhd
       hg clone --rev 21560 http://xenbits.xensource.com/xen-4.0-testing.hg
-      cd xen-4.0-testing.hg/tools
-      patch -p0 < /tmp/vhd-util-patch
-      cd ..
+      cd xen-4.0-testing.hg
+      patch --forward -p1 < /tmp/vhd-util-patch
       make install-tools
       cd tools/blktap2/
       make 
