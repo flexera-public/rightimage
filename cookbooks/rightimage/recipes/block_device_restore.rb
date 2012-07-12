@@ -13,7 +13,7 @@ def restore_snapshot_from_s3
   arch = node[:rightimage][:arch]
   year = node[:rightimage][:timestamp][0..3]
   lineage = ri_lineage
-  base_image_endpoint = 'https://rightscale-rightimage-base-dev.s3.amazonaws.com'
+  base_image_endpoint = "https://#{node[:rightimage][:base_image_bucket]}.s3.amazonaws.com"
   partition_number = (partitioned?) ? "0" : ""
   FileUtils.mkdir_p(target_raw_root)
   url = "#{base_image_endpoint}/#{platform}/#{platform_version}/#{arch}/#{year}/#{loopback_filename(partitioned?)}.gz"
@@ -38,16 +38,6 @@ elsif ::File.exists?(loopback_file(partitioned?))
   Chef::Log::info("Already restored raw image from S3")
 else
 
-      # Create and return BlockDevice object
-#      device = ::RightScale::Tools::BlockDevice.factory(
-#        :lvm,   # Backup using local LVM snapshot + cloud persistence.
-#        "ec2",  # The local cloud that we are currently running.
-#        target_raw_root, # Mountpoint for device.
-#        ri_lineage,    # Nickname for device.
-#        {:hypervisor = "xen"} #additional options
-#      )
-#
-#    end
   begin
     @api = RightScale::Tools::API.factory('1.0', {'cloud'=>'ec2'})
     Chef::Log::info("Attempting to restore from EBS snapshot lineage #{ri_lineage}")

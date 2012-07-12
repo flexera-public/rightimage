@@ -16,6 +16,7 @@ set_unless[:rightimage][:cloud] = "ec2"
 set[:rightimage][:root_mount][:label_dev] = "ROOT"
 set[:rightimage][:root_mount][:dev] = "LABEL=#{rightimage[:root_mount][:label_dev]}"
 set_unless[:rightimage][:image_source_bucket] = "rightscale-us-west-2"
+set_unless[:rightimage][:base_image_bucket] = "rightscale-rightimage-base-dev"
 
 if timestamp
   if rightimage[:platform] == "ubuntu"
