@@ -1138,3 +1138,29 @@ diff -Naur xen-4.0-testing.hg/tools/blktap2/vhd/vhd-util.c blktap2-new/vhd/vhd-u
  			continue;
  		}
 
+--- xen-4.0.1-testing.orig/tools/blktap/drivers/Makefile
++++ xen-4.0.1-testing/tools/blktap/drivers/Makefile
+@@ -28,8 +28,9 @@ CFLAGS += -DMEMSHR
+ MEMSHRLIBS += $(MEMSHR_DIR)/libmemshr.a
+ endif
+ 
+-LDFLAGS_blktapctrl := $(LDFLAGS_libxenctrl) $(LDFLAGS_libxenstore) $(MEMSHRLIBS) -L../lib -lblktap -lrt -lm -lpthread
+-LDFLAGS_img := $(LIBAIO_DIR)/libaio.a $(CRYPT_LIB) -lpthread -lz
++LDFLAGS_xen := $(LDFLAGS_libxenctrl) $(LDFLAGS_libxenstore)
++LDFLAGS_blktapctrl := $(LDFLAGS_xen) $(MEMSHRLIBS) -L../lib -lblktap -lrt -lm -lpthread $(LDFLAGS_xen)
++LDFLAGS_img := $(LIBAIO_DIR)/libaio.a $(CRYPT_LIB) -lpthread -lz $(LDFLAGS_xen)
+ 
+ BLK-OBJS-y  := block-aio.o
+ BLK-OBJS-y  += block-sync.o
+
+--- xen-4.0-testing.hg-RS/tools/xenpaging/Makefile	2012-07-09 16:15:22.000000000 +0000
++++ xen-4.0-testing.hg/tools/xenpaging/Makefile	2012-07-09 16:05:41.000000000 +0000
+@@ -27,7 +27,7 @@
+ all: $(IBINS)
+ 
+ xenpaging: $(OBJS)
+-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
++	$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS)
+
+ install: all
+ 	$(INSTALL_DIR) $(DESTDIR)$(SBINDIR)

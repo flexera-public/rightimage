@@ -11,7 +11,8 @@ action :package do
       vhd_util_deps=%w{mercurial git ncurses-devel dev86 iasl SDL python-devel libgcrypt-devel uuid-devel openssl-devel}
       vhd_util_deps << (el6? ? "libuuid-devel" : "e2fsprogs-devel")
     when "ubuntu"
-      vhd_util_deps=%w{mercurial libncurses5-dev bin86 bcc iasl libsdl1.2debian-all libsdl1.2-dev python-dev libgcrypt11-dev uuid-dev libssl-dev gettext}
+      vhd_util_deps=%w{mercurial libncurses5-dev bin86 bcc iasl libsdl1.2-dev python-dev libgcrypt11-dev uuid-dev libssl-dev gettext libc6-dev libc6-dev:i386}
+      vhd_util_deps << (node[:rightimage][:platform_version].to_f < 12.04 ? "libsdl1.2debian-all" : "libsdl1.2debian")
     else
       raise "ERROR: platform #{node[:platform]} not supported. Please feel free to add support ;) "
   end
@@ -35,6 +36,12 @@ action :package do
       make 
       make install
     EOF
+  end
+
+  # Xen tools libs install into /usr/lib64, not in search path on Ubuntu 12.04
+  execute "echo '/usr/lib64' > /etc/ld.so.conf.d/usr-lib64.conf && ldconfig" do
+    only_if { ::File.exists?"/etc/ld.so.conf.d" }
+    creates "/etc/ld.so.conf.d/usr-lib64.conf"
   end
 
   bash "package XEN image" do 
