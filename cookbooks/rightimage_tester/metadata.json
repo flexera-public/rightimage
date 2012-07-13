@@ -83,7 +83,8 @@
     "rightimage_tester::ssh": "Ensure can ssh into self.",
     "rightimage_tester::rubygems": "Check rubygems installation.",
     "rightimage_tester::hostname": "Ensure hostname set.",
-    "rightimage_tester::apt_config": "Check apt configuration."
+    "rightimage_tester::apt_config": "Check apt configuration.",
+    "rightimage_tester::ipv6": "Ensure IPv6 is disabled."
   },
   "groupings": {
   },
