@@ -77,8 +77,7 @@ attribute "rightimage/platform_version",
 attribute "rightimage/arch",
   :display_name => "Guest OS Architecture",
   :description => "The architecture for the virtual image.",
-  :default => "x86_64",
-  :choice => [ "i386", "x86_64" ],
+  :choice => [ "x86_64", "i386" ],
   :required => "required"
   
 attribute "rightimage/cloud",

@@ -663,10 +663,9 @@
       "required": "required",
       "calculated": false,
       "choice": [
-        "i386",
-        "x86_64"
+        "x86_64",
+        "i386"
       ],
-      "default": "x86_64",
       "type": "string",
       "recipes": [
 
