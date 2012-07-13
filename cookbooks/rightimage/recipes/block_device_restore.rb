@@ -52,10 +52,10 @@ elsif ::File.exists?(loopback_file(partitioned?))
   Chef::Log::info("Already restored raw image from S3")
 else
   begin
-    @api = RightScale::Tools::API.factory('1.0', {'cloud'=>'ec2'})
+    @api = RightScale::Tools::API.factory('1.0', {:cloud=>'ec2',:hypervisor=>'xen'})
     Chef::Log::info("Attempting to restore from EBS snapshot lineage #{ri_lineage}")
-    @api.find_latest_ebs_backup(ri_lineage,false,'')
-    Chef::Log::info("Found EBS snapshot for #{ri_lineage}")
+    snaps = @api.find_latest_ebs_backup(ri_lineage, false)
+    Chef::Log::info("Found EBS snapshot for #{ri_lineage} #{snaps.inspect}, restoring")
 
     block_device ri_lineage do
       cloud "ec2"
