@@ -31,10 +31,10 @@ end
 
 
 # Requirement for nokogiri and rightimage_tools now
-packages = case node[:platform]
-           when "ubuntu" then %w(libxml2-dev libxslt1-dev)
-           when "centos", /redhat/ then %w(libxml2-devel libxslt-devel)
-           end
+packages = value_for_platform(
+  "ubuntu" => {"default" => %w(libxml2-dev libxslt1-dev)},
+  "default" => %w(libxml2-devel libxslt-devel)
+)
 
 packages.each do |p| 
   r = package p do 
