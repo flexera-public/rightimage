@@ -570,6 +570,7 @@
         "i386",
         "x86_64"
       ],
+      "default": "x86_64",
       "type": "string",
       "recipes": [
 
