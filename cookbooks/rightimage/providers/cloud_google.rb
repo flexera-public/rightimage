@@ -53,14 +53,6 @@ action :configure do
     raise "Unsupported platform/version combination #{new_resource.platform} #{new_resource.platform_version}"
   end
 
-  
-  
-  # HACK: our ubuntu base images currently do not have a motd -- adding it here
-  cookbook_file "#{guest_root}/etc/motd.tail" do 
-    source "motd"
-    backup false
-  end
-
   if new_resource.platform == "ubuntu"
     bash "Link init script to runlevels" do
       flags "-ex" 
