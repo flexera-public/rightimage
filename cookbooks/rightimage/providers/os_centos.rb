@@ -206,14 +206,7 @@ action :install do
   echo "install pata_acpi /bin/true" >> #{guest_root}/etc/modprobe.d/disable-pata_acpi.conf
     
   # disable IPV6
-  echo "NETWORKING_IPV6=no" >> #{guest_root}/etc/sysconfig/network
-  echo "install ipv6 /bin/true" > #{guest_root}/etc/modprobe.d/disable-ipv6.conf
-  echo "options ipv6 disable=1" >> #{guest_root}/etc/modprobe.d/disable-ipv6.conf
   chroot #{guest_root} /sbin/chkconfig ip6tables off
-
-  # Depricated CentOS 5.3 and older uses this to disable ipv6
-  #echo "alias ipv6 off" >> #{guest_root}/etc/modprobe.conf 
-  #echo "alias net-pf-10 off" >> #{guest_root}/etc/modprobe.conf 
   EOF
   end
 
