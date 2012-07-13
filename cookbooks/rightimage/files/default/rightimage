@@ -218,6 +218,17 @@ function get_cloud_userdata() {
       wait_for_userdata_file $userdata_file
       CLOUD_USERDATA=`cat $userdata_file`
       ;;
+    google*)
+      metadata_server="http://metadata:80"
+      attributes=`curl -s $metadata_server/0.1/meta-data/attributes/ | grep -v /`
+      CLOUD_USERDATA=""
+      for attr in $attributes
+      do
+        attr_val=`curl -s $metadata_server/0.1/meta-data/attributes/$attr`
+        CLOUD_USERDATA="${CLOUD_USERDATA}&$attr=$attr_val"
+      done
+      CLOUD_USERDATA=${CLOUD_USERDATA:1}
+      ;;
     azure*)
       userdata_file='/var/lib/waagent/Certificates.pem'
       wait_for_userdata_file $userdata_file
@@ -266,7 +277,9 @@ function get_rs_version() {
   fi
 }
 
-RS_SRC=
+# We export this so /etc/init.d/rightscale startup script can see it and get
+# packages from the dev_bucket
+export RS_SRC=
 function get_rs_src() {
   if devsrc=`expr "$CLOUD_USERDATA" : '.*RS_src=\([-_.0-9a-z/]*\)'`; then
     RS_SRC=$devsrc

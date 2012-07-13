@@ -29,8 +29,21 @@ class Chef::Recipe
   include RightScale::RightImage::Helper
 end
 
-SANDBOX_BIN_DIR = "/opt/rightscale/sandbox/bin"
 
+# Requirement for nokogiri and rightimage_tools now
+packages = value_for_platform(
+  "ubuntu" => {"default" => %w(libxml2-dev libxslt1-dev)},
+  "default" => %w(libxml2-devel libxslt-devel)
+)
+
+packages.each do |p| 
+  r = package p do 
+    action :nothing 
+  end
+  r.run_action(:install)
+end
+
+SANDBOX_BIN_DIR = "/opt/rightscale/sandbox/bin"
 # These are needed until rest_connection pins it's activesupport dependency version
 r = gem_package "activesupport" do
   gem_binary "#{SANDBOX_BIN_DIR}/gem"

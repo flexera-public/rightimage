@@ -27,18 +27,6 @@ directory temp_root do
   recursive true
 end
 
-packages = case node[:platform]
-           when "ubuntu" then %w(libxml2-dev libxslt1-dev)
-           when "centos", /redhat/ then %w(libxml2-devel libxslt-devel)
-           end
-
-packages.each do |p| 
-  r = package p do 
-    action :nothing 
-  end
-  r.run_action(:install)
-end
-
 node[:rightimage][:host_packages].split.each { |p| package p }
 
 include_recipe "rightimage::block_device_restore"

@@ -84,7 +84,7 @@ attribute "rightimage/arch",
 attribute "rightimage/cloud",
   :display_name => "Target Cloud",
   :description => "The supported cloud for the virtual image. If unset, build a generic base image.",
-  :choice => [ "ec2", "cloudstack", "eucalyptus", "openstack", "rackspace", "rackspace_managed", "azure" ],
+  :choice => [ "ec2", "cloudstack", "eucalyptus", "openstack", "rackspace", "rackspace_managed", "azure", "google"],
   :required => "recommended"
   
 attribute "rightimage/region",
@@ -359,4 +359,42 @@ attribute "rightimage/azure/id",
   :display_name => "Azure Subscription ID",
   :description => "Azure Subscription ID",
   :required => "required",
+  :recipes => [ "rightimage::cloud_upload" ]
+
+
+# Google
+attribute "rightimage/google/gc_access_key_id",
+  :display_name => "Google access_key_id",
+  :description => "Google storage (interoperable) access key id",
+  :required => "optional",
+  :recipes => [ "rightimage::cloud_upload" ]
+
+attribute "rightimage/google/gc_secret_access_key",
+  :display_name => "Google secret_access_key",
+  :description => "Google storage (interoperable) secret access key",
+  :required => "optional",
+  :recipes => [ "rightimage::cloud_upload" ]
+
+attribute "rightimage/google/project_id",
+  :display_name => "Google Project ID",
+  :description => "GCE Project ID to register this image for",
+  :required => "optional",
+  :recipes => [ "rightimage::cloud_upload" ]
+
+attribute "rightimage/google/client_secret",
+  :display_name => "Google client secret",
+  :description => "OAuth2 credentials client secret for GCE. Pulled from gcutil conf",
+  :required => "optional",
+  :recipes => [ "rightimage::cloud_upload" ]
+
+attribute "rightimage/google/client_id",
+  :display_name => "Google client id",
+  :description => "OAuth2 credentials client id for GCE. Pulled from gcutil conf",
+  :required => "optional",
+  :recipes => [ "rightimage::cloud_upload" ]
+
+attribute "rightimage/google/refresh_token",
+  :display_name => "Google OAuth2 credentials refresh token",
+  :description => "Refresh token value for GCE. Pulled form gcutil conf",
+  :required => "optional",
   :recipes => [ "rightimage::cloud_upload" ]

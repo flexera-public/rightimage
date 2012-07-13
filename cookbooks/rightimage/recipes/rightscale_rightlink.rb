@@ -10,13 +10,18 @@ end
 
 rightlink_file="rightscale_#{node[:rightimage][:rightlink_version]}-#{node[:rightimage][:platform]}_#{node[:rightimage][:platform_version]}-" + ((node[:rightimage][:platform] == "ubuntu") && (node[:rightimage][:arch] == "x86_64") ? "amd64" : node[:rightimage][:arch]) + "." + (node[:rightimage][:platform] =~ /centos|rhel/ ? "rpm" : "deb")
 
+directory "#{guest_root}/root/.rightscale/" do
+  owner "root"
+  group "root"
+  mode "0770"
+  recursive true
+end
+
 bash "download_rightlink" do
   flags "-x"
   location1 ="#{node[:rightimage][:rightlink_version]}/#{rightlink_file}"
   location2 ="#{node[:rightimage][:rightlink_version]}/#{node[:rightimage][:platform]}/#{rightlink_file}"
   code <<-EOC
-    mkdir -p #{guest_root}/root/.rightscale
-    
     buckets=( rightscale_rightlink rightscale_rightlink_dev )
     locations=( #{location1} #{location2})
     
@@ -44,18 +49,19 @@ execute "insert_rightlink_version" do
   command  "echo -n " + node[:rightimage][:rightlink_version] + " > " + guest_root + "/etc/rightscale.d/rightscale-release"
 end
 
+log "Place rightlink seed script into image"
 cookbook_file "#{guest_root}/etc/init.d/rightimage" do
   source "rightimage"
   backup false
   mode "0755"
 end
 
+log "Setup seed script to run on boot"
 bash "install_rightlink" do 
   flags "-ex"
   code <<-EOC
     rm -rf #{guest_root}/opt/rightscale/
 
-    chmod 0770 #{guest_root}/root/.rightscale
     chmod 0440 #{guest_root}/root/.rightscale/*
 
     case "#{node[:rightimage][:platform]}" in 
@@ -68,4 +74,5 @@ bash "install_rightlink" do
     esac
   EOC
 end
+
 rightscale_marker :end

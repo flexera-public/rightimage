@@ -1,4 +1,11 @@
 action :configure do
+
+  ruby_block "check hypervisor" do
+    block do
+      raise "ERROR: you must set your hypervisor to xen!" unless new_resource.hypervisor == "xen"
+    end
+  end
+
   # insert grub conf, and link menu.lst to grub.conf
   directory "#{guest_root}/boot/grub" do
     owner "root"
