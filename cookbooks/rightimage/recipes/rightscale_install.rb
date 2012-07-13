@@ -18,26 +18,6 @@ else
   include_recipe "rightimage::rightscale_rightlink"
 end
 
-bash "setup_motd" do
-  only_if { ::File.directory? "#{guest_root}/etc/update-motd.d" }
-  code <<-EOC
-    rm #{guest_root}/etc/update-motd.d/10-help-text || true
-    mv #{guest_root}/etc/update-motd.d/99-footer #{guest_root}/etc/update-motd.d/10-rightscale-message || true
-  EOC
-end
-
-cookbook_file "#{guest_root}/etc/motd.tail" do 
-  only_if { ::File.directory? "#{guest_root}/etc/update-motd.d" }
-  source "motd"
-  backup false
-end
-
-cookbook_file "#{guest_root}/etc/motd" do 
-  not_if { ::File.directory? "#{guest_root}/etc/update-motd.d" }
-  source "motd"
-  backup false
-end
-
 bash "insert_bashrc" do 
   code <<-EOS
     # Move the current .bashrc out of the way if it exists
