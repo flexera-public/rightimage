@@ -192,6 +192,34 @@
       "display_name": "Azure Management Certificate",
       "description": "Azure Management Certificate"
     },
+    "rightscale/mci_name": {
+      "required": "optional",
+      "calculated": false,
+      "choice": [
+
+      ],
+      "default": "",
+      "type": "string",
+      "recipes": [
+        "rightimage::do_create_mci"
+      ],
+      "display_name": "MCI Name",
+      "description": "MCI to add this image to. If empty, use image_name attribute"
+    },
+    "rightscale/api_url": {
+      "required": "optional",
+      "calculated": false,
+      "choice": [
+
+      ],
+      "type": "string",
+      "recipes": [
+        "rightimage::do_create_mci"
+      ],
+      "recommended": true,
+      "display_name": "API URL",
+      "description": "The rightscale account specific api url to use.  Ex. https://my.rightscale.com/api/acct/1234 (where 1234 is your account id)"
+    },
     "rightimage/cloudstack/version": {
       "required": "required",
       "calculated": false,
@@ -255,6 +283,20 @@
       ],
       "display_name": "aws_secret_access_key",
       "description": "aws_secret_access_key"
+    },
+    "rightscale/api_password": {
+      "required": "optional",
+      "calculated": false,
+      "choice": [
+
+      ],
+      "type": "string",
+      "recipes": [
+        "rightimage::do_create_mci"
+      ],
+      "recommended": true,
+      "display_name": "API Password",
+      "description": "Rightscale API password."
     },
     "rightimage/debug": {
       "required": "optional",
@@ -360,19 +402,6 @@
       ],
       "display_name": "Eucalyptus Access Key",
       "description": "The EC2_ACCESS_KEY value defined in your eucarc credentials file. User must have admin privileges."
-    },
-    "rest_connection/pass": {
-      "required": "required",
-      "calculated": false,
-      "choice": [
-
-      ],
-      "type": "string",
-      "recipes": [
-        "rightimage::do_create_mci"
-      ],
-      "display_name": "API Password",
-      "description": "Rightscale API password."
     },
     "rightimage/cloud": {
       "required": "recommended",
@@ -482,7 +511,7 @@
 
       ],
       "display_name": "Datacenter ID",
-      "description": "Datacenter/Zone ID.  Defaults to 1.  Use UK for rackspace UK"
+      "description": "Datacenter/Zone ID.  Defaults to 1.  Use US/UK for rackspace US/UK"
     },
     "rightimage/rebundle_git_revision": {
       "required": "optional",
@@ -588,8 +617,8 @@
       "display_name": "aws_access_key_id",
       "description": "aws_access_key_id"
     },
-    "rest_connection/api_url": {
-      "required": "required",
+    "rightscale/api_user": {
+      "required": "optional",
       "calculated": false,
       "choice": [
 
@@ -598,8 +627,9 @@
       "recipes": [
         "rightimage::do_create_mci"
       ],
-      "display_name": "API URL",
-      "description": "The rightscale account specific api url to use.  Ex. https://my.rightscale.com/api/acct/1234 (where 1234 is your account id)"
+      "recommended": true,
+      "display_name": "API User",
+      "description": "RightScale API username. Ex. you@rightscale.com"
     },
     "rightimage/timestamp": {
       "required": "recommended",
@@ -674,20 +704,6 @@
       ],
       "display_name": "EC2 Image Type",
       "description": "Type of EC2 Image cloud_upload recipe will create"
-    },
-    "rightimage/mci_name": {
-      "required": "optional",
-      "calculated": false,
-      "choice": [
-
-      ],
-      "default": "",
-      "type": "string",
-      "recipes": [
-        "rightimage::do_create_mci"
-      ],
-      "display_name": "MCI Name",
-      "description": "MCI to add this image to. If empty, use Image Name"
     },
     "rightimage/image_upload_bucket": {
       "required": "required",
@@ -765,8 +781,8 @@
       "display_name": "Eucalyptus User ID",
       "description": "The EC2_USER_ID value defined in your eucarc credentials file. User must have admin privileges."
     },
-    "rest_connection/user": {
-      "required": "required",
+    "rightscale/cloud_id": {
+      "required": "optional",
       "calculated": false,
       "choice": [
 
@@ -775,8 +791,9 @@
       "recipes": [
         "rightimage::do_create_mci"
       ],
-      "display_name": "API User",
-      "description": "RightScale API username. Ex. you@rightscale.com"
+      "recommended": true,
+      "display_name": "RightScale Cloud ID (integer)",
+      "description": "The numeric ID in RightScale for the cloud which we will create this image for. For example, 6 = AWS Oregon, 232 = Rackspace"
     },
     "rightimage/region": {
       "required": "required",
