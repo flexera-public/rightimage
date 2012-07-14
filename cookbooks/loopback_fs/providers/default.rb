@@ -93,7 +93,7 @@ action :resize do
     end
     flags "-x"
     code <<-EOH
-      e2fsck -cn -f #{new_resource.source}
+      e2fsck -p -f #{new_resource.source}
       resize2fs #{new_resource.source} #{new_resource.size_gb*1024}M
     EOH
   end
