@@ -22,7 +22,7 @@ bash "insert_bashrc" do
   # note that ubuntu uses /etc/bash.bashrc and sources it automatically for us
   # also note that .bashrc in /skel already has this code so it should work 
   # normally for rightlink created users
-  flags "+e-x"
+  flags "+e -x"
   code <<-EOS
     grep ". /etc/bashrc" #{guest_root}/root/.bashrc
     if [ "$?" == "2" -o "$?" == "1" ]; then
