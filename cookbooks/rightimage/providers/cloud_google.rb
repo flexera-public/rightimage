@@ -40,17 +40,17 @@ action :configure do
       action :create
       backup false
     end
-    cookbook_file "#{temp_root}/google_centos.tgz" do
-      source "google_centos.tgz"
-      action :create
-      backup false
-    end
-#    directory "#{guest_root}/usr/share" { recursive true }
-    bash "untar google startup scripts" do
-      code "tar zxvf #{temp_root}/google_centos.tgz -C #{guest_root}/usr/share"
-    end
   else
     raise "Unsupported platform/version combination #{new_resource.platform} #{new_resource.platform_version}"
+  end
+
+  cookbook_file "#{temp_root}/google.tgz" do
+    source "google.tgz"
+    action :create
+    backup false
+  end
+  bash "untar google helper and startup scripts" do
+    code "tar zxvf #{temp_root}/google.tgz -C #{guest_root}/usr/share"
   end
 
   if new_resource.platform == "ubuntu"
