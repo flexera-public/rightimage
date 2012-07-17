@@ -213,12 +213,27 @@
 
       ],
       "type": "string",
+      "recommended": true,
       "recipes": [
         "rightimage::do_create_mci"
       ],
-      "recommended": true,
       "display_name": "API URL",
       "description": "The rightscale account specific api url to use.  Ex. https://my.rightscale.com/api/acct/1234 (where 1234 is your account id)"
+    },
+    "rightimage/virtualization": {
+      "required": "recommended",
+      "calculated": false,
+      "choice": [
+        "hvm",
+        "pvm"
+      ],
+      "default": "pvm",
+      "type": "string",
+      "recipes": [
+
+      ],
+      "display_name": "Virtualization type",
+      "description": "Virtualization type (EC2 only).  Defaults to pvm."
     },
     "rightimage/cloudstack/version": {
       "required": "required",
@@ -291,10 +306,10 @@
 
       ],
       "type": "string",
+      "recommended": true,
       "recipes": [
         "rightimage::do_create_mci"
       ],
-      "recommended": true,
       "display_name": "API Password",
       "description": "Rightscale API password."
     },
@@ -624,10 +639,10 @@
 
       ],
       "type": "string",
+      "recommended": true,
       "recipes": [
         "rightimage::do_create_mci"
       ],
-      "recommended": true,
       "display_name": "API User",
       "description": "RightScale API username. Ex. you@rightscale.com"
     },
@@ -787,10 +802,10 @@
 
       ],
       "type": "string",
+      "recommended": true,
       "recipes": [
         "rightimage::do_create_mci"
       ],
-      "recommended": true,
       "display_name": "RightScale Cloud ID (integer)",
       "description": "The numeric ID in RightScale for the cloud which we will create this image for. For example, 6 = AWS Oregon, 232 = Rackspace"
     },

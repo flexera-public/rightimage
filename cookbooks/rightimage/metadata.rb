@@ -167,6 +167,13 @@ attribute "rightimage/datacenter",
   :default => "1",
   :required => "recommended"
 
+attribute "rightimage/virtualization",
+  :display_name => "Virtualization type",
+  :description => "Virtualization type (EC2 only).  Defaults to pvm.",
+  :choice => [ "hvm", "pvm" ],
+  :default => "pvm",
+  :required => "recommended"
+
 # Optional, parameters for auto creation of mci
 attribute "rightscale/api_user",
   :display_name => "API User",
