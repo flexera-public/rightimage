@@ -20,7 +20,7 @@
 rightscale_marker :begin
 
 rightimage_tester "Verify IPv6 disabled" do
-  command 'ifconfig lo0 | grep inet6; if [ "$?" == "0" ]; then exit 1; else exit 0; fi'
+  command 'ifconfig lo | grep inet6; if [ "$?" == "0" ]; then exit 1; else exit 0; fi'
   action :test
 end
 
