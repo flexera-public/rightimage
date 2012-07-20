@@ -218,6 +218,10 @@ module RightScale
           ""
         end
       end
+
+      def hvm?
+        node[:rightimage][:virtualization] == "hvm"
+      end
     end
   end
 end
