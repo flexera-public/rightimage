@@ -97,7 +97,7 @@ end
 
 
 action :upload do
-  is_ebs = new_resource.image_type =~ /ebs/i or new_resource.image_name =~ /_EBS/
+  is_ebs = new_resource.image_type =~ /ebs/i or new_resource.image_name =~ /_EBS/ or hvm?
 
   bash "setup keyfiles" do
     not_if { ::File.exists? "/tmp/AWS_X509_KEY.pem" }
