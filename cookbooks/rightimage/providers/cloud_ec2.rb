@@ -317,6 +317,7 @@ EOF
     code <<-EOH
       #{setup_ec2_tools_env}
       set -x
+      hvm="#{hvm?}"
       snap_id=`cat /var/tmp/ebs_snapshot_id`
       vol_id=`cat /var/tmp/ebs_volume_id`
   ## loop and wait for snapshot to become available, up to 60 minutes
@@ -332,19 +333,28 @@ EOF
 
   ## calculate options
       kernel_opt=""
-      if [ -n "#{node[:rightimage][:aki_id]}" ]; then
+      if [[ -n "#{node[:rightimage][:aki_id]}" && "$hvm" == "false" ]]; then
         kernel_opt="--kernel #{node[:rightimage][:aki_id]}"
       fi 
 
       ramdisk_opt=""
-      if [ -n "#{node[:rightimage][:ramdisk_id]}" ]; then
+      if [[ -n "#{node[:rightimage][:ramdisk_id]}" && "$hvm" == "false" ]]; then
         ramdisk_opt="--ramdisk #{node[:rightimage][:ramdisk_id]}"
+      fi
+
+      if [ "$hvm" == "true" ]; then
+        ec2_path=/tmp/ec2-api-nda
+        virt_type_opt="--virtualization-type hvm"
+        export EC2_HOME=$ec2_path
+      else
+        ec2_path=/home/ec2
+        virt_type_opt=""
       fi
 
   ## calculate ec2 region
       region=#{node[:ec2][:placement][:availability_zone].chop}
 
-      image_out_ebs=`/home/ec2/bin/ec2-register \
+      image_out_ebs=`${ec2_path}/bin/ec2-register \
         --private-key /tmp/AWS_X509_KEY.pem \
         --cert /tmp/AWS_X509_CERT.pem \
         --region $region \
@@ -356,6 +366,7 @@ EOF
         --snapshot $snap_id \
         $kernel_opt \
         $ramdisk_opt \
+        $virt_type_opt \
         --root-device-name /dev/sda1 `
 
   ## parse out image id
