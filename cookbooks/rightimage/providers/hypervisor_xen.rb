@@ -40,6 +40,25 @@ action :install_kernel do
         esac
     EOH
   end
+
+  bash "install grub" do
+    flags "-ex"
+    only_if { hvm? }
+    code <<-EOH
+      guest_root=#{guest_root}
+
+      case #{node[:rightimage][:platform]} in
+      "ubuntu")
+        pkg_cmd="apt-get -y install"
+        ;;
+      *)
+        pkg_cmd="yum -y install"
+        ;;
+      esac
+
+      chroot $guest_root $pkg_cmd grub
+    EOH
+  end
 end
 
 action :install_tools do
