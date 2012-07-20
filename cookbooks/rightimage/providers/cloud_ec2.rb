@@ -122,6 +122,24 @@ action :upload do
     EOH
   end
 
+  cookbook_file "/tmp/ec2-api-nda.zip" do
+    only_if { hvm? }
+    source "ec2-api-tools-1.5.2.4-nda.zip"
+    action :create
+    backup false
+  end
+
+  bash "install NDA tools" do
+    only_if { hvm? }
+    creates "/tmp/ec2-api-nda"
+    flags "-ex"
+    code <<-EOH
+      mkdir -p /tmp/ec2-api-nda
+      unzip /tmp/ec2-api-*nda.zip -d /tmp/ec2-api-nda
+      mv /tmp/ec2-api-nda/*/* /tmp/ec2-api-nda
+    EOH
+  end
+
   if is_ebs
     upload_ebs()
   else
