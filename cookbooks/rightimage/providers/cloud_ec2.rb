@@ -214,7 +214,7 @@ def upload_ebs
 
 
   bash "attach ebs volume" do 
-    not_if "cat /proc/partitions | grep #{local_device}"
+    not_if "cat /proc/partitions | grep #{local_device.split("/dev/")[1]}"
     flags "-e"
     code <<-EOH
       #{setup_ec2_tools_env}
