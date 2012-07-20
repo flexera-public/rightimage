@@ -247,20 +247,51 @@ def upload_ebs
     flags "-e"
     code <<-EOH
       #{setup_ec2_tools_env}
+      hvm=#{hvm?}
       set -x
       vol_id=`cat /var/tmp/ebs_volume_id`
       ebs_mount="/mnt/ebs_mount"
       mkdir -p $ebs_mount
       image_mount=#{guest_root}
 
+  ## partition volume (HVM only)
+      if [ "$hvm" == "true" ]; then
+        echo "1,,L,*" | sfdisk #{local_device}
+        device="#{local_device}1"
+      else
+        device="#{local_device}"
+      fi
+
   ## format and mount volume
-      mkfs.ext3 -F #{local_device}
+      mkfs.ext3 -F $device
       root_label="#{node[:rightimage][:root_mount][:label_dev]}"
-      tune2fs -L $root_label #{local_device}
-      mount #{local_device} $ebs_mount
+      tune2fs -L $root_label $device
+      mount $device $ebs_mount
 
   ## mount EBS volume, rsync, and unmount ebs volume
       rsync -a $image_mount/ $ebs_mount/ --exclude '/proc'
+
+      if [ "$hvm" == "true" ]; then
+  case "#{new_resource.platform}" in
+        "ubuntu")
+          grub_command="/usr/sbin/grub"
+          ;;
+        "centos"|"rhel")
+          grub_command="/sbin/grub"
+          ;;
+      esac
+
+      cat > device.map <<EOF
+(hd0) #{local_device}
+EOF
+
+    ${grub_command} --batch --device-map=device.map <<EOF
+root (hd0,0)
+setup (hd0)
+quit
+EOF
+      fi
+
   ## recreate the /proc mountpoint
       mkdir -p $ebs_mount/proc
   #    mount --bind /proc $ebs_mount/proc
