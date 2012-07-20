@@ -99,7 +99,8 @@ case rightimage[:cloud]
     set[:rightimage][:fstab][:ephemeral] = true
     # Might have to double check don't know if maverick should use kernel linux-image-ec2 or not
     set[:rightimage][:swap_mount] = "/dev/sda3" unless rightimage[:arch] == "x86_64"
-    set[:rightimage][:ephemeral_mount] = "/dev/sdb" 
+    set[:rightimage][:ephemeral_mount] = "/dev/sdb"
+
     case rightimage[:platform]
       when "ubuntu" 
         set[:rightimage][:fstab][:ephemeral_mount_opts] = "defaults,nobootwait"
@@ -112,10 +113,15 @@ case rightimage[:cloud]
         set[:rightimage][:fstab][:ephemeral_mount_opts] = "defaults"
         set[:rightimage][:fstab][:swap] = "defaults"
 
-        # CentOS 6.1 and above start SCSI device naming from e
-        if rightimage[:platform_version].to_f >= 6.1
-          set[:rightimage][:ephemeral_mount] = "/dev/xvdf"
-          set[:rightimage][:swap_mount] = "/dev/xvde3"  unless rightimage[:arch]  == "x86_64"
+        # CentOS 6.1-6.2 start SCSI device naming from e
+        if rightimage[:platform_version].to_i == 6
+          if rightimage[:platform_version].to_f.between?(6.1,6.2)
+            set[:rightimage][:ephemeral_mount] = "/dev/xvdf"
+            set[:rightimage][:swap_mount] = "/dev/xvde3"  unless rightimage[:arch]  == "x86_64"
+          else
+            set[:rightimage][:ephemeral_mount] = "/dev/xvdb"
+            set[:rightimage][:swap_mount] = "/dev/xvda3"  unless rightimage[:arch]  == "x86_64"
+          end
         end
     end
   else 
