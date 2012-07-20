@@ -73,6 +73,23 @@ action :configure do
     done
     EOH
   end 
+
+  bash "setup grub" do
+    only_if { hvm? }
+    flags "-ex"
+    code <<-EOH
+      guest_root="#{guest_root}"
+
+      case "#{new_resource.platform}" in
+        "ubuntu")
+          chroot $guest_root cp -p /usr/lib/grub/x86_64-pc/* /boot/grub
+          ;;
+        "centos"|"rhel")
+          chroot $guest_root cp -p /usr/share/grub/x86_64-redhat/* /boot/grub
+          ;;
+      esac
+EOH
+  end
 end
 
 action :package do
