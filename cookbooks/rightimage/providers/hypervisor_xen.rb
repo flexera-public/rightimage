@@ -7,6 +7,7 @@ action :install_kernel do
  
   bash "install xen kernel" do
     flags "-ex"
+    not_if { hvm? }
     ubuntu_kernel_packages = 'linux-image-virtual linux-headers-virtual grub-legacy-ec2'
     if new_resource.platform_version <= 10.04
       ubuntu_kernel_packages = 'linux-image-ec2 linux-headers-ec2 grub-legacy-ec2'
