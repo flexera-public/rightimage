@@ -356,6 +356,10 @@ EOF
       def grub_root
         "(hd0" + (node[:rightimage][:cloud] == "ec2" ? "":",#{partition_number}") + ")"
       end
+
+      def hvm?
+        node[:rightimage][:virtualization] == "hvm"
+      end
     end
   end
 end
