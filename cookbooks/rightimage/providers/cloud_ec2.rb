@@ -389,6 +389,8 @@ EOF
         --cert /tmp/AWS_X509_CERT.pem \
         --url #{node[:rightimage][:ec2_endpoint]} \
         --region $region 
+
+      rm -f /var/tmp/ebs_volume_id
     EOH
   end
 
