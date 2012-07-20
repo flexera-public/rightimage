@@ -6,6 +6,7 @@ module RightScale
         name = node[:rightimage][:image_name].dup
         name << "_#{generate_persisted_passwd}" if node[:rightimage][:debug] == "true" && node[:rightimage][:build_mode] != "migrate" && node[:rightimage][:cloud] != "rackspace"
         name.gsub!("_","-") if node[:rightimage][:cloud] == "rackspace"
+        name << "_HVM_EBS" if hvm? and name !~ /_HVM_EBS/
         name
       end
 
