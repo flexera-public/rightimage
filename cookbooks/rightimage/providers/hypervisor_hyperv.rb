@@ -87,17 +87,34 @@ end
 
 action :install_tools do
   
-  remote_file "#{LIS_DIR_HOST}/WALinuxAgent.rpm" do
-    source "http://devs-us-west.s3.amazonaws.com/caryp/azure/WALinuxAgent-1.0-1.noarch.rpm"
+  remote_file "#{LIS_DIR_HOST}/WALinuxAgent.pkg" do
+    suffix = case node[:rightimage][:platform]
+             when "centos", "rhel" then ".noarch.rpm"
+             when "ubuntu" then "_all.deb"
+             end
+    source "http://devs-us-west.s3.amazonaws.com/caryp/azure/WALinuxAgent-1.0-1#{suffix}"
   end
   
   bash "install WAZ agent" do
+    not_if_check = case node[:rightimage][:platform]
+                   when "centos", "rhel" then "rpm --root #{guest_root} -qa WALinuxAgent|grep WA"
+                   when "ubuntu" then "dpkg --get-selections walinuxagent|grep install"
+                   end
+
     flags "-ex"
     cwd LIS_DIR_HOST
-    not_if "rpm --root #{guest_root} -qa WALinuxAgent|grep WA"
+    not_if not_if_check
     code <<-EOH
       guest_root=#{guest_root}
-      yum -c /tmp/yum.conf --installroot=$guest_root -y install WALinuxAgent.rpm
+
+      case "#{new_resource.platform}" in
+      "ubuntu")
+        dpkg --root $guest_root --install WALinuxAgent.pkg
+        ;;
+      "centos"|"rhel")
+        yum -c /tmp/yum.conf --installroot=$guest_root -y install WALinuxAgent.pkg
+        ;;
+      esac
     EOH
   end
 end
