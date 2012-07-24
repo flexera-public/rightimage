@@ -11,7 +11,8 @@ action :configure do
     code <<-EOH
       case "#{new_resource.platform}" in
       "ubuntu")
-        chroot #{guest_root} apt-get -y install grub iscsi-initiator-utils
+        chroot #{guest_root} apt-get -y purge grub-pc
+        chroot #{guest_root} apt-get -y install grub
         ;;
       "centos"|"rhel")
         chroot #{guest_root} yum -y install grub iscsi-initiator-utils
