@@ -20,6 +20,7 @@ set[:rightimage][:grub][:kernel][:options] = "consoleblank=0"
 set[:rightimage][:root_mount][:label_dev] = "ROOT"
 set[:rightimage][:root_mount][:dev] = "LABEL=#{rightimage[:root_mount][:label_dev]}"
 set_unless[:rightimage][:image_source_bucket] = "rightscale-us-west-2"
+set_unless[:rightimage][:virtualization] = "pvm"
 
 if rightimage[:platform] == "ubuntu"
   set[:rightimage][:mirror_date] = "#{timestamp[0..3]}/#{timestamp[4..5]}/#{timestamp[6..7]}"
