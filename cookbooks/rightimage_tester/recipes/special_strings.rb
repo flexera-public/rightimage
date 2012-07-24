@@ -73,6 +73,7 @@ skip_dirs=(
 #{node[:rightimage_tester][:root]}/lib
 #{node[:rightimage_tester][:root]}/lib64
 #{node[:rightimage_tester][:root]}/proc
+#{node[:rightimage_tester][:root]}/root/.npm
 #{node[:rightimage_tester][:root]}/sys
 #{node[:rightimage_tester][:root]}/usr/java
 #{node[:rightimage_tester][:root]}/usr/lib
