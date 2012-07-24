@@ -3,7 +3,7 @@ module RightImage
 
   class Util
       
-    DIRS_delete = [ "/mnt", "/tmp", "/var/cache/yum" ]
+    DIRS_delete = [ "/mnt", "/tmp", "/var/cache/apt/archives", "/var/cache/yum" ]
     DIRS_truncate = [ "/var/log", "/var/mail", "/var/spool/posfix" ]
     
     # Utility Class
