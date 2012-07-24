@@ -6,5 +6,5 @@ hiddenmenu
 <% initrd = ::File.basename(Dir.glob("#{guest_root}/boot/initr*").sort_by { |f| File.mtime(f) }.last) %>
 title           <%= node[:rightimage][:platform] %> <%= node[:rightimage][:platform_version] %> (<%= kern %>) (<%= node[:rightimage][:hypervisor] %>) 
 root            (hd0<%= ((partitioned?)?",#{partition_number}":"") %>)
-kernel          /boot/<%= kern %> root=<%= node[:rightimage][:root_mount][:dev] %> ro <%= ((node[:rightimage][:hypervisor] == "xen")?"console=hvc0":"") %>consoleblank=0 <%= node[:rightimage][:cloud] == "azure" ? "numa=off":"" %>
+kernel          /boot/<%= kern %> root=<%= node[:rightimage][:root_mount][:dev] %> ro <%= ((node[:rightimage][:hypervisor] == "xen")?"console=hvc0":"") %>consoleblank=0 <% if node[:rightimage][:cloud] == "azure" %><%= node[:rightimage][:platform] == "centos" ? "numa=off":"ata_piix.disable_driver" %><% end %>
 initrd          /boot/<%= initrd %>
