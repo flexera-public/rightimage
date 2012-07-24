@@ -15,10 +15,12 @@ action :install_kernel do
   end
   
   remote_file LIS_PACKAGE do
+    only_if { node[:rightimage][:platform] == "centos" }
     source "http://devs-us-west.s3.amazonaws.com/caryp/azure/CENTOS%20LIS%20BETA3.3.zip"
   end
  
   bash "install Linux Integration Services package" do
+    only_if { node[:rightimage][:platform] == "centos" }
     flags "-ex"
     cwd LIS_DIR_HOST
     not_if "rpm --root #{guest_root} -qa microsoft-hyper-v|grep microsoft"
