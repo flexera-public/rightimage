@@ -111,6 +111,11 @@ module RightScale
         end
       end
 
+      def do_loopback_resize
+        source_size_gb = (::File.size(loopback_file(partitioned?))/1024/1024/1024).to_f.round
+        node[:rightimage][:root_size_gb].to_i != source_size_gb
+      end
+
       def guest_root
         node[:rightimage][:guest_root]
       end
