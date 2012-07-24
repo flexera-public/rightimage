@@ -92,9 +92,13 @@ action :resize do
       new_resource.size_gb == source_size_gb
     end
     flags "-x"
-    code <<-EOH
-      e2fsck -p -f #{new_resource.source}
-      resize2fs #{new_resource.source} #{new_resource.size_gb*1024}M
-    EOH
+    if new_resource.partitioned
+      raise "Resizing of partitioned images not supported yet for this cookbook"
+    else
+      code <<-EOH
+        e2fsck -p -f #{new_resource.source}
+        resize2fs #{new_resource.source} #{new_resource.size_gb*1024}M
+      EOH
+    end
   end
 end

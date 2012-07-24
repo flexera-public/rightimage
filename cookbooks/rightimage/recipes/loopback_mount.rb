@@ -11,7 +11,7 @@ loopback_fs loopback_file(partitioned?) do
   mount_point guest_root
   size_gb node[:rightimage][:root_size_gb].to_i
   partitioned partitioned?
-  action [:resize, :mount]
+  action :mount
 end
 
 rightscale_marker :end

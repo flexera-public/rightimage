@@ -30,6 +30,7 @@ end
 node[:rightimage][:host_packages].split.each { |p| package p }
 
 include_recipe "rightimage::block_device_restore"
+include_recipe "rightimage::loopback_resize"
 include_recipe "rightimage::loopback_mount"
 include_recipe "rightimage::clean"
 include_recipe "rightimage::rightscale_install"

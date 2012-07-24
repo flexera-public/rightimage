@@ -36,6 +36,7 @@ recipe "rightimage::loopback_create", "creates and mounts loopback file system"
 recipe "rightimage::loopback_copy", "creates non-partitioned loopback fs image from a partitioned one"
 recipe "rightimage::loopback_unmount", "unmounts loopback file system"
 recipe "rightimage::loopback_mount", "mounts loopback file system"
+recipe "rightimage::loopback_resize", "resizes loopback file system"
 
 
 
@@ -47,7 +48,7 @@ attribute "rightimage/root_size_gb",
   :description => "Sets the size of the virtual image. Units are in GB.",
   :choice => [ "10", "4", "2" ],
   :default => "10",
-  :recipes => [ "rightimage::default", "rightimage::build_base", "rightimage::build_image", "rightimage::loopback_copy", "rightimage::block_device_backup","rightimage::block_device_create",  "rightimage::block_device_restore", "rightimage::loopback_mount", "rightimage::loopback_create", "rightimage::cloud_add", "rightimage::cloud_upload", "rightimage::cloud_package"]
+  :recipes => [ "rightimage::default", "rightimage::build_base", "rightimage::build_image", "rightimage::loopback_copy", "rightimage::block_device_backup","rightimage::block_device_create",  "rightimage::block_device_restore", "rightimage::loopback_resize", "rightimage::loopback_mount", "rightimage::loopback_create", "rightimage::cloud_add", "rightimage::cloud_upload", "rightimage::cloud_package"]
 
 attribute "rightimage/manual_mode",
   :display_name => "Manual Mode",
