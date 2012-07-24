@@ -272,20 +272,20 @@ def upload_ebs
       rsync -a $image_mount/ $ebs_mount/ --exclude '/proc'
 
       if [ "$hvm" == "true" ]; then
-  case "#{new_resource.platform}" in
+        case "#{new_resource.platform}" in
         "ubuntu")
           grub_command="/usr/sbin/grub"
           ;;
         "centos"|"rhel")
           grub_command="/sbin/grub"
           ;;
-      esac
+        esac
 
-      cat > device.map <<EOF
+        cat > device.map <<EOF
 (hd0) #{local_device}
 EOF
 
-    ${grub_command} --batch --device-map=device.map <<EOF
+        ${grub_command} --batch --device-map=device.map <<EOF
 root (hd0,0)
 setup (hd0)
 quit
