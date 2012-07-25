@@ -54,6 +54,9 @@ action :configure do
       case "#{new_resource.platform}" in
       "centos"|"rhel")
         chroot $guest_root yum -y install python-setuptools python-devel python-libs
+
+        # enable console access
+        sed -i "s/ACTIVE_CONSOLES=.*/ACTIVE_CONSOLES=\\/dev\\/tty1/" $guest_root/etc/sysconfig/init
         ;;
       "ubuntu")
         chroot $guest_root apt-get -y install python-dev python-setuptools
@@ -64,6 +67,11 @@ action :configure do
 
         # Google disables loading of kernel modules
         echo '' > /etc/modules
+
+        # Disable all ttys except for tty1 (console)
+        for i in `ls $guest_root/etc/init/tty[2-9].conf`; do
+          mv $i $i.disabled;
+        done
         ;;
       esac
 
