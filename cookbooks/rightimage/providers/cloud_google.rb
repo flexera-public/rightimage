@@ -59,6 +59,9 @@ action :configure do
         chroot $guest_root apt-get -y install python-dev python-setuptools
         chroot $guest_root apt-get -y install acpid dhcp3-client
 
+        # Uninstall grub (not needed)
+        chroot $guest_root apt-get -y purge grub-common
+
         # Google disables loading of kernel modules
         echo '' > /etc/modules
         ;;
