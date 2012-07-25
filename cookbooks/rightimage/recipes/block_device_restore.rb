@@ -14,13 +14,16 @@ if mounted?
 else
   # Times 2.3 since we need to store 2 raw loopback files, and need a 
   # little extra space to gzip them, take snapshots, etc
-  new_volume_size = (node[:rightimage][:root_size_gb].to_f*2.3).ceil.to_s
+  new_volume_size = (node[:rightimage][:root_size_gb].to_f*2.3).ceil
+  # This is a hack since our base snapshot size is 23, if we specify less
+  # than that it'll error out with an exception.
+  new_volume_size = 23 if new_volume_size < 23
   block_device ri_lineage do
     cloud "ec2"
     lineage ri_lineage
     mount_point target_raw_root
     vg_data_percentage "95"
-    volume_size new_volume_size
+    volume_size new_volume_size.to_s
     stripe_count "1"
     persist true
 

@@ -7,6 +7,11 @@ action :create do
   bash "create loopback fs #{new_resource.source}" do
     not_if { ::File.exists? new_resource.source }
     flags "-ex"
+# Cylinders is the second param to sfdisk, however it doesn't
+# seem to be necessary, if its blank it'll just calculate it itself
+# and use all the space
+#    size_bytes = new_resource.size_gb*1024*1024*1024
+#    cylinders = size_bytes/(255*63*512)
     code <<-EOH
       calc_mb="#{new_resource.size_gb*1024}"
       loop_dev="/dev/loop#{new_resource.device_number}"
@@ -18,7 +23,7 @@ action :create do
       losetup $loop_dev $source
 
       sfdisk $loop_dev << EOF
-0,1304,L,*
+0,,L,*
 EOF
       if [ "#{new_resource.partitioned}" == "true" ]; then
         kpartx -a $loop_dev
