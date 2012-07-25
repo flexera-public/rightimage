@@ -54,25 +54,22 @@ action :configure do
       case "#{new_resource.platform}" in
       "centos"|"rhel")
         chroot $guest_root yum -y install python-setuptools python-devel python-libs
-        # Emit signal to run google_run_startup_scripts
-        # Note that this comes after and replaces the /etc/rc.local written in KVM provider
-        # will not work centos 5
-        echo '#!/bin/bash' > $guest_root/etc/rc.local
-        echo 'initctl emit --no-wait google-rc-local-has-run' >> $guest_root/etc/rc.local
-        chmod 755 $guest_root/etc/rc.local
         ;;
       "ubuntu")
         chroot $guest_root apt-get -y install python-dev python-setuptools
         chroot $guest_root apt-get -y install acpid dhcp3-client
-        # Emit signal to run google_run_startup_scripts
-        # Note that this comes after and replaces the /etc/rc.local written in KVM provider
-        echo '#!/bin/bash' > $guest_root/etc/rc.local
-        echo 'initctl emit --no-wait google-rc-local-has-run' >> $guest_root/etc/rc.local
-        chmod 755 $guest_root/etc/rc.local
+
         # Google disables loading of kernel modules
         echo '' > /etc/modules
         ;;
       esac
+
+      # Emit signal to run google_run_startup_scripts
+      # Note that this comes after and replaces the /etc/rc.local written in KVM provider
+      # will not work centos 5
+      echo '#!/bin/bash' > $guest_root/etc/rc.local
+      echo 'initctl emit --no-wait google-rc-local-has-run' >> $guest_root/etc/rc.local
+      chmod 755 $guest_root/etc/rc.local
 
       set +e 
       # Add metadata alias
