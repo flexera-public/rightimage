@@ -12,18 +12,8 @@ action :configure do
 
   directory temp_root { recursive true }
 
-  # Add google init script for ubuntu
-  if new_resource.platform == "ubuntu"
-    cookbook_file "#{guest_root}/etc/init.d/google" do
-      source "google_initscript.sh"
-      owner "root"
-      group "root"
-      mode "0755"
-      action :create
-      backup false
-    end
-  elsif new_resource.platform =~ /centos|rhel/ && new_resource.platform_version.to_f >= 6
-    # Add google init script for centos (6+ only)
+  if (new_resource.platform =~ /centos|rhel/ && new_resource.platform_version.to_f >= 6) || new_resource.platform == "ubuntu"
+    # Add google init script for centos (6+ only) / ubuntu
     cookbook_file "#{guest_root}/etc/init/google.conf" do
       source "google.conf"
       owner "root"
@@ -51,26 +41,6 @@ action :configure do
   end
   bash "untar google helper and startup scripts" do
     code "tar zxvf #{temp_root}/google.tgz -C #{guest_root}/usr/share"
-  end
-
-  if new_resource.platform == "ubuntu"
-    bash "Link init script to runlevels" do
-      flags "-ex" 
-      code <<-EOH
-        guest_root=#{guest_root}
-      
-        # Link init script to runlevels
-        chroot $guest_root ln -sf ../init.d/google /etc/rc0.d/K01google
-        chroot $guest_root ln -sf ../init.d/google /etc/rc1.d/K01google
-        chroot $guest_root ln -sf ../init.d/google /etc/rc6.d/K01google
-        chroot $guest_root ln -sf ../init.d/google /etc/rc2.d/s99google
-        chroot $guest_root ln -sf ../init.d/google /etc/rc3.d/s99google
-        chroot $guest_root ln -sf ../init.d/google /etc/rc4.d/s99google
-        chroot $guest_root ln -sf ../init.d/google /etc/rc5.d/s99google
-      EOH
-    end
-  else
-    # Not necessary for upstart
   end
 
   bash "configure for google compute" do
