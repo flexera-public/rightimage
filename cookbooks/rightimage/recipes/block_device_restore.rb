@@ -6,51 +6,14 @@ class Chef::Resource
   include RightScale::RightImage::Helper
 end
 
+
 # Our preferred way to restore base snapshots is from an EBS snapshot, however when
 # one isn't available (i.e. running cookbook from an alternate RightScale account)
 # we'll try to restore one of the standard RightScale base images
 #
-# This function will pull down a "base image" from a standard rightscale bucket
-# location. A base image is a standard centos or ubuntu image with most righscale
-# specific software customizations but without any cloud specific customizations
-def restore_snapshot_from_s3
-  ruby_block "restore base image snapshot from s3" do
-    guest_platform = node[:rightimage][:platform]
-    platform_version = node[:rightimage][:platform_version]
-    arch = node[:rightimage][:arch]
-    year = node[:rightimage][:timestamp][0..3]
-    image_upload_bucket = node[:rightimage][:base_image_bucket]
-    base_image_endpoint = "https://#{image_upload_bucket}.s3.amazonaws.com"
-
-    image_s3_path = guest_platform+"/"+platform_version+"/"+arch+"/"+year+"/"
-    block do 
-      require 'zlib'
-      FileUtils.mkdir_p(target_raw_root)
-      FileUtils.mkdir_p(temp_root)
-      url = "#{base_image_endpoint}/#{image_s3_path}#{loopback_filename(partitioned?)}.gz"
-      Chef::Log.info("Restoring from URL: #{url}")
-      raw_gz_file = "#{temp_root}/#{loopback_filename(partitioned?)}.gz"
-      res = `curl -o #{raw_gz_file} --retry 7 --connect-timeout 10 --fail --silent --write-out %{http_code} #{url}`
-      if res =~ /^2../
-        Chef::Log.info("Downloaded file to #{raw_gz_file}, unzipping")
-        fin = Zlib::GzipReader.new(::File.open(raw_gz_file))
-        ::File.open("#{target_raw_root}/#{loopback_filename(partitioned?)}","w") do |fout|
-          until fin.eof?
-            fout.write(fin.read(1024*1024))
-          end
-        end
-      else
-        Chef::Log.error("Could not restore lineage #{ri_lineage} from either EBS or S3, snapshot not found")
-        raise "Base image snapshot for #{ri_lineage} not found"
-      end
-      Chef::Log.info("got result #{res} from curl call")
-    end
-  end
-end
-
-# the mounted? check can't be in a not_if, it errors out Marshal.dump->node 
-# when the persist flag is set because its can't serialize the Proc
 if mounted? 
+  # the mounted? check can't be in a not_if, it errors out Marshal.dump->node 
+  # when the persist flag is set because its can't serialize the Proc
   Chef::Log::info("Block device already mounted")
 elsif ::File.exists?(loopback_file(partitioned?))
   Chef::Log::info("Already restored raw image from S3")
@@ -75,7 +38,40 @@ else
   rescue Exception => e
     if e.message =~ /execution expired/
       Chef::Log::info("Attempting to restore from S3 lineage #{ri_lineage}")
-      restore_snapshot_from_s3
+     # This block will pull down a "base image" from a standard rightscale bucket
+     # location. A base image is a standard centos or ubuntu image with most righscale
+     # specific software customizations but without any cloud specific customizations
+      guest_platform = node[:rightimage][:platform]
+      platform_version = node[:rightimage][:platform_version]
+      arch = node[:rightimage][:arch]
+      year = node[:rightimage][:timestamp][0..3]
+      image_upload_bucket = node[:rightimage][:base_image_bucket]
+      base_image_endpoint = "https://#{image_upload_bucket}.s3.amazonaws.com"
+      image_s3_path = guest_platform+"/"+platform_version+"/"+arch+"/"+year+"/"
+
+      ruby_block "restore base image snapshot from s3" do
+        block do 
+          require 'zlib'
+          FileUtils.mkdir_p(target_raw_root)
+          FileUtils.mkdir_p(temp_root)
+          url = "#{base_image_endpoint}/#{image_s3_path}#{loopback_filename(partitioned?)}.gz"
+          Chef::Log.info("Restoring from URL: #{url}")
+          raw_gz_file = "#{temp_root}/#{loopback_filename(partitioned?)}.gz"
+          res = `curl -o #{raw_gz_file} --retry 7 --connect-timeout 10 --fail --silent --write-out %{http_code} #{url}`
+          if res =~ /^2../
+            Chef::Log.info("Downloaded file to #{raw_gz_file}, unzipping")
+            fin = Zlib::GzipReader.new(::File.open(raw_gz_file))
+            ::File.open("#{target_raw_root}/#{loopback_filename(partitioned?)}","w") do |fout|
+              until fin.eof?
+                fout.write(fin.read(1024*1024))
+              end
+            end
+          else
+            Chef::Log.error("Could not restore lineage #{ri_lineage} from either EBS or S3, snapshot not found")
+            raise "Base image snapshot for #{ri_lineage} not found"
+          end
+        end
+      end
     else
       raise e
     end
