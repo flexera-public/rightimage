@@ -212,10 +212,12 @@ EOF
     EOF
   end
 
-#  ruby_block "store id" do
-    # add to global id store for use by other recipes
-#    id_list = RightImage::IdList.new(Chef::Log)
-#    id_list.add(image_id)
-#  end
+  # Needed for do_create_mci, the primary key is the image_name
+  ruby_block "store id" do
+    block do
+      id_list = RightImage::IdList.new(Chef::Log)
+      id_list.add("projects/#{node[:rightimage][:google][:project_id]}/images/"+new_resource.image_name)
+    end
+  end
 end
 

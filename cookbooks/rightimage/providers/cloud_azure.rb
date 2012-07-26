@@ -168,5 +168,13 @@ action :upload do
       azure account clear
     EOH
   end
+
+  # Needed for do_create_mci, the primary key is the image_name
+  ruby_block "store id" do
+    block do
+      id_list = RightImage::IdList.new(Chef::Log)
+      id_list.add(image_name)
+    end
+  end
 end
 
