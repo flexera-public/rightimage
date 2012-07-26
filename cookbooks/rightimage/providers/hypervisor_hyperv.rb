@@ -98,7 +98,7 @@ action :install_tools do
   bash "install WAZ agent" do
     not_if_check = case node[:rightimage][:platform]
                    when "centos", "rhel" then "rpm --root #{guest_root} -qa WALinuxAgent|grep WA"
-                   when "ubuntu" then "dpkg --get-selections walinuxagent|grep install"
+                   when "ubuntu" then "dpkg --root #{guest_root} --get-selections walinuxagent|grep install"
                    end
 
     flags "-ex"
