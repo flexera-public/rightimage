@@ -6,19 +6,23 @@ class Chef::Resource
   include RightScale::RightImage::Helper
 end
 
+# Our preferred way to restore base snapshots is from an EBS snapshot, however when
+# one isn't available (i.e. running cookbook from an alternate RightScale account)
+# we'll try to restore one of the standard RightScale base images
+#
+# This function will pull down a "base image" from a standard rightscale bucket
+# location. A base image is a standard centos or ubuntu image with most righscale
+# specific software customizations but without any cloud specific customizations
 def restore_snapshot_from_s3
   ruby_block "restore base image snapshot from s3" do
-    lineage = ri_lineage
-    platform = node[:rightimage][:platform]
+    guest_platform = node[:rightimage][:platform]
     platform_version = node[:rightimage][:platform_version]
     arch = node[:rightimage][:arch]
     year = node[:rightimage][:timestamp][0..3]
-    lineage = ri_lineage
     image_upload_bucket = node[:rightimage][:base_image_bucket]
     base_image_endpoint = "https://#{image_upload_bucket}.s3.amazonaws.com"
-    partition_number = (partitioned?) ? "0" : ""
 
-    image_s3_path = guest_platform+"/"+platform_version+"/"+arch+"/"+timestamp[0..3]+"/"
+    image_s3_path = guest_platform+"/"+platform_version+"/"+arch+"/"+year+"/"
     block do 
       require 'zlib'
       FileUtils.mkdir_p(target_raw_root)
@@ -78,8 +82,9 @@ else
   end
 end
 
-
-# Delete unneeded loopback file to save disk space.
+# We store an identical unpartitioned and partitioned base image in EBS snapshot
+# Any particular cloud will only use one or the other so delete the one we don't
+# need so we have space to work with
 file loopback_file(!partitioned?) do
   backup false
   action :delete
