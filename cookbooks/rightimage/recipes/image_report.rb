@@ -45,7 +45,6 @@ bash "query_image" do
   if [ "$found" == "false" ]; then
     /usr/sbin/chroot $guest_root gem uninstall json
   fi
-
   EOH
 end
 
