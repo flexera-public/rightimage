@@ -155,5 +155,7 @@ case rightimage[:platform]
   when "centos", "rhel"
     set[:rightimage][:getsshkey_cmd] = "chroot $GUEST_ROOT chkconfig --add getsshkey && \
                chroot $GUEST_ROOT chkconfig --level 4 getsshkey on"
-
 end
+
+# image_report variable
+default[:rightimage][:print_json] = "false"

@@ -37,6 +37,8 @@ recipe "rightimage::loopback_copy", "creates non-partitioned loopback fs image f
 recipe "rightimage::loopback_unmount", "unmounts loopback file system"
 recipe "rightimage::loopback_mount", "mounts loopback file system"
 
+# Report tool recipe
+recipe "rightimage::image_report","Combines image info into a JSON blob"
 
 
 #
@@ -198,6 +200,15 @@ attribute "rightscale/mci_name",
    :default => "",
    :recipes => [ "rightimage::do_create_mci" ],
    :required => "optional"
+
+# image_report
+attribute "rightimage/print_json",
+  :display_name => "Print JSON",
+  :description => "Print JSON blob to terminal",
+  :choice => [ "true", "false" ],
+  :default => "false",
+  :required => "optional",
+  :recipes => [ "rightimage::image_report" ]
 
 # AWS
 aws_x509_recipes = ["rightimage::cloud_upload", "rightimage::rebundle", "rightimage::default", "rightimage::ec2_download_bundle"]
