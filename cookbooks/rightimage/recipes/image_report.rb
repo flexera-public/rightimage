@@ -14,7 +14,7 @@ bash "query_image" do
   cwd "/"
   code <<-EOH
   guest_root="#{guest_root}"
-  target_type="#{target_type}"
+  loopback_filename="#{loopback_filename}"
   target_raw_root="#{target_raw_root}"
   print_json="#{node[:rightimage][:print_json]}"
 
@@ -36,7 +36,7 @@ bash "query_image" do
   fi
 
   # Move JSON file out of image to receive md5.  
-  mv /mnt/image/tmp/report.js ${target_raw_root}/${target_type}.js
+  mv /mnt/image/tmp/report.js ${target_raw_root}/${loopback_filename}.js
   
   # Clean up report tool.
   rm -f /mnt/image/tmp/report_tool.rb
