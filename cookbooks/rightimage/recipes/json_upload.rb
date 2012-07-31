@@ -50,16 +50,21 @@ ruby_block "compressed_md5_checksum" do
   end
 end
 
+image_s3_path = guest_platform+"/"+platform_version+"/"+arch+"/"+timestamp[0..3]+"/"
+image_upload_bucket = "rightscale-rightimage-base-dev"
+
 bash "upload_json_blobs" do
   cwd target_raw_root
-  not_if {`curl -o /dev/null --head --connect-timeout 10 --fail --silent --write-out %{http_code} http://#{base_image_upload_bucket}.s3.amazonaws.com/#{s3_path_base}/#{loopback_filename(false)}.js`.strip == "200" }
+  not_if {`curl -o /dev/null --head --connect-timeout 10 --fail --silent --write-out %{http_code} http://#{image_upload_bucket}.s3.amazonaws.com/#{image_s3_path}/#{loopback_filename(false)}.js`.strip == "200" }
   flags "-ex"
   environment(cloud_credentials("ec2"))
   code <<-EOH
   loopback_filename="#{loopback_filename(false)}"
+  image_s3_path=#{image_s3_path}
+  image_upload_bucket=#{image_upload_bucket}
     # Upload JSON
-    s3cmd put #{base_image_upload_bucket}:#{s3_path_base}/#{target_type}.js ${loopback_filename}.js x-amz-acl:public-read
-    s3cmd put #{base_image_upload_bucket}:#{s3_path_base}/#{target_type}0.js ${loopback_filename}0.js x-amz-acl:public-read
+    s3cmd put #{image_upload_bucket}:#{image_s3_path}/#{loopback_filename}.js ${loopback_filename}.js x-amz-acl:public-read
+    s3cmd put #{image_upload_bucket}:#{image_s3_path}/#{loopback_filename}0.js ${loopback_filename}0.js x-amz-acl:public-read
   EOH
 end
 
