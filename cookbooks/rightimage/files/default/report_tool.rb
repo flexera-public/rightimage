@@ -128,7 +128,7 @@ class Rightscale
   def initialize(imagehint)
     @repo_freezedate = imagehint.repo_freezedate
     @rubygems_freezedate = imagehint.rubygems_freezedate
-    @rightlink_version = File.open('/etc/rightscale.d/rightscale-release.js', &:readline).sub("\n",'')
+    @rightlink_version = File.open('/etc/rightscale.d/rightscale-release', &:readline).sub("\n",'')
   end
 
   def to_hash(*a) 
@@ -181,6 +181,7 @@ if not File.exists? "/etc/rightscale.d"
 #end
 #if not File.exists? "/etc/rightscale.d/rightscale-release"
   `wget --quiet -P /etc/rightscale.d/ https://dl.dropbox.com/u/1428622/RightScale/rightscale-release`
+#end
 #if not File.exists? "/etc/rightscale.d/cloud"
   `wget --quiet -P /etc/rightscale.d/ https://dl.dropbox.com/u/1428622/RightScale/cloud`
 end
