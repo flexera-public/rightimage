@@ -131,12 +131,12 @@ class Rightscale
     @rightlink_version = File.open('/etc/rightscale.d/rightscale-release.js', &:readline).sub("\n",'')
   end
 
-  def to_hash(*a)
-    {"rightscale" => 
-      {"repo-freezedate" => @repo_freezedate, 
-       "rubygems-freezedate" => @rubygems_freezedate,
-       "rightlink-version" => @rightlink_version}
-    }
+  def to_hash(*a) 
+      {"rightscale" => 
+        {"repo-freezedate" => @repo_freezedate, 
+         "rubygems-freezedate" => @rubygems_freezedate,
+         "rightlink-version" => @rightlink_version}
+      }
   end
 end
 
@@ -146,15 +146,11 @@ end
 class Image
   def initialize(imagehint)
     @build_date = imagehint.build_date
-    #@raw_md5 = "DEFAULT_VALUE"
-    #@compressed_md5 = "DEFAULT_VALUE"
   end
 
   def to_hash(*a)
     {"image" => 
-      {"build-date" => @build_date }#, 
-       #"raw-md5" => @raw_md5,
-       #"compressed-md5" => @compressed_md5}
+      {"build-date" => @build_date } 
      }
   end
 end
@@ -179,6 +175,7 @@ end
 # Hint crutch
 if not File.exists? "/etc/rightscale.d"
   `mkdir /etc/rightscale.d`
+end
 if not File.exists? "/etc/rightscale.d/rightimage-release.js"
   `wget --quiet -P /etc/rightscale.d/ https://dl.dropbox.com/u/1428622/RightScale/rightimage-release.js`
 end
