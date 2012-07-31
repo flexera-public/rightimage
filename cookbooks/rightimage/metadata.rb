@@ -38,8 +38,8 @@ recipe "rightimage::loopback_unmount", "unmounts loopback file system"
 recipe "rightimage::loopback_mount", "mounts loopback file system"
 
 # Report tool recipe
-recipe "rightimage::image_report","Combines image info into a JSON blob"
-
+recipe "rightimage::image_report","Combines image info into JSON blobs"
+recipe "rightimage::json_upload","Takes md5 checksum of compressed images and uploads the json blobs"
 
 #
 # required
