@@ -14,7 +14,7 @@ bash "query_image" do
   cwd "/"
   code <<-EOH
   guest_root="#{guest_root}"
-  loopback_filename="#{loopback_filename}"
+  loopback_filename="#{loopback_filename(false)}"
   target_raw_root="#{target_raw_root}"
   print_json="#{node[:rightimage][:print_json]}"
 
