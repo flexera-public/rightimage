@@ -218,6 +218,10 @@ module RightScale
           ""
         end
       end
+
+      def gem_install_source
+        "--source http://#{node[:rightimage][:mirror]}/rubygems/archive/#{node[:rightimage][:timestamp][0..7]}/"
+      end
     end
   end
 end

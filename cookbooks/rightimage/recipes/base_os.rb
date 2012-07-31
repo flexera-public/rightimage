@@ -64,8 +64,8 @@ if [ "#{node[:rightimage][:platform]}" == "ubuntu" ]; then
   ln -sf /usr/bin/gem1.8 /usr/bin/gem
 fi
 
-gem install xml-simple net-ssh net-sftp  --no-ri --no-rdoc
-gem install rake $rake_ver --no-ri --no-rdoc
+gem install #{gem_install_source} xml-simple net-ssh net-sftp  --no-ri --no-rdoc
+gem install #{gem_install_source} rake $rake_ver --no-ri --no-rdoc
 updatedb
 CHROOT_SCRIPT
 chmod +x $ROOT/tmp/rubygems_install.sh

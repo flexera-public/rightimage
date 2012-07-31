@@ -247,11 +247,6 @@ action :install do
     backup false
   end
 
-  template "#{guest_root}/root/.gemrc" do 
-    source "gemrc.erb"
-    backup false
-  end
-
   bash "clean_db" do 
     code <<-EOH
       #have to do this to fix a yummy bug
