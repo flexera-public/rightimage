@@ -1,4 +1,5 @@
 rightscale_marker :begin
+
 class Chef::Resource::Bash
   include RightScale::RightImage::Helper
 end
@@ -32,6 +33,7 @@ ruby_block "compressed_md5_checksum" do
     # Write back to unpartitioned json file.
     File.open("#{target_raw_root}/#{loopback_filename}.js","w") do |f|
       f.write(JSON.pretty_generate(hob))
+    end
 
     #---
 
@@ -48,7 +50,7 @@ ruby_block "compressed_md5_checksum" do
   end
 end
 
-bash "upload json blobs" do
+bash "upload_json_blobs" do
   cwd build_root
   not_if {`curl -o /dev/null --head --connect-timeout 10 --fail --silent --write-out %{http_code} http://#{base_image_upload_bucket}.s3.amazonaws.com/#{s3_path_base}/#{target_type}.js`.strip == "200" }
   flags "-ex"
