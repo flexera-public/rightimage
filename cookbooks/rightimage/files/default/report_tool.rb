@@ -172,13 +172,20 @@ if blob["os"] != "linux"
   exit
 end
 
-# Hint crutch
+# Hint crutches
 if not File.exists? "/etc/rightscale.d"
   `mkdir /etc/rightscale.d`
-end
-if not File.exists? "/etc/rightscale.d/rightimage-release.js"
+#end
+#if not File.exists? "/etc/rightscale.d/rightimage-release.js"
   `wget --quiet -P /etc/rightscale.d/ https://dl.dropbox.com/u/1428622/RightScale/rightimage-release.js`
+#end
+#if not File.exists? "/etc/rightscale.d/rightscale-release"
+  `wget --quiet -P /etc/rightscale.d/ https://dl.dropbox.com/u/1428622/RightScale/rightscale-release`
+#if not File.exists? "/etc/rightscale.d/cloud"
+  `wget --quiet -P /etc/rightscale.d/ https://dl.dropbox.com/u/1428622/RightScale/cloud`
 end
+
+
 # Read hint-file
 hint = ImageHint.new
 
@@ -186,10 +193,12 @@ hint = ImageHint.new
 blob.merge!(LSB.new)
 blob.merge!(UKernel.new)
 blob.merge!(Packages.new(blob["lsb"]["id"]))
-hint = ImageHint.new
-blob.merge!(Rightscale.new(hint))
-blob.merge!(Image.new(hint))
-blob.merge!(Cloud.new)
+#if not File.exists? "/etc/rightscale.d"
+  hint = ImageHint.new
+  blob.merge!(Rightscale.new(hint))
+  blob.merge!(Image.new(hint))
+  blob.merge!(Cloud.new)
+#end
 
 # Print results
 if(ARGV[0] == "print" ):
