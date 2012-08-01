@@ -4,7 +4,7 @@
 #STDERR.reopen("quer_err.log", "w")
 
 require 'rubygems'
-#JSON not in Ruby core!!!
+#JSON not in core-ruby
 require 'json'
 #Platform checking
 require 'rbconfig'
@@ -22,7 +22,8 @@ class OS
       @os = "windows"
     end 
   end
-  def ==(string) self.os2 == string end
+  # Refactoring idea
+  #def ==(string) self.os2 == string end
   def to_hash(*a) {"os" => @os} end
 end
 
@@ -173,18 +174,18 @@ if blob["os"] != "linux"
 end
 
 # Hint crutches
-if not File.exists? "/etc/rightscale.d"
-  `mkdir /etc/rightscale.d`
+#if not File.exists? "/etc/rightscale.d"
+#  `mkdir /etc/rightscale.d`
 #end
 #if not File.exists? "/etc/rightscale.d/rightimage-release.js"
-  `wget --quiet -P /etc/rightscale.d/ https://dl.dropbox.com/u/1428622/RightScale/rightimage-release.js`
+#  `wget --quiet -P /etc/rightscale.d/ https://dl.dropbox.com/u/1428622/RightScale/rightimage-release.js`
 #end
 #if not File.exists? "/etc/rightscale.d/rightscale-release"
-  `wget --quiet -P /etc/rightscale.d/ https://dl.dropbox.com/u/1428622/RightScale/rightscale-release`
+#  `wget --quiet -P /etc/rightscale.d/ https://dl.dropbox.com/u/1428622/RightScale/rightscale-release`
 #end
 #if not File.exists? "/etc/rightscale.d/cloud"
-  `wget --quiet -P /etc/rightscale.d/ https://dl.dropbox.com/u/1428622/RightScale/cloud`
-end
+#  `wget --quiet -P /etc/rightscale.d/ https://dl.dropbox.com/u/1428622/RightScale/cloud`
+#end
 
 
 # Read hint-file
@@ -194,12 +195,17 @@ hint = ImageHint.new
 blob.merge!(LSB.new)
 blob.merge!(UKernel.new)
 blob.merge!(Packages.new(blob["lsb"]["id"]))
-#if not File.exists? "/etc/rightscale.d"
+
+# Fail gracefully if information is missing
+if File.exists? "/etc/rightscale.d/rightimage-release.js"
   hint = ImageHint.new
   blob.merge!(Rightscale.new(hint))
   blob.merge!(Image.new(hint))
+end
+
+if File.exists? "/etc/rightscale.d/cloud"
   blob.merge!(Cloud.new)
-#end
+end
 
 # Print results
 if(ARGV[0] == "print" ):
