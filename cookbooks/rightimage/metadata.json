@@ -226,7 +226,8 @@
         "rightimage::build_image",
         "rightimage::upload_image_s3",
         "rightimage::base_upload",
-        "rightimage::image_tests"
+        "rightimage::image_tests",
+        "rightimage::json_upload"
       ],
       "display_name": "aws_secret_access_key",
       "description": "aws_secret_access_key"
@@ -306,7 +307,8 @@
         "rightimage::build_image",
         "rightimage::upload_image_s3",
         "rightimage::base_upload",
-        "rightimage::image_tests"
+        "rightimage::image_tests",
+        "rightimage::json_upload"
       ],
       "display_name": "aws_account_number",
       "description": "aws_account_number"
@@ -533,7 +535,8 @@
         "rightimage::build_image",
         "rightimage::upload_image_s3",
         "rightimage::base_upload",
-        "rightimage::image_tests"
+        "rightimage::image_tests",
+        "rightimage::json_upload"
       ],
       "display_name": "aws_access_key_id",
       "description": "aws_access_key_id"
