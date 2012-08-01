@@ -15,7 +15,7 @@ ruby_block "compressed_md5_checksum" do
 
     # Open existing json file placed in /mnt/storage.
     hob = Hash.new
-    File.open("#{target_raw_root}/#{loopback_filename(false)}.js","r") do |f|
+    File.open("#{temp_root}/#{loopback_filename(false)}.js","r") do |f|
       hob = JSON.load(f)
     end
 
@@ -56,6 +56,7 @@ image_upload_bucket = "rightscale-rightimage-base-dev"
 
 bash "upload_json_blobs" do
   cwd temp_root
+  #!!! How to check for both json files
   #not_if {`curl -o /dev/null --head --connect-timeout 10 --fail --silent --write-out %{http_code} http://#{image_upload_bucket}.s3.amazonaws.com/#{image_s3_path}/#{loopback_filename(false)}.js`.strip == "200" }
   flags "-ex"
   environment(cloud_credentials("ec2"))
