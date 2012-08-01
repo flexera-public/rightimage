@@ -48,7 +48,7 @@ module RightImage
       DIRS_truncate.each do |dir|
         files = ::Dir.glob(::File.join(@root, dir, "**", "*"))
         files.each do |f|
-          if ::File.file?(f)
+          if ::File.file?(f) && ::File.size?(f)
             @log.warn("Truncating file: #{f}")
             ::File.truncate(f, 0)
           end
