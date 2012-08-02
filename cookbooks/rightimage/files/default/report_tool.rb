@@ -9,11 +9,17 @@ require 'json'
 #Platform checking
 require 'rbconfig'
 
+# Function to recursively delete empty hash entries
+class Hash
+  def rec_empty_delete
+    delete_if{|k, v| v.empty? or v.instance_of?(Hash) && v.delete_blank.empty?}
+  end
+end
+
 # JSON class infrastructure
 
 # Inform parser what platform file is from.
 class OS
-
   def initialize() 
     # If it contains linux the Linux, otherwise Windows (in case of RS)
     if Config::CONFIG["host_os"] =~ /linux/i
@@ -70,6 +76,7 @@ class UKernel
   end
 end
 
+
 # List packages on Linux system.
 # Takes the LSB's id as an argument.
 class Packages
@@ -109,8 +116,9 @@ class Packages
 end
 
 # Holds RS specific info
+# Takes RightLink version as an arg (even if nil)
 class RightScale
-  def initialize()
+  def initialize(rl_version)
     # rightimage-release existence check.
     if File.exists? "/etc/rightscale.d/rightimage-release.js"
       hint = JSON.parse(File.read('/etc/rightscale.d/rightimage-release.js'))
@@ -118,14 +126,7 @@ class RightScale
       @rubygems_freezedate = hint["timestamp"]
     end
 
-    # rightscale-release existence check.
-    #if File.exists? "/etc/rightscale.d/rightscale-release"
-    #  @rightlink_version = File.open('/etc/rightscale.d/rightscale-release', &:readline).sub("\n",'')
-    #end
-
-    #if not 
-    #  @rightlink_version = 
-    #end
+    @rightlink_version = rl_version
   end
 
   def to_hash(*a) 
@@ -134,7 +135,7 @@ class RightScale
          "rubygems-freezedate" => @rubygems_freezedate,
          "rightlink-version" => @rightlink_version
         # Delete empty pairs.
-        }.delete_if{ |k,v| v.nil? }
+        }.rec_empty_delete#.delete_if{ |k,v| v.nil? }
       }
   end
 end
@@ -171,22 +172,14 @@ if blob["os"] != "linux"
   exit
 end
 
-# Hint crutches
-#if not File.exists? "/etc/rightscale.d"
-#  `mkdir /etc/rightscale.d`
-#end
-#if not File.exists? "/etc/rightscale.d/rightimage-release.js"
-#  `wget --quiet -P /etc/rightscale.d/ https://dl.dropbox.com/u/1428622/RightScale/rightimage-release.js`
-#end
-
 # And the rest
 blob.merge!(LSB.new)
 blob.merge!(UKernel.new)
 # Take platform as arg
 blob.merge!(Packages.new(blob["lsb"]["id"]))
 
-blob.merge!(RightScale.new)
-
+# Take RightLink version as arg (even if nil)
+blob.merge!(RightScale.new(blob["packages"]["rightscale"]))
 blob.merge!(Image.new)
 
 if File.exists? "/etc/rightscale.d/cloud"
