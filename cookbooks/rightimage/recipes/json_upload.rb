@@ -22,10 +22,10 @@ ruby_block "compressed_md5_checksum" do
     # Checksum unpartioned.
 
     # Helper md5 checksum function
-    #hob["image"]["raw-md5"] = calc_md5sum("#{temp_root}.raw.gz")
+    #hob["image"]["md5"] = calc_md5sum("#{temp_root}.raw.gz")
 
     # Inject the md5 sum.
-    hob["image"]["raw-md5"] = `md5sum #{temp_root}/#{loopback_filename(false)}.gz`.split[0]
+    hob["image"]["md5"] = `md5sum #{temp_root}/#{loopback_filename(false)}.gz`.split[0]
 
     # Write back to unpartitioned json file.
     File.open("#{temp_root}/#{loopback_filename(false)}.js","w") do |f|
