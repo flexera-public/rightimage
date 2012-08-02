@@ -1,5 +1,10 @@
 rightscale_marker :begin
+
 class Chef::Resource::Bash
+  include RightScale::RightImage::Helper
+end
+
+class Chef::Resource::RubyBlock
   include RightScale::RightImage::Helper
 end
 
@@ -7,6 +12,21 @@ end
 cookbook_file "/mnt/image/tmp/report_tool.rb" do
   source "report_tool.rb"
   mode "0755"
+end
+
+ruby_block "create_hint_file" do
+  block do
+    hint = Hash.new
+    hint["timestamp"] = #{node[:rightimage][:timestamp]}
+
+    if not File.exists? "/mnt/image/etc/rightscale.d"
+      `mkdir /mnt/image/etc/rightscale.d`
+    end
+
+    File.open("/mnt/image/etc/rightscale.d/rightimage-release.js","w") do |f|
+      f.write(JSON.pretty_generate(hint))
+    end
+  end
 end
 
 bash "query_image" do

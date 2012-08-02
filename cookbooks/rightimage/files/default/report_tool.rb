@@ -108,51 +108,49 @@ class Packages
   end
 end
 
-
-# Fetches info from hint file
-# Members publicly accessible
-class ImageHint
-  attr_reader :build_date,:repo_freezedate,:rubygems_freezedate
-
-  def initialize()
-    hint = JSON.parse(File.read('/etc/rightscale.d/rightimage-release.js'))
-
-    @build_date = hint["build-date"]
-    @repo_freezedate = hint["repo-freezedate"]
-    @rubygems_freezedate = hint["rubygems-freezedate"]
-  end
-end
-
 # Holds RS specific info
-# Takes ImageHint instance as argument
-class Rightscale
-  def initialize(imagehint)
-    @repo_freezedate = imagehint.repo_freezedate
-    @rubygems_freezedate = imagehint.rubygems_freezedate
-    @rightlink_version = File.open('/etc/rightscale.d/rightscale-release', &:readline).sub("\n",'')
+class RightScale
+  def initialize()
+    # rightimage-release existence check.
+    if File.exists? "/etc/rightscale.d/rightimage-release.js"
+      hint = JSON.parse(File.read('/etc/rightscale.d/rightimage-release.js'))
+      @repo_freezedate = hint["timestamp"]
+      @rubygems_freezedate = hint["timestamp"]
+    end
+
+    # rightscale-release existence check.
+    #if File.exists? "/etc/rightscale.d/rightscale-release"
+    #  @rightlink_version = File.open('/etc/rightscale.d/rightscale-release', &:readline).sub("\n",'')
+    #end
+
+    #if not 
+    #  @rightlink_version = 
+    #end
   end
 
   def to_hash(*a) 
       {"rightscale" => 
         {"repo-freezedate" => @repo_freezedate, 
          "rubygems-freezedate" => @rubygems_freezedate,
-         "rightlink-version" => @rightlink_version}
+         "rightlink-version" => @rightlink_version
+        # Delete empty pairs.
+        }.delete_if{ |k,v| v.nil? }
       }
   end
 end
 
+#!!! other cases
 # Holds info about the image
-# Takes ImageHint instance as argument
 # MD5 sums added to blob in later step
 class Image
-  def initialize(imagehint)
-    @build_date = imagehint.build_date
+  def initialize()
+    @build_date = Time.new.strftime("%Y%m%d")
   end
 
   def to_hash(*a)
     {"image" => 
       {"build-date" => @build_date } 
-     }
+    }
   end
 end
 
@@ -180,35 +178,23 @@ end
 #if not File.exists? "/etc/rightscale.d/rightimage-release.js"
 #  `wget --quiet -P /etc/rightscale.d/ https://dl.dropbox.com/u/1428622/RightScale/rightimage-release.js`
 #end
-#if not File.exists? "/etc/rightscale.d/rightscale-release"
-#  `wget --quiet -P /etc/rightscale.d/ https://dl.dropbox.com/u/1428622/RightScale/rightscale-release`
-#end
-#if not File.exists? "/etc/rightscale.d/cloud"
-#  `wget --quiet -P /etc/rightscale.d/ https://dl.dropbox.com/u/1428622/RightScale/cloud`
-#end
-
-
-# Read hint-file
-hint = ImageHint.new
 
 # And the rest
 blob.merge!(LSB.new)
 blob.merge!(UKernel.new)
+# Take platform as arg
 blob.merge!(Packages.new(blob["lsb"]["id"]))
 
-# Fail gracefully if information is missing
-if File.exists? "/etc/rightscale.d/rightimage-release.js"
-  hint = ImageHint.new
-  blob.merge!(Rightscale.new(hint))
-  blob.merge!(Image.new(hint))
-end
+blob.merge!(RightScale.new)
+
+blob.merge!(Image.new)
 
 if File.exists? "/etc/rightscale.d/cloud"
   blob.merge!(Cloud.new)
 end
 
 # Print results
-if(ARGV[0] == "print" ):
+if(ARGV[0] == "print" )
   puts JSON.pretty_generate(blob)
 end
 
