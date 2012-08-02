@@ -18,6 +18,7 @@ ruby_block "create_hint_file" do
   block do
     hint = Hash.new
     hint["timestamp"] = node[:rightimage][:timestamp]
+    hint["build-date"] = Time.new.strftime("%Y%m%d")
 
     if not File.exists? "/mnt/image/etc/rightscale.d"
       `mkdir /mnt/image/etc/rightscale.d`

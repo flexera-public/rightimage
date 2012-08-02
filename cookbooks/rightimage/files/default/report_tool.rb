@@ -9,10 +9,10 @@ require 'json'
 #Platform checking
 require 'rbconfig'
 
-# Function to recursively delete empty hash entries
+# Monkeypatch to recursively clean empty hashes
 class Hash
-  def rec_empty_delete
-    delete_if{|k, v| v.empty? or v.instance_of?(Hash) && v.delete_blank.empty?}
+  def rec_delete_empty
+    delete_if{|k, v| v.nil? or v.empty? or v.instance_of?(Hash) && v.rec_delete_empty.empty?}
   end
 end
 
@@ -118,47 +118,49 @@ end
 # Holds RS specific info
 # Takes RightLink version as an arg (even if nil)
 class RightScale
-  def initialize(rl_version)
-    # rightimage-release existence check.
-    if File.exists? "/etc/rightscale.d/rightimage-release.js"
-      hint = JSON.parse(File.read('/etc/rightscale.d/rightimage-release.js'))
-      @repo_freezedate = hint["timestamp"]
-      @rubygems_freezedate = hint["timestamp"]
-    end
-
-    @rightlink_version = rl_version
+  def initialize(hint)
+    @repo_freezedate = hint["timestamp"]
+    @rubygems_freezedate = hint["timestamp"]
+    @rightlink_version = hint["rl-version"]
   end
 
-  def to_hash(*a) 
-      {"rightscale" => 
-        {"repo-freezedate" => @repo_freezedate, 
-         "rubygems-freezedate" => @rubygems_freezedate,
-         "rightlink-version" => @rightlink_version
-        # Delete empty pairs.
-        }.rec_empty_delete#.delete_if{ |k,v| v.nil? }
+  def to_hash(*a)
+    {"rightscale" =>
+      {"repo-freezedate" => @repo_freezedate, 
+      "rubygems-freezedate" => @rubygems_freezedate,
+      "rightlink-version" => @rightlink_version
       }
+    # Delete empty pairs
+    }.rec_delete_empty
   end
 end
 
-#!!! other cases
+# TO-DO: Arbitrary and rebundle cases
 # Holds info about the image
 # MD5 sums added to blob in later step
 class Image
-  def initialize()
-    @build_date = Time.new.strftime("%Y%m%d")
+  def initialize(hint)
+    @build_date = hint["build-date"]
   end
 
   def to_hash(*a)
     {"image" => 
       {"build-date" => @build_date } 
-    }
+    # Delete empty pairs
+    }.rec_delete_empty
   end
 end
 
 # Name of the cloud the image is meant for
 class Cloud
-  def initialize() @cloud = File.open('/etc/rightscale.d/cloud', &:readline) end
-  def to_hash(*a) {"cloud" => @cloud} end
+  def initialize()
+    if File.exists? "/etc/rightscale.d/cloud"
+      @cloud = File.open('/etc/rightscale.d/cloud', &:readline)
+    else
+      @cloud = nil
+    end
+  end
+  def to_hash(*a) {"cloud" => @cloud}.delete_if{ |k,v| v.nil? } end
 end
 
 # End JSON class infrastructure
@@ -175,16 +177,22 @@ end
 # And the rest
 blob.merge!(LSB.new)
 blob.merge!(UKernel.new)
+blob.merge!(Cloud.new)
 # Take platform as arg
 blob.merge!(Packages.new(blob["lsb"]["id"]))
 
-# Take RightLink version as arg (even if nil)
-blob.merge!(RightScale.new(blob["packages"]["rightscale"]))
-blob.merge!(Image.new)
-
-if File.exists? "/etc/rightscale.d/cloud"
-  blob.merge!(Cloud.new)
-end
+# Give hint
+if File.exists? "/etc/rightscale.d/rightimage-release.js"
+  hint = JSON.parse(File.read('/etc/rightscale.d/rightimage-release.js'))
+else
+  hint = Hash.new
+end  
+# Add to hint to simplify arguments
+hint["rl-version"] = blob["packages"]["rightscale"]
+  
+# Receive hint
+blob.merge!(RightScale.new(hint))
+blob.merge!(Image.new(hint))
 
 # Print results
 if(ARGV[0] == "print" )
