@@ -29,6 +29,8 @@ ruby_block "create_hint_file" do
   end
 end
 
+directory temp_root { recursive true }
+
 bash "query_image" do
   cwd "/"
   code <<-EOH
