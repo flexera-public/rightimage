@@ -20,74 +20,74 @@ plugins=1
 <% if node[:rightimage][:platform] == "centos" -%>
 [base]
 name = none
-baseurl = http://<%= node[:rightimage][:mirror] %>/centos/<%= node[:rightimage][:platform_version][0].chr %>/os/<%= node[:rightimage][:arch] %>/archive/<%= @mirror_date %>/
+baseurl = http://<%= node[:rightimage][:mirror] %>/centos/<%= node[:rightimage][:platform_version].to_i %>/os/<%= node[:rightimage][:arch] %>/archive/<%= @mirror_date %>/
 failovermethod=priority
 gpgcheck=1
 enabled=1
-gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-<%= node[:rightimage][:platform_version][0].chr %>
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-<%= node[:rightimage][:platform_version].to_i %>
 
 <% if node[:rightimage][:platform_version].to_i < 6 -%>
 [addons]
 name = none
-baseurl = http://<%= node[:rightimage][:mirror] %>/centos/<%= node[:rightimage][:platform_version][0].chr %>/addons/<%= node[:rightimage][:arch] %>/archive/<%= @mirror_date %>/
+baseurl = http://<%= node[:rightimage][:mirror] %>/centos/<%= node[:rightimage][:platform_version].to_i %>/addons/<%= node[:rightimage][:arch] %>/archive/<%= @mirror_date %>/
 failovermethod=priority
 gpgcheck=1
 enabled=1
-gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-<%= node[:rightimage][:platform_version][0].chr %>
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-<%= node[:rightimage][:platform_version].to_i %>
 <% end -%>
 
 [centosplus]
 name = none
-baseurl = http://<%= node[:rightimage][:mirror] %>/centos/<%= node[:rightimage][:platform_version][0].chr %>/centosplus/<%= node[:rightimage][:arch] %>/archive/<%= @mirror_date %>/
+baseurl = http://<%= node[:rightimage][:mirror] %>/centos/<%= node[:rightimage][:platform_version].to_i %>/centosplus/<%= node[:rightimage][:arch] %>/archive/<%= @mirror_date %>/
 failovermethod=priority
 gpgcheck=1
 enabled=1
-gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-<%= node[:rightimage][:platform_version][0].chr %>
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-<%= node[:rightimage][:platform_version].to_i %>
 
 [extras]
 name = none
-baseurl = http://<%= node[:rightimage][:mirror] %>/centos/<%= node[:rightimage][:platform_version][0].chr %>/extras/<%= node[:rightimage][:arch] %>/archive/<%= @mirror_date %>/
+baseurl = http://<%= node[:rightimage][:mirror] %>/centos/<%= node[:rightimage][:platform_version].to_i %>/extras/<%= node[:rightimage][:arch] %>/archive/<%= @mirror_date %>/
 failovermethod=priority
 gpgcheck=1
 enabled=1
-gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-<%= node[:rightimage][:platform_version][0].chr %>
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-<%= node[:rightimage][:platform_version].to_i %>
 
 [updates]
 name = none
-baseurl = http://<%= node[:rightimage][:mirror] %>/centos/<%= node[:rightimage][:platform_version][0].chr %>/updates/<%= node[:rightimage][:arch] %>/archive/<%= @mirror_date %>/
+baseurl = http://<%= node[:rightimage][:mirror] %>/centos/<%= node[:rightimage][:platform_version].to_i %>/updates/<%= node[:rightimage][:arch] %>/archive/<%= @mirror_date %>/
 failovermethod=priority
 gpgcheck=1
 enabled=1
-gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-<%= node[:rightimage][:platform_version][0].chr %>
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-<%= node[:rightimage][:platform_version].to_i %>
 <% else -%>
 <% if @bootstrap -%>
 [rhui-us-west-2-rhel-server-releases]
-name=Red Hat Enterprise Linux Server <%= node[:rightimage][:platform_version][0].chr %> (RPMs)
-mirrorlist=https://rhui2-cds01.us-west-2.aws.ce.redhat.com/pulp/mirror/content/dist/rhel/rhui/server/<%= node[:rightimage][:platform_version][0].chr %>/<%= node[:rightimage][:platform_version][0].chr %>Server/x86_64/os
+name=Red Hat Enterprise Linux Server <%= node[:rightimage][:platform_version].to_i %> (RPMs)
+mirrorlist=https://rhui2-cds01.us-west-2.aws.ce.redhat.com/pulp/mirror/content/dist/rhel/rhui/server/<%= node[:rightimage][:platform_version].to_i %>/<%= node[:rightimage][:platform_version].to_i %>Server/x86_64/os
 enabled=1
 gpgcheck=1
 gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
 sslverify=1
 sslclientkey=/etc/pki/entitlement/content-rhel6-key.pem
-sslclientcert=/etc/pki/entitlement/product/content-rhel<%= node[:rightimage][:platform_version][0].chr %>.crt
+sslclientcert=/etc/pki/entitlement/product/content-rhel<%= node[:rightimage][:platform_version].to_i %>.crt
 sslcacert=/etc/pki/entitlement/cdn.redhat.com-chain.crt
 
 [rhui-us-west-2-rhel-server-releases-optional]
-name=Red Hat Enterprise Linux Server <%= node[:rightimage][:platform_version][0].chr %> Optional (RPMs)
-mirrorlist=https://rhui2-cds01.us-west-2.aws.ce.redhat.com/pulp/mirror/content/dist/rhel/rhui/server/<%= node[:rightimage][:platform_version][0].chr %>/<%= node[:rightimage][:platform_version][0].chr %>Server/x86_64/optional/os
+name=Red Hat Enterprise Linux Server <%= node[:rightimage][:platform_version].to_i %> Optional (RPMs)
+mirrorlist=https://rhui2-cds01.us-west-2.aws.ce.redhat.com/pulp/mirror/content/dist/rhel/rhui/server/<%= node[:rightimage][:platform_version].to_i %>/<%= node[:rightimage][:platform_version].to_i %>Server/x86_64/optional/os
 enabled=1
 gpgcheck=1
 gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
 sslverify=1
-sslclientkey=/etc/pki/entitlement/content-rhel<%= node[:rightimage][:platform_version][0].chr %>-key.pem
-sslclientcert=/etc/pki/entitlement/product/content-rhel<%= node[:rightimage][:platform_version][0].chr %>.crt
+sslclientkey=/etc/pki/entitlement/content-rhel<%= node[:rightimage][:platform_version].to_i %>-key.pem
+sslclientcert=/etc/pki/entitlement/product/content-rhel<%= node[:rightimage][:platform_version].to_i %>.crt
 sslcacert=/etc/pki/entitlement/cdn.redhat.com-chain.crt
 <% end -%>
 <% end -%>
 
 [epel]
 name = none
-baseurl = http://<%= node[:rightimage][:mirror] %>/epel/<%= node[:rightimage][:platform_version][0].chr %>/<%= node[:rightimage][:arch] %>/archive/<%= @mirror_date %>/
+baseurl = http://<%= node[:rightimage][:mirror] %>/epel/<%= node[:rightimage][:platform_version].to_i %>/<%= node[:rightimage][:arch] %>/archive/<%= @mirror_date %>/
 failovermethod=priority
 gpgcheck=1
 enabled=1
@@ -95,7 +95,7 @@ gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL<%= epel_key_name %>
 
 [rightscale-epel]
 name = none
-baseurl = http://<%= node[:rightimage][:mirror] %>/rightscale_software/epel/<%= node[:rightimage][:platform_version][0].chr %>/<%= node[:rightimage][:arch] %>/archive/<%= @mirror_date %>/
+baseurl = http://<%= node[:rightimage][:mirror] %>/rightscale_software/epel/<%= node[:rightimage][:platform_version].to_i %>/<%= node[:rightimage][:arch] %>/archive/<%= @mirror_date %>/
 failovermethod=priority
 gpgcheck=0
 enabled=1
