@@ -1,4 +1,4 @@
-actions :install
+actions :install, :repo_freeze, :repo_unfreeze
 
 attribute :platform, :kind_of => String, :name_attribute => true
 attribute :platform_version, :kind_of => Float, :required => true, :required => true

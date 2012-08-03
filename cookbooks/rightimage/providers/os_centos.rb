@@ -10,12 +10,8 @@ end
 
 
 action :install do 
-  template "/tmp/yum.conf" do 
-    source "yum.conf.erb"
-    backup false
-    variables ({
-      :bootstrap => true
-    })
+  rightimage_os new_resource.platform do
+    action :repo_freeze
   end
 
   cookbook_file "/etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL#{epel_key_name}" do
@@ -237,14 +233,8 @@ action :install do
     backup false
   end
 
-  repo_file = case node[:rightimage][:platform]
-              when "centos" then "CentOS-Base"
-              when "rhel" then "Epel"
-              end
-
-  template "#{guest_root}/etc/yum.repos.d/#{repo_file}.repo" do
-    source "yum.conf.erb"
-    backup false
+  rightimage_os new_resource.platform do
+    action :repo_unfreeze
   end
 
   bash "clean_db" do 
@@ -262,4 +252,35 @@ action :install do
       umount -lf #{guest_root}/dev/pts || true
     EOH
   end    
+end
+
+action :repo_freeze do
+  repo_dir = "#{guest_root}/etc/yum.repos.d"
+
+  directory repo_dir do
+    recursive true
+    action :create
+  end
+
+  ["/tmp/yum.conf", "#{repo_dir}/#{el_repo_file}"].each do |location|
+    template location do
+      source "yum.conf.erb"
+      backup false
+      variables ({
+        :bootstrap => true,
+        :mirror_date => node[:rightimage][:mirror_date]
+      })
+    end
+  end
+end
+
+action :repo_unfreeze do
+  template "#{guest_root}/etc/yum.repos.d/#{el_repo_file}" do
+    source "yum.conf.erb"
+    backup false
+    variables ({
+      :bootstrap => false,
+      :mirror_date => "latest"
+    })
+  end
 end

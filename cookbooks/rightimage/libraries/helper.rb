@@ -211,6 +211,14 @@ module RightScale
         (centos? || rhel?) and node[:platform_version].to_f >= 6.0
       end
 
+      def el_repo_file
+        repo_file = case node[:rightimage][:platform]
+                    when "centos" then "CentOS-Base"
+                    when "rhel" then "Epel"
+                    end
+        "#{repo_file}.repo"
+      end
+
       def epel_key_name
         if node[:rightimage][:platform_version].to_i >= 6.0
           "-#{node[:rightimage][:platform_version][0].chr}"
