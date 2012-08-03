@@ -115,6 +115,7 @@ class Packages
   end
 end
 
+
 # Holds RS specific info
 # Takes RightLink version as an arg (even if nil)
 class RightScale
@@ -199,6 +200,7 @@ if(ARGV[0] == "print" )
   puts JSON.pretty_generate(blob)
 end
 
+# Save JSON to /tmp
 File.open("/tmp/report.js","w") do |f|
   f.write(JSON.pretty_generate(blob))
 end

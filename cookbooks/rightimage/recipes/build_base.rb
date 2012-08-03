@@ -27,5 +27,5 @@ include_recipe "rightimage::loopback_copy"
 include_recipe "rightimage::loopback_unmount"
 include_recipe "rightimage::block_device_backup"
 include_recipe "rightimage::base_upload"
-include_recipe "rightimage::json_upload"
+include_recipe "rightimage::report_upload"
 rightscale_marker :end

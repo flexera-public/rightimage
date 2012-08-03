@@ -227,7 +227,7 @@
         "rightimage::upload_image_s3",
         "rightimage::base_upload",
         "rightimage::image_tests",
-        "rightimage::json_upload"
+        "rightimage::report_upload"
       ],
       "display_name": "aws_secret_access_key",
       "description": "aws_secret_access_key"
@@ -308,7 +308,7 @@
         "rightimage::upload_image_s3",
         "rightimage::base_upload",
         "rightimage::image_tests",
-        "rightimage::json_upload"
+        "rightimage::report_upload"
       ],
       "display_name": "aws_account_number",
       "description": "aws_account_number"
@@ -536,7 +536,7 @@
         "rightimage::upload_image_s3",
         "rightimage::base_upload",
         "rightimage::image_tests",
-        "rightimage::json_upload"
+        "rightimage::report_upload"
       ],
       "display_name": "aws_access_key_id",
       "description": "aws_access_key_id"
@@ -759,6 +759,7 @@
     "rightimage::rebundle": "coordinate a rebundled image build (redhat on on ec2 or rackspace)",
     "rightimage::cloud_upload": "upload and register image with cloud",
     "rightimage::build_base": "build base image based on host platform",
+    "rightimage::report_upload": "Takes md5 checksum of compressed images and uploads the json blobs",
     "rightimage::block_device_restore": "creates a new EBS volume by restoring from an EBS snapshot",
     "rightimage::block_device_create": "creates, formats, and mounts a brand new EBS volume",
     "rightimage::enable_debug": "enables a root login on image for debugging purposes",
@@ -772,7 +773,6 @@
     "rightimage::loopback_mount": "mounts loopback file system",
     "rightimage::ec2_download_bundle": "Downloads bundled image from EC2 S3.",
     "rightimage::build_image": "build image based on host platform",
-    "rightimage::json_upload": "Takes md5 checksum of compressed images and uploads the json blobs",
     "rightimage::cloud_package": "packages RightImage for a specific cloud",
     "rightimage::loopback_create": "creates and mounts loopback file system",
     "rightimage::block_device_backup": "creates an EBS snapshot from attached EBS volume",

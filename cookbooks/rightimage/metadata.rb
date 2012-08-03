@@ -39,7 +39,7 @@ recipe "rightimage::loopback_mount", "mounts loopback file system"
 
 # Report tool recipe
 recipe "rightimage::image_report","Combines image info into JSON blobs"
-recipe "rightimage::json_upload","Takes md5 checksum of compressed images and uploads the json blobs"
+recipe "rightimage::report_upload","Takes md5 checksum of compressed images and uploads the json blobs"
 
 #
 # required
@@ -212,7 +212,7 @@ attribute "rightimage/print_json",
 
 # AWS
 aws_x509_recipes = ["rightimage::cloud_upload", "rightimage::rebundle", "rightimage::default", "rightimage::ec2_download_bundle"]
-aws_api_recipes = aws_x509_recipes + ["rightimage::build_base", "rightimage::build_image", "rightimage::upload_image_s3", "rightimage::base_upload", "rightimage::image_tests", "rightimage::json_upload" ]
+aws_api_recipes = aws_x509_recipes + ["rightimage::build_base", "rightimage::build_image", "rightimage::upload_image_s3", "rightimage::base_upload", "rightimage::image_tests", "rightimage::report_upload" ]
 
 attribute "rightimage/ec2/image_type",
   :display_name => "EC2 Image Type",
