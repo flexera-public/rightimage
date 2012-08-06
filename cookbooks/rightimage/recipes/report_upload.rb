@@ -8,7 +8,7 @@ class Chef::Resource::RubyBlock
   include RightScale::RightImage::Helper
 end
 
-# Inject md5 sum of compresseded images.
+# Inject md5 sum of compressed images.
 ruby_block "compressed_md5_checksum" do
   block do
     require 'json'
@@ -22,6 +22,7 @@ ruby_block "compressed_md5_checksum" do
     # Checksum unpartioned.
 
     # Helper md5 checksum function
+    # Returns empty string?
     #hob["image"]["md5"] = calc_md5sum("#{temp_root}.raw.gz")
 
     # Inject the md5 sum.
@@ -46,12 +47,15 @@ end
 
 # Create vars
 image_s3_path = guest_platform+"/"+platform_version+"/"+arch+"/"+timestamp[0..3]
+# Switch after testing:
+#image_upload_bucket = "rightscale-rightimage-base"
 image_upload_bucket = "rightscale-rightimage-base-dev"
 
 bash "upload_json_blobs" do
   cwd temp_root
-  #!!! How to check for both json files
+  # Check if they exist
   #not_if {`curl -o /dev/null --head --connect-timeout 10 --fail --silent --write-out %{http_code} http://#{image_upload_bucket}.s3.amazonaws.com/#{image_s3_path}/#{loopback_filename(false)}.js`.strip == "200" }
+  #not_if {`curl -o /dev/null --head --connect-timeout 10 --fail --silent --write-out %{http_code} http://#{image_upload_bucket}.s3.amazonaws.com/#{image_s3_path}/#{loopback_filename(true)}.js`.strip == "200" }
   flags "-ex"
   environment(cloud_credentials("ec2"))
   code <<-EOH

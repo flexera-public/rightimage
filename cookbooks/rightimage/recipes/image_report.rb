@@ -14,22 +14,31 @@ cookbook_file "/mnt/image/tmp/report_tool.rb" do
   mode "0755"
 end
 
+# Possibly a better way of creating the folder below
+# directory "/mnt/image/etc/rightscale.d" { recursive true }
+
+# Provide the timestamp and build-date to the chrooted report tool.
 ruby_block "create_hint_file" do
   block do
     hint = Hash.new
+    # Pull from Chef input.
     hint["timestamp"] = node[:rightimage][:timestamp][-8..-1]
+    # Current date
     hint["build-date"] = Time.new.strftime("%Y%m%d")
 
+    # This folder does not exist yet, so create it.
     if not File.exists? "/mnt/image/etc/rightscale.d"
       `mkdir /mnt/image/etc/rightscale.d`
     end
 
+    # Save hash as JSON file.
     File.open("/mnt/image/etc/rightscale.d/rightimage-release.js","w") do |f|
       f.write(JSON.pretty_generate(hint))
     end
   end
 end
 
+# Directory does not exist yet, so create it.
 directory temp_root { recursive true }
 
 bash "query_image" do
@@ -37,7 +46,7 @@ bash "query_image" do
   code <<-EOH
   # If json is not installed, install it. Otherwise, don't.
   found="$(/usr/sbin/chroot #{guest_root} gem list json | grep -i json)"
-  # Found is nil if json wasn't in installed list.
+  # Found is nil if json wasn't installed in image.
   if [ -z "$found" ]; then  
     /usr/sbin/chroot #{guest_root} gem install json
     # Sentinel for uninstall at end.

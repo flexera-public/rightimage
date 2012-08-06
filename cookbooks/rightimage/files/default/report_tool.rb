@@ -1,23 +1,23 @@
 #!/usr/bin/env ruby
 
-# Used to silence ouput
-#STDERR.reopen("quer_err.log", "w")
-
 require 'rubygems'
-#JSON not in core-ruby
+# JSON not in core-ruby.
 require 'json'
-#Platform checking
+# Platform checking.
 require 'rbconfig'
 
-# Monkeypatch to recursively clean empty hashes
+# Monkeypatch to recursively clean empty hashes.
 class Hash
   def rec_delete_empty
     delete_if{|k, v| v.nil? or v.empty? or v.instance_of?(Hash) && v.rec_delete_empty.empty?}
   end
 end
 
-# JSON class infrastructure
+# JSON class infrastructure.
 
+# Considering factoring this out.
+  # Not needed for parsing.
+    # Can be checked in packages.
 # Inform parser what platform file is from.
 class OS
   def initialize() 
@@ -28,21 +28,20 @@ class OS
       @os = "windows"
     end 
   end
-  # Refactoring idea
-  #def ==(string) self.os2 == string end
+
   def to_hash(*a) {"os" => @os} end
 end
+
 
 # Linux Standard Base
 # lsb_release: id (i), description (d), release (r), codename (c)
 class LSB
-  #attr_reader :id
   def initialize()
     # Retrieve and split command output.
     lsb = `lsb_release -ircs`.split
 
     @id = lsb[0]
-    # Done to get full description with spaces.
+    # Called separately to get full description with spaces.
     # Sanitize newline and quotes.
     @description = `lsb_release -ds`.sub("\n",'').gsub("\"",'')
     @release = lsb[2]
@@ -102,7 +101,7 @@ class Packages
             packs[col[0]] = col[1]
             }
     else
-      packs["This platform"] = "is not supported."
+      packs["This distro"] = "is not supported."
       exit
     end
 
@@ -116,8 +115,9 @@ class Packages
 end
 
 
-# Holds RS specific info
-# Takes RightLink version as an arg (even if nil)
+# Holds RS specific info.
+# Takes hint hash as arg.
+# rec_empty_delete strips empty and nil values.
 class RightScale
   def initialize(hint)
     @repo_freezedate = hint["timestamp"]
@@ -131,14 +131,16 @@ class RightScale
       "rubygems-freezedate" => @rubygems_freezedate,
       "rightlink-version" => @rightlink_version
       }
-    # Delete empty pairs
+    # Strip empty values
     }.rec_delete_empty
   end
 end
 
-# TO-DO: Arbitrary and rebundle cases
-# Holds info about the image
-# MD5 sums added to blob in later step
+# TO-DO: Arbitrary and rebundle cases.
+# Holds info about the image.
+# MD5 sums added to blob in later step.
+# Takes hint hash as arg.
+# rec_empty_delete strips empty and nil values.
 class Image
   def initialize(hint)
     @build_date = hint["build-date"]
@@ -152,15 +154,17 @@ class Image
   end
 end
 
-# Name of the cloud the image is meant for
+# Name of the cloud the image is meant for.
 class Cloud
   def initialize()
+    # Safely ignores hint if not available.
     if File.exists? "/etc/rightscale.d/cloud"
       @cloud = File.open('/etc/rightscale.d/cloud', &:readline)
     else
       @cloud = nil
     end
   end
+  # Strips value if nil
   def to_hash(*a) {"cloud" => @cloud}.delete_if{ |k,v| v.nil? } end
 end
 
@@ -179,6 +183,7 @@ end
 blob.merge!(LSB.new)
 blob.merge!(UKernel.new)
 blob.merge!(Cloud.new)
+
 # Take platform as arg
 blob.merge!(Packages.new(blob["lsb"]["id"]))
 
@@ -195,7 +200,7 @@ hint["rl-version"] = blob["packages"]["rightscale"]
 blob.merge!(RightScale.new(hint))
 blob.merge!(Image.new(hint))
 
-# Print results
+# Print results if flag is set
 if(ARGV[0] == "print" )
   puts JSON.pretty_generate(blob)
 end
