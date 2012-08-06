@@ -66,6 +66,7 @@
     "rightimage_tester::filesystem_size": "Check root filesystem size.",
     "rightimage_tester::default": "",
     "rightimage_tester::sudo": "Check sudo configuration.",
+    "rightimage_tester::gemrc": "Ensure /root/.gem and .gemrc doesn't exist.",
     "rightimage_tester::modprobe": "Ensure modprobe runs.",
     "rightimage_tester::dupe_mounts": "Check for duplicate mounts.",
     "rightimage_tester::banned_packages": "Ensure no banned packages installed.",
