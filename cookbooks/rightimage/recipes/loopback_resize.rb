@@ -4,7 +4,16 @@ class Chef::Resource
   include RightScale::RightImage::Helper
 end
 
+# If the image is unpartitioned we use resize2fs, if its partitioned we 
+# create a new loopback file of the desired size, mount it, and copy over
+# then replace the old file since that works equally well for growing/shrinking
+# and was simpler/quicker than resizing the partitions disk
 # Resize will leave the loopback fs in an unmounted state
+#
+# TBD: Resize functionality should be pushed into loopback cookbook at some point
+# but will need a little bit of a refactor for that.
+# TBD: Make a second go at trying to resize the partitions in place
+#
 log "Resizing loopback filesystem to (#{node[:rightimage][:root_size_gb]}" do 
   only_if { do_loopback_resize }
 end
@@ -67,16 +76,5 @@ else
     action :resize
   end
 end
-
-#  loopback_fs loopback_file(partitioned?) do
-#    mount_point guest_root
-#    action :unmount
-#  end
-#  loopback_fs loopback_file(partitioned?) do
-#    mount_point guest_root
-#    size_gb node[:rightimage][:root_size_gb].to_i
-#    partitioned partitioned?
-#    action :resize
-#  end
 
 rightscale_marker :end
