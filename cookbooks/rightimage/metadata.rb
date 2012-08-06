@@ -347,6 +347,25 @@ attribute "rightimage/rackspace/api_token",
   :recipes => [ "rightimage::rebundle", "rightimage::default" ]
 
 # Azure
+attribute "rightimage/azure/shared_key",
+  :display_name => "Azure Shared Key",
+  :description => "Shared key for the storage account to upload the image to.  If supplied, will use Image Upload Bucket as the container to uplaod to.  If not supplied, will let Azure command line tool automatically determine a storage account and container to upload to. ",
+  :required => "recommended",
+  :recipes => [ "rightimage::cloud_upload" ]
+
+attribute "rightimage/azure/storage_account",
+  :display_name => "Azure Storage Account. Required when supplying a Shared Key",
+  :description => "Storage account to upload the image to.",
+  :required => "recommended",
+  :recipes => [ "rightimage::cloud_upload" ]
+
+attribute "rightimage/azure/region",
+  :display_name => "Azure Location",
+  :required => "recommended",
+  :choice => [ 'West Europe', 'North Europe', 'Southeast Asia', 'East Asia', 'West US', 'East US' ],
+  :default => 'West US',
+  :recipes => [ "rightimage::cloud_upload" ]
+
 attribute "rightimage/azure/cert",
   :display_name => "Azure Management Certificate",
   :description => "Azure Management Certificate",
