@@ -59,7 +59,7 @@ action :upload do
                %w(python-dev python-setuptools)
              end
 
-  packages.each { package p }
+  packages.each { |p| package p }
 
   # work around bug, doesn't chef doesn't install noarch packages for centos without arch flag
   yum_package "python26-distribute" do
