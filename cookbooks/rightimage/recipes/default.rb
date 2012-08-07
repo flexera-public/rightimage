@@ -66,8 +66,9 @@ r = gem_package "net-ssh" do
 end
 r.run_action(:install)
 
-RI_TOOL_VERSION = "0.4.0"
-RI_TOOL_GEM = ::File.join(::File.dirname(__FILE__), "..", "files", "default", "rightimage_tools-#{RI_TOOL_VERSION}.gem")
+RI_TOOL_GEM = ::Dir.glob(::File.dirname(__FILE__)+"/../files/default/rightimage_tools*.gem").first
+RI_TOOL_VERSION = /-([\d\.]+)\.gem$/.match(RI_TOOL_GEM)[1]
+
 r = gem_package RI_TOOL_GEM do
   gem_binary "#{SANDBOX_BIN_DIR}/gem"
   version RI_TOOL_VERSION

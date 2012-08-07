@@ -35,4 +35,19 @@ BASHRC
     fi
   EOS
 end
+
+# Ubuntu only, centos sources /etc/profile.d as it should
+bash "set ec2 home var for all users" do 
+  only_if { node[:rightimage][:platform] == "ubuntu" && node[:rightimage][:cloud] == "ec2" }
+  flags "+e -x"
+  code <<-EOS
+    grep "EC2_HOME" #{guest_root}/etc/bash.bashrc
+    if [ "$?" == "1" ]; then
+      mv -f #{guest_root}/etc/bash.bashrc /tmp/bash.save
+      echo 'export PATH=$PATH:/home/ec2/bin' > #{guest_root}/etc/bash.bashrc
+      echo 'export EC2_HOME=/home/ec2' >> #{guest_root}/etc/bash.bashrc
+      cat /tmp/bash.save >> #{guest_root}/etc/bash.bashrc
+    fi
+  EOS
+end
 rightscale_marker :end
