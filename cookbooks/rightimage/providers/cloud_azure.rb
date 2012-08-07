@@ -180,8 +180,8 @@ action :upload do
       flags "-e"
       cwd target_raw_root
       code <<-EOH
-        azure vm disk upload #{image_name} \
-          https://#{account}.blob.core.windows.net/#{container}/#{image_name}.vhd \
+        azure vm disk upload #{image_name}.vhd \
+          http://#{account}.blob.core.windows.net/#{container}/#{image_name}.vhd \
           #{node[:rightimage][:azure][:shared_key]}
       EOH
     end
@@ -189,7 +189,7 @@ action :upload do
       flags "-ex"
       cwd target_raw_root
       code <<-EOH
-        azure vm image create #{image_name} #{image_name}.vhd \
+        azure vm image create #{image_name} \
           --os Linux \
           --location "#{node[:rightimage][:azure][:region]}" \
           --blob-url https://#{account}.blob.core.windows.net/#{container}/#{image_name}.vhd

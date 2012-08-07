@@ -601,8 +601,8 @@
       "recipes": [
         "rightimage::cloud_upload"
       ],
-      "display_name": "Azure Storage Account. Required when supplying a Shared Key",
-      "description": "Storage account to upload the image to."
+      "display_name": "Azure Storage Account",
+      "description": "Storage account to upload the image to. Required when supplying a Shared Key"
     },
     "rightimage/rackspace/api_token": {
       "required": "required",

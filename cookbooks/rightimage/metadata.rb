@@ -354,8 +354,8 @@ attribute "rightimage/azure/shared_key",
   :recipes => [ "rightimage::cloud_upload" ]
 
 attribute "rightimage/azure/storage_account",
-  :display_name => "Azure Storage Account. Required when supplying a Shared Key",
-  :description => "Storage account to upload the image to.",
+  :display_name => "Azure Storage Account",
+  :description => "Storage account to upload the image to. Required when supplying a Shared Key",
   :required => "recommended",
   :recipes => [ "rightimage::cloud_upload" ]
 
