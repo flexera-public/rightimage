@@ -46,13 +46,13 @@ else
      # This block will pull down a "base image" from a standard rightscale bucket
      # location. A base image is a standard centos or ubuntu image with most righscale
      # specific software customizations but without any cloud specific customizations
-      guest_platform = node[:rightimage][:platform]
+      platform = node[:rightimage][:platform]
       platform_version = node[:rightimage][:platform_version]
       arch = node[:rightimage][:arch]
       year = node[:rightimage][:timestamp][0..3]
       image_upload_bucket = node[:rightimage][:base_image_bucket]
       base_image_endpoint = "https://#{image_upload_bucket}.s3.amazonaws.com"
-      image_s3_path = guest_platform+"/"+platform_version+"/"+arch+"/"+year+"/"
+      image_s3_path = platform+"/"+platform_version+"/"+arch+"/"+year+"/"
 
       ruby_block "restore base image snapshot from s3" do
         block do 

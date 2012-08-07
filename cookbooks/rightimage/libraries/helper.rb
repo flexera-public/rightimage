@@ -39,7 +39,7 @@ module RightScale
       end
 
       def ri_lineage
-        ["base_image",guest_platform,platform_version,arch,timestamp,build_number].join("_")
+        ["base_image",guest_platform,guest_platform_version,guest_arch,timestamp,build_number].join("_")
       end
 
       # call this guest_platform, not platform, otherwise can introduce a 
@@ -61,11 +61,11 @@ module RightScale
         end
       end
 
-      def platform_version
+      def guest_platform_version
         node[:rightimage][:platform_version]
       end
 
-      def arch
+      def guest_arch
         if node[:rightimage][:arch] == "x64"
           "x86_64"
         else
