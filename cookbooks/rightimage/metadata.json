@@ -68,6 +68,19 @@
       "display_name": "RightLink Version",
       "description": "The RightLink version we are building into our image"
     },
+    "rightimage/azure/shared_key": {
+      "required": "recommended",
+      "calculated": false,
+      "choice": [
+
+      ],
+      "type": "string",
+      "recipes": [
+        "rightimage::cloud_upload"
+      ],
+      "display_name": "Azure Shared Key",
+      "description": "Shared key for the storage account to upload the image to.  If supplied, will use Image Upload Bucket as the container to uplaod to.  If not supplied, will let Azure command line tool automatically determine a storage account and container to upload to. "
+    },
     "rightimage/openstack/user": {
       "required": "optional",
       "calculated": false,
@@ -213,10 +226,10 @@
 
       ],
       "type": "string",
+      "recommended": true,
       "recipes": [
         "rightimage::do_create_mci"
       ],
-      "recommended": true,
       "display_name": "API URL",
       "description": "The rightscale account specific api url to use.  Ex. https://my.rightscale.com/api/acct/1234 (where 1234 is your account id)"
     },
@@ -291,10 +304,10 @@
 
       ],
       "type": "string",
+      "recommended": true,
       "recipes": [
         "rightimage::do_create_mci"
       ],
-      "recommended": true,
       "display_name": "API Password",
       "description": "Rightscale API password."
     },
@@ -464,6 +477,24 @@
       "display_name": "Google OAuth2 credentials refresh token",
       "description": "Refresh token value for GCE. Pulled form gcutil conf"
     },
+    "rightimage/azure/region": {
+      "required": "recommended",
+      "calculated": false,
+      "choice": [
+        "West Europe",
+        "North Europe",
+        "Southeast Asia",
+        "East Asia",
+        "West US",
+        "East US"
+      ],
+      "default": "West US",
+      "type": "string",
+      "recipes": [
+        "rightimage::cloud_upload"
+      ],
+      "display_name": "Azure Location"
+    },
     "rightimage/cloudstack/cdc_api_key": {
       "required": "required",
       "calculated": false,
@@ -560,6 +591,19 @@
       "display_name": "Google Project ID",
       "description": "GCE Project ID to register this image for"
     },
+    "rightimage/azure/storage_account": {
+      "required": "recommended",
+      "calculated": false,
+      "choice": [
+
+      ],
+      "type": "string",
+      "recipes": [
+        "rightimage::cloud_upload"
+      ],
+      "display_name": "Azure Storage Account",
+      "description": "Storage account to upload the image to. Required when supplying a Shared Key"
+    },
     "rightimage/rackspace/api_token": {
       "required": "required",
       "calculated": false,
@@ -628,10 +672,10 @@
 
       ],
       "type": "string",
+      "recommended": true,
       "recipes": [
         "rightimage::do_create_mci"
       ],
-      "recommended": true,
       "display_name": "API User",
       "description": "RightScale API username. Ex. you@rightscale.com"
     },
@@ -791,10 +835,10 @@
 
       ],
       "type": "string",
+      "recommended": true,
       "recipes": [
         "rightimage::do_create_mci"
       ],
-      "recommended": true,
       "display_name": "RightScale Cloud ID (integer)",
       "description": "The numeric ID in RightScale for the cloud which we will create this image for. For example, 6 = AWS Oregon, 232 = Rackspace"
     },
@@ -837,7 +881,7 @@
       "description": "The OS version to build into the virtual image."
     }
   },
-  "license": "Apache v2.0",
+  "license": "none",
   "suggestions": {
   },
   "platforms": {

@@ -156,18 +156,49 @@ action :upload do
     backup false
   end
 
-  bash "upload image" do
-    flags "-ex"
-    cwd target_raw_root
+  bash "import settings" do
     code <<-EOH
       settings=/root/azure.publishsettings
       azure account import $settings
       rm -f $settings
-      azure vm image create #{image_name} #{image_name}.vhd --os Linux --location "West US"
-      # Delete publishsettings
-      azure account clear
     EOH
   end
+  if node[:rightimage][:azure][:shared_key].to_s.empty?
+    bash "upload and register image" do
+      flags "-ex"
+      cwd target_raw_root
+      code <<-EOH
+        azure vm image create #{image_name} #{image_name}.vhd \
+          --os Linux \
+          --location "#{node[:rightimage][:azure][:region]}"
+      EOH
+    end
+  else
+    account = node[:rightimage][:azure][:storage_account]
+    container = node[:rightimage][:image_upload_bucket]
+    bash "upload image" do
+      flags "-e"
+      cwd target_raw_root
+      code <<-EOH
+        azure vm disk upload #{image_name}.vhd \
+          http://#{account}.blob.core.windows.net/#{container}/#{image_name}.vhd \
+          #{node[:rightimage][:azure][:shared_key]}
+      EOH
+    end
+    bash "register image" do
+      flags "-ex"
+      cwd target_raw_root
+      code <<-EOH
+        azure vm image create #{image_name} \
+          --os Linux \
+          --location "#{node[:rightimage][:azure][:region]}" \
+          --blob-url https://#{account}.blob.core.windows.net/#{container}/#{image_name}.vhd
+      EOH
+    end
+  end
+
+  # Delete publishsettings
+  execute "azure account clear"
 
   # Needed for do_create_mci, the primary key is the image_name
   ruby_block "store id" do
