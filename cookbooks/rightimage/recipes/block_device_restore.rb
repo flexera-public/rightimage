@@ -24,15 +24,20 @@ else
     snaps = @api.find_latest_ebs_backup(ri_lineage, false)
     Chef::Log::info("Found EBS snapshot for #{ri_lineage} #{snaps.inspect}, restoring")
 
+    # Times 2.3 since we need to store 2 raw loopback files, and need a 
+    # little extra space to gzip them, take snapshots, etc
+    new_volume_size = (node[:rightimage][:root_size_gb].to_f*2.3).ceil
+    # This is a hack since our base snapshot size is 23, if we specify less
+    # than that it'll error out with an exception.
+    new_volume_size = 23 if new_volume_size < 23
     block_device ri_lineage do
       cloud "ec2"
       lineage ri_lineage
       mount_point target_raw_root
       vg_data_percentage "95"
-      volume_size "23"
+      volume_size new_volume_size.to_s
       stripe_count "1"
       persist true
-
       action :primary_restore
     end
   rescue Exception => e
@@ -41,13 +46,13 @@ else
      # This block will pull down a "base image" from a standard rightscale bucket
      # location. A base image is a standard centos or ubuntu image with most righscale
      # specific software customizations but without any cloud specific customizations
-      guest_platform = node[:rightimage][:platform]
+      platform = node[:rightimage][:platform]
       platform_version = node[:rightimage][:platform_version]
       arch = node[:rightimage][:arch]
       year = node[:rightimage][:timestamp][0..3]
       image_upload_bucket = node[:rightimage][:base_image_bucket]
       base_image_endpoint = "https://#{image_upload_bucket}.s3.amazonaws.com"
-      image_s3_path = guest_platform+"/"+platform_version+"/"+arch+"/"+year+"/"
+      image_s3_path = platform+"/"+platform_version+"/"+arch+"/"+year+"/"
 
       ruby_block "restore base image snapshot from s3" do
         block do 

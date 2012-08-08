@@ -105,19 +105,17 @@ bash "upload code to the remote instance" do
   if timestamp
     freeze_date_opt = "--freeze-date #{timestamp[0..3]}-#{timestamp[4..5]}-#{timestamp[6..7]}"
   end
-  debug_opt = node[:rightimage][:debug] == "true" ? "--debug" : ""
 
   code <<-EOH
-  /opt/rightscale/sandbox/bin/ruby bin/upload --rightlink #{node[:rightimage][:rightlink_version]} #{freeze_date_opt} #{debug_opt} --no-checkout --no-configure
+  /opt/rightscale/sandbox/bin/ruby bin/upload --rightlink #{node[:rightimage][:rightlink_version]} #{freeze_date_opt} --no-checkout --no-configure
   EOH
 end
 
 bash "configure the remote instance" do
   flags "-ex"
   cwd BaseRhelConstants::REBUNDLE_SOURCE_PATH
-  debug_opt = node[:rightimage][:debug] == "true" ? "--debug" : ""
   code <<-EOH
-  /opt/rightscale/sandbox/bin/ruby bin/configure --rightlink #{node[:rightimage][:rightlink_version]} #{debug_opt}
+  /opt/rightscale/sandbox/bin/ruby bin/configure --rightlink #{node[:rightimage][:rightlink_version]} 
   EOH
 end
 

@@ -30,64 +30,64 @@ when "ec2"
   when "us-east"
     case rightimage[:arch]
     when "i386" 
-      set[:rightimage][:aki_id] = "aki-805ea7e9"
+      set[:rightimage][:aki_id] = "aki-b6aa75df"
       set[:rightimage][:ramdisk_id] = nil
     when "x86_64"
-      set[:rightimage][:aki_id] = "aki-825ea7eb"
+      set[:rightimage][:aki_id] = "aki-88aa75e1"
       set[:rightimage][:ramdisk_id] = nil
     end
   when "us-west"
     case rightimage[:arch]
     when "i386" 
-      set[:rightimage][:aki_id] = "aki-83396bc6"
+      set[:rightimage][:aki_id] = "aki-f57e26b0"
       set[:rightimage][:ramdisk_id] = nil
     when "x86_64"
-      set[:rightimage][:aki_id] = "aki-8d396bc8"
+      set[:rightimage][:aki_id] = "aki-f77e26b2"
       set[:rightimage][:ramdisk_id] = nil
     end
   when "eu-west" 
     case rightimage[:arch]
     when "i386" 
-      set[:rightimage][:aki_id] = "aki-64695810"
+      set[:rightimage][:aki_id] = "aki-75665e01"
       set[:rightimage][:ramdisk_id] = nil
     when "x86_64"
-      set[:rightimage][:aki_id] = "aki-62695816"
+      set[:rightimage][:aki_id] = "aki-71665e05"
       set[:rightimage][:ramdisk_id] = nil
     end
   when "ap-southeast"
     case rightimage[:arch]
     when "i386" 
-      set[:rightimage][:aki_id] = "aki-a4225af6"
+      set[:rightimage][:aki_id] = "aki-f81354aa"
       set[:rightimage][:ramdisk_id] = nil
     when "x86_64"
-      set[:rightimage][:aki_id] = "aki-aa225af8"
+      set[:rightimage][:aki_id] = "aki-fe1354ac"
       set[:rightimage][:ramdisk_id] = nil
     end
   when "ap-northeast"
     case rightimage[:arch]
     when "i386" 
-      set[:rightimage][:aki_id] = "aki-ec5df7ed"
+      set[:rightimage][:aki_id] = "aki-42992843"
       set[:rightimage][:ramdisk_id] = nil
     when "x86_64"
-      set[:rightimage][:aki_id] = "aki-ee5df7ef"
+      set[:rightimage][:aki_id] = "aki-44992845"
       set[:rightimage][:ramdisk_id] = nil
     end
   when "us-west-2"
     case rightimage[:arch]
     when "i386" 
-      set[:rightimage][:aki_id] = "aki-c2e26ff2"
+      set[:rightimage][:aki_id] = "aki-fa37baca"
       set[:rightimage][:ramdisk_id] = nil
     when "x86_64"
-      set[:rightimage][:aki_id] = "aki-98e26fa8"
+      set[:rightimage][:aki_id] = "aki-fc37bacc"
       set[:rightimage][:ramdisk_id] = nil
     end
   when "sa-east"
     case rightimage[:arch]
     when "i386" 
-      set[:rightimage][:aki_id] = "aki-bc3ce3a1"
+      set[:rightimage][:aki_id] = "aki-ca8f51d7"
       set[:rightimage][:ramdisk_id] = nil
     when "x86_64"
-      set[:rightimage][:aki_id] = "aki-cc3ce3d1"
+      set[:rightimage][:aki_id] = "aki-c48f51d9"
       set[:rightimage][:ramdisk_id] = nil
     end
   end
