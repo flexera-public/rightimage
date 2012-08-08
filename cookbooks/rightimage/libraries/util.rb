@@ -8,7 +8,7 @@ module RightImage
     # Delete entire directory tree including the directory itself.
     DIRS_delete_tree = [ "/root/.gem" ]
     # Truncate contents of all files in these directories.
-    DIRS_truncate = [ "/var/log", "/var/mail", "/var/spool/posfix" ]
+    DIRS_truncate = [ "/var/log", "/var/mail", "/var/spool/postfix" ]
     # Delete these files.
     FILES_delete = [ "/root/.gemrc" ]
     
