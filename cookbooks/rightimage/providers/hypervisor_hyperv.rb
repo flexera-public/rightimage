@@ -86,8 +86,6 @@ EOF
 end
 
 action :install_tools do
-
-
   package_name =
     case node[:rightimage][:platform]
     when "centos", "rhel" then "WALinuxAgent-1.0-1.noarch.rpm"

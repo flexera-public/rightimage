@@ -163,14 +163,9 @@ EOS
   end
 
   #  - configure mirrors
-  template "#{guest_root}/etc/apt/sources.list" do 
-    source "sources.list.erb"
-    variables(
-      :mirror_url => node[:rightimage][:mirror_url], 
-      :platform_codename => platform_codename
-    )
-    backup false
-  end 
+  rightimage_os new_resource.platform do
+    action :repo_unfreeze
+  end
 
   bash "Restore original ext4 in /etc/mke2fs.conf" do
     flags "-ex"
@@ -283,4 +278,32 @@ EOF
       chroot #{guest_root} apt-get clean
     EOH
   end
+end
+
+action :repo_freeze do
+  template "#{guest_root}/etc/apt/sources.list" do
+    source "sources.list.erb"
+    variables(
+      :mirror_date => node[:rightimage][:mirror_date],
+      :platform_codename => platform_codename
+    )
+    backup false
+  end
+
+  # Need to apt-get update whenever the repo file is changed.
+  execute "chroot #{guest_root} apt-get -y update"
+end
+
+action :repo_unfreeze do
+  template "#{guest_root}/etc/apt/sources.list" do
+    source "sources.list.erb"
+    variables(
+      :mirror_date => "latest",
+      :platform_codename => platform_codename
+    )
+    backup false
+  end
+
+  # Need to apt-get update whenever the repo file is changed.
+  execute "chroot #{guest_root} apt-get -y update"
 end
