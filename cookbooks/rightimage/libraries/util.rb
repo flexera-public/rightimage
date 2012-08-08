@@ -3,8 +3,14 @@ module RightImage
 
   class Util
       
-    DIRS_delete = [ "/mnt", "/tmp", "/var/cache/yum" ]
-    DIRS_truncate = [ "/var/log", "/var/mail", "/var/spool/posfix" ]
+    # Delete contents of these directories, including deleting subdirectories, but not the directory itself.
+    DIRS_delete = [ "/mnt", "/tmp", "/var/cache/apt/archives", "/var/cache/yum" ]
+    # Delete entire directory tree including the directory itself.
+    DIRS_delete_tree = [ "/root/.gem" ]
+    # Truncate contents of all files in these directories.
+    DIRS_truncate = [ "/var/log", "/var/mail", "/var/spool/postfix" ]
+    # Delete these files.
+    FILES_delete = [ "/root/.gemrc" ]
     
     # Utility Class
     #
@@ -21,6 +27,15 @@ module RightImage
     #
     def sanitize()
       @log.info("Performing image sanitization routine...")
+      DIRS_delete_tree.each do |dir|
+        directory = ::File.join(@root, dir)
+
+        if ::File.directory?(directory)
+          @log.warn("Deleting directory tree: #{directory}")
+          FileUtils.rm_rf directory
+        end
+      end
+
       DIRS_delete.each do |dir|
         files = ::Dir.glob(::File.join(@root, dir, "**", "*"))
         @log.warn("Contents found in #{dir}!") unless files.empty?
@@ -33,10 +48,19 @@ module RightImage
       DIRS_truncate.each do |dir|
         files = ::Dir.glob(::File.join(@root, dir, "**", "*"))
         files.each do |f|
-          if ::File.file?(f)
+          if ::File.file?(f) && ::File.size?(f)
             @log.warn("Truncating file: #{f}")
             ::File.truncate(f, 0)
           end
+        end
+      end
+
+      FILES_delete.each do |f|
+        filename = ::File.join(@root, f)
+
+        if ::File.file?(filename)
+          @log.warn("Deleting file: #{filename}")
+          ::File.delete(filename)
         end
       end
 

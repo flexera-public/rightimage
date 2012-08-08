@@ -60,7 +60,7 @@ action :configure do
       rm -r $ROOT/tmp/ec2-a*
       echo 'export PATH=/home/ec2/bin:${PATH}' >> $ROOT/etc/profile.d/ec2.sh
       echo 'export EC2_HOME=/home/ec2' >> $ROOT/etc/profile.d/ec2.sh
-      chroot $ROOT gem install s3sync --no-ri --no-rdoc
+      chroot $ROOT gem install #{gem_install_source} s3sync --no-ri --no-rdoc
     EOH
   end
    

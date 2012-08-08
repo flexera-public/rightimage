@@ -14,7 +14,7 @@ gem_package_fog
 full_image_path = target_raw_root+"/"+image_name+"."+image_file_ext
 
 hypervisor = node[:rightimage][:hypervisor]
-image_s3_path = hypervisor+"/"+guest_platform+"/"+platform_version+"/"
+image_s3_path = hypervisor+"/"+guest_platform+"/"+guest_platform_version+"/"
 
 image_upload_bucket = "rightscale-#{node[:rightimage][:cloud]}-dev"
 

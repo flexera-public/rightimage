@@ -25,8 +25,8 @@ bash "compress partitioned base image" do
 end
 
 
-image_s3_path = guest_platform+"/"+platform_version+"/"+arch+"/"+timestamp[0..3]+"/"
-image_upload_bucket = "rightscale-rightimage-base-dev"
+image_s3_path = guest_platform+"/"+guest_platform_version+"/"+guest_arch+"/"+timestamp[0..3]+"/"
+image_upload_bucket = node[:rightimage][:base_image_bucket]
 
 # Upload partitioned image
 rightimage_upload file_partitioned do

@@ -12,18 +12,8 @@ action :configure do
 
   directory temp_root { recursive true }
 
-  # Add google init script for ubuntu
-  if new_resource.platform == "ubuntu"
-    cookbook_file "#{guest_root}/etc/init.d/google" do
-      source "google_initscript.sh"
-      owner "root"
-      group "root"
-      mode "0755"
-      action :create
-      backup false
-    end
-  elsif new_resource.platform =~ /centos|rhel/ && new_resource.platform_version.to_f >= 6
-    # Add google init script for centos (6+ only)
+  if (new_resource.platform =~ /centos|rhel/ && new_resource.platform_version.to_f >= 6) || new_resource.platform == "ubuntu"
+    # Add google init script for centos (6+ only) / ubuntu
     cookbook_file "#{guest_root}/etc/init/google.conf" do
       source "google.conf"
       owner "root"
@@ -53,26 +43,6 @@ action :configure do
     code "tar zxvf #{temp_root}/google.tgz -C #{guest_root}/usr/share"
   end
 
-  if new_resource.platform == "ubuntu"
-    bash "Link init script to runlevels" do
-      flags "-ex" 
-      code <<-EOH
-        guest_root=#{guest_root}
-      
-        # Link init script to runlevels
-        chroot $guest_root ln -sf ../init.d/google /etc/rc0.d/K01google
-        chroot $guest_root ln -sf ../init.d/google /etc/rc1.d/K01google
-        chroot $guest_root ln -sf ../init.d/google /etc/rc6.d/K01google
-        chroot $guest_root ln -sf ../init.d/google /etc/rc2.d/s99google
-        chroot $guest_root ln -sf ../init.d/google /etc/rc3.d/s99google
-        chroot $guest_root ln -sf ../init.d/google /etc/rc4.d/s99google
-        chroot $guest_root ln -sf ../init.d/google /etc/rc5.d/s99google
-      EOH
-    end
-  else
-    # Not necessary for upstart
-  end
-
   bash "configure for google compute" do
     flags "-ex" 
     code <<-EOH
@@ -84,25 +54,33 @@ action :configure do
       case "#{new_resource.platform}" in
       "centos"|"rhel")
         chroot $guest_root yum -y install python-setuptools python-devel python-libs
-        # Emit signal to run google_run_startup_scripts
-        # Note that this comes after and replaces the /etc/rc.local written in KVM provider
-        # will not work centos 5
-        echo '#!/bin/bash' > $guest_root/etc/rc.local
-        echo 'initctl emit --no-wait google-rc-local-has-run' >> $guest_root/etc/rc.local
-        chmod 755 $guest_root/etc/rc.local
+
+        # enable console access
+        sed -i "s/ACTIVE_CONSOLES=.*/ACTIVE_CONSOLES=\\/dev\\/tty1/" $guest_root/etc/sysconfig/init
         ;;
       "ubuntu")
         chroot $guest_root apt-get -y install python-dev python-setuptools
         chroot $guest_root apt-get -y install acpid dhcp3-client
-        # Emit signal to run google_run_startup_scripts
-        # Note that this comes after and replaces the /etc/rc.local written in KVM provider
-        echo '#!/bin/bash' > $guest_root/etc/rc.local
-        echo 'initctl emit --no-wait google-rc-local-has-run' >> $guest_root/etc/rc.local
-        chmod 755 $guest_root/etc/rc.local
+
+        # Uninstall grub (not needed)
+        chroot $guest_root apt-get -y purge grub-common
+
         # Google disables loading of kernel modules
         echo '' > /etc/modules
+
+        # Disable all ttys except for tty1 (console)
+        for i in `ls $guest_root/etc/init/tty[2-9].conf`; do
+          mv $i $i.disabled;
+        done
         ;;
       esac
+
+      # Emit signal to run google_run_startup_scripts
+      # Note that this comes after and replaces the /etc/rc.local written in KVM provider
+      # will not work centos 5
+      echo '#!/bin/bash' > $guest_root/etc/rc.local
+      echo 'initctl emit --no-wait google-rc-local-has-run' >> $guest_root/etc/rc.local
+      chmod 755 $guest_root/etc/rc.local
 
       set +e 
       # Add metadata alias
@@ -234,10 +212,12 @@ EOF
     EOF
   end
 
-#  ruby_block "store id" do
-    # add to global id store for use by other recipes
-#    id_list = RightImage::IdList.new(Chef::Log)
-#    id_list.add(image_id)
-#  end
+  # Needed for do_create_mci, the primary key is the image_name
+  ruby_block "store id" do
+    block do
+      id_list = RightImage::IdList.new(Chef::Log)
+      id_list.add("projects/#{node[:rightimage][:google][:project_id]}/images/"+new_resource.image_name)
+    end
+  end
 end
 

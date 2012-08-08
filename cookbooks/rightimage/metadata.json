@@ -68,6 +68,19 @@
       "display_name": "RightLink Version",
       "description": "The RightLink version we are building into our image"
     },
+    "rightimage/azure/shared_key": {
+      "required": "recommended",
+      "calculated": false,
+      "choice": [
+
+      ],
+      "type": "string",
+      "recipes": [
+        "rightimage::cloud_upload"
+      ],
+      "display_name": "Azure Shared Key",
+      "description": "Shared key for the storage account to upload the image to.  If supplied, will use Image Upload Bucket as the container to uplaod to.  If not supplied, will let Azure command line tool automatically determine a storage account and container to upload to. "
+    },
     "rightimage/openstack/user": {
       "required": "optional",
       "calculated": false,
@@ -453,7 +466,11 @@
         "rightimage::build_base",
         "rightimage::build_image",
         "rightimage::loopback_copy",
+        "rightimage::block_device_backup",
+        "rightimage::block_device_create",
         "rightimage::block_device_restore",
+        "rightimage::loopback_resize",
+        "rightimage::loopback_mount",
         "rightimage::loopback_create",
         "rightimage::cloud_add",
         "rightimage::cloud_upload",
@@ -474,6 +491,24 @@
       ],
       "display_name": "Google OAuth2 credentials refresh token",
       "description": "Refresh token value for GCE. Pulled form gcutil conf"
+    },
+    "rightimage/azure/region": {
+      "required": "recommended",
+      "calculated": false,
+      "choice": [
+        "West Europe",
+        "North Europe",
+        "Southeast Asia",
+        "East Asia",
+        "West US",
+        "East US"
+      ],
+      "default": "West US",
+      "type": "string",
+      "recipes": [
+        "rightimage::cloud_upload"
+      ],
+      "display_name": "Azure Location"
     },
     "rightimage/cloudstack/cdc_api_key": {
       "required": "required",
@@ -570,6 +605,19 @@
       ],
       "display_name": "Google Project ID",
       "description": "GCE Project ID to register this image for"
+    },
+    "rightimage/azure/storage_account": {
+      "required": "recommended",
+      "calculated": false,
+      "choice": [
+
+      ],
+      "type": "string",
+      "recipes": [
+        "rightimage::cloud_upload"
+      ],
+      "display_name": "Azure Storage Account",
+      "description": "Storage account to upload the image to. Required when supplying a Shared Key"
     },
     "rightimage/rackspace/api_token": {
       "required": "required",
@@ -848,7 +896,7 @@
       "description": "The OS version to build into the virtual image."
     }
   },
-  "license": "Apache v2.0",
+  "license": "none",
   "suggestions": {
   },
   "platforms": {
@@ -863,6 +911,7 @@
     "rightimage::rebundle": "coordinate a rebundled image build (redhat on on ec2 or rackspace)",
     "rightimage::cloud_upload": "upload and register image with cloud",
     "rightimage::build_base": "build base image based on host platform",
+    "rightimage::loopback_resize": "resizes loopback file system",
     "rightimage::block_device_restore": "creates a new EBS volume by restoring from an EBS snapshot",
     "rightimage::block_device_create": "creates, formats, and mounts a brand new EBS volume",
     "rightimage::enable_debug": "enables a root login on image for debugging purposes",

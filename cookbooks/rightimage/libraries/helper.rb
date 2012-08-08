@@ -40,7 +40,7 @@ module RightScale
       end
 
       def ri_lineage
-        ["base_image",guest_platform,platform_version,arch,timestamp,build_number].join("_")
+        ["base_image",guest_platform,guest_platform_version,guest_arch,timestamp,build_number].join("_")
       end
 
       # call this guest_platform, not platform, otherwise can introduce a 
@@ -62,11 +62,11 @@ module RightScale
         end
       end
 
-      def platform_version
+      def guest_platform_version
         node[:rightimage][:platform_version]
       end
 
-      def arch
+      def guest_arch
         if node[:rightimage][:arch] == "x64"
           "x86_64"
         else
@@ -110,6 +110,11 @@ module RightScale
         else
           return TRUE
         end
+      end
+
+      def do_loopback_resize
+        source_size_gb = (::File.size(loopback_file(partitioned?))/1024/1024/1024).to_f.round
+        node[:rightimage][:root_size_gb].to_i != source_size_gb
       end
 
       def guest_root
@@ -212,6 +217,14 @@ module RightScale
         (centos? || rhel?) and node[:platform_version].to_f >= 6.0
       end
 
+      def el_repo_file
+        repo_file = case node[:rightimage][:platform]
+                    when "centos" then "CentOS-Base"
+                    when "rhel" then "Epel"
+                    end
+        "#{repo_file}.repo"
+      end
+
       def epel_key_name
         if node[:rightimage][:platform_version].to_i >= 6.0
           "-#{node[:rightimage][:platform_version][0].chr}"
@@ -222,6 +235,10 @@ module RightScale
 
       def hvm?
         node[:rightimage][:virtualization] == "hvm"
+      end
+
+      def gem_install_source
+        "--source http://#{node[:rightimage][:mirror]}/rubygems/archive/#{node[:rightimage][:timestamp][0..7]}/"
       end
     end
   end

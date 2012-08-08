@@ -11,7 +11,8 @@ action :configure do
     code <<-EOH
       case "#{new_resource.platform}" in
       "ubuntu")
-        chroot #{guest_root} apt-get -y install grub iscsi-initiator-utils
+        chroot #{guest_root} apt-get -y purge grub-pc
+        chroot #{guest_root} apt-get -y install grub
         ;;
       "centos"|"rhel")
         chroot #{guest_root} yum -y install grub iscsi-initiator-utils
@@ -101,8 +102,18 @@ EOH
       guest_root=#{guest_root}
 
       # Ignore errors during install, for re-runability.  If you're missing something, it will fail anyway during npm install.
-      yum --installroot $guest_root -y --nogpgcheck install http://nodejs.tchol.org/repocfg/el/nodejs-stable-release.noarch.rpm
-      chroot $guest_root yum -y install nodejs-compat-symlinks npm
+      case "#{new_resource.platform}" in
+      "ubuntu")
+        chroot $guest_root apt-get -y install python-software-properties
+        chroot $guest_root add-apt-repository -y ppa:chris-lea/node.js
+        chroot $guest_root apt-get update
+        chroot $guest_root apt-get -y install nodejs npm
+        ;;
+      "centos"|"rhel")
+        yum --installroot $guest_root -y --nogpgcheck install http://nodejs.tchol.org/repocfg/el/nodejs-stable-release.noarch.rpm
+        chroot $guest_root yum -y install nodejs-compat-symlinks npm
+        ;;
+      esac
       set -e
       chroot $guest_root npm install azure -g
     EOH
@@ -120,8 +131,18 @@ action :upload do
     flags "-x"
     code <<-EOH
       # Ignore errors during install, for re-runability.  If you're missing something, it will fail anyway during npm install.
-      yum -y --nogpgcheck install http://nodejs.tchol.org/repocfg/el/nodejs-stable-release.noarch.rpm
-      yum -y install nodejs-compat-symlinks npm
+      case "#{new_resource.platform}" in
+      "ubuntu")
+        apt-get -y install python-software-properties
+        add-apt-repository -y ppa:chris-lea/node.js
+        apt-get update
+        apt-get -y install nodejs npm
+        ;;
+      "centos"|"rhel")
+        yum -y --nogpgcheck install http://nodejs.tchol.org/repocfg/el/nodejs-stable-release.noarch.rpm
+        yum -y install nodejs-compat-symlinks npm
+        ;;
+      esac
       npm -g ls | grep azure
       if [ "$?" == "1" ]; then
         set -e
@@ -135,17 +156,56 @@ action :upload do
     backup false
   end
 
-  bash "upload image" do
-    flags "-ex"
-    cwd target_raw_root
+  bash "import settings" do
     code <<-EOH
       settings=/root/azure.publishsettings
       azure account import $settings
       rm -f $settings
-      azure vm image create #{image_name} #{image_name}.vhd --os Linux --location "West US"
-      # Delete publishsettings
-      azure account clear
     EOH
+  end
+  if node[:rightimage][:azure][:shared_key].to_s.empty?
+    bash "upload and register image" do
+      flags "-ex"
+      cwd target_raw_root
+      code <<-EOH
+        azure vm image create #{image_name} #{image_name}.vhd \
+          --os Linux \
+          --location "#{node[:rightimage][:azure][:region]}"
+      EOH
+    end
+  else
+    account = node[:rightimage][:azure][:storage_account]
+    container = node[:rightimage][:image_upload_bucket]
+    bash "upload image" do
+      flags "-e"
+      cwd target_raw_root
+      code <<-EOH
+        azure vm disk upload #{image_name}.vhd \
+          http://#{account}.blob.core.windows.net/#{container}/#{image_name}.vhd \
+          #{node[:rightimage][:azure][:shared_key]}
+      EOH
+    end
+    bash "register image" do
+      flags "-ex"
+      cwd target_raw_root
+      code <<-EOH
+        azure vm image create #{image_name} \
+          --os Linux \
+          --location "#{node[:rightimage][:azure][:region]}" \
+          --blob-url https://#{account}.blob.core.windows.net/#{container}/#{image_name}.vhd
+      EOH
+    end
+  end
+
+  # Delete publishsettings
+  execute "azure account clear"
+
+  # Needed for do_create_mci, the primary key is the image_name
+  ruby_block "store id" do
+    block do
+      id_list = RightImage::IdList.new(Chef::Log)
+      id_list.add(image_name)
+    end
   end
 end
 
