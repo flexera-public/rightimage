@@ -20,12 +20,12 @@
 rightscale_marker :begin
 
 rightimage_tester "Ensure /root/.gem doesn't exist" do
-  command "[ ! -d /root/.gem ]"
+  command "test ! -d #{node[:rightimage_tester][:root]}/root/.gem"
   action :test
 end
 
 rightimage_tester "Ensure /root/.gemrc doesn't exist" do
-  command "[ ! -f /root/.gemrc ]"
+  command "test ! -f #{node[:rightimage_tester][:root]}/root/.gemrc"
   action :test
 end
 rightscale_marker :end
