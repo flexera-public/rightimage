@@ -44,7 +44,7 @@ end
 # Create vars
 image_s3_path = guest_platform+"/"+platform_version+"/"+arch+"/"+timestamp[0..3]
 # Switch after testing:
-image_upload_bucket = "rightscale-rightimage-base"
+image_upload_bucket = "rightscale-rightimage-base-dev"
 
 bash "upload_json_blobs" do
   cwd temp_root
