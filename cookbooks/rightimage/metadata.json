@@ -279,7 +279,8 @@
         "rightimage::build_image",
         "rightimage::upload_image_s3",
         "rightimage::base_upload",
-        "rightimage::image_tests"
+        "rightimage::image_tests",
+        "rightimage::report_upload"
       ],
       "display_name": "aws_secret_access_key",
       "description": "aws_secret_access_key"
@@ -344,7 +345,8 @@
         "rightimage::build_image",
         "rightimage::upload_image_s3",
         "rightimage::base_upload",
-        "rightimage::image_tests"
+        "rightimage::image_tests",
+        "rightimage::report_upload"
       ],
       "display_name": "aws_account_number",
       "description": "aws_account_number"
@@ -612,7 +614,8 @@
         "rightimage::build_image",
         "rightimage::upload_image_s3",
         "rightimage::base_upload",
-        "rightimage::image_tests"
+        "rightimage::image_tests",
+        "rightimage::report_upload"
       ],
       "display_name": "aws_access_key_id",
       "description": "aws_access_key_id"
@@ -848,6 +851,7 @@
     "rightimage::rebundle": "coordinate a rebundled image build (redhat on on ec2 or rackspace)",
     "rightimage::cloud_upload": "upload and register image with cloud",
     "rightimage::build_base": "build base image based on host platform",
+    "rightimage::report_upload": "Checksums compressed images, adds info to reports, and uploads reports alongside images",
     "rightimage::block_device_restore": "creates a new EBS volume by restoring from an EBS snapshot",
     "rightimage::block_device_create": "creates, formats, and mounts a brand new EBS volume",
     "rightimage::enable_debug": "enables a root login on image for debugging purposes",
@@ -856,6 +860,7 @@
     "rightimage::loopback_unmount": "unmounts loopback file system",
     "rightimage::block_device_destroy": "unmounts, and deletes an attached EBS volume",
     "rightimage::cloud_add": "configures base os image for a specific cloud",
+    "rightimage::image_report": "Compiles information into a json report by parsing system calls and optional hint files",
     "rightimage::do_create_mci": "creates RightScale MultiCloudImage (MCI) for image (only ec2 currently supported)",
     "rightimage::loopback_mount": "mounts loopback file system",
     "rightimage::ec2_download_bundle": "Downloads bundled image from EC2 S3.",
