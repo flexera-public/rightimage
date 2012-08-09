@@ -17,12 +17,12 @@ end
 # Possibly a better way of creating the folder below
 # directory "/mnt/image/etc/rightscale.d" { recursive true }
 
-# Provide the timestamp and build-date to the chrooted report tool.
+# Provide the freeze-date and build-date to the chrooted report tool.
 ruby_block "create_hint_file" do
   block do
     hint = Hash.new
     # Pull from Chef input.
-    hint["timestamp"] = node[:rightimage][:timestamp][-8..-1]
+    hint["freeze-date"] = "#{node[:rightimage][:timestamp]}"[0..7]
     # Current date
     hint["build-date"] = Time.new.strftime("%Y%m%d")
 

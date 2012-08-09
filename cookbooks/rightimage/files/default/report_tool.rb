@@ -120,8 +120,8 @@ end
 # rec_empty_delete strips empty and nil values.
 class RightScale
   def initialize(hint)
-    @repo_freezedate = hint["timestamp"]
-    @rubygems_freezedate = hint["timestamp"]
+    @repo_freezedate = hint["freeze-date"]
+    @rubygems_freezedate = hint["freeze-date"]
     @rightlink_version = hint["rl-version"]
   end
 
