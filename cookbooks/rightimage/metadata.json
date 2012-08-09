@@ -28,7 +28,8 @@
       "choice": [
         "xen",
         "kvm",
-        "esxi"
+        "esxi",
+        "hyperv"
       ],
       "type": "string",
       "recipes": [
@@ -139,6 +140,58 @@
       "display_name": "Rebundle Base Image ID",
       "description": "Cloud specific ID for the image to start with when building a rebundle image"
     },
+    "rightimage/google/client_id": {
+      "required": "optional",
+      "calculated": false,
+      "choice": [
+
+      ],
+      "type": "string",
+      "recipes": [
+        "rightimage::cloud_upload"
+      ],
+      "display_name": "Google client id",
+      "description": "OAuth2 credentials client id for GCE. Pulled from gcutil conf"
+    },
+    "rightimage/google/gc_secret_access_key": {
+      "required": "optional",
+      "calculated": false,
+      "choice": [
+
+      ],
+      "type": "string",
+      "recipes": [
+        "rightimage::cloud_upload"
+      ],
+      "display_name": "Google secret_access_key",
+      "description": "Google storage (interoperable) secret access key"
+    },
+    "rightimage/azure/id": {
+      "required": "required",
+      "calculated": false,
+      "choice": [
+
+      ],
+      "type": "string",
+      "recipes": [
+        "rightimage::cloud_upload"
+      ],
+      "display_name": "Azure Subscription ID",
+      "description": "Azure Subscription ID"
+    },
+    "rightimage/azure/cert": {
+      "required": "required",
+      "calculated": false,
+      "choice": [
+
+      ],
+      "type": "string",
+      "recipes": [
+        "rightimage::cloud_upload"
+      ],
+      "display_name": "Azure Management Certificate",
+      "description": "Azure Management Certificate"
+    },
     "rightscale/mci_name": {
       "required": "optional",
       "calculated": false,
@@ -227,25 +280,10 @@
         "rightimage::upload_image_s3",
         "rightimage::base_upload",
         "rightimage::image_tests",
-        "rightimage::report_upload"
+        "rightimage::json_upload"
       ],
       "display_name": "aws_secret_access_key",
       "description": "aws_secret_access_key"
-    },
-    "rightimage/print_json": {
-      "required": "optional",
-      "calculated": false,
-      "choice": [
-        "true",
-        "false"
-      ],
-      "default": "false",
-      "type": "string",
-      "recipes": [
-        "rightimage::image_report"
-      ],
-      "display_name": "Print JSON",
-      "description": "Print JSON blob to terminal"
     },
     "rightscale/api_password": {
       "required": "optional",
@@ -308,7 +346,7 @@
         "rightimage::upload_image_s3",
         "rightimage::base_upload",
         "rightimage::image_tests",
-        "rightimage::report_upload"
+        "rightimage::json_upload"
       ],
       "display_name": "aws_account_number",
       "description": "aws_account_number"
@@ -327,6 +365,19 @@
       ],
       "display_name": "Build Mode",
       "description": "Build base image, full image, or migrate existing image."
+    },
+    "rightimage/google/gc_access_key_id": {
+      "required": "optional",
+      "calculated": false,
+      "choice": [
+
+      ],
+      "type": "string",
+      "recipes": [
+        "rightimage::cloud_upload"
+      ],
+      "display_name": "Google access_key_id",
+      "description": "Google storage (interoperable) access key id"
     },
     "rightimage/cloudstack/cdc_secret_key": {
       "required": "required",
@@ -363,7 +414,9 @@
         "eucalyptus",
         "openstack",
         "rackspace",
-        "rackspace_managed"
+        "rackspace_managed",
+        "azure",
+        "google"
       ],
       "type": "string",
       "recipes": [
@@ -395,6 +448,19 @@
       ],
       "display_name": "Root Size GB",
       "description": "Sets the size of the virtual image. Units are in GB."
+    },
+    "rightimage/google/refresh_token": {
+      "required": "optional",
+      "calculated": false,
+      "choice": [
+
+      ],
+      "type": "string",
+      "recipes": [
+        "rightimage::cloud_upload"
+      ],
+      "display_name": "Google OAuth2 credentials refresh token",
+      "description": "Refresh token value for GCE. Pulled form gcutil conf"
     },
     "rightimage/cloudstack/cdc_api_key": {
       "required": "required",
@@ -479,6 +545,19 @@
       "display_name": "Image Source Bucket",
       "description": "When migrating an image, where to download the image from."
     },
+    "rightimage/google/project_id": {
+      "required": "optional",
+      "calculated": false,
+      "choice": [
+
+      ],
+      "type": "string",
+      "recipes": [
+        "rightimage::cloud_upload"
+      ],
+      "display_name": "Google Project ID",
+      "description": "GCE Project ID to register this image for"
+    },
     "rightimage/rackspace/api_token": {
       "required": "required",
       "calculated": false,
@@ -536,7 +615,7 @@
         "rightimage::upload_image_s3",
         "rightimage::base_upload",
         "rightimage::image_tests",
-        "rightimage::report_upload"
+        "rightimage::json_upload"
       ],
       "display_name": "aws_access_key_id",
       "description": "aws_access_key_id"
@@ -587,8 +666,8 @@
       "required": "required",
       "calculated": false,
       "choice": [
-        "i386",
-        "x86_64"
+        "x86_64",
+        "i386"
       ],
       "type": "string",
       "recipes": [
@@ -663,6 +742,19 @@
       ],
       "display_name": "Guest OS Platform",
       "description": "The operating system for the virtual image."
+    },
+    "rightimage/google/client_secret": {
+      "required": "optional",
+      "calculated": false,
+      "choice": [
+
+      ],
+      "type": "string",
+      "recipes": [
+        "rightimage::cloud_upload"
+      ],
+      "display_name": "Google client secret",
+      "description": "OAuth2 credentials client secret for GCE. Pulled from gcutil conf"
     },
     "rightimage/openstack/password": {
       "required": "optional",
@@ -759,7 +851,7 @@
     "rightimage::rebundle": "coordinate a rebundled image build (redhat on on ec2 or rackspace)",
     "rightimage::cloud_upload": "upload and register image with cloud",
     "rightimage::build_base": "build base image based on host platform",
-    "rightimage::report_upload": "Takes md5 checksum of compressed images and uploads the json blobs",
+    "rightimage::report_upload": "Checksums compressed images, adds info to reports, and uploads reports alongside images",
     "rightimage::block_device_restore": "creates a new EBS volume by restoring from an EBS snapshot",
     "rightimage::block_device_create": "creates, formats, and mounts a brand new EBS volume",
     "rightimage::enable_debug": "enables a root login on image for debugging purposes",
@@ -768,7 +860,7 @@
     "rightimage::loopback_unmount": "unmounts loopback file system",
     "rightimage::block_device_destroy": "unmounts, and deletes an attached EBS volume",
     "rightimage::cloud_add": "configures base os image for a specific cloud",
-    "rightimage::image_report": "Combines image info into JSON blobs",
+    "rightimage::image_report": "Compiles information into a json report by parsing system calls and optional hint files",
     "rightimage::do_create_mci": "creates RightScale MultiCloudImage (MCI) for image (only ec2 currently supported)",
     "rightimage::loopback_mount": "mounts loopback file system",
     "rightimage::ec2_download_bundle": "Downloads bundled image from EC2 S3.",

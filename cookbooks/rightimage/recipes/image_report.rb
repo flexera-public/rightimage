@@ -49,12 +49,8 @@ bash "query_image" do
   fi
 
   # Run report tool in image chroot.
-  # Input determines if json is printed to log.
-  if [ "#{node[:rightimage][:print_json]}" == "true" ]; then
-    /usr/sbin/chroot #{guest_root} /tmp/report_tool.rb "print"
-  else
-    /usr/sbin/chroot #{guest_root} /tmp/report_tool.rb
-  fi
+  # Prints report to log
+  /usr/sbin/chroot #{guest_root} /tmp/report_tool.rb "print"
 
   # Move json file out of image to receive md5.  
   mv #{guest_root}/tmp/report.js #{temp_root}/#{loopback_filename(false)}.js

@@ -37,9 +37,9 @@ recipe "rightimage::loopback_copy", "creates non-partitioned loopback fs image f
 recipe "rightimage::loopback_unmount", "unmounts loopback file system"
 recipe "rightimage::loopback_mount", "mounts loopback file system"
 
-# Report tool recipe
-recipe "rightimage::image_report","Combines image info into JSON blobs"
-recipe "rightimage::report_upload","Takes md5 checksum of compressed images and uploads the json blobs"
+# Report tool recipes
+recipe "rightimage::image_report","Compiles information into a json report by parsing system calls and optional hint files"
+recipe "rightimage::report_upload","Checksums compressed images, adds info to reports, and uploads reports alongside images"
 
 #
 # required
@@ -79,13 +79,13 @@ attribute "rightimage/platform_version",
 attribute "rightimage/arch",
   :display_name => "Guest OS Architecture",
   :description => "The architecture for the virtual image.",
-  :choice => [ "i386", "x86_64" ],
+  :choice => [ "x86_64", "i386" ],
   :required => "required"
   
 attribute "rightimage/cloud",
   :display_name => "Target Cloud",
   :description => "The supported cloud for the virtual image. If unset, build a generic base image.",
-  :choice => [ "ec2", "cloudstack", "eucalyptus", "openstack", "rackspace", "rackspace_managed" ],
+  :choice => [ "ec2", "cloudstack", "eucalyptus", "openstack", "rackspace", "rackspace_managed", "azure", "google"],
   :required => "recommended"
   
 attribute "rightimage/region",
@@ -160,7 +160,7 @@ attribute "rightimage/build_number",
 attribute "rightimage/hypervisor",
   :display_name => "Hypervisor",
   :description => "Which hypervisor is this image for?",
-  :choice => [ "xen", "kvm", "esxi" ],
+  :choice => [ "xen", "kvm", "esxi", "hyperv" ],
   :required => "required"
 
 attribute "rightimage/datacenter",
@@ -201,18 +201,9 @@ attribute "rightscale/mci_name",
    :recipes => [ "rightimage::do_create_mci" ],
    :required => "optional"
 
-# image_report
-attribute "rightimage/print_json",
-  :display_name => "Print JSON",
-  :description => "Print JSON blob to terminal",
-  :choice => [ "true", "false" ],
-  :default => "false",
-  :required => "optional",
-  :recipes => [ "rightimage::image_report" ]
-
 # AWS
 aws_x509_recipes = ["rightimage::cloud_upload", "rightimage::rebundle", "rightimage::default", "rightimage::ec2_download_bundle"]
-aws_api_recipes = aws_x509_recipes + ["rightimage::build_base", "rightimage::build_image", "rightimage::upload_image_s3", "rightimage::base_upload", "rightimage::image_tests", "rightimage::report_upload" ]
+aws_api_recipes = aws_x509_recipes + ["rightimage::build_base", "rightimage::build_image", "rightimage::upload_image_s3", "rightimage::base_upload", "rightimage::image_tests", "rightimage::json_upload" ]
 
 attribute "rightimage/ec2/image_type",
   :display_name => "EC2 Image Type",
@@ -356,3 +347,53 @@ attribute "rightimage/rackspace/api_token",
   :required => "required",
   :recipes => [ "rightimage::rebundle", "rightimage::default" ]
 
+# Azure
+attribute "rightimage/azure/cert",
+  :display_name => "Azure Management Certificate",
+  :description => "Azure Management Certificate",
+  :required => "required",
+  :recipes => [ "rightimage::cloud_upload" ]
+
+attribute "rightimage/azure/id",
+  :display_name => "Azure Subscription ID",
+  :description => "Azure Subscription ID",
+  :required => "required",
+  :recipes => [ "rightimage::cloud_upload" ]
+
+
+# Google
+attribute "rightimage/google/gc_access_key_id",
+  :display_name => "Google access_key_id",
+  :description => "Google storage (interoperable) access key id",
+  :required => "optional",
+  :recipes => [ "rightimage::cloud_upload" ]
+
+attribute "rightimage/google/gc_secret_access_key",
+  :display_name => "Google secret_access_key",
+  :description => "Google storage (interoperable) secret access key",
+  :required => "optional",
+  :recipes => [ "rightimage::cloud_upload" ]
+
+attribute "rightimage/google/project_id",
+  :display_name => "Google Project ID",
+  :description => "GCE Project ID to register this image for",
+  :required => "optional",
+  :recipes => [ "rightimage::cloud_upload" ]
+
+attribute "rightimage/google/client_secret",
+  :display_name => "Google client secret",
+  :description => "OAuth2 credentials client secret for GCE. Pulled from gcutil conf",
+  :required => "optional",
+  :recipes => [ "rightimage::cloud_upload" ]
+
+attribute "rightimage/google/client_id",
+  :display_name => "Google client id",
+  :description => "OAuth2 credentials client id for GCE. Pulled from gcutil conf",
+  :required => "optional",
+  :recipes => [ "rightimage::cloud_upload" ]
+
+attribute "rightimage/google/refresh_token",
+  :display_name => "Google OAuth2 credentials refresh token",
+  :description => "Refresh token value for GCE. Pulled form gcutil conf",
+  :required => "optional",
+  :recipes => [ "rightimage::cloud_upload" ]
