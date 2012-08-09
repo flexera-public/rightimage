@@ -203,7 +203,7 @@ attribute "rightscale/mci_name",
 
 # AWS
 aws_x509_recipes = ["rightimage::cloud_upload", "rightimage::rebundle", "rightimage::default", "rightimage::ec2_download_bundle"]
-aws_api_recipes = aws_x509_recipes + ["rightimage::build_base", "rightimage::build_image", "rightimage::upload_image_s3", "rightimage::base_upload", "rightimage::image_tests", "rightimage::json_upload" ]
+aws_api_recipes = aws_x509_recipes + ["rightimage::build_base", "rightimage::build_image", "rightimage::upload_image_s3", "rightimage::base_upload", "rightimage::image_tests", "rightimage::report_upload" ]
 
 attribute "rightimage/ec2/image_type",
   :display_name => "EC2 Image Type",
