@@ -9,13 +9,13 @@ class Chef::Resource::RubyBlock
 end
 
 # Stage report tool in image.
-cookbook_file "/mnt/image/tmp/report_tool.rb" do
+cookbook_file "#{guest_root}/tmp/report_tool.rb" do
   source "report_tool.rb"
   mode "0755"
 end
 
 # This folder does not exist yet, so create it.
-directory "/mnt/image/etc/rightscale.d" { recursive true }
+directory "#{guest_root}/etc/rightscale.d" { recursive true }
 
 # Provide the freeze-date and build-date to the chrooted report tool.
 ruby_block "create_hint_file" do
@@ -27,7 +27,7 @@ ruby_block "create_hint_file" do
     hint["build-date"] = Time.new.strftime("%Y%m%d")
 
     # Save hash as JSON file.
-    File.open("/mnt/image/etc/rightscale.d/rightimage-release.js","w") do |f|
+    File.open("#{guest_root}/etc/rightscale.d/rightimage-release.js","w") do |f|
       f.write(JSON.pretty_generate(hint))
     end
   end
@@ -57,10 +57,10 @@ bash "query_image" do
   fi
 
   # Move json file out of image to receive md5.  
-  mv /mnt/image/tmp/report.js #{temp_root}/#{loopback_filename(false)}.js
+  mv #{guest_root}/tmp/report.js #{temp_root}/#{loopback_filename(false)}.js
   
   # Clean up report tool.
-  rm -f /mnt/image/tmp/report_tool.rb
+  rm -f #{guest_root}/tmp/report_tool.rb
 
   # If json was installed, uninstall it.
   if [ "$found" == "false" ]; then
