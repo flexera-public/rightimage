@@ -15,7 +15,11 @@ cookbook_file "#{guest_root}/tmp/report_tool.rb" do
 end
 
 # This folder does not exist yet, so create it.
-directory "#{guest_root}/etc/rightscale.d" do { recursive true }
+directory "#{guest_root}/etc/rightscale.d" do
+  owner "root"
+  group "root"
+  recursive true
+end
 
 # Provide the freeze-date and build-date to the chrooted report tool.
 ruby_block "create_hint_file" do
@@ -34,7 +38,11 @@ ruby_block "create_hint_file" do
 end
 
 # Directory does not exist yet, so create it.
-directory temp_root do { recursive true }
+directory temp_root do
+  owner "root"
+  group "root"
+  recursive true
+end
 
 bash "query_image" do
   cwd "/"
