@@ -122,7 +122,7 @@ class RightScale
   def initialize(hint)
     @repo_freezedate = hint["freeze-date"]
     @rubygems_freezedate = hint["freeze-date"]
-    @rightlink_version = hint["rl-version"]
+    @rightlink_version = hint["rightlink-version"]
   end
 
   def to_hash(*a)
@@ -138,7 +138,7 @@ end
 
 # TO-DO: Arbitrary and rebundle cases.
 # Holds info about the image.
-# MD5 sums added to blob in later step.
+# MD5 sums added to report-hash in later step.
 # Takes hint hash as arg.
 # rec_empty_delete strips empty and nil values.
 class Image
@@ -170,22 +170,22 @@ end
 
 # End JSON class infrastructure
 
-# Merge JSON of classes into blob
-blob = Hash.new
-blob.merge!(OS.new)
+# Merge JSON of classes into report-hash
+report-hash = Hash.new
+report-hash.merge!(OS.new)
 # Switch on OS
-if blob["os"] != "linux"
+if report-hash["os"] != "linux"
   puts "Windows support is coming... soon."
   exit
 end
 
 # And the rest
-blob.merge!(LSB.new)
-blob.merge!(UKernel.new)
-blob.merge!(Cloud.new)
+report-hash.merge!(LSB.new)
+report-hash.merge!(UKernel.new)
+report-hash.merge!(Cloud.new)
 
 # Take platform as arg
-blob.merge!(Packages.new(blob["lsb"]["id"]))
+report-hash.merge!(Packages.new(blob["lsb"]["id"]))
 
 # Give hint
 if File.exists? "/etc/rightscale.d/rightimage-release.js"
@@ -194,18 +194,18 @@ else
   hint = Hash.new
 end  
 # Add to hint to simplify arguments
-hint["rl-version"] = blob["packages"]["rightscale"]
+hint["rightlink-version"] = report-hash["packages"]["rightscale"]
   
 # Receive hint
-blob.merge!(RightScale.new(hint))
-blob.merge!(Image.new(hint))
+report-hash.merge!(RightScale.new(hint))
+report-hash.merge!(Image.new(hint))
 
 # Print results if flag is set
 if(ARGV[0] == "print" )
-  puts JSON.pretty_generate(blob)
+  puts JSON.pretty_generate(report-hash)
 end
 
 # Save JSON to /tmp
 File.open("/tmp/report.js","w") do |f|
-  f.write(JSON.pretty_generate(blob))
+  f.write(JSON.pretty_generate(report-hash))
 end
