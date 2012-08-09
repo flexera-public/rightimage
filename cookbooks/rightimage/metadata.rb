@@ -37,7 +37,9 @@ recipe "rightimage::loopback_copy", "creates non-partitioned loopback fs image f
 recipe "rightimage::loopback_unmount", "unmounts loopback file system"
 recipe "rightimage::loopback_mount", "mounts loopback file system"
 
-
+# Report tool recipes
+recipe "rightimage::image_report","Compiles information into a json report by parsing system calls and optional hint files"
+recipe "rightimage::report_upload","Checksums compressed images, adds info to reports, and uploads reports alongside images"
 
 #
 # required
@@ -201,7 +203,7 @@ attribute "rightscale/mci_name",
 
 # AWS
 aws_x509_recipes = ["rightimage::cloud_upload", "rightimage::rebundle", "rightimage::default", "rightimage::ec2_download_bundle"]
-aws_api_recipes = aws_x509_recipes + ["rightimage::build_base", "rightimage::build_image", "rightimage::upload_image_s3", "rightimage::base_upload", "rightimage::image_tests" ]
+aws_api_recipes = aws_x509_recipes + ["rightimage::build_base", "rightimage::build_image", "rightimage::upload_image_s3", "rightimage::base_upload", "rightimage::image_tests", "rightimage::report_upload" ]
 
 attribute "rightimage/ec2/image_type",
   :display_name => "EC2 Image Type",
