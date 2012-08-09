@@ -138,7 +138,7 @@ end
 
 # TO-DO: Arbitrary and rebundle cases.
 # Holds info about the image.
-# MD5 sums added to report-hash in later step.
+# MD5 sums added to report_hash in later step.
 # Takes hint hash as arg.
 # rec_empty_delete strips empty and nil values.
 class Image
@@ -170,22 +170,22 @@ end
 
 # End JSON class infrastructure
 
-# Merge JSON of classes into report-hash
-report-hash = Hash.new
-report-hash.merge!(OS.new)
+# Merge JSON of classes into report_hash
+report_hash = Hash.new
+report_hash.merge!(OS.new)
 # Switch on OS
-if report-hash["os"] != "linux"
+if report_hash["os"] != "linux"
   puts "Windows support is coming... soon."
   exit
 end
 
 # And the rest
-report-hash.merge!(LSB.new)
-report-hash.merge!(UKernel.new)
-report-hash.merge!(Cloud.new)
+report_hash.merge!(LSB.new)
+report_hash.merge!(UKernel.new)
+report_hash.merge!(Cloud.new)
 
 # Take platform as arg
-report-hash.merge!(Packages.new(blob["lsb"]["id"]))
+report_hash.merge!(Packages.new(report_hash["lsb"]["id"]))
 
 # Give hint
 if File.exists? "/etc/rightscale.d/rightimage-release.js"
@@ -194,18 +194,18 @@ else
   hint = Hash.new
 end  
 # Add to hint to simplify arguments
-hint["rightlink-version"] = report-hash["packages"]["rightscale"]
+hint["rightlink-version"] = report_hash["packages"]["rightscale"]
   
 # Receive hint
-report-hash.merge!(RightScale.new(hint))
-report-hash.merge!(Image.new(hint))
+report_hash.merge!(RightScale.new(hint))
+report_hash.merge!(Image.new(hint))
 
 # Print results if flag is set
 if(ARGV[0] == "print" )
-  puts JSON.pretty_generate(report-hash)
+  puts JSON.pretty_generate(report_hash)
 end
 
 # Save JSON to /tmp
 File.open("/tmp/report.js","w") do |f|
-  f.write(JSON.pretty_generate(report-hash))
+  f.write(JSON.pretty_generate(report_hash))
 end
