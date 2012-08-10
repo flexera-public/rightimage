@@ -25,7 +25,7 @@ bash "Test reboot" do
 #set up a script to wait and reboot
 cat << EOF > /root/reboot.sh
 #!/bin/bash 
-sleep 30
+sleep 5
 init 6
 EOF
 chmod +x /root/reboot.sh
@@ -37,10 +37,16 @@ else
     echo already rebooted once. Rebooting again...
     touch /root/reboot2
     nohup /root/reboot.sh &
+    sleep 240
+    echo "Reboot failed to trigger after 240 seconds"
+    exit 1
   else
     echo About to reboot for the first time...
     touch /root/reboot1
     nohup /root/reboot.sh &
+    sleep 240
+    echo "Reboot failed to trigger after 240 seconds"
+    exit 1
   fi
 fi
   EOH
