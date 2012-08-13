@@ -711,7 +711,7 @@
       "description": "Git repository to checkout from when building a rebundle image"
     },
     "rightimage/arch": {
-      "required": "required",
+      "required": "optional",
       "calculated": false,
       "choice": [
         "x86_64",
@@ -776,7 +776,7 @@
       "description": "The bucket to upload the image to."
     },
     "rightimage/platform": {
-      "required": "required",
+      "required": "optional",
       "calculated": false,
       "choice": [
         "centos",
@@ -865,7 +865,7 @@
       "description": "The EC2 region in which the image will reside"
     },
     "rightimage/platform_version": {
-      "required": "required",
+      "required": "optional",
       "calculated": false,
       "choice": [
         "5.4",
@@ -884,7 +884,7 @@
       "description": "The OS version to build into the virtual image."
     }
   },
-  "license": "none",
+  "license": "Apache v2.0",
   "suggestions": {
   },
   "platforms": {

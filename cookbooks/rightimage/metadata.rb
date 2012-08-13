@@ -69,19 +69,19 @@ attribute "rightimage/platform",
   :display_name => "Guest OS Platform",
   :description => "The operating system for the virtual image.",
   :choice => [ "centos", "ubuntu", "suse", "rhel" ],
-  :required => "required"
+  :required => "optional"
   
 attribute "rightimage/platform_version",
   :display_name => "Guest OS Version",
   :description => "The OS version to build into the virtual image.",
   :choice => [ "5.4", "5.6", "5.8", "6.2", "10.04", "10.10", "12.04" ],
-  :required => "required"
+  :required => "optional"
   
 attribute "rightimage/arch",
   :display_name => "Guest OS Architecture",
   :description => "The architecture for the virtual image.",
   :choice => [ "x86_64", "i386" ],
-  :required => "required"
+  :required => "optional"
   
 attribute "rightimage/cloud",
   :display_name => "Target Cloud",

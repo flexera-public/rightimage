@@ -17,6 +17,9 @@ set[:rightimage][:root_mount][:label_dev] = "ROOT"
 set[:rightimage][:root_mount][:dev] = "LABEL=#{rightimage[:root_mount][:label_dev]}"
 set_unless[:rightimage][:image_source_bucket] = "rightscale-us-west-2"
 set_unless[:rightimage][:base_image_bucket] = "rightscale-rightimage-base-dev"
+set_unless[:rightimage][:platform] = guest_platform
+set_unless[:rightimage][:platform_version] = guest_platform_version
+set_unless[:rightimage][:arch] = guest_arch
 
 if timestamp
   if rightimage[:platform] == "ubuntu"
