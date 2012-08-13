@@ -17,6 +17,8 @@ rightscale_marker :begin
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+raise "ERROR: your build_mode input is set to #{node[:rightimage][:build_mode]}. Should be 'full'" unless node[:rightimage][:build_mode] == "full"
+
 class Chef::Recipe
   include RightScale::RightImage::Helper
 end
