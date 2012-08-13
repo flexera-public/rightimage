@@ -54,7 +54,6 @@ files/default/s3sync.tgz	4cc1011db235866838a0787efce5670068ba5c31
 files/default/bashrc	48cae91832d0faf2134398f92eca80eb84998b26
 libraries/helper.rb	da63b6cbc11683666d0dfdc24b17490d59cf452b
 files/default/motd	998817f0bdf63ae7814f0ea4a3c7069f0fea8a8d
-templates/default/gemrc.erb	7f4a89dc1477707c963fc579aa5869fa5e88201a
 templates/default/sles/root/etc/YaST2/licenses/base/license.fr.txt	4ac2a2bc35998569d7bd5d71fab047280d81c5b6
 recipes/cloud_add_raw.rb	c3a081bc4be03bdfcb3e9a9ce6296d48cbbfaa0b
 recipes/cloud_add_vmops_xen.rb	c0536b18c6e605980c834bf8f9293eef47d5204b
@@ -76,7 +75,6 @@ files/default/chkconfig	2e434487d34dfca44de061ce57248b2070989091
 templates/default/sles/root/etc/zypp/repos.d/susecloud:SLES11-SP1.repo.erb	bf22b93c2acd271674473a6e11436d1e7b1f23b5
 recipes/build_image.rb	94134b403781e941dc84fa2818e5b201f5ced0ba
 recipes/cloud_add_vmops.rb	2cccb592bf40955704f00adb536adbc9c37a9cfc
-templates/default/CentOS.repo.erb	52874d694b1e6ddf56d82d7b3ba2d322c2505cb3
 files/ubuntu/linux-headers-2.6.31-307-ec2_2.6.31-307.27_amd64.deb	fb56f386e8b957e56fde76710519d20c18a70982
 templates/default/sles/root/linuxrc.erb	d36fc84b38b6acbe16b028836c8373c2a12f1a5b
 templates/default/sles/root/etc/zypp/repos.d/susecloud:SLE11-SDK-SP1-Updates.repo.erb	9bd7ef0e0b16894a7df86c5446efe1d11522177b
