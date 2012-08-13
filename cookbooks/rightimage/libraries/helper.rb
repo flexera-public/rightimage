@@ -69,7 +69,7 @@ module RightScale
         if node[:rightimage][:arch] == "x64"
           "x86_64"
         else
-          node[:rightimage][:arch] || node[:arch]
+          node[:rightimage][:arch] || node[:kernel][:machine]
         end
       end
 
