@@ -1,10 +1,6 @@
-<%= node[:rightimage][:root_mount][:dev] %> /         ext3    <%= node[:rightimage][:platform] == "ubuntu" && node[:rightimage][:platform_version].to_f >= 12.04 && node[:rightimage][:hypervisor] == "xen" ? "errors=remount-ro,barrier=0":"defaults" %>        <%= node[:rightimage][:root_mount][:dump] %> <%= node[:rightimage][:root_mount][:fsck] %>
-<% unless node[:rightimage][:fstab][:ephemeral] == false %>
-<% unless node[:rightimage][:fstab][:ephemeral_mount_opts] == nil -%>
+<%= node[:rightimage][:root_mount][:dev] %> /         ext3    <%= node[:rightimage][:root_mount][:options] %>        <%= node[:rightimage][:root_mount][:dump] %> <%= node[:rightimage][:root_mount][:fsck] %>
+<% unless node[:rightimage][:ephemeral_mount] == nil %>
 <%= node[:rightimage][:ephemeral_mount] %>   /mnt      ext3    <%= node[:rightimage][:fstab][:ephemeral_mount_opts] %>        0 0
-<% else -%>
-<%= node[:rightimage][:ephemeral_mount] %>   /mnt      ext3    defaults        0 0
-<% end -%>
 <% end %>
 <% unless node[:rightimage][:swap_mount] == nil -%>
 <%= node[:rightimage][:swap_mount] %>  swap      swap    <%= node[:rightimage][:fstab][:swap_mount_opts] %>        0 0
