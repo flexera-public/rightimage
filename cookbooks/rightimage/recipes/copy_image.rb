@@ -20,7 +20,8 @@ bash "create nonpartitioned image" do
     rm -rf $source_image2
     mkdir -p $source_image2
     mount $loop_dev $source_image2
-    rsync -a $source_image/ $source_image2/
+    rsync -a --exclude '/proc/' $source_image/ $source_image2/
+    mkdir -p $source_image2/proc
     umount -lf $source_image2
     losetup -d $loop_dev
   EOH
