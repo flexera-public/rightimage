@@ -1,10 +1,8 @@
 default         0
-timeout         <%= node[:rightimage][:cloud] == "azure" || node[:rightimage][:cloud] == "ec2" ? "0":"5" %>
+timeout         <%= node[:rightimage][:grub][:timeout] %>
 hiddenmenu
 
-<% kern = ::File.basename(Dir.glob("#{guest_root}/boot/vmlinuz*").sort_by { |f| File.mtime(f) }.last) %>
-<% initrd = ::File.basename(Dir.glob("#{guest_root}/boot/initr*").sort_by { |f| File.mtime(f) }.last) %>
-title           <%= node[:rightimage][:platform] %> <%= node[:rightimage][:platform_version] %> (<%= kern %>) (<%= node[:rightimage][:hypervisor] %>) 
-root            (hd0<%= ((partitioned?)?",#{partition_number}":"") %>)
-kernel          /boot/<%= kern %> root=<%= node[:rightimage][:root_mount][:dev] %> ro <%= ((node[:rightimage][:hypervisor] == "xen")?"console=hvc0 ":"") %>consoleblank=0 <% if node[:rightimage][:cloud] == "azure" %><%= node[:rightimage][:platform] == "centos" ? "numa=off ":"ata_piix.disable_driver " %><% end %><%= (node[:rightimage][:platform] == "centos" && node[:rightimage][:platform_version].to_f >= 6.3) ? 'xen_blkfront.sda_is_xvda=1 ':''%>
-initrd          /boot/<%= initrd %>
+title           <%= node[:rightimage][:platform] %> <%= node[:rightimage][:platform_version] %> (<%= grub_kernel %>) (<%= node[:rightimage][:hypervisor] %>)
+root            (hd0<%= grub_root %>)
+kernel          /boot/<%= grub_kernel %> root=<%= node[:rightimage][:root_mount][:dev] %> ro <%= node[:rightimage][:grub][:kernel][:options] %>
+initrd          /boot/<%= grub_initrd %>
