@@ -147,7 +147,6 @@ case rightimage[:cloud]
       set[:rightimage][:root_mount][:dump] = "1" 
       set[:rightimage][:root_mount][:fsck] = "1" 
     when "kvm"
-      set[:rightimage][:fstab][:ephemeral] = false
       set[:rightimage][:ephemeral_mount] = "/dev/vdb"
       set[:rightimage][:fstab][:ephemeral_mount_opts] = "defaults"
       set[:rightimage][:grub][:root_device] = "/dev/vda"
