@@ -40,12 +40,15 @@ action :install do
     EOH
   end
 
+  mirror_date = "#{timestamp[0..3]}/#{timestamp[4..5]}/#{timestamp[6..7]}"
+  mirror_url = "http://#{node[:rightimage][:mirror]}/ubuntu_daily/#{mirror_date}"
+
   bootstrap_cmd = "/usr/bin/vmbuilder xen ubuntu -o \
       --suite=#{platform_codename} \
       -d #{node[:rightimage][:build_dir]} \
       --rootsize=2048 \
-      --install-mirror=#{node[:rightimage][:mirror_url]} \
-      --install-security-mirror=#{node[:rightimage][:mirror_url]} \
+      --install-mirror=#{mirror_url} \
+      --install-security-mirror=#{mirror_url} \
       --components=main,restricted,universe,multiverse \
       --lang=#{node[:rightimage][:lang]} --verbose "
   if node[:rightimage][:arch] == "i386"
@@ -284,7 +287,7 @@ action :repo_freeze do
   template "#{guest_root}/etc/apt/sources.list" do
     source "sources.list.erb"
     variables(
-      :mirror_date => node[:rightimage][:mirror_date],
+      :mirror_date => "#{timestamp[0..3]}/#{timestamp[4..5]}/#{timestamp[6..7]}",
       :platform_codename => platform_codename
     )
     backup false
