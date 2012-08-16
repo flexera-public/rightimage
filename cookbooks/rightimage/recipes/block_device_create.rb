@@ -34,23 +34,35 @@ end
 if mounted?
   Chef::Log::info("Block device already mounted")
 else
-  # Times 2.3 since we need to store 2 raw loopback files, and need a·
-  # little extra space to gzip them, take snapshots, etc
-  new_volume_size = (node[:rightimage][:root_size_gb].to_f*2.3).ceil.to_s
-  block_device ri_lineage do
-    cloud "ec2"
-    mount_point target_raw_root
-    vg_data_percentage "95"
-    max_snapshots "1000"
-    keep_daily "1000"
-    keep_weekly "1000"
-    keep_monthly "1000"
-    keep_yearly "1000"
-    volume_size new_volume_size
-    stripe_count "1"
-    lineage ri_lineage
-    action :create
-    persist true
+  begin
+    @api = RightScale::Tools::API.factory('1.0', {:cloud=>'ec2',:hypervisor=>'xen'})
+    Chef::Log::info("Checking for existing EBS snapshot lineage #{ri_lineage}")
+    snaps = @api.find_latest_ebs_backup(ri_lineage, false)
+    raise "Existing EBS snapshot found for lineage #{ri_lineage} #{snaps.inspect}"
+  rescue Exception => e
+    if e.message =~ /execution expired/
+      Chef::Log::info("No existing snapshot found.  Creating.")
+      # Times 2.3 since we need to store 2 raw loopback files, and need a·
+      # little extra space to gzip them, take snapshots, etc
+      new_volume_size = (node[:rightimage][:root_size_gb].to_f*2.3).ceil.to_s
+      block_device ri_lineage do
+        cloud "ec2"
+        mount_point target_raw_root
+        vg_data_percentage "95"
+        max_snapshots "1000"
+        keep_daily "1000"
+        keep_weekly "1000"
+        keep_monthly "1000"
+        keep_yearly "1000"
+        volume_size new_volume_size
+        stripe_count "1"
+        lineage ri_lineage
+        action :create
+        persist true
+      end
+    else
+      raise e
+    end
   end
 end
 
