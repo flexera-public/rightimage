@@ -222,7 +222,7 @@ case rightimage[:cloud]
 
         # CentOS 6.1-6.2 start SCSI device naming from e
         if rightimage[:platform_version].to_i == 6
-          if rightimage[:platform_version].to_f.between?(6.1,6.2)
+          if rightimage[:platform_version].to_f > 6.1
             set[:rightimage][:ephemeral_mount] = "/dev/xvdf"
             set[:rightimage][:swap_mount] = "/dev/xvde3"  unless rightimage[:arch]  == "x86_64"
           else
