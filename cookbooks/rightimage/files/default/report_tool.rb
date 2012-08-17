@@ -44,8 +44,8 @@ class LSB
     # Called separately to get full description with spaces.
     # Sanitize newline and quotes.
     @description = `lsb_release -ds`.sub("\n",'').gsub("\"",'')
-    @release = lsb[2]
-    @codename = lsb[1]
+    @release = lsb[1]
+    @codename = lsb[2]
   end
 
   def to_hash(*a)
