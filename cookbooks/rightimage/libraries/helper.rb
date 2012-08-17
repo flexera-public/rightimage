@@ -244,7 +244,7 @@ module RightScale
         (partitioned?) ? ",#{partition_number}":""
       end
 
-      # Timestamp is used to generate the snapshots that base image are stored to and restored from
+      # Timestamp is used to name the snapshots that base images are stored to and restored from
       # For base images, we'll use the specified timestamp or default to the latest date
       # For full images, we'll restored from the specified timestamp, or else poll the API for
       # the latest snapshot and use that.
@@ -254,7 +254,7 @@ module RightScale
         if !node[:rightimage][:timestamp].to_s.empty?
           @@timestamp = node[:rightimage][:timestamp]
         elsif node[:rightimage][:build_mode] == "base"
-          # minus one day, todays mirror may not be ready depending on the time
+          # Minus one day, today's mirror may not be ready depending on the time
           # use 0 for hour and minute fields, if we run block_device_create and block_device_backup
           # separately during development we would like the value to remain stable.
           # bit of a hack, maybe store this value to disk somewhere?
