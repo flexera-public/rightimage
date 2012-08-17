@@ -255,8 +255,11 @@ module RightScale
           @@timestamp = node[:rightimage][:timestamp]
         elsif node[:rightimage][:build_mode] == "base"
           # minus one day, todays mirror may not be ready depending on the time
+          # use 0 for hour and minute fields, if we run block_device_create and block_device_backup
+          # separately during development we would like the value to remain stable.
+          # bit of a hack, maybe store this value to disk somewhere?
           ts = Time.now - (3600*24)
-          @@timestamp = "%04d%02d%02d%02d%02d" % [ts.year,ts.month,ts.day,ts.hour,ts.min]
+          @@timestamp = "%04d%02d%02d%02d%02d" % [ts.year,ts.month,ts.day,0,0]
           Chef::Log::info("Using latest available mirror date (#{@@timestamp}) as timestamp input")
         elsif node[:rightimage][:build_mode] == "migrate"
           @@timestamp = nil
