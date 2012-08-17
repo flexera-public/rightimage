@@ -28,4 +28,5 @@ include_recipe "rightimage::loopback_unmount"
 include_recipe "rightimage::block_device_backup"
 include_recipe "rightimage::base_upload"
 include_recipe "rightimage::report_upload"
+include_recipe "rightimage::s3index_update"
 rightscale_marker :end
