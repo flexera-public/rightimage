@@ -58,6 +58,7 @@ rightimage[:common_guest_packages] << " subversion"
 rightimage[:common_guest_packages] << " sysstat"
 rightimage[:common_guest_packages] << " tmux"
 rightimage[:common_guest_packages] << " unzip"
+rightimage[:common_guest_packages] << " "
 
 # set base os packages
 case rightimage[:platform]
