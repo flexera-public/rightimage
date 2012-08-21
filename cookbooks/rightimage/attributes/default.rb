@@ -132,7 +132,7 @@ when "ubuntu"
      rightimage[:host_packages] << " devscripts"
   end
 when "centos","rhel"
-  set[:rightimage][:guest_packages] << "bwm-ng"
+  set[:rightimage][:guest_packages] = "bwm-ng"
   rightimage[:guest_packages] << " compat-gcc-34-g77"
   rightimage[:guest_packages] << " compat-libstdc++-296"
   rightimage[:guest_packages] << " createrepo"
