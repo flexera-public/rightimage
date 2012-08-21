@@ -7,15 +7,20 @@ end
 # Location of rightimage_tools gem.
 SANDBOX_BIN_DIR = "/opt/rightscale/sandbox/bin"
 
-# Replace with more general bucket var.
-image_upload_bucket = node[:rightimage][:base_image_bucket]
+# Choose correct bucket for base or private cloud.
+if (node[:rightimage][:build_mode] == "base")
+  image_upload_bucket = node[:rightimage][:base_image_bucket]
+else
+  image_upload_bucket = "rightscale-#{node[:rightimage][:cloud]}"
+  image_upload_bucket << "-dev" if node[:rightimage][:debug] == "true"
+end
 
 bash "update_s3index" do
   cwd "/tmp"
   flags "-ex"
-  environment(cloud_credentials("ec2"))
+  environment(cloud_credentials("ec2").merge({'AWS_IMAGE_BUCKET' => image_upload_bucket}))
   code <<-EOH
-    #{SANDBOX_BIN_DIR}/update_s3_index #{image_upload_bucket}
+    #{SANDBOX_BIN_DIR}/update_s3_index
   EOH
 end
 
