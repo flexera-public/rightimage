@@ -122,7 +122,7 @@ bash "upload code to the remote instance" do
   end
 
   code <<-EOH
-  /opt/rightscale/sandbox/bin/ruby bin/upload --rightlink #{node[:rightimage][:rightlink_version]} #{freeze_date_opt} --no-checkout --no-configure
+  /opt/rightscale/sandbox/bin/ruby bin/upload --rightlink #{node[:rightimage][:rightlink_version]} #{freeze_date_opt} --no-configure
   EOH
 end
 

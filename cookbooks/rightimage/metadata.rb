@@ -74,8 +74,9 @@ attribute "rightimage/platform",
 attribute "rightimage/platform_version",
   :display_name => "Guest OS Version",
   :description => "The OS version to build into the virtual image.",
+  :choice => [ "5.4", "5.6", "5.8", "6.2", "6.3", "10.04", "10.10", "12.04" ],
   :required => "optional"
-  
+ 
 attribute "rightimage/arch",
   :display_name => "Guest OS Architecture",
   :description => "The architecture for the virtual image.",

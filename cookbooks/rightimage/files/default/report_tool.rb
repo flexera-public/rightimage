@@ -44,8 +44,8 @@ class LSB
     # Called separately to get full description with spaces.
     # Sanitize newline and quotes.
     @description = `lsb_release -ds`.sub("\n",'').gsub("\"",'')
-    @release = lsb[2]
-    @codename = lsb[1]
+    @release = lsb[1]
+    @codename = lsb[2]
   end
 
   def to_hash(*a)
@@ -118,7 +118,7 @@ end
 # Holds RS specific info.
 # Takes hint hash as arg.
 # rec_empty_delete strips empty and nil values.
-class RightScale
+class RightScaleMirror
   def initialize(hint)
     @repo_freezedate = hint["freeze-date"]
     @rubygems_freezedate = hint["freeze-date"]
@@ -126,7 +126,7 @@ class RightScale
   end
 
   def to_hash(*a)
-    {"rightscale" =>
+    {"rightscale-mirror" =>
       {"repo-freezedate" => @repo_freezedate, 
       "rubygems-freezedate" => @rubygems_freezedate,
       "rightlink-version" => @rightlink_version
@@ -197,7 +197,7 @@ end
 hint["rightlink-version"] = report_hash["packages"]["rightscale"]
   
 # Receive hint
-report_hash.merge!(RightScale.new(hint))
+report_hash.merge!(RightScaleMirror.new(hint))
 report_hash.merge!(Image.new(hint))
 
 # Print results if flag is set

@@ -13,8 +13,12 @@ set[:rightimage][:guest_root] = "/mnt/image"
 set_unless[:rightimage][:hypervisor] = "xen"
 set[:rightimage][:mirror] = "cf-mirror.rightscale.com"
 set_unless[:rightimage][:cloud] = "ec2"
+set[:rightimage][:fstab][:ephemeral][:options] = "defaults"
+set[:rightimage][:grub][:timeout] = "5"
+set[:rightimage][:grub][:kernel][:options] = "consoleblank=0"
 set[:rightimage][:root_mount][:label_dev] = "ROOT"
 set[:rightimage][:root_mount][:dev] = "LABEL=#{rightimage[:root_mount][:label_dev]}"
+set[:rightimage][:root_mount][:options] = "defaults"
 set_unless[:rightimage][:image_source_bucket] = "rightscale-us-west-2"
 set_unless[:rightimage][:base_image_bucket] = "rightscale-rightimage-base-dev"
 set_unless[:rightimage][:platform] = guest_platform
@@ -204,54 +208,60 @@ case rightimage[:cloud]
   when "ec2", "eucalyptus" 
     set[:rightimage][:root_mount][:dump] = "0" 
     set[:rightimage][:root_mount][:fsck] = "0" 
-    set[:rightimage][:fstab][:ephemeral] = true
     # Might have to double check don't know if maverick should use kernel linux-image-ec2 or not
     set[:rightimage][:swap_mount] = "/dev/sda3" unless rightimage[:arch] == "x86_64"
-    set[:rightimage][:ephemeral_mount] = "/dev/sdb"
+    set[:rightimage][:fstab][:ephemeral][:dev] = "/dev/sdb"
+    set[:rightimage][:grub][:timeout] = "0"
 
     case rightimage[:platform]
       when "ubuntu" 
-        set[:rightimage][:fstab][:ephemeral_mount_opts] = "defaults,nobootwait"
+        set[:rightimage][:fstab][:ephemeral][:options] = "defaults,nobootwait"
         set[:rightimage][:fstab][:swap] = "defaults,nobootwait"
         if rightimage[:platform_version].to_f >= 10.10
-          set[:rightimage][:ephemeral_mount] = "/dev/xvdb"
+          set[:rightimage][:fstab][:ephemeral][:dev] = "/dev/xvdb"
           set[:rightimage][:swap_mount] = "/dev/xvda3" unless rightimage[:arch]  == "x86_64"
         end
       when "centos", "rhel"
-        set[:rightimage][:fstab][:ephemeral_mount_opts] = "defaults"
+        set[:rightimage][:fstab][:ephemeral][:options] = "defaults"
         set[:rightimage][:fstab][:swap] = "defaults"
 
         # CentOS 6.1-6.2 start SCSI device naming from e
         if rightimage[:platform_version].to_i == 6
           if rightimage[:platform_version].to_f.between?(6.1,6.2)
-            set[:rightimage][:ephemeral_mount] = "/dev/xvdf"
+            set[:rightimage][:fstab][:ephemeral][:dev] = "/dev/xvdf"
             set[:rightimage][:swap_mount] = "/dev/xvde3"  unless rightimage[:arch]  == "x86_64"
           else
-            set[:rightimage][:ephemeral_mount] = "/dev/xvdb"
+            set[:rightimage][:fstab][:ephemeral][:dev] = "/dev/xvdb"
             set[:rightimage][:swap_mount] = "/dev/xvda3"  unless rightimage[:arch]  == "x86_64"
           end
         end
     end
+  when "azure"
+    set[:rightimage][:grub][:timeout] = "0"
+
+    case rightimage[:platform]
+    when "centos"
+      set[:rightimage][:grub][:kernel][:options] << " numa=off"
+    when "ubuntu"
+      set[:rightimage][:grub][:kernel][:options] << " ata_piix.disable_driver"
+    end
   else 
     case rightimage[:hypervisor]
     when "xen"
-      set[:rightimage][:fstab][:ephemeral] = false
-      set[:rightimage][:ephemeral_mount] = nil
-      set[:rightimage][:fstab][:ephemeral_mount_opts] = nil
+      set[:rightimage][:fstab][:ephemeral][:dev] = nil
+      set[:rightimage][:fstab][:ephemeral][:options] = nil
       set[:rightimage][:grub][:root_device] = "/dev/xvda"
       set[:rightimage][:root_mount][:dump] = "1" 
       set[:rightimage][:root_mount][:fsck] = "1" 
     when "kvm"
-      set[:rightimage][:fstab][:ephemeral] = false
-      set[:rightimage][:ephemeral_mount] = "/dev/vdb"
-      set[:rightimage][:fstab][:ephemeral_mount_opts] = "defaults"
+      set[:rightimage][:fstab][:ephemeral][:dev] = "/dev/vdb"
+      set[:rightimage][:fstab][:ephemeral][:options] = "defaults"
       set[:rightimage][:grub][:root_device] = "/dev/vda"
       set[:rightimage][:root_mount][:dump] = "1" 
       set[:rightimage][:root_mount][:fsck] = "1" 
     when "esxi", "hyperv"
-      set[:rightimage][:ephemeral_mount] = nil
-      set[:rightimage][:fstab][:ephemeral_mount_opts] = nil
-      set[:rightimage][:fstab][:ephemeral] = false
+      set[:rightimage][:fstab][:ephemeral][:dev] = nil
+      set[:rightimage][:fstab][:ephemeral][:options] = nil
       set[:rightimage][:grub][:root_device] = "/dev/sda"
       set[:rightimage][:root_mount][:dump] = "1" 
       set[:rightimage][:root_mount][:fsck] = "1" 
@@ -271,3 +281,12 @@ case rightimage[:platform]
     set[:rightimage][:getsshkey_cmd] = "chroot $GUEST_ROOT chkconfig --add getsshkey && \
                chroot $GUEST_ROOT chkconfig --level 4 getsshkey on"
 end
+
+# http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=637234#40
+set[:rightimage][:root_mount][:options] = "errors=remount-ro,barrier=0" if rightimage[:platform] == "ubuntu" && rightimage[:platform_version].to_f >= 12.04 && rightimage[:hypervisor] == "xen"
+
+set[:rightimage][:grub][:kernel][:options] << " console=hvc0" if rightimage[:hypervisor] == "xen"
+
+# Start device naming from xvda instead of xvde (w-4893)
+# https://bugzilla.redhat.com/show_bug.cgi?id=729586
+set[:rightimage][:grub][:kernel][:options] << " xen_blkfront.sda_is_xvda=1" if rightimage[:platform] == "centos" && rightimage[:platform_version].to_f >= 6.3

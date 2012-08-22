@@ -63,14 +63,14 @@ bash "query_image" do
   # Move json file out of image to receive md5.  
   mv #{guest_root}/tmp/report.js #{temp_root}/#{loopback_filename(false)}.js
   
-  # Clean up report tool.
-  rm -f #{guest_root}/tmp/report_tool.rb
-
   # If json was installed, uninstall it.
   if [ "$found" == "false" ]; then
     /usr/sbin/chroot #{guest_root} gem uninstall json
   fi
   EOH
 end
+
+# Clean up report tool.
+file "#{guest_root}/tmp/report_tool.r" do action :delete end
 
 rightscale_marker :end

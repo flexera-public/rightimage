@@ -235,6 +235,18 @@ module RightScale
       def gem_install_source
         "--source http://#{node[:rightimage][:mirror]}/rubygems/archive/#{node[:rightimage][:timestamp][0..7]}/"
       end
+
+      def grub_initrd
+        ::File.basename(Dir.glob("#{guest_root}/boot/initr*").sort_by { |f| File.mtime(f) }.last)
+      end
+
+      def grub_kernel
+        ::File.basename(Dir.glob("#{guest_root}/boot/vmlinuz*").sort_by { |f| File.mtime(f) }.last)
+      end
+
+      def grub_root
+        (partitioned?) ? ",#{partition_number}":""
+      end
     end
   end
 end

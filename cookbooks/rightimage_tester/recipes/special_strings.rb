@@ -86,6 +86,7 @@ skip_dirs=(
 #{node[:rightimage_tester][:root]}/usr/local/gcutil
 #{node[:rightimage_tester][:root]}/usr/share
 #{node[:rightimage_tester][:root]}/var/lib/ureadahead
+#{node[:rightimage_tester][:root]}/usr/local/lib/python2.7/dist-packages/boto
 )
 
 # List of files to ignore.
