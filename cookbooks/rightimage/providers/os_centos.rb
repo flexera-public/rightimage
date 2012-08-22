@@ -10,12 +10,8 @@ end
 
 
 action :install do 
-  template "/tmp/yum.conf" do 
-    source "yum.conf.erb"
-    backup false
-    variables ({
-      :bootstrap => true
-    })
+  rightimage_os new_resource.platform do
+    action :repo_freeze
   end
 
   cookbook_file "/etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL#{epel_key_name}" do
@@ -83,6 +79,7 @@ action :install do
   /sbin/MAKEDEV -d #{guest_root}/dev -x null
   /sbin/MAKEDEV -d #{guest_root}/dev -x zero
   /sbin/MAKEDEV -d #{guest_root}/dev ptmx
+  /sbin/MAKEDEV -d #{guest_root}/dev urandom
 
   mkdir -p #{guest_root}/dev/pts
   mkdir -p #{guest_root}/sys/block
@@ -163,14 +160,8 @@ action :install do
   echo "127.0.0.1   localhost   localhost.localdomain" > #{guest_root}/etc/hosts
   echo "NOZEROCONF=true" >> #{guest_root}/etc/sysconfig/network
 
-  #install syslog-ng
-  chroot #{guest_root} rpm -e rsyslog --nodeps || true #remove rsyslog if it exists 
-  if [ "#{node[:rightimage][:arch]}" == i386 ] ; then 
-    rpm --force --root #{guest_root} -Uvh http://s3.amazonaws.com/rightscale_scripts/syslog-ng-1.6.12-1.el5.centos.i386.rpm
-  else 
-    rpm --force --root #{guest_root} -Uvh http://s3.amazonaws.com/rightscale_scripts/syslog-ng-1.6.12-1.x86_64.rpm
-  fi
-  chroot #{guest_root} chkconfig --level 234 syslog-ng on
+  # Start rsyslog on startup
+  chroot #{guest_root} chkconfig --level 234 rsyslog on
 
   #Install the JDK from S3.
   if [ "#{node[:rightimage][:arch]}" == x86_64 ] ; then 
@@ -203,19 +194,15 @@ action :install do
   #Disable FSCK on the image
   touch #{guest_root}/fastboot
 
+  # Set timezone to UTC by default
+  chroot #{guest_root} ln -sf /usr/share/zoneinfo/UTC /etc/localtime
+
   # disable loading pata_acpi module - currently breaks acpid from discovering volumes attached to CDC KVM hypervisor
   echo "blacklist pata_acpi"          > #{guest_root}/etc/modprobe.d/disable-pata_acpi.conf
   echo "install pata_acpi /bin/true" >> #{guest_root}/etc/modprobe.d/disable-pata_acpi.conf
     
   # disable IPV6
-  echo "NETWORKING_IPV6=no" >> #{guest_root}/etc/sysconfig/network
-  echo "install ipv6 /bin/true" > #{guest_root}/etc/modprobe.d/disable-ipv6.conf
-  echo "options ipv6 disable=1" >> #{guest_root}/etc/modprobe.d/disable-ipv6.conf
   chroot #{guest_root} /sbin/chkconfig ip6tables off
-
-  # Depricated CentOS 5.3 and older uses this to disable ipv6
-  #echo "alias ipv6 off" >> #{guest_root}/etc/modprobe.conf 
-  #echo "alias net-pf-10 off" >> #{guest_root}/etc/modprobe.conf 
   EOF
   end
 
@@ -246,19 +233,8 @@ action :install do
     backup false
   end
 
-  repo_file = case node[:rightimage][:platform]
-              when "centos" then "CentOS-Base"
-              when "rhel" then "Epel"
-              end
-
-  template "#{guest_root}/etc/yum.repos.d/#{repo_file}.repo" do
-    source "yum.conf.erb"
-    backup false
-  end
-
-  template "#{guest_root}/root/.gemrc" do 
-    source "gemrc.erb"
-    backup false
+  rightimage_os new_resource.platform do
+    action :repo_unfreeze
   end
 
   bash "clean_db" do 
@@ -276,4 +252,35 @@ action :install do
       umount -lf #{guest_root}/dev/pts || true
     EOH
   end    
+end
+
+action :repo_freeze do
+  repo_dir = "#{guest_root}/etc/yum.repos.d"
+
+  directory repo_dir do
+    recursive true
+    action :create
+  end
+
+  ["/tmp/yum.conf", "#{repo_dir}/#{el_repo_file}"].each do |location|
+    template location do
+      source "yum.conf.erb"
+      backup false
+      variables ({
+        :bootstrap => true,
+        :mirror_date => node[:rightimage][:mirror_date]
+      })
+    end
+  end
+end
+
+action :repo_unfreeze do
+  template "#{guest_root}/etc/yum.repos.d/#{el_repo_file}" do
+    source "yum.conf.erb"
+    backup false
+    variables ({
+      :bootstrap => false,
+      :mirror_date => "latest"
+    })
+  end
 end

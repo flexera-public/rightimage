@@ -13,9 +13,14 @@ set[:rightimage][:guest_root] = "/mnt/image"
 set_unless[:rightimage][:hypervisor] = "xen"
 set[:rightimage][:mirror] = "cf-mirror.rightscale.com"
 set_unless[:rightimage][:cloud] = "ec2"
+set[:rightimage][:fstab][:ephemeral][:options] = "defaults"
+set[:rightimage][:grub][:timeout] = "5"
+set[:rightimage][:grub][:kernel][:options] = "consoleblank=0"
 set[:rightimage][:root_mount][:label_dev] = "ROOT"
 set[:rightimage][:root_mount][:dev] = "LABEL=#{rightimage[:root_mount][:label_dev]}"
+set[:rightimage][:root_mount][:options] = "defaults"
 set_unless[:rightimage][:image_source_bucket] = "rightscale-us-west-2"
+set_unless[:rightimage][:base_image_bucket] = "rightscale-rightimage-base-dev"
 
 if timestamp
   if rightimage[:platform] == "ubuntu"
@@ -33,13 +38,14 @@ case node[:rightimage][:hypervisor]
 when "xen" then set[:rightimage][:image_type] = "vhd"
 when "esxi" then set[:rightimage][:image_type] = "vmdk"
 when "kvm" then set[:rightimage][:image_type] = "qcow2"
+when "hyperv" then set[:rightimage][:image_type] = "msvhd"
 else raise ArgumentError, "don't know what image format to use for #{node[:rightimage][:hypervisor]}!"
 end
 
 # set base os packages
 case rightimage[:platform]
 when "ubuntu"   
-  set[:rightimage][:guest_packages] = "ubuntu-standard binutils ruby1.8 curl unzip openssh-server ruby1.8-dev build-essential autoconf automake libtool logrotate rsync openssl openssh-server ca-certificates libopenssl-ruby1.8 subversion vim libreadline-ruby1.8 irb rdoc1.8 git-core liberror-perl dmsetup emacs rake screen mailutils nscd bison ncurses-dev zlib1g-dev readline-common libxslt1-dev sqlite3 libxml2 libxml2-dev flex libshadow-ruby1.8 postfix sysstat iptraf syslog-ng libarchive-dev tmux dhcp3-client"
+  set[:rightimage][:guest_packages] = "ubuntu-standard binutils ruby1.8 curl unzip openssh-server ruby1.8-dev build-essential autoconf automake libtool logrotate rsync openssl openssh-server ca-certificates libopenssl-ruby1.8 subversion vim libreadline-ruby1.8 irb rdoc1.8 git-core liberror-perl dmsetup emacs rake screen mailutils nscd bison ncurses-dev zlib1g-dev readline-common libxslt1-dev sqlite3 libxml2 libxml2-dev flex libshadow-ruby1.8 postfix sysstat iptraf libarchive-dev tmux dhcp3-client acpid"
 
   case rightimage[:platform_version]
   when "8.04"
@@ -52,7 +58,7 @@ when "ubuntu"
 
   set[:rightimage][:host_packages] = "openjdk-6-jre openssl ca-certificates"
 when "centos","rhel"
-  set[:rightimage][:guest_packages] = "wget mlocate nano logrotate ruby ruby-devel ruby-docs ruby-irb ruby-libs ruby-mode ruby-rdoc ruby-ri ruby-tcltk openssl openssh openssh-askpass openssh-clients openssh-server curl gcc* zip unzip bison flex compat-libstdc++-296 cvs subversion autoconf automake libtool compat-gcc-34-g77 mutt sysstat rpm-build fping vim-common vim-enhanced rrdtool-1.2.27 rrdtool-devel-1.2.27 rrdtool-doc-1.2.27 rrdtool-perl-1.2.27 rrdtool-python-1.2.27 rrdtool-ruby-1.2.27 rrdtool-tcl-1.2.27 pkgconfig lynx screen yum-utils bwm-ng createrepo redhat-rpm-config redhat-lsb git nscd xfsprogs swig libarchive-devel tmux libxml2 libxml2-devel libxslt libxslt-devel dhclient sudo telnet"
+  set[:rightimage][:guest_packages] = "wget mlocate nano logrotate ruby ruby-devel ruby-docs ruby-irb ruby-libs ruby-mode ruby-rdoc ruby-ri ruby-tcltk openssl openssh openssh-askpass openssh-clients openssh-server curl gcc* zip unzip bison flex compat-libstdc++-296 cvs subversion autoconf automake libtool compat-gcc-34-g77 mutt sysstat rpm-build fping vim-common vim-enhanced rrdtool-1.2.27 rrdtool-devel-1.2.27 rrdtool-doc-1.2.27 rrdtool-perl-1.2.27 rrdtool-python-1.2.27 rrdtool-ruby-1.2.27 rrdtool-tcl-1.2.27 pkgconfig lynx screen yum-utils bwm-ng createrepo redhat-rpm-config redhat-lsb git nscd xfsprogs swig libarchive-devel tmux libxml2 libxml2-devel libxslt libxslt-devel dhclient sudo telnet acpid"
 
   set[:rightimage][:host_packages] = "swig"
 
@@ -95,48 +101,60 @@ case rightimage[:cloud]
   when "ec2", "eucalyptus" 
     set[:rightimage][:root_mount][:dump] = "0" 
     set[:rightimage][:root_mount][:fsck] = "0" 
-    set[:rightimage][:fstab][:ephemeral] = true
     # Might have to double check don't know if maverick should use kernel linux-image-ec2 or not
     set[:rightimage][:swap_mount] = "/dev/sda3" unless rightimage[:arch] == "x86_64"
-    set[:rightimage][:ephemeral_mount] = "/dev/sdb" 
+    set[:rightimage][:fstab][:ephemeral][:dev] = "/dev/sdb"
+    set[:rightimage][:grub][:timeout] = "0"
+
     case rightimage[:platform]
       when "ubuntu" 
-        set[:rightimage][:fstab][:ephemeral_mount_opts] = "defaults,nobootwait"
+        set[:rightimage][:fstab][:ephemeral][:options] = "defaults,nobootwait"
         set[:rightimage][:fstab][:swap] = "defaults,nobootwait"
         if rightimage[:platform_version].to_f >= 10.10
-          set[:rightimage][:ephemeral_mount] = "/dev/xvdb"
+          set[:rightimage][:fstab][:ephemeral][:dev] = "/dev/xvdb"
           set[:rightimage][:swap_mount] = "/dev/xvda3" unless rightimage[:arch]  == "x86_64"
         end
       when "centos", "rhel"
-        set[:rightimage][:fstab][:ephemeral_mount_opts] = "defaults"
+        set[:rightimage][:fstab][:ephemeral][:options] = "defaults"
         set[:rightimage][:fstab][:swap] = "defaults"
 
-        # CentOS 6.1 and above start SCSI device naming from e
-        if rightimage[:platform_version].to_f >= 6.1
-          set[:rightimage][:ephemeral_mount] = "/dev/xvdf"
-          set[:rightimage][:swap_mount] = "/dev/xvde3"  unless rightimage[:arch]  == "x86_64"
+        # CentOS 6.1-6.2 start SCSI device naming from e
+        if rightimage[:platform_version].to_i == 6
+          if rightimage[:platform_version].to_f.between?(6.1,6.2)
+            set[:rightimage][:fstab][:ephemeral][:dev] = "/dev/xvdf"
+            set[:rightimage][:swap_mount] = "/dev/xvde3"  unless rightimage[:arch]  == "x86_64"
+          else
+            set[:rightimage][:fstab][:ephemeral][:dev] = "/dev/xvdb"
+            set[:rightimage][:swap_mount] = "/dev/xvda3"  unless rightimage[:arch]  == "x86_64"
+          end
         end
     end
-  when "cloudstack", "openstack"
+  when "azure"
+    set[:rightimage][:grub][:timeout] = "0"
+
+    case rightimage[:platform]
+    when "centos"
+      set[:rightimage][:grub][:kernel][:options] << " numa=off"
+    when "ubuntu"
+      set[:rightimage][:grub][:kernel][:options] << " ata_piix.disable_driver"
+    end
+  else 
     case rightimage[:hypervisor]
     when "xen"
-      set[:rightimage][:fstab][:ephemeral] = false
-      set[:rightimage][:ephemeral_mount] = nil
-      set[:rightimage][:fstab][:ephemeral_mount_opts] = nil
+      set[:rightimage][:fstab][:ephemeral][:dev] = nil
+      set[:rightimage][:fstab][:ephemeral][:options] = nil
       set[:rightimage][:grub][:root_device] = "/dev/xvda"
       set[:rightimage][:root_mount][:dump] = "1" 
       set[:rightimage][:root_mount][:fsck] = "1" 
     when "kvm"
-      set[:rightimage][:fstab][:ephemeral] = false
-      set[:rightimage][:ephemeral_mount] = "/dev/vdb"
-      set[:rightimage][:fstab][:ephemeral_mount_opts] = "defaults"
+      set[:rightimage][:fstab][:ephemeral][:dev] = "/dev/vdb"
+      set[:rightimage][:fstab][:ephemeral][:options] = "defaults"
       set[:rightimage][:grub][:root_device] = "/dev/vda"
       set[:rightimage][:root_mount][:dump] = "1" 
       set[:rightimage][:root_mount][:fsck] = "1" 
-    when "esxi"
-      set[:rightimage][:ephemeral_mount] = nil
-      set[:rightimage][:fstab][:ephemeral_mount_opts] = nil
-      set[:rightimage][:fstab][:ephemeral] = false
+    when "esxi", "hyperv"
+      set[:rightimage][:fstab][:ephemeral][:dev] = nil
+      set[:rightimage][:fstab][:ephemeral][:options] = nil
       set[:rightimage][:grub][:root_device] = "/dev/sda"
       set[:rightimage][:root_mount][:dump] = "1" 
       set[:rightimage][:root_mount][:fsck] = "1" 
@@ -155,5 +173,13 @@ case rightimage[:platform]
   when "centos", "rhel"
     set[:rightimage][:getsshkey_cmd] = "chroot $GUEST_ROOT chkconfig --add getsshkey && \
                chroot $GUEST_ROOT chkconfig --level 4 getsshkey on"
-
 end
+
+# http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=637234#40
+set[:rightimage][:root_mount][:options] = "errors=remount-ro,barrier=0" if rightimage[:platform] == "ubuntu" && rightimage[:platform_version].to_f >= 12.04 && rightimage[:hypervisor] == "xen"
+
+set[:rightimage][:grub][:kernel][:options] << " console=hvc0" if rightimage[:hypervisor] == "xen"
+
+# Start device naming from xvda instead of xvde (w-4893)
+# https://bugzilla.redhat.com/show_bug.cgi?id=729586
+set[:rightimage][:grub][:kernel][:options] << " xen_blkfront.sda_is_xvda=1" if rightimage[:platform] == "centos" && rightimage[:platform_version].to_f >= 6.3

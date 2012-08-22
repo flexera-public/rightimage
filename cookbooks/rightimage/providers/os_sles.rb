@@ -80,3 +80,10 @@ action :install do
   EOS
   end
 end
+
+# NOT SUPPORTED
+action :repo_freeze do
+end
+
+action :repo_unfreeze do
+end

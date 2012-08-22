@@ -64,13 +64,53 @@ if [ "#{node[:rightimage][:platform]}" == "ubuntu" ]; then
   ln -sf /usr/bin/gem1.8 /usr/bin/gem
 fi
 
-gem install xml-simple net-ssh net-sftp  --no-ri --no-rdoc
-gem install rake $rake_ver --no-ri --no-rdoc
+gem install #{gem_install_source} xml-simple net-ssh net-sftp  --no-ri --no-rdoc
+gem install #{gem_install_source} rake $rake_ver --no-ri --no-rdoc
 updatedb
 CHROOT_SCRIPT
 chmod +x $ROOT/tmp/rubygems_install.sh
 chroot $ROOT /tmp/rubygems_install.sh > /dev/null 
 EOC
+end
+
+# Method recommened by CentOS:
+# https://bugzilla.redhat.com/show_bug.cgi?id=641836#c17
+bash "disable IPv6" do
+  code <<-EOF
+    guest_root=#{guest_root}
+    file=$guest_root/etc/sysctl.conf
+    grep "net.ipv6.conf.all.disable_ipv6" $file
+
+    if [ "$?" == "1" ]; then
+      echo -n "Disabling IPv6"
+      cat <<-EOC >> $file
+net.ipv6.conf.all.disable_ipv6 = 1
+net.ipv6.conf.default.disable_ipv6 = 1
+EOC
+    else
+      echo -n "IPv6 already disabled"
+    fi
+  EOF
+end
+
+bash "setup_motd" do
+  only_if { ::File.directory? "#{guest_root}/etc/update-motd.d" }
+  code <<-EOC
+    rm #{guest_root}/etc/update-motd.d/10-help-text || true
+    mv #{guest_root}/etc/update-motd.d/99-footer #{guest_root}/etc/update-motd.d/10-rightscale-message || true
+  EOC
+end
+
+cookbook_file "#{guest_root}/etc/motd.tail" do 
+  only_if { ::File.directory? "#{guest_root}/etc/update-motd.d" }
+  source "motd"
+  backup false
+end
+
+cookbook_file "#{guest_root}/etc/motd" do 
+  not_if { ::File.directory? "#{guest_root}/etc/update-motd.d" }
+  source "motd"
+  backup false
 end
 
 # Clean up GUEST_ROOT image

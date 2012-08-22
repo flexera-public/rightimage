@@ -53,20 +53,13 @@ action :upload do
                if node[:platform_version].to_f >= 6.0
                  %w(python-setuptools python-devel python-libs)
                else
-                 %w(python26-devel python26-libs)
+                 %w(python26-distribute python26-devel python26-libs)
                end
              when "ubuntu" then
                %w(python-dev python-setuptools)
              end
 
-  packages.each { package p }
-
-  # work around bug, doesn't chef doesn't install noarch packages for centos without arch flag
-  yum_package "python26-distribute" do
-    only_if { node[:platform] =~ /centos|redhat/ and node[:platform_version].to_f < 6.0 }
-    action :install
-    arch "noarch"
-  end
+  packages.each { |p| package p }
 
   # Switched from easy_install to pip for most stuff, easy_install seems to be
   # crapping out complaining about fetching from git urls while pip handles them fine
@@ -78,6 +71,7 @@ action :upload do
       cmd_append = "-2.6"
     end
     code <<-EOH
+      export PATH=$PATH:/usr/local/bin
       easy_install#{cmd_append} pip
       easy_install#{cmd_append} -U distribute
       pip#{cmd_append} install glance

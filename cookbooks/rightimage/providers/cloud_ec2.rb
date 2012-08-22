@@ -1,4 +1,11 @@
 action :configure do
+
+  ruby_block "check hypervisor" do
+    block do
+      raise "ERROR: you must set your hypervisor to xen!" unless new_resource.hypervisor == "xen"
+    end
+  end
+
   # insert grub conf, and link menu.lst to grub.conf
   directory "#{guest_root}/boot/grub" do
     owner "root"
@@ -53,7 +60,7 @@ action :configure do
       rm -r $ROOT/tmp/ec2-a*
       echo 'export PATH=/home/ec2/bin:${PATH}' >> $ROOT/etc/profile.d/ec2.sh
       echo 'export EC2_HOME=/home/ec2' >> $ROOT/etc/profile.d/ec2.sh
-      chroot $ROOT gem install s3sync --no-ri --no-rdoc
+      chroot $ROOT gem install #{gem_install_source} s3sync --no-ri --no-rdoc
     EOH
   end
    
@@ -172,7 +179,7 @@ def upload_ebs
 
 
   bash "attach ebs volume" do 
-    not_if "cat /proc/partitions | grep #{local_device}"
+    not_if "cat /proc/partitions | grep #{local_device.split("/dev/")[1]}"
     flags "-e"
     code <<-EOH
       #{setup_ec2_tools_env}

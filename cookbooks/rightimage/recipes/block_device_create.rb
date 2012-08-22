@@ -34,6 +34,9 @@ end
 if mounted?
   Chef::Log::info("Block device already mounted")
 else
+  # Times 2.3 since we need to store 2 raw loopback files, and need a·
+  # little extra space to gzip them, take snapshots, etc
+  new_volume_size = (node[:rightimage][:root_size_gb].to_f*2.3).ceil.to_s
   block_device ri_lineage do
     cloud "ec2"
     mount_point target_raw_root
@@ -43,7 +46,7 @@ else
     keep_weekly "1000"
     keep_monthly "1000"
     keep_yearly "1000"
-    volume_size "23"
+    volume_size new_volume_size
     stripe_count "1"
     lineage ri_lineage
     action :create

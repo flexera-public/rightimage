@@ -95,7 +95,7 @@ set -e
 set -x
 
 chroot \\$1 localedef -i en_US -c -f UTF-8 en_US.UTF-8
-chroot \\$1 cp /usr/share/zoneinfo/UTC /etc/timezone
+chroot \\$1 ln -sf /usr/share/zoneinfo/UTC /etc/localtime
 chroot \\$1 userdel -r ubuntu
 chroot \\$1 rm -rf /home/ubuntu
 chroot \\$1 rm -f /etc/hostname
@@ -154,15 +154,18 @@ EOS
   EOH
   end
 
+  # disable loading pata_acpi module - currently breaks acpid from discovering volumes attached to CDC KVM hypervisor, from bootstrap_centos, should be applicable to ubuntu though
+  bash "blacklist pata_acpi" do
+    code <<-EOF
+      echo "blacklist pata_acpi"          > #{guest_root}/etc/modprobe.d/disable-pata_acpi.conf
+      echo "install pata_acpi /bin/true" >> #{guest_root}/etc/modprobe.d/disable-pata_acpi.conf
+    EOF
+  end
+
   #  - configure mirrors
-  template "#{guest_root}/etc/apt/sources.list" do 
-    source "sources.list.erb"
-    variables(
-      :mirror_url => node[:rightimage][:mirror_url], 
-      :platform_codename => platform_codename
-    )
-    backup false
-  end 
+  rightimage_os new_resource.platform do
+    action :repo_unfreeze
+  end
 
   bash "Restore original ext4 in /etc/mke2fs.conf" do
     flags "-ex"
@@ -212,12 +215,6 @@ EOF
 
       chmod 775 $guest_root/etc/profile.d/java.sh
     EOH
-  end
-
-  # Modified version of syslog-ng.conf that will properly route recipe output to /var/log/messages
-  cookbook_file "#{guest_root}/etc/syslog-ng/syslog-ng.conf" do
-    source "syslog-ng.conf"
-    backup false
   end
 
   # Set DHCP timeout
@@ -276,9 +273,37 @@ EOF
     flags "-ex"
     code <<-EOH
 
-      chroot #{guest_root} rm -rf /etc/init/plymouth* /etc/init/rsyslog.conf
+      chroot #{guest_root} rm -rf /etc/init/plymouth*
       chroot #{guest_root} apt-get update
       chroot #{guest_root} apt-get clean
     EOH
   end
+end
+
+action :repo_freeze do
+  template "#{guest_root}/etc/apt/sources.list" do
+    source "sources.list.erb"
+    variables(
+      :mirror_date => node[:rightimage][:mirror_date],
+      :platform_codename => platform_codename
+    )
+    backup false
+  end
+
+  # Need to apt-get update whenever the repo file is changed.
+  execute "chroot #{guest_root} apt-get -y update"
+end
+
+action :repo_unfreeze do
+  template "#{guest_root}/etc/apt/sources.list" do
+    source "sources.list.erb"
+    variables(
+      :mirror_date => "latest",
+      :platform_codename => platform_codename
+    )
+    backup false
+  end
+
+  # Need to apt-get update whenever the repo file is changed.
+  execute "chroot #{guest_root} apt-get -y update"
 end

@@ -66,6 +66,7 @@
     "rightimage_tester::filesystem_size": "Check root filesystem size.",
     "rightimage_tester::default": "",
     "rightimage_tester::sudo": "Check sudo configuration.",
+    "rightimage_tester::gemrc": "Ensure /root/.gem and .gemrc doesn't exist.",
     "rightimage_tester::modprobe": "Ensure modprobe runs.",
     "rightimage_tester::dupe_mounts": "Check for duplicate mounts.",
     "rightimage_tester::banned_packages": "Ensure no banned packages installed.",
@@ -83,7 +84,8 @@
     "rightimage_tester::ssh": "Ensure can ssh into self.",
     "rightimage_tester::rubygems": "Check rubygems installation.",
     "rightimage_tester::hostname": "Ensure hostname set.",
-    "rightimage_tester::apt_config": "Check apt configuration."
+    "rightimage_tester::apt_config": "Check apt configuration.",
+    "rightimage_tester::ipv6": "Ensure IPv6 is disabled."
   },
   "groupings": {
   },

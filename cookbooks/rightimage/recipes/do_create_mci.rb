@@ -16,9 +16,9 @@ directory "/root/.rest_connection"
 template "/root/.rest_connection/rest_api_config.yaml" do
   source "rest_api_config.yaml.erb"
   variables(
-    :user => node[:rest_connection][:user],
-    :password => node[:rest_connection][:pass],
-    :api_url => node[:rest_connection][:api_url]
+    :user => node[:rightscale][:api_user],
+    :password => node[:rightscale][:api_password],
+    :api_url => node[:rightscale][:api_url]
   )
   backup false
 end
@@ -26,6 +26,15 @@ end
 # Create MCI from image
 script "Create MCI or Add to MCI" do
   interpreter "#{SANDBOX_BIN_DIR}/ruby"
+  cloud_id = node[:rightscale][:cloud_id]
+  if node[:rightscale][:mci_name] =~ /./
+    mci_base_name = node[:rightscale][:mci_name]
+  else
+    mci_base_name = node[:rightimage][:image_name]
+  end
+  raise "You must specify a mci_name or an image_name!" unless mci_base_name =~ /./
+  raise "You must specify a cloud_id" unless cloud_id =~ /^\d+$/
+
   code <<-EOF
     require 'rubygems'
     require 'rest_connection'

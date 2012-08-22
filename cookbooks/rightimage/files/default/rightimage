@@ -215,26 +215,54 @@ function get_cloud_userdata() {
     rackspace*)
       #wait for userdata to appear
       userdata_file="/var/spool/rackspace/user-data.txt"
-      while [ ! -e $userdata_file ]; do
-        logger -st RightScale "Waiting for user-data file ($userdata_file)..."
-        sleep 10
-      done
-
-      #wait for userdata to settle (don't want to read a half written file)
-      CLOUD_USERDATA_OLD=""
+      wait_for_userdata_file $userdata_file
+      CLOUD_USERDATA=`cat $userdata_file`
+      ;;
+    google*)
+      metadata_server="http://metadata:80"
+      attributes=`curl -s $metadata_server/0.1/meta-data/attributes/ | grep -v /`
       CLOUD_USERDATA=""
-      while [ "$CLOUD_USERDATA_OLD" != "$CLOUD_USERDATA" ] && [ "$CLOUD_USERDATA" == "" ]; do
-        sleep 1
-        CLOUD_USERDATA_OLD=`cat $userdata_file`
-        sleep 1
-        CLOUD_USERDATA=`cat $userdata_file`
+      for attr in $attributes
+      do
+        attr_val=`curl -s $metadata_server/0.1/meta-data/attributes/$attr`
+        CLOUD_USERDATA="${CLOUD_USERDATA}&$attr=$attr_val"
       done
+      CLOUD_USERDATA=${CLOUD_USERDATA:1}
+      ;;
+    azure*)
+      userdata_file='/var/lib/waagent/Certificates.pem'
+      wait_for_userdata_file $userdata_file
+      CLOUD_USERDATA=$(\
+        openssl x509 -in $userdata_file -subject -noout | \
+        awk '{ sub(/subject=[ ]*\/CN=/,""); gsub(/\\x0A/,""); print }' | \
+        base64 --decode)
+
+      # Currently we do not currently parse user data for RS_src values on this cloud, this means that
+      # rs_agent_dev:package tag will not be honored and only the rightlink package that is present on
+      # the image will be installed. (w-4626)
       ;;
     *)
       logger -st RightScale "Unable to query user data - unknown cloud family $RS_CLOUD. Cannot continue."
       exit 1
       ;;
   esac
+}
+
+function wait_for_userdata_file () {
+  while [ ! -e $1 ]; do
+    logger -st RightScale "Waiting for user-data file ($1)..."
+    sleep 10
+  done
+
+  #wait for userdata to settle (don't want to read a half written file)
+  DATA_OLD=""
+  DATA=""
+  while [ "$DATA_OLD" != "$DATA" ] || [ "$DATA" == "" ]; do
+    logger -st RightScale "Waiting for user-data ($1)..."
+    DATA_OLD=`cat $1`
+    sleep 1
+    DATA=`cat $1`
+  done
 }
 
 RS_VERSION=
@@ -249,7 +277,9 @@ function get_rs_version() {
   fi
 }
 
-RS_SRC=
+# We export this so /etc/init.d/rightscale startup script can see it and get
+# packages from the dev_bucket
+export RS_SRC=
 function get_rs_src() {
   if devsrc=`expr "$CLOUD_USERDATA" : '.*RS_src=\([-_.0-9a-z/]*\)'`; then
     RS_SRC=$devsrc
@@ -303,6 +333,7 @@ function download_package_or_tarball() {
   fi
 }
 
+NET_WAIT_COUNT=0
 DOWNLOADED_FILE_NAME=
 function download_file() {
   declare -a urls=("${!1}")
@@ -316,6 +347,17 @@ function download_file() {
       logger -st RightScale "Downloading $temp_filename from $url"
       CODE=`curl "${CURL_OPT[@]}" -w '%{http_code}' -o $output_file $url`
       logger -st RightScale "curl returned code: $CODE"
+      # 000 denotes network unreachable, wait up to 30 seconds for
+      # networking to be set up, but only once.  This works around
+      # a race condition for azure
+      if [ "$CODE" -eq "000" ] && [ $NET_WAIT_COUNT -lt 30 ]; then
+        logger -st RightScale "Networking not set yet, waiting up to 30 seconds for it to appear"
+      fi
+      while [ "$CODE" -eq "000" ] && [ $NET_WAIT_COUNT -lt 30 ]; do
+        sleep 1
+        NET_WAIT_COUNT=`expr $NET_WAIT_COUNT + 1`
+        CODE=`curl "${CURL_OPT[@]}" -w '%{http_code}' -o $output_file $url`
+      done
       final_filename=$(basename $url)
     done
 

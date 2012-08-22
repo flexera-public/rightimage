@@ -6,17 +6,10 @@ module RightScale
         name = node[:rightimage][:image_name].dup
         name << "_#{generate_persisted_passwd}" if node[:rightimage][:debug] == "true" && node[:rightimage][:build_mode] != "migrate" && node[:rightimage][:cloud] !~ /rackspace/
         name << "_EBS" if node[:rightimage][:ec2][:image_type] =~ /ebs/i and name !~ /_EBS/
-        name.gsub!("_","-") if node[:rightimage][:cloud] == /rackspace/
+        name.gsub!("_","-") if node[:rightimage][:cloud] =~ /rackspace|google|azure/
+        name.gsub!(".","-") if node[:rightimage][:cloud] =~ /google/
+        name.downcase! if node[:rightimage][:cloud] =~ /google/
         name
-      end
-
-      def mci_base_name
-        if node[:rightimage][:mci_name] =~ /./
-          return node[:rightimage][:mci_name]
-        else
-          raise "ERROR: you must specify a mci_name or an image_name!" unless node[:rightimage][:image_name] =~ /./
-          return node[:rightimage][:image_name]
-        end
       end
 
       def generate_persisted_passwd
@@ -35,34 +28,18 @@ module RightScale
       def image_file_ext
         case node[:rightimage][:hypervisor]
         when "xen"
-          (node[:rightimage][:cloud] == "euca" ? "tar.gz":"vhd.bz2")
+          (node[:rightimage][:cloud] == "eucalyptus" ? "tar.gz":"vhd.bz2")
         when "kvm"
           "qcow2.bz2"
         when "esxi"
           "vmdk.ova"
+        when "hyperv"
+          "vhd"
         end
-      end
-
-      def cloud_id
-        cloud_names = { 
-          "us-east" => "1", 
-          "eu-west" => "2", 
-          "us-west" => "3",
-          "ap-southeast" => "4",
-          "ap-northeast" => "5", 
-          "us-west-2" => "6",
-          "sa-east" => "7",
-          "cloudstack-xen" => "850"
-        }
-        id = nil
-        cloud_names.each do |cloud_name, cloud_id|
-          id = cloud_id if node[:rightimage][:region] == (cloud_name)
-        end
-        id
       end
 
       def ri_lineage
-        [guest_platform,platform_version,arch,timestamp,build_number].join("_")
+        ["base_image",guest_platform,guest_platform_version,guest_arch,timestamp,build_number].join("_")
       end
 
       # call this guest_platform, not platform, otherwise can introduce a 
@@ -84,11 +61,11 @@ module RightScale
         end
       end
 
-      def platform_version
+      def guest_platform_version
         node[:rightimage][:platform_version]
       end
 
-      def arch
+      def guest_arch
         if node[:rightimage][:arch] == "x64"
           "x86_64"
         else
@@ -132,6 +109,11 @@ module RightScale
         else
           return TRUE
         end
+      end
+
+      def do_loopback_resize
+        source_size_gb = (::File.size(loopback_file(partitioned?))/1024/1024/1024).to_f.round
+        node[:rightimage][:root_size_gb].to_i != source_size_gb
       end
 
       def guest_root
@@ -234,12 +216,36 @@ module RightScale
         (centos? || rhel?) and node[:platform_version].to_f >= 6.0
       end
 
+      def el_repo_file
+        repo_file = case node[:rightimage][:platform]
+                    when "centos" then "CentOS-Base"
+                    when "rhel" then "Epel"
+                    end
+        "#{repo_file}.repo"
+      end
+
       def epel_key_name
         if node[:rightimage][:platform_version].to_i >= 6.0
           "-#{node[:rightimage][:platform_version][0].chr}"
         else
           ""
         end
+      end
+
+      def gem_install_source
+        "--source http://#{node[:rightimage][:mirror]}/rubygems/archive/#{node[:rightimage][:timestamp][0..7]}/"
+      end
+
+      def grub_initrd
+        ::File.basename(Dir.glob("#{guest_root}/boot/initr*").sort_by { |f| File.mtime(f) }.last)
+      end
+
+      def grub_kernel
+        ::File.basename(Dir.glob("#{guest_root}/boot/vmlinuz*").sort_by { |f| File.mtime(f) }.last)
+      end
+
+      def grub_root
+        (partitioned?) ? ",#{partition_number}":""
       end
     end
   end
