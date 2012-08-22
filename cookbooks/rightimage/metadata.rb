@@ -152,7 +152,7 @@ attribute "rightimage/debug",
 
 attribute "rightimage/timestamp",
   :display_name => "Build timestamp and mirror freeze date",
-  :description => "Initial build date of this image.  Also doubles as the archive date from which to pull packages. Expected format is YYYYMMDDHHMM",
+  :description => "Initial build date of this image, and also the archive date from which to pull packages. Expected format is YYYYMMDDHHMM. If not supplied, will use latest available date.",
   :required => "recommended"
 
 attribute "rightimage/build_number",

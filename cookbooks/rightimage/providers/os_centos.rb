@@ -268,7 +268,7 @@ action :repo_freeze do
       backup false
       variables ({
         :bootstrap => true,
-        :mirror_date => node[:rightimage][:mirror_date]
+        :mirror_date => timestamp[0..7]
       })
     end
   end
