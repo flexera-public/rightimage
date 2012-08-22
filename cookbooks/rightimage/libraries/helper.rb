@@ -93,7 +93,7 @@ module RightScale
 
       def partitioned?
         case node[:rightimage][:cloud]
-        when "ec2", "eucalyptus"
+        when "eucalyptus"
           return FALSE
         when "cloudstack"
           case node[:rightimage][:hypervisor]
