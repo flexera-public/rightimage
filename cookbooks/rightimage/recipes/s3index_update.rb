@@ -8,11 +8,11 @@ end
 SANDBOX_BIN_DIR = "/opt/rightscale/sandbox/bin"
 
 # Choose correct bucket for base or private cloud.
+# Default to dev buckets for RS reasons.
 if (node[:rightimage][:build_mode] == "base")
   image_upload_bucket = node[:rightimage][:base_image_bucket]
 else
-  image_upload_bucket = "rightscale-#{node[:rightimage][:cloud]}"
-  image_upload_bucket << "-dev" if node[:rightimage][:debug] == "true"
+  image_upload_bucket = "rightscale-#{node[:rightimage][:cloud]}-dev"
 end
 
 bash "update_s3index" do
