@@ -206,6 +206,37 @@ action :install do
   EOF
   end
 
+  # Fix for illegal instruction error caused by AVX extension (w-4923)
+  # See https://bugzilla.redhat.com/show_bug.cgi?id=752122, patch backported
+  if node[:rightimage][:platform_version].to_s == "6.2"
+    directory "/tmp/packages"
+    bash "install custom libc" do
+      packages = %w(
+        nscd-2.12-1.47.el6.x86_64.rpm
+        glibc-utils-2.12-1.47.el6.x86_64.rpm
+        glibc-static-2.12-1.47.el6.x86_64.rpm
+        glibc-headers-2.12-1.47.el6.x86_64.rpm
+        glibc-devel-2.12-1.47.el6.x86_64.rpm
+        glibc-debuginfo-common-2.12-1.47.el6.x86_64.rpm
+        glibc-debuginfo-2.12-1.47.el6.x86_64.rpm
+        glibc-common-2.12-1.47.el6.x86_64.rpm
+        glibc-2.12-1.47.el6.x86_64.rpm
+      ).join(" ")
+      cwd "/tmp/packages"
+      flags "-ex"
+      code <<-EOH
+      base_url=http://rightscale-rightimage.s3.amazonaws.com/patches/centos/6.2/w-4923/RPMS/x86_64/
+      for p in #{packages}
+      do
+        curl -s -S -f -L --retry 7 -O $base_url$p 
+      done
+
+      rpm --force --nodeps --root #{guest_root} --upgrade #{packages}
+      EOH
+    end
+  end
+
+
   cookbook_file "#{guest_root}/etc/pki/rpm-gpg/RPM-GPG-KEY-RightScale" do
     source "GPG-KEY-RightScale"
     backup false
