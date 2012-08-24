@@ -192,8 +192,6 @@ if File.exists? "/etc/rightscale.d/rightimage-release.js"
 else
   hint = Hash.new
 end  
-# Add to hint to simplify RightScaleMirror arguments.
-hint["rightlink-version"] = report_hash["packages"]["rightscale"]
   
 # Receive hint.
 report_hash.merge!(RightScaleMirror.new(hint))
