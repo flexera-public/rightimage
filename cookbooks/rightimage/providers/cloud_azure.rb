@@ -146,7 +146,8 @@ action :upload do
       npm -g ls | grep azure
       if [ "$?" == "1" ]; then
         set -e
-        npm install azure -g
+        # Freeze to version 0.6.0 for now, 0.6.2 kept erroring out during blob upload
+        npm install azure@0.6.0 -g
       fi
     EOH
   end
