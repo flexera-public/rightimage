@@ -80,6 +80,8 @@ case node[:rightimage][:platform_version]
   when "12.04"
     rightimage[:host_packages] << " devscripts liburi-perl"
     rightimage[:guest_packages] << " linux-image-virtual"
+    # extra-virtual contains the UDF kernel module (DVD format), needed for azure
+    rightimage[:guest_packages] << " linux-image-extra-virtual"
   else
      rightimage[:host_packages] << " devscripts"
 end if rightimage[:platform] == "ubuntu" 
