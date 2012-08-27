@@ -87,8 +87,8 @@ class Packages
     case id
       when "Ubuntu"
         # Read packages into a hash.
-        `dpkg -l`.sub(/.*?(?=ii)/im,'').each_line{ |line|
-          col = line.split[1..2] 
+        `dpkg-query -W`.each_line{ |line|
+          col = line.split 
           packs[col[0]] = col[1]
           }
 
