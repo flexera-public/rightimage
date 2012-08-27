@@ -77,6 +77,6 @@ bash "query_image" do
 end
 
 # Clean up report tool.
-file "#{guest_root}/tmp/report_tool.r" do action :delete end
+file "#{guest_root}/tmp/report_tool.rb" do action :delete end
 
 rightscale_marker :end
