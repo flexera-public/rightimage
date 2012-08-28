@@ -50,7 +50,7 @@ rightimage[:guest_packages] << " acpid"
 rightimage[:guest_packages] << " autoconf"
 rightimage[:guest_packages] << " automake"
 rightimage[:guest_packages] << " bison"
-rightimage[:guest_packages] << " curl"
+rightimage[:guest_packages] << " curl" # RightLink
 rightimage[:guest_packages] << " flex"
 rightimage[:guest_packages] << " libtool"
 rightimage[:guest_packages] << " libxml2"
@@ -76,16 +76,16 @@ when "ubuntu"
   rightimage[:guest_packages] << " dhcp3-client"
   rightimage[:guest_packages] << " dmsetup"
   rightimage[:guest_packages] << " emacs"
-  rightimage[:guest_packages] << " git-core"
+  rightimage[:guest_packages] << " git-core" # RightLink
   rightimage[:guest_packages] << " iptraf"
   rightimage[:guest_packages] << " irb"
-  rightimage[:guest_packages] << " libarchive-dev"
+  rightimage[:guest_packages] << " libarchive-dev" # RightLink
   rightimage[:guest_packages] << " liberror-perl"
   rightimage[:guest_packages] << " libopenssl-ruby1.8"
   rightimage[:guest_packages] << " libreadline-ruby1.8"
   rightimage[:guest_packages] << " libshadow-ruby1.8"
-  rightimage[:guest_packages] << " libxml2-dev"
-  rightimage[:guest_packages] << " libxslt1-dev"
+  rightimage[:guest_packages] << " libxml2-dev" # RightLink
+  rightimage[:guest_packages] << " libxslt1-dev" # RightLink
   rightimage[:guest_packages] << " mailutils"
   rightimage[:guest_packages] << " ncurses-dev"
   rightimage[:guest_packages] << " postfix"
@@ -148,11 +148,11 @@ when "centos","rhel"
   rightimage[:guest_packages] << " dhclient"
   rightimage[:guest_packages] << " fping"
   rightimage[:guest_packages] << " gcc*"
-  rightimage[:guest_packages] << " git"
-  rightimage[:guest_packages] << " libarchive-devel"
-  rightimage[:guest_packages] << " libxml2-devel"
+  rightimage[:guest_packages] << " git" # RightLink
+  rightimage[:guest_packages] << " libarchive-devel" # RightLink
+  rightimage[:guest_packages] << " libxml2-devel" # RightLink
   rightimage[:guest_packages] << " libxslt"
-  rightimage[:guest_packages] << " libxslt-devel"
+  rightimage[:guest_packages] << " libxslt-devel" # RightLink
   rightimage[:guest_packages] << " lynx"
   rightimage[:guest_packages] << " mlocate"
   rightimage[:guest_packages] << " mutt"
