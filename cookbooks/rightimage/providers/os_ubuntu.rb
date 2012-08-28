@@ -57,7 +57,7 @@ action :install do
   else
     bootstrap_cmd << " --arch amd64"
   end
-  node[:rightimage][:guest_packages].each { |p| bootstrap_cmd << " --addpkg " + p}
+  node[:rightimage][:guest_packages].each { |p| bootstrap_cmd << " --addpkg #{p.split}"}
 
   Chef::Log.info "vmbuilder bootstrap command is: " + bootstrap_cmd
 

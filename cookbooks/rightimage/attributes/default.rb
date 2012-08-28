@@ -52,7 +52,6 @@ rightimage[:guest_packages] << " subversion"
 rightimage[:guest_packages] << " sysstat"
 rightimage[:guest_packages] << " tmux"
 rightimage[:guest_packages] << " unzip"
-rightimage[:guest_packages] << " "
 
 set[:rightimage][:host_packages] = []
 
