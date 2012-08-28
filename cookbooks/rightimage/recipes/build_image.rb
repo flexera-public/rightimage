@@ -29,7 +29,7 @@ directory temp_root do
   recursive true
 end
 
-node[:rightimage][:host_packages].split.each { |p| package p }
+node[:rightimage][:host_packages].each { |p| package p.strip }
 
 include_recipe "rightimage::block_device_restore"
 include_recipe "rightimage::loopback_resize"

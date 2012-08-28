@@ -45,7 +45,8 @@ when "hyperv" then set[:rightimage][:image_type] = "msvhd"
 else raise ArgumentError, "don't know what image format to use for #{node[:rightimage][:hypervisor]}!"
 end
 
-set[:rightimage][:guest_packages] = "acpid"
+set[:rightimage][:guest_packages] = []
+rightimage[:guest_packages] << " acpid"
 rightimage[:guest_packages] << " autoconf"
 rightimage[:guest_packages] << " automake"
 rightimage[:guest_packages] << " bison"
@@ -63,6 +64,8 @@ rightimage[:guest_packages] << " sysstat"
 rightimage[:guest_packages] << " tmux"
 rightimage[:guest_packages] << " unzip"
 rightimage[:guest_packages] << " "
+
+set[:rightimage][:host_packages] = []
 
 # set base os packages
 case rightimage[:platform]
@@ -108,7 +111,7 @@ when "ubuntu"
     rightimage[:guest_packages] << " libreadline-gplv2-dev"
   end
 
-  set[:rightimage][:host_packages] = "ca-certificates"
+  rightimage[:host_packages] << " ca-certificates"
   rightimage[:host_packages] << " openjdk-6-jre"
   rightimage[:host_packages] << " openssl"
 
@@ -178,7 +181,7 @@ when "centos","rhel"
   rightimage[:guest_packages] << " xfsprogs"
   rightimage[:guest_packages] << " yum-utils"
 
-  set[:rightimage][:host_packages] = "swig"
+  rightimage[:host_packages] << " swig"
 
   extra_el_packages =
     if el6?
@@ -191,12 +194,14 @@ when "centos","rhel"
       " openssl"
     end
 
-  rightimage[:guest_packages] << extra_el_packages
-  rightimage[:host_packages] << extra_el_packages
+  extra_el_packages.split.each do |p|
+    rightimage[:guest_packages] << " #{p}"
+    rightimage[:host_packages] << " #{p}"
+  end
 when "suse"
-  set[:rightimage][:guest_packages] = "gcc"
+  rightimage[:guest_packages] << " gcc"
 
-  set[:rightimage][:host_packages] = "kiwi"
+  rightimage[:host_packages] << " kiwi"
 end
 
 # set cloud stuff
