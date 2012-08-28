@@ -26,7 +26,7 @@ action :configure do
   end 
 
   # insert grub conf, and symlink
-  template "#{guest_root}/boot/grub/menu.lst" do
+  template "#{guest_root}/boot/grub/grub.conf" do
     source "menu.lst.erb"
     backup false 
   end
