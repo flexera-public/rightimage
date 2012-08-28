@@ -22,7 +22,7 @@ ruby_block "compressed_md5_checksum" do
     # Checksum unpartioned.
 
     # Inject the md5 sum.
-    hob["image"]["md5"] = `md5sum #{temp_root}/#{loopback_filename(false)}.gz`.split[0]
+    hob["image"]["compressed-md5"] = `md5sum #{temp_root}/#{loopback_filename(false)}.gz`.split[0]
 
     # Write back to unpartitioned json file.
     File.open("#{temp_root}/#{loopback_filename(false)}.js","w") do |f|
@@ -32,7 +32,7 @@ ruby_block "compressed_md5_checksum" do
     # Checksum partitioned.
 
     # Inject the md5 sum.
-    hob["image"]["md5"] = `md5sum #{temp_root}/#{loopback_filename(true)}.gz`.split[0]
+    hob["image"]["compressed-md5"] = `md5sum #{temp_root}/#{loopback_filename(true)}.gz`.split[0]
 
     # Write to partitioned json file.
     File.open("#{temp_root}/#{loopback_filename(true)}.js","w") do |f|

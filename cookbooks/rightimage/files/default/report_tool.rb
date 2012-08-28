@@ -15,9 +15,6 @@ end
 
 # JSON class infrastructure.
 
-# Considering factoring this out.
-  # Not needed for parsing.
-    # Can be checked in packages.
 # Inform parser what platform file is from.
 class OS
   def initialize() 
@@ -60,17 +57,16 @@ end
 
 
 #uname: release (r), version (v)
-class UKernel
+class Kern
   def initialize()
-    # Sanitize newlines.
-    @release = `uname -r`.sub("\n",'')
-    @version = `uname -v`.sub("\n",'')
+    # kernel-release is on the first line beginning with "(optional whitespace)initrd".
+    # It is located after the first "-" and should not include an ending ".img", if present.
+    @release = IO.read("/boot/grub/menu.lst").match(/^\s*initrd[^-]*-(.*)(?:.img)?$/)[1]
   end
 
   def to_hash(*a)
     {"kernel" => 
-      {"release" => @release,
-       "version" => @version} 
+      {"release" => @release}
     }
   end
 end
@@ -83,29 +79,31 @@ class Packages
     # Prep packages hash
     packs = Hash.new
 
-    # Linux distro family specific options
-    # 1. Parsing dpkg/yum
-      # or exit
+    # Linux distro family specific options:
+      # Ubuntu = dpkg,
+      # CentOS/RHEL = rpm,
+        # or exit.
+ 
+    case id
+      when "Ubuntu"
+        # Read packages into a hash.
+        `dpkg-query -W`.each_line{ |line|
+          col = line.split 
+          packs[col[0]] = col[1]
+          }
 
-    if id == "Ubuntu"
-      # Read packages into a hash
-      `dpkg -l`.sub(/.*?(?=ii)/im,'').each_line{ |line|
-        col = line.split[1..2] 
-        packs[col[0]] = col[1]
-        }
+      when "CentOS", /RedHat/
+        # Read packages into a hash.
+        `rpm -qa --qf "%{NAME}\t%{VERSION}\n"`.each_line{ |line|
+              col = line.split
+              packs[col[0]] = col[1]
+              }
+      else
+        packs["This distro"] = "is not supported."
+        exit
+      end
 
-    elsif id == "CentOS" || id == "RedHatEnterpriseServer"
-      # Read packages into a hash
-      `rpm -qa --qf "%{NAME}\t%{VERSION}\n"`.each_line{ |line|
-            col = line.split
-            packs[col[0]] = col[1]
-            }
-    else
-      packs["This distro"] = "is not supported."
-      exit
-    end
-
-    # Store in instance variable
+    # Store in instance variable to extract rightlink version.
     @packages = packs
   end
 
@@ -149,7 +147,7 @@ class Image
   def to_hash(*a)
     {"image" => 
       {"build-date" => @build_date } 
-    # Delete empty pairs
+    # Delete empty pairs.
     }.rec_delete_empty
   end
 end
@@ -164,48 +162,47 @@ class Cloud
       @cloud = nil
     end
   end
-  # Strips value if nil
+  # Strips value if nil.
   def to_hash(*a) {"cloud" => @cloud}.delete_if{ |k,v| v.nil? } end
 end
 
-# End JSON class infrastructure
+# End JSON class infrastructure.
 
-# Merge JSON of classes into report_hash
+# Merge JSON of classes into report_hash.
 report_hash = Hash.new
 report_hash.merge!(OS.new)
-# Switch on OS
+# Switch on OS.
 if report_hash["os"] != "linux"
   puts "Windows support is coming... soon."
   exit
 end
 
-# And the rest
+# And the rest.
 report_hash.merge!(LSB.new)
-report_hash.merge!(UKernel.new)
+report_hash.merge!(Kern.new)
 report_hash.merge!(Cloud.new)
 
-# Take platform as arg
+# Take platform as arg.
 report_hash.merge!(Packages.new(report_hash["lsb"]["id"]))
 
-# Give hint
+# Give hint hash.
 if File.exists? "/etc/rightscale.d/rightimage-release.js"
   hint = JSON.parse(File.read('/etc/rightscale.d/rightimage-release.js'))
+# Otherwise give empty hint hash.
 else
   hint = Hash.new
 end  
-# Add to hint to simplify arguments
-hint["rightlink-version"] = report_hash["packages"]["rightscale"]
   
-# Receive hint
+# Receive hint.
 report_hash.merge!(RightScaleMirror.new(hint))
 report_hash.merge!(Image.new(hint))
 
-# Print results if flag is set
+# Print results if flag is set.
 if(ARGV[0] == "print" )
   puts JSON.pretty_generate(report_hash)
 end
 
-# Save JSON to /tmp
+# Save JSON to /tmp.
 File.open("/tmp/report.js","w") do |f|
   f.write(JSON.pretty_generate(report_hash))
 end

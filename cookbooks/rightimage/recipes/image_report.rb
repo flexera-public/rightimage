@@ -15,6 +15,7 @@ cookbook_file "#{guest_root}/tmp/report_tool.rb" do
 end
 
 # This folder does not exist yet, so create it.
+# Store hint files in here.
 directory "#{guest_root}/etc/rightscale.d" do
   owner "root"
   group "root"
@@ -27,8 +28,12 @@ ruby_block "create_hint_file" do
     hint = Hash.new
     # Pull from Chef input.
     hint["freeze-date"] = "#{timestamp}"[0..7]
-    # Current date
+    # Current date.
     hint["build-date"] = Time.new.strftime("%Y%m%d")
+    # Pull from chef input if full image.
+    if node[:rightimage][:build_mode] == "full"
+      hint["rightlink-version"] = "#{node[:rightimage][:rightlink_version]}"
+    end
 
     # Save hash as JSON file.
     File.open("#{guest_root}/etc/rightscale.d/rightimage-release.js","w") do |f|
@@ -38,6 +43,7 @@ ruby_block "create_hint_file" do
 end
 
 # Directory does not exist yet, so create it.
+# This will store the compressed image and reports.
 directory temp_root do
   owner "root"
   group "root"
@@ -57,7 +63,7 @@ bash "query_image" do
   fi
 
   # Run report tool in image chroot.
-  # Prints report to log
+  # Prints report to log.
   /usr/sbin/chroot #{guest_root} /tmp/report_tool.rb "print"
 
   # Move json file out of image to receive md5.  
