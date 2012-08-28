@@ -45,29 +45,29 @@ when "hyperv" then set[:rightimage][:image_type] = "msvhd"
 else raise ArgumentError, "don't know what image format to use for #{node[:rightimage][:hypervisor]}!"
 end
 
-set[:rightimage][:common_guest_packages] = "acpid"
-rightimage[:common_guest_packages] << " autoconf"
-rightimage[:common_guest_packages] << " automake"
-rightimage[:common_guest_packages] << " bison"
-rightimage[:common_guest_packages] << " curl"
-rightimage[:common_guest_packages] << " flex"
-rightimage[:common_guest_packages] << " libtool"
-rightimage[:common_guest_packages] << " libxml2"
-rightimage[:common_guest_packages] << " logrotate"
-rightimage[:common_guest_packages] << " nscd"
-rightimage[:common_guest_packages] << " openssh-server"
-rightimage[:common_guest_packages] << " openssl"
-rightimage[:common_guest_packages] << " screen"
-rightimage[:common_guest_packages] << " subversion"
-rightimage[:common_guest_packages] << " sysstat"
-rightimage[:common_guest_packages] << " tmux"
-rightimage[:common_guest_packages] << " unzip"
-rightimage[:common_guest_packages] << " "
+set[:rightimage][:guest_packages] = "acpid"
+rightimage[:guest_packages] << " autoconf"
+rightimage[:guest_packages] << " automake"
+rightimage[:guest_packages] << " bison"
+rightimage[:guest_packages] << " curl"
+rightimage[:guest_packages] << " flex"
+rightimage[:guest_packages] << " libtool"
+rightimage[:guest_packages] << " libxml2"
+rightimage[:guest_packages] << " logrotate"
+rightimage[:guest_packages] << " nscd"
+rightimage[:guest_packages] << " openssh-server"
+rightimage[:guest_packages] << " openssl"
+rightimage[:guest_packages] << " screen"
+rightimage[:guest_packages] << " subversion"
+rightimage[:guest_packages] << " sysstat"
+rightimage[:guest_packages] << " tmux"
+rightimage[:guest_packages] << " unzip"
+rightimage[:guest_packages] << " "
 
 # set base os packages
 case rightimage[:platform]
 when "ubuntu"
-  set[:rightimage][:guest_packages] = "binutils"
+  rightimage[:guest_packages] << " binutils"
   rightimage[:guest_packages] << " build-essential"
   rightimage[:guest_packages] << " ca-certificates"
   rightimage[:guest_packages] << " dhcp3-client"
@@ -137,7 +137,7 @@ when "ubuntu"
      rightimage[:host_packages] << " devscripts"
   end
 when "centos","rhel"
-  set[:rightimage][:guest_packages] = "bwm-ng"
+  rightimage[:guest_packages] << " bwm-ng"
   rightimage[:guest_packages] << " compat-gcc-34-g77"
   rightimage[:guest_packages] << " compat-libstdc++-296"
   rightimage[:guest_packages] << " createrepo"
@@ -198,9 +198,6 @@ when "suse"
 
   set[:rightimage][:host_packages] = "kiwi"
 end
-
-# Append list of common packages to platform specific package list
-set[:rightimage][:guest_packages] << " " + rightimage[:common_guest_packages]
 
 # set cloud stuff
 # TBD Refactor this block to use consistent naming, figure out how to move logic into cloud providers
