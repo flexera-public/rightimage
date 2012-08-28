@@ -26,19 +26,9 @@ action :configure do
   end 
 
   # insert grub conf, and symlink
-  template "#{guest_root}/boot/grub/grub.conf" do 
+  template "#{guest_root}/boot/grub/menu.lst" do
     source "menu.lst.erb"
     backup false 
-  end
-
-  file "#{guest_root}/boot/grub/menu.lst" do 
-    action :delete
-    backup false
-  end
-
-  link "#{guest_root}/boot/grub/menu.lst" do 
-    link_type :hard # soft symlinks don't work outside chrooted env
-    to "#{guest_root}/boot/grub/grub.conf"
   end
 
   Chef::Log::info "Add DHCP symlink for RightLink"

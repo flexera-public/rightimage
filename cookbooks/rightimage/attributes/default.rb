@@ -25,17 +25,6 @@ set_unless[:rightimage][:platform] = guest_platform
 set_unless[:rightimage][:platform_version] = guest_platform_version
 set_unless[:rightimage][:arch] = guest_arch
 
-if timestamp
-  if rightimage[:platform] == "ubuntu"
-    set[:rightimage][:mirror_date] = "#{timestamp[0..3]}/#{timestamp[4..5]}/#{timestamp[6..7]}"
-    set[:rightimage][:mirror_url] = "http://#{node[:rightimage][:mirror]}/ubuntu_daily/#{node[:rightimage][:mirror_date]}"
-  else
-    set[:rightimage][:mirror_date] = timestamp[0..7]
-  end
-else
-  set[:rightimage][:mirror_date] = nil
-end
-
 
 case node[:rightimage][:hypervisor]
 when "xen" then set[:rightimage][:image_type] = "vhd"
@@ -136,6 +125,8 @@ when "ubuntu"
     rightimage[:guest_packages] << " linux-image-virtual"
     rightimage[:host_packages] << " devscripts"
     rightimage[:host_packages] << " liburi-perl"
+    # extra-virtual contains the UDF kernel module (DVD format), needed for azure
+    rightimage[:guest_packages] << " linux-image-extra-virtual"
   else
      rightimage[:host_packages] << " devscripts"
   end

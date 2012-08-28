@@ -26,7 +26,7 @@ ruby_block "create_hint_file" do
   block do
     hint = Hash.new
     # Pull from Chef input.
-    hint["freeze-date"] = "#{node[:rightimage][:timestamp]}"[0..7]
+    hint["freeze-date"] = "#{timestamp}"[0..7]
     # Current date
     hint["build-date"] = Time.new.strftime("%Y%m%d")
 

@@ -98,6 +98,12 @@ rightimage_cloud node[:rightimage][:cloud] do
 
   action :configure
 end
+
+execute "grub symlink" do
+  only_if { ::File.exists?"#{guest_root}/boot/grub/menu.lst" }
+  command "chroot #{guest_root} ln -s /boot/grub/menu.lst /boot/grub/grub.conf"
+  creates "#{guest_root}/boot/grub/grub.conf"
+end
 # END cloud specific additions
 
 rightimage_os node[:rightimage][:platform] do
