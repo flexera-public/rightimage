@@ -21,6 +21,9 @@ set[:rightimage][:root_mount][:dev] = "LABEL=#{rightimage[:root_mount][:label_de
 set[:rightimage][:root_mount][:options] = "defaults"
 set_unless[:rightimage][:image_source_bucket] = "rightscale-us-west-2"
 set_unless[:rightimage][:base_image_bucket] = "rightscale-rightimage-base-dev"
+set_unless[:rightimage][:platform] = guest_platform
+set_unless[:rightimage][:platform_version] = guest_platform_version
+set_unless[:rightimage][:arch] = guest_arch
 
 
 case node[:rightimage][:hypervisor]
@@ -31,60 +34,165 @@ when "hyperv" then set[:rightimage][:image_type] = "msvhd"
 else raise ArgumentError, "don't know what image format to use for #{node[:rightimage][:hypervisor]}!"
 end
 
+set[:rightimage][:guest_packages] = []
+rightimage[:guest_packages] << " acpid"
+rightimage[:guest_packages] << " autoconf"
+rightimage[:guest_packages] << " automake"
+rightimage[:guest_packages] << " bison"
+rightimage[:guest_packages] << " curl" # RightLink
+rightimage[:guest_packages] << " flex"
+rightimage[:guest_packages] << " libtool"
+rightimage[:guest_packages] << " libxml2"
+rightimage[:guest_packages] << " logrotate"
+rightimage[:guest_packages] << " nscd"
+rightimage[:guest_packages] << " openssh-server"
+rightimage[:guest_packages] << " openssl"
+rightimage[:guest_packages] << " screen"
+rightimage[:guest_packages] << " subversion"
+rightimage[:guest_packages] << " sysstat"
+rightimage[:guest_packages] << " tmux"
+rightimage[:guest_packages] << " unzip"
+
+set[:rightimage][:host_packages] = []
+
 # set base os packages
 case rightimage[:platform]
-when "ubuntu"   
-  set[:rightimage][:guest_packages] = "ubuntu-standard binutils ruby1.8 curl unzip openssh-server ruby1.8-dev build-essential autoconf automake libtool logrotate rsync openssl openssh-server ca-certificates libopenssl-ruby1.8 subversion vim libreadline-ruby1.8 irb rdoc1.8 git-core liberror-perl dmsetup emacs rake screen mailutils nscd bison ncurses-dev zlib1g-dev readline-common libxslt1-dev sqlite3 libxml2 libxml2-dev flex libshadow-ruby1.8 postfix sysstat iptraf libarchive-dev tmux dhcp3-client acpid"
+when "ubuntu"
+  rightimage[:guest_packages] << " binutils"
+  rightimage[:guest_packages] << " build-essential"
+  rightimage[:guest_packages] << " ca-certificates"
+  rightimage[:guest_packages] << " dhcp3-client"
+  rightimage[:guest_packages] << " dmsetup"
+  rightimage[:guest_packages] << " emacs"
+  rightimage[:guest_packages] << " git-core" # RightLink
+  rightimage[:guest_packages] << " iptraf"
+  rightimage[:guest_packages] << " irb"
+  rightimage[:guest_packages] << " libarchive-dev" # RightLink
+  rightimage[:guest_packages] << " liberror-perl"
+  rightimage[:guest_packages] << " libopenssl-ruby1.8"
+  rightimage[:guest_packages] << " libreadline-ruby1.8"
+  rightimage[:guest_packages] << " libshadow-ruby1.8"
+  rightimage[:guest_packages] << " libxml2-dev" # RightLink
+  rightimage[:guest_packages] << " libxslt1-dev" # RightLink
+  rightimage[:guest_packages] << " mailutils"
+  rightimage[:guest_packages] << " ncurses-dev"
+  rightimage[:guest_packages] << " postfix"
+  rightimage[:guest_packages] << " rake"
+  rightimage[:guest_packages] << " rdoc1.8"
+  rightimage[:guest_packages] << " readline-common"
+  rightimage[:guest_packages] << " rsync"
+  rightimage[:guest_packages] << " ruby1.8"
+  rightimage[:guest_packages] << " ruby1.8-dev"
+  rightimage[:guest_packages] << " sqlite3"
+  rightimage[:guest_packages] << " ubuntu-standard"
+  rightimage[:guest_packages] << " vim"
+  rightimage[:guest_packages] << " zlib1g-dev"
 
   case rightimage[:platform_version]
   when "8.04"
   when "10.04"
   when "10.10"
-    rightimage[:guest_packages] << " libreadline5-dev libdigest-sha1-perl linux-headers-virtual"
+    rightimage[:guest_packages] << " libdigest-sha1-perl"
+    rightimage[:guest_packages] << " libreadline5-dev"
+    rightimage[:guest_packages] << " linux-headers-virtual"
   else
     rightimage[:guest_packages] << " libreadline-gplv2-dev"
   end
 
-  set[:rightimage][:host_packages] = "openjdk-6-jre openssl ca-certificates"
-when "centos","rhel"
-  set[:rightimage][:guest_packages] = "wget mlocate nano logrotate ruby ruby-devel ruby-docs ruby-irb ruby-libs ruby-mode ruby-rdoc ruby-ri ruby-tcltk openssl openssh openssh-askpass openssh-clients openssh-server curl gcc* zip unzip bison flex compat-libstdc++-296 cvs subversion autoconf automake libtool compat-gcc-34-g77 mutt sysstat rpm-build fping vim-common vim-enhanced rrdtool-1.2.27 rrdtool-devel-1.2.27 rrdtool-doc-1.2.27 rrdtool-perl-1.2.27 rrdtool-python-1.2.27 rrdtool-ruby-1.2.27 rrdtool-tcl-1.2.27 pkgconfig lynx screen yum-utils bwm-ng createrepo redhat-rpm-config redhat-lsb git nscd xfsprogs swig libarchive-devel tmux libxml2 libxml2-devel libxslt libxslt-devel dhclient sudo telnet acpid"
+  rightimage[:host_packages] << " ca-certificates"
+  rightimage[:host_packages] << " openjdk-6-jre"
+  rightimage[:host_packages] << " openssl"
 
-  set[:rightimage][:host_packages] = "swig"
-
-  extra_el_packages = el6? ? " compat-db43 compat-expat1 openssl098e" : " db4 expat openssl"
-  rightimage[:guest_packages] << extra_el_packages
-  rightimage[:host_packages] << extra_el_packages
-when "suse"
-  set[:rightimage][:guest_packages] = "gcc"
-
-  set[:rightimage][:host_packages] = "kiwi"
-end
-
-
-# set addtional release specific packages
-case node[:rightimage][:platform_version]
+  case rightimage[:platform_version]
   when "8.04"
-    set[:rightimage][:guest_packages] = rightimage[:guest_packages] + " sysv-rc-conf debian-helper-scripts"
+    rightimage[:guest_packages] << " debian-helper-scripts"
+    rightimage[:guest_packages] << " sysv-rc-conf"
     rightimage[:host_packages] << " ubuntu-vm-builder"
   when "9.10"
     rightimage[:host_packages] << " python-vm-builder-ec2"
   when "10.04"
     if rightimage[:cloud] == "ec2"
-      rightimage[:host_packages] << " python-vm-builder-ec2 devscripts"
+      rightimage[:host_packages] << " devscripts"
+      rightimage[:host_packages] << " python-vm-builder-ec2"
     else
       rightimage[:host_packages] << " devscripts"
     end
   when "10.10"
+    rightimage[:guest_packages] << " linux-image-virtual"
     rightimage[:host_packages] << " devscripts"
-    rightimage[:guest_packages] << " linux-image-virtual"
   when "12.04"
-    rightimage[:host_packages] << " devscripts liburi-perl"
     rightimage[:guest_packages] << " linux-image-virtual"
+    rightimage[:host_packages] << " devscripts"
+    rightimage[:host_packages] << " liburi-perl"
     # extra-virtual contains the UDF kernel module (DVD format), needed for azure
     rightimage[:guest_packages] << " linux-image-extra-virtual"
   else
      rightimage[:host_packages] << " devscripts"
-end if rightimage[:platform] == "ubuntu" 
+  end
+when "centos","rhel"
+  rightimage[:guest_packages] << " bwm-ng"
+  rightimage[:guest_packages] << " compat-gcc-34-g77"
+  rightimage[:guest_packages] << " compat-libstdc++-296"
+  rightimage[:guest_packages] << " createrepo"
+  rightimage[:guest_packages] << " cvs"
+  rightimage[:guest_packages] << " dhclient"
+  rightimage[:guest_packages] << " fping"
+  rightimage[:guest_packages] << " gcc*"
+  rightimage[:guest_packages] << " git" # RightLink
+  rightimage[:guest_packages] << " libarchive-devel" # RightLink
+  rightimage[:guest_packages] << " libxml2-devel" # RightLink
+  rightimage[:guest_packages] << " libxslt"
+  rightimage[:guest_packages] << " libxslt-devel" # RightLink
+  rightimage[:guest_packages] << " lynx"
+  rightimage[:guest_packages] << " mlocate"
+  rightimage[:guest_packages] << " mutt"
+  rightimage[:guest_packages] << " nano"
+  rightimage[:guest_packages] << " openssh-askpass"
+  rightimage[:guest_packages] << " openssh-clients"
+  rightimage[:guest_packages] << " pkgconfig"
+  rightimage[:guest_packages] << " redhat-lsb"
+  rightimage[:guest_packages] << " redhat-rpm-config"
+  rightimage[:guest_packages] << " rpm-build"
+  rightimage[:guest_packages] << " ruby"
+  rightimage[:guest_packages] << " ruby-devel"
+  rightimage[:guest_packages] << " ruby-docs"
+  rightimage[:guest_packages] << " ruby-irb"
+  rightimage[:guest_packages] << " ruby-libs"
+  rightimage[:guest_packages] << " ruby-mode"
+  rightimage[:guest_packages] << " ruby-rdoc"
+  rightimage[:guest_packages] << " ruby-ri"
+  rightimage[:guest_packages] << " ruby-tcltk"
+  rightimage[:guest_packages] << " sudo"
+  rightimage[:guest_packages] << " swig"
+  rightimage[:guest_packages] << " telnet"
+  rightimage[:guest_packages] << " vim-common"
+  rightimage[:guest_packages] << " vim-enhanced"
+  rightimage[:guest_packages] << " wget"
+  rightimage[:guest_packages] << " xfsprogs"
+  rightimage[:guest_packages] << " yum-utils"
+
+  rightimage[:host_packages] << " swig"
+
+  extra_el_packages =
+    if el6?
+      " compat-db43" +
+      " compat-expat1" +
+      " openssl098e"
+    else
+      " db4" +
+      " expat" +
+      " openssl"
+    end
+
+  extra_el_packages.split.each do |p|
+    rightimage[:guest_packages] << " #{p}"
+    rightimage[:host_packages] << " #{p}"
+  end
+when "suse"
+  rightimage[:guest_packages] << " gcc"
+
+  rightimage[:host_packages] << " kiwi"
+end
 
 # set cloud stuff
 # TBD Refactor this block to use consistent naming, figure out how to move logic into cloud providers

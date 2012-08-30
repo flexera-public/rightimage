@@ -45,7 +45,7 @@ module RightScale
       # call this guest_platform, not platform, otherwise can introduce a 
       # weird bug where platform func can overwrite chef default platform func
       def guest_platform
-        node[:rightimage][:platform]
+        node[:rightimage][:platform] || node[:platform]
       end
 
       def platform_codename(platform_version = node[:rightimage][:platform_version])
@@ -62,14 +62,14 @@ module RightScale
       end
 
       def guest_platform_version
-        node[:rightimage][:platform_version]
+        node[:rightimage][:platform_version] || node[:platform_version]
       end
 
       def guest_arch
         if node[:rightimage][:arch] == "x64"
           "x86_64"
         else
-          node[:rightimage][:arch]
+          node[:rightimage][:arch] || node[:kernel][:machine]
         end
       end
 

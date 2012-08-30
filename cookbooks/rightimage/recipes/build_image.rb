@@ -17,6 +17,8 @@ rightscale_marker :begin
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+raise "ERROR: your build_mode input is set to #{node[:rightimage][:build_mode]}. Should be 'full'" unless node[:rightimage][:build_mode] == "full"
+
 class Chef::Recipe
   include RightScale::RightImage::Helper
 end
@@ -27,7 +29,7 @@ directory temp_root do
   recursive true
 end
 
-node[:rightimage][:host_packages].split.each { |p| package p }
+node[:rightimage][:host_packages].each { |p| package p.strip }
 
 include_recipe "rightimage::block_device_restore"
 include_recipe "rightimage::loopback_resize"
