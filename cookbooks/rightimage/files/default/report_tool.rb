@@ -18,7 +18,7 @@ end
 # Inform parser what platform file is from.
 class OS
   def initialize() 
-    # If it contains linux the Linux, otherwise Windows (in case of RS)
+    # If it contains linux then Linux, otherwise Windows (future dev).
     if Config::CONFIG["host_os"] =~ /linux/i
       @os = "linux"
     else  
@@ -30,8 +30,8 @@ class OS
 end
 
 
-# Linux Standard Base
-# lsb_release: id (i), description (d), release (r), codename (c)
+# Linux Standard Base.
+# lsb_release: id (i), description (d), release (r), codename (c) .
 class LSB
   def initialize()
     # Retrieve and split command output.
@@ -55,18 +55,23 @@ class LSB
   end
 end
 
-
-#uname: release (r), version (v)
+# Kernel release name.
+# Retrieved from /boot/grub/grub.conf if it is available.
+# rec_empty_delete strips empty and nil values.
 class Kern
   def initialize()
     # kernel-release is on the first line beginning with "(optional whitespace)initrd".
     # It is located after the first "-" and should not include an ending ".img", if present.
-    @release = IO.read("/boot/grub/menu.lst").match(/^\s*initrd[^-]*-(.*)(?:.img)?$/)[1]
+    if File.exists? "/boot/grub/grub.conf"
+      @release = IO.read("/boot/grub/grub.conf").match(/^\s*initrd[^-]*-(.*)(?:.img)?$/)[1]
+    else
+      @release = nil
+    end
   end
 
   def to_hash(*a)
     {"kernel" => 
-      {"release" => @release}
+      {"release" => @release}.delete_if{ |k,v| v.nil? }
     }
   end
 end
@@ -115,7 +120,6 @@ end
 
 # Holds RS specific info.
 # Takes hint hash as arg.
-# rec_empty_delete strips empty and nil values.
 class RightScaleMirror
   def initialize(hint)
     @repo_freezedate = hint["freeze-date"]
@@ -138,7 +142,6 @@ end
 # Holds info about the image.
 # MD5 sums added to report_hash in later step.
 # Takes hint hash as arg.
-# rec_empty_delete strips empty and nil values.
 class Image
   def initialize(hint)
     @build_date = hint["build-date"]
