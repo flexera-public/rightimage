@@ -41,19 +41,31 @@ ruby_block "compressed_md5_checksum" do
   end
 end
 
-# Create vars
+# Upload vars.
 image_s3_path = guest_platform+"/"+guest_platform_version+"/"+guest_arch+"/"+timestamp[0..3]
 # Switch after testing:
 image_upload_bucket = node[:rightimage][:base_image_bucket]
 
-bash "upload_json_reports" do
-  cwd temp_root
-  flags "-ex"
-  environment(cloud_credentials("ec2"))
-  code <<-EOH
-    s3cmd put #{image_upload_bucket}:#{image_s3_path}/#{loopback_filename(false)}.js #{loopback_filename(false)}.js x-amz-acl:public-read
-    s3cmd put #{image_upload_bucket}:#{image_s3_path}/#{loopback_filename(true)}.js #{loopback_filename(true)}.js x-amz-acl:public-read
-  EOH
+# Upload base partitioned JSON file.
+json_partitioned = temp_root+"/"+"#{loopback_filename(false)}.js"
+
+rightimage_upload json_partitioned do
+  provider "rightimage_upload_s3"
+  only_if { node[:rightimage][:build_mode] == "base" }
+  endpoint 's3-us-west-2.amazonaws.com'
+  remote_path  "#{image_upload_bucket}/#{image_s3_path}"
+  action :upload
+end
+
+# Upload base unpartitioned JSON file.
+json_unpartitioned = temp_root+"/"+"#{loopback_filename(true)}.js"
+
+rightimage_upload json_unpartitioned do
+  provider "rightimage_upload_s3"
+  only_if { node[:rightimage][:build_mode] == "base" }
+  endpoint 's3-us-west-2.amazonaws.com'
+  remote_path  "#{image_upload_bucket}/#{image_s3_path}"
+  action :upload
 end
 
 rightscale_marker :end
