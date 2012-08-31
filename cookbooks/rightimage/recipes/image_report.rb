@@ -67,7 +67,7 @@ bash "query_image" do
   /usr/sbin/chroot #{guest_root} /tmp/report_tool.rb "print"
 
   # Move json file out of image to receive md5.  
-  mv #{guest_root}/tmp/report.js #{temp_root}/#{loopback_filename(false)}.js
+  mv #{guest_root}/tmp/report.js #{temp_root}/#{loopback_filename(partitioned?)}.js
   
   # If json was installed, uninstall it.
   if [ "$found" == "false" ]; then
