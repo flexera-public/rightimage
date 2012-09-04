@@ -78,9 +78,15 @@ bash "query_image" do
   
   # If rightimage_tools was installed, uninstall it.
   if [ "$found" == "false" ]; then
+    # TO-DO: Uninstall dependencies recursively or ignore dependencies. 
     /usr/sbin/chroot #{guest_root} gem uninstall rightimage_tools
   fi
   EOH
+end
+
+# For base and full images, uninstall all gems when finished.
+if node[:rightimage][:build_mode] == "base" || node[:rightimage][:build_mode] == "full" 
+  `gem list | cut -d" " -f1 | xargs gem uninstall -aIx`
 end
 
 # Clean up report tool.
