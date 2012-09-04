@@ -1,4 +1,69 @@
 action :configure do 
+  
+  bash "install guest packages" do 
+    flags '-ex'
+    code <<-EOH
+  case "#{new_resource.platform}" in
+    "centos"|"rhel")
+      chroot #{guest_root} yum -y install iscsi-initiator-utils
+      ;;
+  esac
+    EOH
+  end
+
+  # insert grub conf, and link menu.lst to grub.conf
+  directory "#{guest_root}/boot/grub" do
+    owner "root"
+    group "root"
+    mode "0750"
+    action :create
+    recursive true
+  end 
+
+  # insert grub conf, and symlink
+  template "#{guest_root}/boot/grub/grub.conf" do
+    source "menu.lst.erb"
+    backup false 
+  end
+
+  Chef::Log::info "Add DHCP symlink for RightLink"
+  execute "chroot #{guest_root} ln -s /var/lib/dhcp /var/lib/dhcp3" do
+    only_if { ::File.exists?"#{guest_root}/var/lib/dhcp" }
+    creates "#{guest_root}/var/lib/dhcp3"
+  end
+
+  bash "setup grub" do
+    not_if { new_resource.hypervisor == "xen" }
+    flags "-ex"
+    code <<-EOH
+      guest_root="#{guest_root}"
+      
+      case "#{new_resource.platform}" in
+        "ubuntu")
+          chroot $guest_root cp -p /usr/lib/grub/x86_64-pc/* /boot/grub
+          grub_command="/usr/sbin/grub"
+          ;;
+        "centos"|"rhel")
+          chroot $guest_root cp -p /usr/share/grub/x86_64-redhat/* /boot/grub
+          grub_command="/sbin/grub"
+          ;;
+      esac
+
+      echo "(hd0) #{node[:rightimage][:grub][:root_device]}" > $guest_root/boot/grub/device.map
+      echo "" >> $guest_root/boot/grub/device.map
+
+      cat > device.map <<EOF
+(hd0) #{loopback_file(partitioned?)}
+EOF
+
+    ${grub_command} --batch --device-map=device.map <<EOF
+root (hd0,0)
+setup (hd0)
+quit
+EOF
+EOH
+  end
+  
   bash "configure for openstack" do
     flags "-ex"
     code <<-EOH
