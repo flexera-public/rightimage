@@ -43,10 +43,6 @@ ruby_block "base_md5_checksums" do
   end
 end
 
-# Full image vars.
-full_image_path = target_raw_root+"/"+image_name+"."+node[:rightimage][:image_type]
-compressed_full_image_path = target_raw_root+"/"+image_name+"."+image_file_ext
-
 # Inject full image MD5 checksums.
 # Compressed and uncompressed.
 ruby_block "full_md5_checksums" do
@@ -60,10 +56,32 @@ ruby_block "full_md5_checksums" do
       hob = JSON.load(f)
     end
 
-    # Uncompressed MD5 sum.
-    hob["image"]["md5"] = `md5sum #{full_image_path}`.split[0]
+    # Eucalyptus + xen case.
+    if (node[:rightimage][:cloud] == "eucalyptus" && node[:rightimage][:hypervisor] == "xen" )
+      # Directory with uncompressed image and kernel directory.
+      euca_dir = target_raw_root+"/"+image_name
+
+      # Uncompressed image.
+      euca_image_path = euca_dir+"/"+image_name+".img"
+      hob["image"]["image-md5"] = `md5sum #{euca_image_path}`.split[0]
+
+      # Initial ramdisk.
+      initrd_path = Dir.glob(euca_dir+"/xen-kernel/initrd*")[0]
+      hob["image"]["initrd-md5"] = `md5sum #{initrd_path}`.split[0]
+
+      # Compressed kernel.
+      vmlinuz_path = Dir.glob(euca_dir+"/xen-kernel/vmlinuz*")[0]
+      hob["image"]["vmlinuz-md5"] = `md5sum #{vmlinuz_path}`.split[0]
+
+    # All other private clouds.
+    else
+      # Uncompressed MD5 sum.
+      full_image_path = target_raw_root+"/"+image_name+"."+node[:rightimage][:image_type]
+      hob["image"]["md5"] = `md5sum #{full_image_path}`.split[0]
+    end
 
     # Compressed MD5 sum.
+    compressed_full_image_path = target_raw_root+"/"+image_name+"."+image_file_ext
     hob["image"]["compressed-md5"] = `md5sum #{compressed_full_image_path}`.split[0]
 
     # Write to full image's JSON.
