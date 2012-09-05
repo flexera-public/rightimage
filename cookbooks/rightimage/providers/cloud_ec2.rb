@@ -16,7 +16,7 @@ action :configure do
   end 
 
   # Setup grub Version 1, ec2
-  template "#{guest_root}/boot/grub/grub.conf" do
+  template "#{guest_root}/boot/grub/menu.lst" do
     source "menu.lst.erb"
     backup false 
   end

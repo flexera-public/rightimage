@@ -241,7 +241,7 @@ module RightScale
       end
 
       def grub_root
-        (partitioned?) ? ",#{partition_number}":""
+        "(hd0" + ((partitioned?) ? ",#{partition_number}":"") + ")"
       end
 
       # Timestamp is used to name the snapshots that base images are stored to and restored from

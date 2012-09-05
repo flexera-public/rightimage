@@ -270,6 +270,16 @@ EOF
     code "chroot #{guest_root} apt-key add /tmp/GPG-KEY-RightScale"
   end
 
+  # Remove grub2 files
+  bash "remove_grub2" do
+    flags "-ex"
+    code <<-EOH
+      guest_root=#{guest_root}
+      chroot $guest_root apt-get -y purge grub2-common grub-pc grub-pc-bin
+      rm -rf $guest_root/boot/grub/menu.lst*
+    EOH
+  end
+
 
   # TODO: Add cleanup
   bash "cleanup" do

@@ -282,3 +282,6 @@ set[:rightimage][:grub][:kernel][:options] << " console=hvc0" if rightimage[:hyp
 # Start device naming from xvda instead of xvde (w-4893)
 # https://bugzilla.redhat.com/show_bug.cgi?id=729586
 set[:rightimage][:grub][:kernel][:options] << " xen_blkfront.sda_is_xvda=1" if rightimage[:platform] == "centos" && rightimage[:platform_version].to_f >= 6.3
+
+# Specify if running in Xen domU or have grub detect automatically
+set[:rightimage][:grub][:indomU] = node[:rightimage][:hypervisor] == "xen" ? "true":"detect"
