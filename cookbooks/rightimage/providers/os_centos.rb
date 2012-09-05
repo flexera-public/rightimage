@@ -244,7 +244,7 @@ action :install do
 
   # Grubby requires a symlink to /etc/grub.conf.
   execute "grub symlink" do
-    command "chroot #{guest_root} ln -s /boot/grub/grub.conf /etc/grub.conf"
+    command "chroot #{guest_root} ln -s /boot/grub/menu.lst /etc/grub.conf"
     creates "#{guest_root}/etc/grub.conf"
   end
 
