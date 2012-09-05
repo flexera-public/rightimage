@@ -35,6 +35,7 @@ ruby_block "create_hint_file" do
     # Pull from chef input if full image.
     if node[:rightimage][:build_mode] == "full"
       hint["rightlink-version"] = "#{node[:rightimage][:rightlink_version]}"
+      hint["hypervisor"] = "#{node[:rightimage][:hypervisor]}"
     end
 
     # Save hash as JSON file.
@@ -78,7 +79,6 @@ bash "query_image" do
   
   # If rightimage_tools was installed, uninstall it.
   if [ "$found" == "false" ]; then
-    # TO-DO: Uninstall dependencies recursively or ignore dependencies. 
     /usr/sbin/chroot #{guest_root} gem uninstall rightimage_tools
   fi
 
