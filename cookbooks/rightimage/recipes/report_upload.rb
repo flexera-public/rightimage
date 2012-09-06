@@ -45,14 +45,16 @@ end
 
 # Inject full image MD5 checksums.
 # Compressed and uncompressed.
+
 ruby_block "full_md5_checksums" do
   only_if { node[:rightimage][:build_mode] == "full" }
   block do
     require 'json'
 
     # Open existing JSON file placed in /mnt/rightimage-temp .
+    # JSON file may have been renamed to upload to full image bucket.
     hob = Hash.new
-    File.open("#{temp_root}/#{loopback_filename(partitioned?)}.js","r") do |f|
+    File.open(Dir.glob("#{temp_root}/*.js")[0],"r") do |f|
       hob = JSON.load(f)
     end
 
@@ -133,7 +135,9 @@ end
 # Full image case:
 
 # Rename JSON file to match packaged image.
+# Only if it hadn't been previosuly.
 bash "upload_JSON_reports" do
+  not_if { File.exists?("#{temp_root}/#{full_image_rootname}"+".js") }
   cwd temp_root
   flags "-ex"
   code <<-EOH
