@@ -6,6 +6,12 @@ end
 action :configure do
   package "grub"
   
+  ruby_block "check hypervisor" do
+    block do
+      raise "ERROR: you must set your hypervisor to hyperv!" unless new_resource.hypervisor == "hyperv"
+    end
+  end
+  
   bash "install guest packages" do 
     flags '-ex'
     code <<-EOH
