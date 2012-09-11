@@ -50,10 +50,8 @@ action :install_kernel do
       if [ "$?" == "1" ]; then
         cat >> $guest_root/etc/yum.conf <<-EOF
 
-# Incompatibility with Azure storage modules - Hard drives not recognized.
-# Tested with 2.6.32-220.17.1 and 2.6.32-220.23.1
-# Works with 2.6.32-220.13.1
-exclude=kernel*
+# Microsoft does not currently support CentOS plus kernels.
+exclude=kernel*plus*
 EOF
       fi
       set -e
