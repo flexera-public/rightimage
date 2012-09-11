@@ -60,7 +60,9 @@ EOF
       rm -f $guest_root/initr* $guest_root/boot/initr*$(uname -r)*
 
       # Kill services started automatically during package installs
+      set +e
       killall hv_kvp_daemon
+      set -e
     EOH
   end
  
