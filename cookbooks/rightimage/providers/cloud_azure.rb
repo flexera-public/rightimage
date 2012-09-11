@@ -106,6 +106,9 @@ EOH
       esac
       set -e
       chroot $guest_root npm install azure -g
+
+      # Remove .swp files
+      find $guest_root/root/.npm $guest_root/usr/lib/nodejs -name *.swp -exec rm -rf {} \\;
     EOH
   end
 end
