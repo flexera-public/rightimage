@@ -2,6 +2,7 @@ maintainer       "RightScale, Inc."
 maintainer_email "support@rightscale.com"
 description      "A cookbook for building RightImages"
 version          "1.0.0"
+license          "Apache v2.0"
 
 depends "rightimage_tester"
 depends "loopback_fs"
@@ -89,7 +90,7 @@ attribute "rightimage/arch",
 attribute "rightimage/cloud",
   :display_name => "Target Cloud",
   :description => "The supported cloud for the virtual image. If unset, build a generic base image.",
-  :choice => [ "ec2", "cloudstack", "eucalyptus", "openstack", "rackspace", "rackspace_managed", "azure", "google"],
+  :choice => [ "ec2", "cloudstack", "eucalyptus", "openstack", "rackspace", "rackspace-managed", "rackspace-v2", "rackspace-managed-v2", "azure", "google"],
   :required => "recommended"
   
 attribute "rightimage/region",
@@ -169,7 +170,7 @@ attribute "rightimage/hypervisor",
 
 attribute "rightimage/datacenter",
   :display_name => "Datacenter ID",
-  :description => "Datacenter/Zone ID.  Defaults to 1.  Use US/UK for rackspace US/UK",
+  :description => "Datacenter/Zone ID.  Defaults to 1.  Use US/UK for rackspace. Use DFW/ORD/LON for rackspace-v2",
   :default => "1",
   :required => "recommended"
 
