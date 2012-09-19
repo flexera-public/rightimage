@@ -97,6 +97,14 @@ ruby_block "full_md5_checksums" do
       hob["image"]["compressed-md5"] = `md5sum #{compressed_full_image_path}`.split[0]
     end
 
+    # Google adds its own kernel during image upload.
+    if node[:rightimage][:cloud] == "google"
+      # Make a note of that fact.
+      hob["kernel"]["release"] = "GCE kernel injected at boot time."
+      # Google also disables module loading.
+      hob.delete("modules")
+    end
+
     # Write full image's JSON matching image name.
     File.open("#{temp_root}/#{image_name}.js","w") do |f|
       f.write(JSON.pretty_generate(hob))
