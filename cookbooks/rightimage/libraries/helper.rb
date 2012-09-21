@@ -28,11 +28,36 @@ module RightScale
       def image_file_ext
         case node[:rightimage][:hypervisor]
         when "xen"
-          (node[:rightimage][:cloud] == "eucalyptus" ? "tar.gz":"vhd.bz2")
+          (if node[:rightimage][:cloud] == "eucalyptus"
+            "tar.gz"
+          elsif node[:rightimage][:cloud] == "ec2"
+            "raw"
+          else
+            "vhd.bz2"
+          end)
         when "kvm"
-          "qcow2.bz2"
+          (node[:rightimage][:cloud] == "google" ? "tar.gz":"qcow2.bz2")
         when "esxi"
           "vmdk.ova"
+        when "hyperv"
+          "vhd"
+        end
+      end
+
+      def uncomp_image_ext
+        case node[:rightimage][:hypervisor]
+        when "xen"
+          (if node[:rightimage][:cloud] == "eucalyptus"
+            "img"
+          elsif node[:rightimage][:cloud] == "ec2"
+            "raw"
+          else
+            "vhd"
+          end)
+        when "kvm"
+          (node[:rightimage][:cloud] == "google" ? "raw":"qcow2")
+        when "esxi"
+          "vmdk"
         when "hyperv"
           "vhd"
         end
@@ -124,9 +149,13 @@ module RightScale
         "#{target_raw_root}/#{loopback_filename(partitioned)}"
       end
 
-      def loopback_filename(partitioned = true)
+      def loopback_rootname(partitioned = true)
         nibble = partitioned ? "0" : ""
-        "#{ri_lineage}_hd0#{nibble}.raw"
+        "#{ri_lineage}_hd0#{nibble}"
+      end
+
+      def loopback_filename(partitioned = true)
+        loopback_rootname(partitioned) + ".raw"
       end
 
       def temp_root
