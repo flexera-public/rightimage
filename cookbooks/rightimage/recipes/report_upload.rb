@@ -47,11 +47,13 @@ ruby_block "base_md5_checksums" do
 end
 
 # Inject full image MD5 checksums.
-# Compressed and uncompressed.
-# JSON file re-saved after MD5 checksums to match image name.
-ruby_block "full_md5_checksums" do
+  # Compressed and uncompressed.
+# And add public cloud specific entries.
+# JSON file re-saved to match image name.
+ruby_block "full_image_report_additions" do
   only_if { node[:rightimage][:build_mode] == "full" }
-  # Skip if MD5 has already been taken.
+  # Skip if report has already been modified.
+  # Evidenced by existing JSON file with image name.
   not_if { File.exists?("#{temp_root}/#{image_name}.js") }
   block do
     require 'json'
@@ -97,21 +99,35 @@ ruby_block "full_md5_checksums" do
       hob["image"]["compressed-md5"] = `md5sum #{compressed_full_image_path}`.split[0]
     end
 
-    # Google adds its own kernel during image upload.
-    if node[:rightimage][:cloud] == "google"
-      # Make a note of that fact.
+
+    # Account for public cloud quirks.
+    case node[:rightimage][:cloud]
+    when "google"
+      # Note that Google adds its own kernel during image upload.
       hob["kernel"]["release"] = "GCE kernel injected at boot time."
       # Google also disables module loading.
       hob.delete("modules")
+      # uuid based on image name.
+      hob["image"]["uuid"] = image_name
+    when "azure"
+      # uuid based on image name.
+      hob["image"]["uuid"] = image_name
+    when "ec2"
+      # Read id that was written in cloud_ec2:upload.
+      # Stored in different place depending on if S3 or EBS.
+      is_ebs = node[:rightimage][:ec2][:image_type] =~ /ebs/i or image_name =~ /_EBS/
+      id_file = is_ebs ? "/var/tmp/image_id_ebs" : "/var/tmp/image_id_s3"
+      if File.exists? id_file
+        # Chomp appended newline.
+        hob["image"]["uuid"] = File.open(id_file, &:readline).chomp
+      end
     end
-
     # Write full image's JSON matching image name.
     File.open("#{temp_root}/#{image_name}.js","w") do |f|
       f.write(JSON.pretty_generate(hob))
     end
   end
 end
-
 
 # Upload JSON files.
   # Base and Full cases. 
