@@ -275,7 +275,7 @@ EOF
     flags "-ex"
     code <<-EOH
       guest_root=#{guest_root}
-      dpkg --root $guest_root --purge grub2-common grub-pc grub-pc-bin
+      dpkg --root $guest_root --purge grub2-common grub-pc grub-pc-bin grub-gfxpayload-lists
       rm -rf $guest_root/boot/grub/menu.lst*
     EOH
   end
