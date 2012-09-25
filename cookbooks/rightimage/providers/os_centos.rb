@@ -236,6 +236,30 @@ action :install do
     end
   end
 
+  bash "install ruby 1.9" do
+    packages = %w( 
+      ruby-tcltk-1.9.3.194-16.el6.x86_64.rpm
+      ruby-libs-1.9.3.194-16.el6.x86_64.rpm
+      ruby-irb-1.9.3.194-16.el6.noarch.rpm
+      ruby-doc-1.9.3.194-16.el6.x86_64.rpm
+      ruby-devel-1.9.3.194-16.el6.x86_64.rpm
+      ruby-1.9.3.194-16.el6.x86_64.rpm
+    ).join(" ")
+    cwd "#{guest_root}/tmp/packages"
+    flags "-ex"
+    code <<-EOH
+      base_url=http://rightscale-rightimage.s3.amazonaws.com/packages/el6/ruby1.9/
+      for p in #{packages}
+      do
+        curl -s -S -f -L --retry 7 -O $base_url$p·
+      done
+      chroot #{guest_root} <<EOF
+        cd /tmp/packages
+        rpm -i #{packages}
+      EOF
+    EOH
+  end
+
 
   cookbook_file "#{guest_root}/etc/pki/rpm-gpg/RPM-GPG-KEY-RightScale" do
     source "GPG-KEY-RightScale"
