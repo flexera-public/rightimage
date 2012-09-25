@@ -94,7 +94,7 @@ EOC
 end
 
 # prevents rsyslog from dropping messages from rightlink w-4912
-directory "#{guest_root}/etc/rsyslog.d" { recursive true }
+directory("#{guest_root}/etc/rsyslog.d"){ recursive true }
 bash "turn off rsyslog rate limiting" do
   code "echo '$SystemLogRateLimitInterval 0' > #{guest_root}/etc/rsyslog.d/10-removeratelimit.conf"
 end
