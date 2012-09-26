@@ -22,9 +22,9 @@ rightscale_marker :begin
 ruby_block "ensure ephemeral mounted" do
   only_if { node[:cloud][:provider] == "ec2" && node[:ec2][:instance_type] != "t1.micro" && node[:platform] != /suse/ }
   block do
-    unless `mount | grep " on /mnt "` =~ /\/dev\/(sd|xvd)/
+    unless `mount | grep " on /mnt/ephemeral "` =~ /\/dev\/(sd|xvd)/
       Chef::Log.info "***********************************************************"
-      Chef::Log.info "*** ERROR: do not see the ephemeral 0 drive mounted on /mnt"
+      Chef::Log.info "*** ERROR: do not see the ephemeral 0 drive mounted on /mnt/ephemeral"
       Chef::Log.info "***********************************************************"
       exit 1
     end
