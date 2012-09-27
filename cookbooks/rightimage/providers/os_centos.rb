@@ -236,8 +236,15 @@ action :install do
     end
   end
 
+  directory("#{guest_root}/tmp/packages") {recursive true}
   bash "install ruby 1.9" do
-    packages = %w( 
+    packages = %w(
+      rubygem-rdoc-3.9.4-16.el6.noarch.rpm
+      rubygem-minitest-2.5.1-16.el6.noarch.rpm
+      rubygem-json-1.5.4-16.el6.x86_64.rpm
+      rubygem-io-console-0.3-16.el6.x86_64.rpm
+      rubygems-1.8.23-16.el6.noarch.rpm
+      rubygem-bigdecimal-1.1.0-16.el6.x86_64.rpm
       ruby-tcltk-1.9.3.194-16.el6.x86_64.rpm
       ruby-libs-1.9.3.194-16.el6.x86_64.rpm
       ruby-irb-1.9.3.194-16.el6.noarch.rpm
@@ -251,12 +258,10 @@ action :install do
       base_url=http://rightscale-rightimage.s3.amazonaws.com/packages/el6/ruby1.9/
       for p in #{packages}
       do
-        curl -s -S -f -L --retry 7 -O $base_url$p·
+        curl -s -S -f -L --retry 7 -O $base_url$p
       done
-      chroot #{guest_root} <<EOF
-        cd /tmp/packages
-        rpm -i #{packages}
-      EOF
+      # zlib bit keeps command from failing if all the packages are installed already
+      yum -c /tmp/yum.conf --installroot=#{guest_root} -y install #{packages} zlib
     EOH
   end
 
