@@ -444,7 +444,9 @@
         "eucalyptus",
         "openstack",
         "rackspace",
-        "rackspace_managed",
+        "rackspace-managed",
+        "rackspace-v2",
+        "rackspace-managed-v2",
         "azure",
         "google"
       ],
@@ -565,7 +567,7 @@
 
       ],
       "display_name": "Datacenter ID",
-      "description": "Datacenter/Zone ID.  Defaults to 1.  Use US/UK for rackspace US/UK"
+      "description": "Datacenter/Zone ID.  Defaults to 1.  Use US/UK for rackspace. Use DFW/ORD/LON for rackspace-v2"
     },
     "rightimage/rebundle_git_revision": {
       "required": "optional",

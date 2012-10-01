@@ -35,6 +35,7 @@ ruby_block "create_hint_file" do
     # Pull from chef input if full image.
     if node[:rightimage][:build_mode] == "full"
       hint["rightlink-version"] = "#{node[:rightimage][:rightlink_version]}"
+      hint["hypervisor"] = "#{node[:rightimage][:hypervisor]}"
     end
 
     # Save hash as JSON file.
@@ -59,8 +60,8 @@ bash "query_image" do
   found="$(/usr/sbin/chroot #{guest_root} gem list rightimage_tools | grep -i rightimage_tools)"
   # Found is nil if rightimage_tools wasn't installed in image.
   if [ -z "$found" ]; then
-    # Stripe the version name.  
-    /usr/sbin/chroot #{guest_root} gem install /tmp/#{RI_TOOL_GEM}
+    # Install gem into image without documentation.  
+    /usr/sbin/chroot #{guest_root} gem install --no-rdoc --no-ri /tmp/#{RI_TOOL_GEM}
     # Sentinel for uninstall at end.
     found="false"
   fi
@@ -74,19 +75,18 @@ bash "query_image" do
   /usr/sbin/chroot #{guest_root} report_tool "print"
 
   # Move JSON file out of image to receive MD5 checksum.
-  mv #{guest_root}/tmp/report.js #{temp_root}/#{loopback_filename(partitioned?)}.js
+  mv #{guest_root}/tmp/report.js #{temp_root}/#{loopback_rootname(partitioned?)}.js
   
   # If rightimage_tools was installed, uninstall it.
   if [ "$found" == "false" ]; then
-    # TO-DO: Uninstall dependencies recursively or ignore dependencies. 
     /usr/sbin/chroot #{guest_root} gem uninstall rightimage_tools
   fi
-  EOH
-end
 
-# For base and full images, uninstall all gems when finished.
-if node[:rightimage][:build_mode] == "base" || node[:rightimage][:build_mode] == "full" 
-  `gem list | cut -d" " -f1 | xargs gem uninstall -aIx`
+  # For base and full images, uninstall all gems when finished.
+  if [ "#{node[:rightimage][:build_mode]}" == "base" ] || [ "#{node[:rightimage][:build_mode]}" == "full" ]; then
+    chroot /mnt/image/ gem list | cut -d" " -f1 | chroot /mnt/image/ xargs gem uninstall -aIx
+  fi
+  EOH
 end
 
 # Clean up report tool.
