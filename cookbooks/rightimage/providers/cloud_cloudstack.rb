@@ -26,19 +26,9 @@ action :configure do
   end 
 
   # insert grub conf, and symlink
-  template "#{guest_root}/boot/grub/grub.conf" do 
+  template "#{guest_root}/boot/grub/menu.lst" do
     source "menu.lst.erb"
     backup false 
-  end
-
-  file "#{guest_root}/boot/grub/menu.lst" do 
-    action :delete
-    backup false
-  end
-
-  link "#{guest_root}/boot/grub/menu.lst" do 
-    link_type :hard # soft symlinks don't work outside chrooted env
-    to "#{guest_root}/boot/grub/grub.conf"
   end
 
   Chef::Log::info "Add DHCP symlink for RightLink"
@@ -164,7 +154,7 @@ end
 
 action :upload do
   CDC_GEM_VER = "0.0.0"
-  CDC_GEM = ::File.join(::File.dirname(__FILE__), "..", "files", "default", "right_vmops-#{CDC_GEM_VER}.gem")
+  CDC_GEM = ::File.join(::File.dirname(__FILE__), "..", "files", "default", "right_cloud_api-#{CDC_GEM_VER}.gem")
   SANDBOX_BIN = "/opt/rightscale/sandbox/bin/gem"
 
   r = gem_package "nokogiri" do
@@ -186,11 +176,14 @@ action :upload do
   ruby_block "trigger download to test cloud" do
     block do
       require "rubygems"
-      require "right_vmops"
+      require "right_cloud_api"
+      require "cloud/cloud_stack/manager"
       require "uri"
 
       name = "#{new_resource.image_name}_#{new_resource.hypervisor.upcase}"
       zoneId = node[:rightimage][:datacenter]
+      cloud_stack = RightScale::CloudApi::CloudStack::Manager::new(node[:rightimage][:cloudstack][:cdc_api_key], node[:rightimage][:cloudstack][:cdc_secret_key], node[:rightimage][:cloudstack][:cdc_url])
+
 
       case node[:rightimage][:cloudstack][:version]
       when "2"
@@ -238,6 +231,10 @@ action :upload do
         file_ext = "vhd.bz2"
       end
 
+      cloud_stack = RightScale::CloudApi::CloudStack::Manager::new(node[:rightimage][:cloudstack][:cdc_api_key], node[:rightimage][:cloudstack][:cdc_secret_key], node[:rightimage][:cloudstack][:cdc_url])
+      res = cloud_stack.ListTemplates("templatefilter" => "self", "name" => name, "zoneid" => zoneId)
+      raise "Image already exists with the name: #{name}" if res["listtemplatesresponse"].any?
+
       filename = "#{new_resource.image_name}.#{image_file_ext}"
       local_file = "#{target_raw_root}/#{filename}"
       md5sum = calc_md5sum(local_file)
@@ -248,8 +245,7 @@ action :upload do
       Chef::Log::info("Downloading from: #{image_url}...")
      
       Chef::Log.info("Registering image on cloud...")
-      vmops = RightScale::VmopsFactory.right_vmops_class_for_version("2.2").new(node[:rightimage][:cloudstack][:cdc_api_key], node[:rightimage][:cloudstack][:cdc_secret_key], node[:rightimage][:cloudstack][:cdc_url])
-      res = vmops.register_template(name, name, image_url, format, osTypeId, zoneId, hypervisor, md5sum, false, true)
+      res = cloud_stack.RegisterTemplate("displaytext" => name, "format" => format, "hypervisor" => hypervisor, "name" => name, "ostypeid" => osTypeId, "url" => image_url, "zoneid" => zoneId, "checksum" => md5sum, "isfeatured" => "true", "ispublic" => "true")
       Chef::Log.info("Returned data: #{res.inspect}")
 
       image_id = res["registertemplateresponse"]["template"][0]["id"]
@@ -260,8 +256,8 @@ action :upload do
       $wait=30
 
       until $i > $retries do
-        info = vmops.list_templates(image_id,nil,"self")["listtemplatesresponse"]["template"][0]
-        ready = info["isready"]
+        info = cloud_stack.ListTemplates("templatefilter" => "self", "id" => image_id)["listtemplatesresponse"]["template"][0]
+        ready = info["isready"].to_s
         status = info["status"]
 
         if ready == "true"

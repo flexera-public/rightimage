@@ -6,6 +6,12 @@ end
 action :configure do
   package "grub"
   
+  ruby_block "check hypervisor" do
+    block do
+      raise "ERROR: you must set your hypervisor to hyperv!" unless new_resource.hypervisor == "hyperv"
+    end
+  end
+  
   bash "install guest packages" do 
     flags '-ex'
     code <<-EOH
@@ -31,19 +37,9 @@ action :configure do
   end 
 
   # insert grub conf, and symlink
-  template "#{guest_root}/boot/grub/grub.conf" do 
+  template "#{guest_root}/boot/grub/menu.lst" do
     source "menu.lst.erb"
     backup false 
-  end
-
-  file "#{guest_root}/boot/grub/menu.lst" do 
-    action :delete
-    backup false
-  end
-
-  link "#{guest_root}/boot/grub/menu.lst" do 
-    link_type :hard # soft symlinks don't work outside chrooted env
-    to "#{guest_root}/boot/grub/grub.conf"
   end
 
   bash "setup grub" do
@@ -116,6 +112,9 @@ EOH
       esac
       set -e
       chroot $guest_root npm install azure -g
+
+      # Remove .swp files
+      find $guest_root/root/.npm $guest_root/usr/lib/nodejs -name *.swp -exec rm -rf {} \\;
     EOH
   end
 end
@@ -146,8 +145,14 @@ action :upload do
       npm -g ls | grep azure
       if [ "$?" == "1" ]; then
         set -e
-        npm install azure -g
+        # Freeze to version 0.6.0 for now, 0.6.2 kept erroring out during blob upload
+        npm install azure@0.6.0 -g
       fi
+
+      # https://github.com/WindowsAzure/azure-sdk-for-node/issues/325
+      cd /usr/lib/nodejs/azure
+      npm uninstall xml2js
+      npm install xml2js@0.1.14
     EOH
   end
 

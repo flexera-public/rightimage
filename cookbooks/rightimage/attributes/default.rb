@@ -13,22 +13,18 @@ set[:rightimage][:guest_root] = "/mnt/image"
 set_unless[:rightimage][:hypervisor] = "xen"
 set[:rightimage][:mirror] = "cf-mirror.rightscale.com"
 set_unless[:rightimage][:cloud] = "ec2"
+set[:rightimage][:fstab][:ephemeral][:options] = "defaults"
+set[:rightimage][:grub][:timeout] = "5"
+set[:rightimage][:grub][:kernel][:options] = "consoleblank=0"
 set[:rightimage][:root_mount][:label_dev] = "ROOT"
 set[:rightimage][:root_mount][:dev] = "LABEL=#{rightimage[:root_mount][:label_dev]}"
+set[:rightimage][:root_mount][:options] = "defaults"
 set_unless[:rightimage][:image_source_bucket] = "rightscale-us-west-2"
 set_unless[:rightimage][:virtualization] = "pvm"
 set_unless[:rightimage][:base_image_bucket] = "rightscale-rightimage-base-dev"
-
-if timestamp
-  if rightimage[:platform] == "ubuntu"
-    set[:rightimage][:mirror_date] = "#{timestamp[0..3]}/#{timestamp[4..5]}/#{timestamp[6..7]}"
-    set[:rightimage][:mirror_url] = "http://#{node[:rightimage][:mirror]}/ubuntu_daily/#{node[:rightimage][:mirror_date]}"
-  else
-    set[:rightimage][:mirror_date] = timestamp[0..7]
-  end
-else
-  set[:rightimage][:mirror_date] = nil
-end
+set_unless[:rightimage][:platform] = guest_platform
+set_unless[:rightimage][:platform_version] = guest_platform_version
+set_unless[:rightimage][:arch] = guest_arch
 
 
 case node[:rightimage][:hypervisor]
@@ -39,58 +35,165 @@ when "hyperv" then set[:rightimage][:image_type] = "msvhd"
 else raise ArgumentError, "don't know what image format to use for #{node[:rightimage][:hypervisor]}!"
 end
 
+set[:rightimage][:guest_packages] = []
+rightimage[:guest_packages] << " acpid"
+rightimage[:guest_packages] << " autoconf"
+rightimage[:guest_packages] << " automake"
+rightimage[:guest_packages] << " bison"
+rightimage[:guest_packages] << " curl" # RightLink
+rightimage[:guest_packages] << " flex"
+rightimage[:guest_packages] << " libtool"
+rightimage[:guest_packages] << " libxml2"
+rightimage[:guest_packages] << " logrotate"
+rightimage[:guest_packages] << " nscd"
+rightimage[:guest_packages] << " openssh-server"
+rightimage[:guest_packages] << " openssl"
+rightimage[:guest_packages] << " screen"
+rightimage[:guest_packages] << " subversion"
+rightimage[:guest_packages] << " sysstat"
+rightimage[:guest_packages] << " tmux"
+rightimage[:guest_packages] << " unzip"
+
+set[:rightimage][:host_packages] = []
+
 # set base os packages
 case rightimage[:platform]
-when "ubuntu"   
-  set[:rightimage][:guest_packages] = "ubuntu-standard binutils ruby1.8 curl unzip openssh-server ruby1.8-dev build-essential autoconf automake libtool logrotate rsync openssl openssh-server ca-certificates libopenssl-ruby1.8 subversion vim libreadline-ruby1.8 irb rdoc1.8 git-core liberror-perl dmsetup emacs rake screen mailutils nscd bison ncurses-dev zlib1g-dev readline-common libxslt1-dev sqlite3 libxml2 libxml2-dev flex libshadow-ruby1.8 postfix sysstat iptraf libarchive-dev tmux dhcp3-client acpid"
+when "ubuntu"
+  rightimage[:guest_packages] << " binutils"
+  rightimage[:guest_packages] << " build-essential"
+  rightimage[:guest_packages] << " ca-certificates"
+  rightimage[:guest_packages] << " dhcp3-client"
+  rightimage[:guest_packages] << " dmsetup"
+  rightimage[:guest_packages] << " emacs"
+  rightimage[:guest_packages] << " git-core" # RightLink
+  rightimage[:guest_packages] << " iptraf"
+  rightimage[:guest_packages] << " irb"
+  rightimage[:guest_packages] << " libarchive-dev" # RightLink
+  rightimage[:guest_packages] << " liberror-perl"
+  rightimage[:guest_packages] << " libopenssl-ruby1.8"
+  rightimage[:guest_packages] << " libreadline-ruby1.8"
+  rightimage[:guest_packages] << " libshadow-ruby1.8"
+  rightimage[:guest_packages] << " libxml2-dev" # RightLink
+  rightimage[:guest_packages] << " libxslt1-dev" # RightLink
+  rightimage[:guest_packages] << " mailutils"
+  rightimage[:guest_packages] << " ncurses-dev"
+  rightimage[:guest_packages] << " postfix"
+  rightimage[:guest_packages] << " rake"
+  rightimage[:guest_packages] << " rdoc1.8"
+  rightimage[:guest_packages] << " readline-common"
+  rightimage[:guest_packages] << " rsync"
+  rightimage[:guest_packages] << " ruby1.8"
+  rightimage[:guest_packages] << " ruby1.8-dev"
+  rightimage[:guest_packages] << " sqlite3"
+  rightimage[:guest_packages] << " ubuntu-standard"
+  rightimage[:guest_packages] << " vim"
+  rightimage[:guest_packages] << " zlib1g-dev"
 
   case rightimage[:platform_version]
   when "8.04"
   when "10.04"
   when "10.10"
-    rightimage[:guest_packages] << " libreadline5-dev libdigest-sha1-perl linux-headers-virtual"
+    rightimage[:guest_packages] << " libdigest-sha1-perl"
+    rightimage[:guest_packages] << " libreadline5-dev"
+    rightimage[:guest_packages] << " linux-headers-virtual"
   else
     rightimage[:guest_packages] << " libreadline-gplv2-dev"
   end
 
-  set[:rightimage][:host_packages] = "openjdk-6-jre openssl ca-certificates"
-when "centos","rhel"
-  set[:rightimage][:guest_packages] = "wget mlocate nano logrotate ruby ruby-devel ruby-docs ruby-irb ruby-libs ruby-mode ruby-rdoc ruby-ri ruby-tcltk openssl openssh openssh-askpass openssh-clients openssh-server curl gcc* zip unzip bison flex compat-libstdc++-296 cvs subversion autoconf automake libtool compat-gcc-34-g77 mutt sysstat rpm-build fping vim-common vim-enhanced rrdtool-1.2.27 rrdtool-devel-1.2.27 rrdtool-doc-1.2.27 rrdtool-perl-1.2.27 rrdtool-python-1.2.27 rrdtool-ruby-1.2.27 rrdtool-tcl-1.2.27 pkgconfig lynx screen yum-utils bwm-ng createrepo redhat-rpm-config redhat-lsb git nscd xfsprogs swig libarchive-devel tmux libxml2 libxml2-devel libxslt libxslt-devel dhclient sudo telnet acpid"
+  rightimage[:host_packages] << " ca-certificates"
+  rightimage[:host_packages] << " openjdk-6-jre"
+  rightimage[:host_packages] << " openssl"
 
-  set[:rightimage][:host_packages] = "swig"
-
-  extra_el_packages = el6? ? " compat-db43 compat-expat1 openssl098e" : " db4 expat openssl"
-  rightimage[:guest_packages] << extra_el_packages
-  rightimage[:host_packages] << extra_el_packages
-when "suse"
-  set[:rightimage][:guest_packages] = "gcc"
-
-  set[:rightimage][:host_packages] = "kiwi"
-end
-
-
-# set addtional release specific packages
-case node[:rightimage][:platform_version]
+  case rightimage[:platform_version]
   when "8.04"
-    set[:rightimage][:guest_packages] = rightimage[:guest_packages] + " sysv-rc-conf debian-helper-scripts"
+    rightimage[:guest_packages] << " debian-helper-scripts"
+    rightimage[:guest_packages] << " sysv-rc-conf"
     rightimage[:host_packages] << " ubuntu-vm-builder"
   when "9.10"
     rightimage[:host_packages] << " python-vm-builder-ec2"
   when "10.04"
     if rightimage[:cloud] == "ec2"
-      rightimage[:host_packages] << " python-vm-builder-ec2 devscripts"
+      rightimage[:host_packages] << " devscripts"
+      rightimage[:host_packages] << " python-vm-builder-ec2"
     else
       rightimage[:host_packages] << " devscripts"
     end
   when "10.10"
+    rightimage[:guest_packages] << " linux-image-virtual"
     rightimage[:host_packages] << " devscripts"
-    rightimage[:guest_packages] << " linux-image-virtual"
   when "12.04"
-    rightimage[:host_packages] << " devscripts liburi-perl"
     rightimage[:guest_packages] << " linux-image-virtual"
+    rightimage[:host_packages] << " devscripts"
+    rightimage[:host_packages] << " liburi-perl"
+    # extra-virtual contains the UDF kernel module (DVD format), needed for azure
+    rightimage[:guest_packages] << " linux-image-extra-virtual"
   else
      rightimage[:host_packages] << " devscripts"
-end if rightimage[:platform] == "ubuntu" 
+  end
+when "centos","rhel"
+  rightimage[:guest_packages] << " bwm-ng"
+  rightimage[:guest_packages] << " compat-gcc-34-g77"
+  rightimage[:guest_packages] << " compat-libstdc++-296"
+  rightimage[:guest_packages] << " createrepo"
+  rightimage[:guest_packages] << " cvs"
+  rightimage[:guest_packages] << " dhclient"
+  rightimage[:guest_packages] << " fping"
+  rightimage[:guest_packages] << " gcc*"
+  rightimage[:guest_packages] << " git" # RightLink
+  rightimage[:guest_packages] << " libarchive-devel" # RightLink
+  rightimage[:guest_packages] << " libxml2-devel" # RightLink
+  rightimage[:guest_packages] << " libxslt"
+  rightimage[:guest_packages] << " libxslt-devel" # RightLink
+  rightimage[:guest_packages] << " lynx"
+  rightimage[:guest_packages] << " mlocate"
+  rightimage[:guest_packages] << " mutt"
+  rightimage[:guest_packages] << " nano"
+  rightimage[:guest_packages] << " openssh-askpass"
+  rightimage[:guest_packages] << " openssh-clients"
+  rightimage[:guest_packages] << " pkgconfig"
+  rightimage[:guest_packages] << " redhat-lsb"
+  rightimage[:guest_packages] << " redhat-rpm-config"
+  rightimage[:guest_packages] << " rpm-build"
+  rightimage[:guest_packages] << " ruby"
+  rightimage[:guest_packages] << " ruby-devel"
+  rightimage[:guest_packages] << " ruby-docs"
+  rightimage[:guest_packages] << " ruby-irb"
+  rightimage[:guest_packages] << " ruby-libs"
+  rightimage[:guest_packages] << " ruby-mode"
+  rightimage[:guest_packages] << " ruby-rdoc"
+  rightimage[:guest_packages] << " ruby-ri"
+  rightimage[:guest_packages] << " ruby-tcltk"
+  rightimage[:guest_packages] << " sudo"
+  rightimage[:guest_packages] << " swig"
+  rightimage[:guest_packages] << " telnet"
+  rightimage[:guest_packages] << " vim-common"
+  rightimage[:guest_packages] << " vim-enhanced"
+  rightimage[:guest_packages] << " wget"
+  rightimage[:guest_packages] << " xfsprogs"
+  rightimage[:guest_packages] << " yum-utils"
+
+  rightimage[:host_packages] << " swig"
+
+  extra_el_packages =
+    if el6?
+      " compat-db43" +
+      " compat-expat1" +
+      " openssl098e"
+    else
+      " db4" +
+      " expat" +
+      " openssl"
+    end
+
+  extra_el_packages.split.each do |p|
+    rightimage[:guest_packages] << " #{p}"
+    rightimage[:host_packages] << " #{p}"
+  end
+when "suse"
+  rightimage[:guest_packages] << " gcc"
+
+  rightimage[:host_packages] << " kiwi"
+end
 
 # set cloud stuff
 # TBD Refactor this block to use consistent naming, figure out how to move logic into cloud providers
@@ -98,54 +201,60 @@ case rightimage[:cloud]
   when "ec2", "eucalyptus" 
     set[:rightimage][:root_mount][:dump] = "0" 
     set[:rightimage][:root_mount][:fsck] = "0" 
-    set[:rightimage][:fstab][:ephemeral] = true
     # Might have to double check don't know if maverick should use kernel linux-image-ec2 or not
     set[:rightimage][:swap_mount] = "/dev/sda3" unless rightimage[:arch] == "x86_64"
-    set[:rightimage][:ephemeral_mount] = "/dev/sdb"
+    set[:rightimage][:fstab][:ephemeral][:dev] = "/dev/sdb"
+    set[:rightimage][:grub][:timeout] = "0"
 
     case rightimage[:platform]
       when "ubuntu" 
-        set[:rightimage][:fstab][:ephemeral_mount_opts] = "defaults,nobootwait"
+        set[:rightimage][:fstab][:ephemeral][:options] = "defaults,nobootwait"
         set[:rightimage][:fstab][:swap] = "defaults,nobootwait"
         if rightimage[:platform_version].to_f >= 10.10
-          set[:rightimage][:ephemeral_mount] = "/dev/xvdb"
+          set[:rightimage][:fstab][:ephemeral][:dev] = "/dev/xvdb"
           set[:rightimage][:swap_mount] = "/dev/xvda3" unless rightimage[:arch]  == "x86_64"
         end
       when "centos", "rhel"
-        set[:rightimage][:fstab][:ephemeral_mount_opts] = "defaults"
+        set[:rightimage][:fstab][:ephemeral][:options] = "defaults"
         set[:rightimage][:fstab][:swap] = "defaults"
 
         # CentOS 6.1-6.2 start SCSI device naming from e
         if rightimage[:platform_version].to_i == 6
           if rightimage[:platform_version].to_f.between?(6.1,6.2)
-            set[:rightimage][:ephemeral_mount] = "/dev/xvdf"
+            set[:rightimage][:fstab][:ephemeral][:dev] = "/dev/xvdf"
             set[:rightimage][:swap_mount] = "/dev/xvde3"  unless rightimage[:arch]  == "x86_64"
           else
-            set[:rightimage][:ephemeral_mount] = "/dev/xvdb"
+            set[:rightimage][:fstab][:ephemeral][:dev] = "/dev/xvdb"
             set[:rightimage][:swap_mount] = "/dev/xvda3"  unless rightimage[:arch]  == "x86_64"
           end
         end
     end
+  when "azure"
+    set[:rightimage][:grub][:timeout] = "0"
+
+    case rightimage[:platform]
+    when "centos"
+      set[:rightimage][:grub][:kernel][:options] << " numa=off"
+    when "ubuntu"
+      set[:rightimage][:grub][:kernel][:options] << " ata_piix.disable_driver"
+    end
   else 
     case rightimage[:hypervisor]
     when "xen"
-      set[:rightimage][:fstab][:ephemeral] = false
-      set[:rightimage][:ephemeral_mount] = nil
-      set[:rightimage][:fstab][:ephemeral_mount_opts] = nil
+      set[:rightimage][:fstab][:ephemeral][:dev] = nil
+      set[:rightimage][:fstab][:ephemeral][:options] = nil
       set[:rightimage][:grub][:root_device] = "/dev/xvda"
       set[:rightimage][:root_mount][:dump] = "1" 
       set[:rightimage][:root_mount][:fsck] = "1" 
     when "kvm"
-      set[:rightimage][:fstab][:ephemeral] = false
-      set[:rightimage][:ephemeral_mount] = "/dev/vdb"
-      set[:rightimage][:fstab][:ephemeral_mount_opts] = "defaults"
+      set[:rightimage][:fstab][:ephemeral][:dev] = "/dev/vdb"
+      set[:rightimage][:fstab][:ephemeral][:options] = "defaults"
       set[:rightimage][:grub][:root_device] = "/dev/vda"
       set[:rightimage][:root_mount][:dump] = "1" 
       set[:rightimage][:root_mount][:fsck] = "1" 
     when "esxi", "hyperv"
-      set[:rightimage][:ephemeral_mount] = nil
-      set[:rightimage][:fstab][:ephemeral_mount_opts] = nil
-      set[:rightimage][:fstab][:ephemeral] = false
+      set[:rightimage][:fstab][:ephemeral][:dev] = nil
+      set[:rightimage][:fstab][:ephemeral][:options] = nil
       set[:rightimage][:grub][:root_device] = "/dev/sda"
       set[:rightimage][:root_mount][:dump] = "1" 
       set[:rightimage][:root_mount][:fsck] = "1" 
@@ -164,5 +273,20 @@ case rightimage[:platform]
   when "centos", "rhel"
     set[:rightimage][:getsshkey_cmd] = "chroot $GUEST_ROOT chkconfig --add getsshkey && \
                chroot $GUEST_ROOT chkconfig --level 4 getsshkey on"
-
 end
+
+# http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=637234#40
+set[:rightimage][:root_mount][:options] = "errors=remount-ro,barrier=0" if rightimage[:platform] == "ubuntu" && rightimage[:platform_version].to_f >= 12.04 && rightimage[:hypervisor] == "xen"
+
+if hvm?
+  set[:rightimage][:grub][:kernel][:options] << " console=ttyS0"
+elsif rightimage[:hypervisor] == "xen"
+  set[:rightimage][:grub][:kernel][:options] << " console=hvc0"
+end
+
+# Start device naming from xvda instead of xvde (w-4893)
+# https://bugzilla.redhat.com/show_bug.cgi?id=729586
+set[:rightimage][:grub][:kernel][:options] << " xen_blkfront.sda_is_xvda=1" if rightimage[:platform] == "centos" && rightimage[:platform_version].to_f >= 6.3
+
+# Specify if running in Xen domU or have grub detect automatically
+set[:rightimage][:grub][:indomU] = (node[:rightimage][:hypervisor] == "xen" && !hvm?)? "true":"detect"

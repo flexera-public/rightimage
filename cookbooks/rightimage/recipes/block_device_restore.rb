@@ -49,7 +49,7 @@ else
       platform = node[:rightimage][:platform]
       platform_version = node[:rightimage][:platform_version]
       arch = node[:rightimage][:arch]
-      year = node[:rightimage][:timestamp][0..3]
+      year = timestamp[0..3]
       image_upload_bucket = node[:rightimage][:base_image_bucket]
       base_image_endpoint = "https://#{image_upload_bucket}.s3.amazonaws.com"
       image_s3_path = platform+"/"+platform_version+"/"+arch+"/"+year+"/"

@@ -8,7 +8,7 @@ class Chef::Recipe
 end
 
 # Install any dependencies
-node[:rightimage][:host_packages].split.each { |p| package p }
+node[:rightimage][:host_packages].each { |p| package p.strip }
 
 # Most of the heavy lifting, install the os from scratch
 rightimage_os node[:rightimage][:platform] do

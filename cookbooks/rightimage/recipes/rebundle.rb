@@ -34,7 +34,22 @@ packages.each { |p| package p }
 
 directory BaseRhelConstants::REBUNDLE_SOURCE_PATH do
   action :create
+  recursive true 
+end
+
+# Disable prompting to verify host key since it breaks the automation
+directory "/root/.ssh" do
   recursive true
+  mode "0700"
+end
+
+bash "disable ssh ask to verify host key" do
+  code <<-EOH
+    grep "StrictHostKeyChecking no" /root/.ssh/config
+    if [ "$?" == "2" -o "$?" == "1" ]; then
+      echo "StrictHostKeyChecking no" >> /root/.ssh/config
+    fi
+  EOH
 end
 
 git BaseRhelConstants::REBUNDLE_SOURCE_PATH do
@@ -107,7 +122,7 @@ bash "upload code to the remote instance" do
   end
 
   code <<-EOH
-  /opt/rightscale/sandbox/bin/ruby bin/upload --rightlink #{node[:rightimage][:rightlink_version]} #{freeze_date_opt} --no-checkout --no-configure
+  /opt/rightscale/sandbox/bin/ruby bin/upload --rightlink #{node[:rightimage][:rightlink_version]} #{freeze_date_opt} --no-configure
   EOH
 end
 

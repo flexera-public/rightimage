@@ -37,8 +37,8 @@
                 <source path="<%= @rpm_dir %>/noarch"/>
         </repository>
 	<packages type="image">
-          <% node.rightimage.guest_packages.split.each do |p| -%>
-          <package name="<%= p %>"/>
+          <% node.rightimage.guest_packages.each do |p| -%>
+          <package name="<%= p.strip %>"/>
           <% end -%>
           <package name="aaa_base"/>
           <package name="acl"/>

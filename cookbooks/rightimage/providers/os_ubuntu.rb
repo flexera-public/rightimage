@@ -40,12 +40,15 @@ action :install do
     EOH
   end
 
+  mirror_date = "#{timestamp[0..3]}/#{timestamp[4..5]}/#{timestamp[6..7]}"
+  mirror_url = "http://#{node[:rightimage][:mirror]}/ubuntu_daily/#{mirror_date}"
+
   bootstrap_cmd = "/usr/bin/vmbuilder xen ubuntu -o \
       --suite=#{platform_codename} \
       -d #{node[:rightimage][:build_dir]} \
       --rootsize=2048 \
-      --install-mirror=#{node[:rightimage][:mirror_url]} \
-      --install-security-mirror=#{node[:rightimage][:mirror_url]} \
+      --install-mirror=#{mirror_url} \
+      --install-security-mirror=#{mirror_url} \
       --components=main,restricted,universe,multiverse \
       --lang=#{node[:rightimage][:lang]} --verbose "
   if node[:rightimage][:arch] == "i386"
@@ -54,7 +57,7 @@ action :install do
   else
     bootstrap_cmd << " --arch amd64"
   end
-  node[:rightimage][:guest_packages].split.each { |p| bootstrap_cmd << " --addpkg " + p} 
+  node[:rightimage][:guest_packages].each { |p| bootstrap_cmd << " --addpkg #{p.split}"}
 
   Chef::Log.info "vmbuilder bootstrap command is: " + bootstrap_cmd
 
@@ -267,6 +270,16 @@ EOF
     code "chroot #{guest_root} apt-key add /tmp/GPG-KEY-RightScale"
   end
 
+  # Remove grub2 files
+  bash "remove_grub2" do
+    flags "-ex"
+    code <<-EOH
+      guest_root=#{guest_root}
+      chroot $guest_root apt-get -y purge grub2-common grub-pc grub-pc-bin
+      rm -rf $guest_root/boot/grub/menu.lst*
+    EOH
+  end
+
 
   # TODO: Add cleanup
   bash "cleanup" do
@@ -284,7 +297,7 @@ action :repo_freeze do
   template "#{guest_root}/etc/apt/sources.list" do
     source "sources.list.erb"
     variables(
-      :mirror_date => node[:rightimage][:mirror_date],
+      :mirror_date => "#{timestamp[0..3]}/#{timestamp[4..5]}/#{timestamp[6..7]}",
       :platform_codename => platform_codename
     )
     backup false
