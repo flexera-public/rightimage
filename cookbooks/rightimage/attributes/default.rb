@@ -46,6 +46,7 @@ rightimage[:guest_packages] << " libtool"
 rightimage[:guest_packages] << " libxml2"
 rightimage[:guest_packages] << " logrotate"
 rightimage[:guest_packages] << " nscd"
+rightimage[:guest_packages] << " ntp" # RightLink requires local time to be accurate (w-5025)
 rightimage[:guest_packages] << " openssh-server"
 rightimage[:guest_packages] << " openssl"
 rightimage[:guest_packages] << " screen"
