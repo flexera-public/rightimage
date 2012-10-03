@@ -203,6 +203,15 @@ action :install do
     
   # disable IPV6
   chroot #{guest_root} /sbin/chkconfig ip6tables off
+
+  # Configure NTP - RightLink requires local time to be accurate (w-5025)
+  chroot #{guest_root} chkconfig ntpd on
+
+  ntp_sys="#{guest_root}/etc/sysconfig/ntpd"
+  set +e
+  grep " -g" $ntp_sys
+  [ "$?" == "1" ] && echo "OPTIONS=\"\$OPTIONS -g\"" >> $ntp_sys
+  set -e
   EOF
   end
 
@@ -235,7 +244,6 @@ action :install do
       EOH
     end
   end
-
 
   cookbook_file "#{guest_root}/etc/pki/rpm-gpg/RPM-GPG-KEY-RightScale" do
     source "GPG-KEY-RightScale"
@@ -272,11 +280,19 @@ action :install do
     backup false
   end
 
-
   cookbook_file "#{guest_root}/etc/profile.d/pkgconfig.sh" do 
     source "pkgconfig.sh" 
     mode "0755"
     backup false
+  end
+
+  # Configure NTP - RightLink requires local time to be accurate (w-5025)
+  template "#{guest_root}/etc/ntp.conf" do
+    source "ntp.conf.erb"
+    backup false
+    variables({
+      :driftfile => "/var/lib/ntp/drift"
+    })
   end
 
   rightimage_os new_resource.platform do
