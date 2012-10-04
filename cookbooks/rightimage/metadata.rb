@@ -2,6 +2,7 @@ maintainer       "RightScale, Inc."
 maintainer_email "support@rightscale.com"
 description      "A cookbook for building RightImages"
 version          "1.0.0"
+license          "Apache v2.0"
 
 depends "rightimage_tester"
 depends "loopback_fs"
@@ -39,8 +40,11 @@ recipe "rightimage::loopback_mount", "mounts loopback file system"
 recipe "rightimage::loopback_resize", "resizes loopback file system"
 
 # Report tool recipes
-recipe "rightimage::image_report","Compiles information into a json report by parsing system calls and optional hint files"
-recipe "rightimage::report_upload","Checksums compressed images, adds info to reports, and uploads reports alongside images"
+recipe "rightimage::image_report", "Compiles information into a json report by parsing system calls and optional hint files"
+recipe "rightimage::report_upload", "Checksums compressed images, adds info to reports, and uploads reports alongside images"
+
+# s3index update recipe
+recipe "rightimage::s3index_update", "Updates the index.html of the upload bucket"
 
 #
 # required
@@ -69,24 +73,24 @@ attribute "rightimage/platform",
   :display_name => "Guest OS Platform",
   :description => "The operating system for the virtual image.",
   :choice => [ "centos", "ubuntu", "suse", "rhel" ],
-  :required => "required"
+  :required => "optional"
   
 attribute "rightimage/platform_version",
   :display_name => "Guest OS Version",
   :description => "The OS version to build into the virtual image.",
   :choice => [ "5.4", "5.6", "5.8", "6.2", "6.3", "10.04", "10.10", "12.04" ],
-  :required => "required"
-  
+  :required => "optional"
+ 
 attribute "rightimage/arch",
   :display_name => "Guest OS Architecture",
   :description => "The architecture for the virtual image.",
   :choice => [ "x86_64", "i386" ],
-  :required => "required"
+  :required => "optional"
   
 attribute "rightimage/cloud",
   :display_name => "Target Cloud",
   :description => "The supported cloud for the virtual image. If unset, build a generic base image.",
-  :choice => [ "ec2", "cloudstack", "eucalyptus", "openstack", "rackspace", "rackspace_managed", "azure", "google"],
+  :choice => [ "ec2", "cloudstack", "eucalyptus", "openstack", "rackspace", "rackspace-managed", "rackspace-v2", "rackspace-managed-v2", "azure", "google"],
   :required => "recommended"
   
 attribute "rightimage/region",
@@ -149,7 +153,7 @@ attribute "rightimage/debug",
 
 attribute "rightimage/timestamp",
   :display_name => "Build timestamp and mirror freeze date",
-  :description => "Initial build date of this image.  Also doubles as the archive date from which to pull packages. Expected format is YYYYMMDDHHMM",
+  :description => "Initial build date of this image, and also the archive date from which to pull packages. Expected format is YYYYMMDDHHMM. If not supplied, will use latest available date.",
   :required => "recommended"
 
 attribute "rightimage/build_number",
@@ -166,7 +170,7 @@ attribute "rightimage/hypervisor",
 
 attribute "rightimage/datacenter",
   :display_name => "Datacenter ID",
-  :description => "Datacenter/Zone ID.  Defaults to 1.  Use US/UK for rackspace US/UK",
+  :description => "Datacenter/Zone ID.  Defaults to 1.  Use US/UK for rackspace. Use DFW/ORD/LON for rackspace-v2",
   :default => "1",
   :required => "recommended"
 
@@ -204,7 +208,7 @@ attribute "rightscale/mci_name",
 
 # AWS
 aws_x509_recipes = ["rightimage::cloud_upload", "rightimage::rebundle", "rightimage::default", "rightimage::ec2_download_bundle"]
-aws_api_recipes = aws_x509_recipes + ["rightimage::build_base", "rightimage::build_image", "rightimage::upload_image_s3", "rightimage::base_upload", "rightimage::image_tests", "rightimage::report_upload" ]
+aws_api_recipes = aws_x509_recipes + ["rightimage::build_base", "rightimage::build_image", "rightimage::upload_image_s3", "rightimage::base_upload", "rightimage::image_tests", "rightimage::report_upload", "rightimage::s3index_update" ]
 
 attribute "rightimage/ec2/image_type",
   :display_name => "EC2 Image Type",

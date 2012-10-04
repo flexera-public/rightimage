@@ -20,9 +20,8 @@ class Chef::Resource::Bash
   include RightScale::RightImage::Helper
 end
 
-module BaseRhelConstants
+module Rebundle
   REBUNDLE_SOURCE_PATH  = "/tmp/rightscale/rightimage_rebundle"
-  LOCAL_PACKAGE_PATH    = "/tmp/rightscale/dist"
 end
 
 packages = case node[:platform]
@@ -32,7 +31,14 @@ packages = case node[:platform]
 
 packages.each { |p| package p }
 
-directory BaseRhelConstants::REBUNDLE_SOURCE_PATH do
+if node[:languages][:ruby][:version] >= "1.8.7"
+  # Use system ruby if possible
+  ruby_bin_dir = ::File.dirname(node[:languages][:ruby][:ruby_bin])
+else
+  ruby_bin_dir = "/opt/rightscale/sandbox/bin"
+end
+
+directory Rebundle::REBUNDLE_SOURCE_PATH do
   action :create
   recursive true 
 end
@@ -52,7 +58,7 @@ bash "disable ssh ask to verify host key" do
   EOH
 end
 
-git BaseRhelConstants::REBUNDLE_SOURCE_PATH do
+git Rebundle::REBUNDLE_SOURCE_PATH do
   repository node[:rightimage][:rebundle_git_repository]
   revision node[:rightimage][:rebundle_git_revision]
   action :sync
@@ -84,19 +90,19 @@ end
 
 bash "install bundler" do
   flags "-ex"
-  code "/opt/rightscale/sandbox/bin/gem install bundler --no-ri --no-rdoc"
+  code "#{ruby_bin_dir}/gem install bundler --no-ri --no-rdoc --bindir #{ruby_bin_dir}"
 end
 
 bash "install bundled gems" do
   flags "-ex"
-  code "/opt/rightscale/sandbox/bin/bundle install"
-  cwd BaseRhelConstants::REBUNDLE_SOURCE_PATH
+  code "#{ruby_bin_dir}/bundle install"
+  cwd Rebundle::REBUNDLE_SOURCE_PATH
 end
 
 bash "launch the remote instance" do
   flags "-ex"
   environment(cloud_credentials)
-  cwd BaseRhelConstants::REBUNDLE_SOURCE_PATH
+  cwd Rebundle::REBUNDLE_SOURCE_PATH
   region_opt = case node[:rightimage][:cloud]
                when "ec2" then "#{node[:ec2][:placement][:availability_zone].chop}"
                when /rackspace/i then "#{node[:rightimage][:datacenter]}"
@@ -109,46 +115,46 @@ bash "launch the remote instance" do
   zone = node[:rightimage][:datacenter].to_s.empty? ? "US" : node[:rightimage][:datacenter]
   name_opt   = node[:rightimage][:cloud] =~ /rackspace/i ? "--hostname ri-rebundle-#{node[:rightimage][:platform]}-#{zone.downcase}" : ""
   code <<-EOH
-  /opt/rightscale/sandbox/bin/ruby bin/launch --provider #{node[:rightimage][:cloud]} --image-id #{node[:rightimage][:rebundle_base_image_id]} #{region_opt} #{flavor_opt} #{name_opt} #{resize_opt} --no-auto
+  #{ruby_bin_dir}/ruby bin/launch --provider #{node[:rightimage][:cloud]} --image-id #{node[:rightimage][:rebundle_base_image_id]} #{region_opt} #{flavor_opt} #{name_opt} #{resize_opt} --no-auto
   EOH
 end
 
 bash "upload code to the remote instance" do
   flags "-ex"
-  cwd BaseRhelConstants::REBUNDLE_SOURCE_PATH
+  cwd Rebundle::REBUNDLE_SOURCE_PATH
   freeze_date_opt = ""
   if timestamp
     freeze_date_opt = "--freeze-date #{timestamp[0..3]}-#{timestamp[4..5]}-#{timestamp[6..7]}"
   end
 
   code <<-EOH
-  /opt/rightscale/sandbox/bin/ruby bin/upload --rightlink #{node[:rightimage][:rightlink_version]} #{freeze_date_opt} --no-configure
+  #{ruby_bin_dir}/ruby bin/upload --rightlink #{node[:rightimage][:rightlink_version]} #{freeze_date_opt} --no-configure
   EOH
 end
 
 bash "configure the remote instance" do
   flags "-ex"
-  cwd BaseRhelConstants::REBUNDLE_SOURCE_PATH
+  cwd Rebundle::REBUNDLE_SOURCE_PATH
   code <<-EOH
-  /opt/rightscale/sandbox/bin/ruby bin/configure --rightlink #{node[:rightimage][:rightlink_version]} 
+  #{ruby_bin_dir}/ruby bin/configure --rightlink #{node[:rightimage][:rightlink_version]} 
   EOH
 end
 
 bash "run clean script on remote instance" do
   flags "-ex"
-  cwd BaseRhelConstants::REBUNDLE_SOURCE_PATH
+  cwd Rebundle::REBUNDLE_SOURCE_PATH
   code <<-EOH
-  /opt/rightscale/sandbox/bin/ruby bin/clean
+  #{ruby_bin_dir}/ruby bin/clean
   EOH
 end
 
 bash "bundle instance" do
   flags "-ex"
-  cwd BaseRhelConstants::REBUNDLE_SOURCE_PATH
+  cwd Rebundle::REBUNDLE_SOURCE_PATH
   environment(cloud_credentials)
   certs_opt = node[:rightimage][:cloud] == "ec2" ? "--aws-cert /tmp/AWS_X509_CERT.pem --aws-key /tmp/AWS_X509_KEY.pem" : ""
   code <<-EOH
-  /opt/rightscale/sandbox/bin/ruby bin/bundle --name #{node[:rightimage][:image_name]} #{certs_opt}
+  #{ruby_bin_dir}/ruby bin/bundle --name #{node[:rightimage][:image_name]} #{certs_opt}
   EOH
 end
 #
@@ -167,7 +173,7 @@ ruby_block "store image id" do
     image_id = nil
     
     # read id which was written in previous stanza
-    ::File.open(::File.join(BaseRhelConstants::REBUNDLE_SOURCE_PATH,"config","imageid"), "r") { |f| image_id = f.read() }
+    ::File.open(::File.join(Rebundle::REBUNDLE_SOURCE_PATH,"config","imageid"), "r") { |f| image_id = f.read() }
     
     # add to global id store for use by other recipes
     id_list = RightImage::IdList.new(Chef::Log)
@@ -177,9 +183,9 @@ end
 
 bash "destroy instance" do
   flags "-ex"
-  cwd BaseRhelConstants::REBUNDLE_SOURCE_PATH
+  cwd Rebundle::REBUNDLE_SOURCE_PATH
   environment(cloud_credentials)
-  code "/opt/rightscale/sandbox/bin/ruby bin/destroy"
+  code "#{ruby_bin_dir}/ruby bin/destroy"
 end  
 
 rightscale_marker :end

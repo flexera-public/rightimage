@@ -17,6 +17,8 @@ rightscale_marker :begin
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+raise "ERROR: your build_mode input is set to #{node[:rightimage][:build_mode]}. Should be 'full'" unless node[:rightimage][:build_mode] == "full"
+
 class Chef::Recipe
   include RightScale::RightImage::Helper
 end
@@ -27,7 +29,7 @@ directory temp_root do
   recursive true
 end
 
-node[:rightimage][:host_packages].split.each { |p| package p }
+node[:rightimage][:host_packages].each { |p| package p.strip }
 
 include_recipe "rightimage::block_device_restore"
 include_recipe "rightimage::loopback_resize"
@@ -36,7 +38,12 @@ include_recipe "rightimage::clean"
 include_recipe "rightimage::rightscale_install"
 include_recipe "rightimage::cloud_add"
 include_recipe "rightimage::image_tests"
+include_recipe "rightimage::image_report"
 include_recipe "rightimage::loopback_unmount"
 include_recipe "rightimage::cloud_package"
 include_recipe "rightimage::upload_image_s3"
+# Only create reports for public cloud images if they are uploaded.
+if not node[:rightimage][:cloud] =~ /ec2|google|azure/
+  include_recipe "rightimage::report_upload"
+end
 rightscale_marker :end

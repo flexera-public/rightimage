@@ -28,11 +28,36 @@ module RightScale
       def image_file_ext
         case node[:rightimage][:hypervisor]
         when "xen"
-          (node[:rightimage][:cloud] == "eucalyptus" ? "tar.gz":"vhd.bz2")
+          (if node[:rightimage][:cloud] == "eucalyptus"
+            "tar.gz"
+          elsif node[:rightimage][:cloud] == "ec2"
+            "raw"
+          else
+            "vhd.bz2"
+          end)
         when "kvm"
-          "qcow2.bz2"
+          (node[:rightimage][:cloud] == "google" ? "tar.gz":"qcow2.bz2")
         when "esxi"
           "vmdk.ova"
+        when "hyperv"
+          "vhd"
+        end
+      end
+
+      def uncomp_image_ext
+        case node[:rightimage][:hypervisor]
+        when "xen"
+          (if node[:rightimage][:cloud] == "eucalyptus"
+            "img"
+          elsif node[:rightimage][:cloud] == "ec2"
+            "raw"
+          else
+            "vhd"
+          end)
+        when "kvm"
+          (node[:rightimage][:cloud] == "google" ? "raw":"qcow2")
+        when "esxi"
+          "vmdk"
         when "hyperv"
           "vhd"
         end
@@ -45,7 +70,7 @@ module RightScale
       # call this guest_platform, not platform, otherwise can introduce a 
       # weird bug where platform func can overwrite chef default platform func
       def guest_platform
-        node[:rightimage][:platform]
+        node[:rightimage][:platform] || node[:platform]
       end
 
       def platform_codename(platform_version = node[:rightimage][:platform_version])
@@ -62,19 +87,15 @@ module RightScale
       end
 
       def guest_platform_version
-        node[:rightimage][:platform_version]
+        node[:rightimage][:platform_version] || node[:platform_version]
       end
 
       def guest_arch
         if node[:rightimage][:arch] == "x64"
           "x86_64"
         else
-          node[:rightimage][:arch]
+          node[:rightimage][:arch] || node[:kernel][:machine]
         end
-      end
-
-      def timestamp
-        node[:rightimage][:timestamp]
       end
 
       def build_number
@@ -128,9 +149,13 @@ module RightScale
         "#{target_raw_root}/#{loopback_filename(partitioned)}"
       end
 
-      def loopback_filename(partitioned = true)
+      def loopback_rootname(partitioned = true)
         nibble = partitioned ? "0" : ""
-        "#{ri_lineage}_hd0#{nibble}.raw"
+        "#{ri_lineage}_hd0#{nibble}"
+      end
+
+      def loopback_filename(partitioned = true)
+        loopback_rootname(partitioned) + ".raw"
       end
 
       def temp_root
@@ -233,7 +258,7 @@ module RightScale
       end
 
       def gem_install_source
-        "--source http://#{node[:rightimage][:mirror]}/rubygems/archive/#{node[:rightimage][:timestamp][0..7]}/"
+        "--source http://#{node[:rightimage][:mirror]}/rubygems/archive/#{timestamp[0..7]}/"
       end
 
       def grub_initrd
@@ -245,7 +270,80 @@ module RightScale
       end
 
       def grub_root
-        (partitioned?) ? ",#{partition_number}":""
+        "(hd0" + ((partitioned?) ? ",#{partition_number}":"") + ")"
+      end
+
+      # Timestamp is used to name the snapshots that base images are stored to and restored from
+      # For base images, we'll use the specified timestamp or default to the latest date
+      # For full images, we'll restored from the specified timestamp, or else poll the API for
+      # the latest snapshot and use that.
+      def timestamp
+        return @@timestamp if defined?(@@timestamp)
+
+        if !node[:rightimage][:timestamp].to_s.empty?
+          @@timestamp = node[:rightimage][:timestamp]
+        elsif node[:rightimage][:build_mode] == "base"
+          # Minus one day, today's mirror may not be ready depending on the time
+          # use 0 for hour and minute fields, if we run block_device_create and block_device_backup
+          # separately during development we would like the value to remain stable.
+          # bit of a hack, maybe store this value to disk somewhere?
+          ts = Time.now - (3600*24)
+          @@timestamp = "%04d%02d%02d%02d%02d" % [ts.year,ts.month,ts.day,0,0]
+          Chef::Log::info("Using latest available mirror date (#{@@timestamp}) as timestamp input")
+        elsif node[:rightimage][:build_mode] == "migrate"
+          @@timestamp = nil
+        elsif rebundle?
+          Chef::Log::info("Using latest available mirror date for rebundle")
+          @@timestamp = nil
+        elsif node[:rightimage][:build_mode] == "full"
+          set_timestamp_from_snapshot
+          @@timestamp = node[:rightimage][:timestamp]
+        else
+          raise "Undefined build_mode #{node[:rightimage][:build_mode]}, must be base, migrate, or full"
+        end
+        return @@timestamp
+      end
+
+      def set_timestamp_from_snapshot
+        require 'rest_client'
+        require 'json'
+        require '/var/spool/cloud/user-data'
+
+        os = node[:rightimage][:platform]
+        ver = node[:rightimage][:platform_version]
+        arch = node[:rightimage][:arch]
+
+        Chef::Log.info("A timestamp was not supplied, attempting to restore from the latest snapshot")
+        Chef::Log.info("Searching for snapshots with the form base_image_#{os}_#{ver}_#{arch}")
+
+        url = ENV['RS_API_URL']
+        body = RestClient.get(url + '/find_ebs_snapshots.js?api_version=1.0')
+        snapshots = JSON.load(body)
+
+        filtered_snaps = snapshots.select do |s| 
+          s['nickname'] =~ /base_image_#{os}_#{ver}_#{arch}_(\d{8,})_(\d+)_(\d+)/ &&
+          s['aws_status'] == "completed"
+        end
+        if filtered_snaps.length > 0
+          sorted_snaps = filtered_snaps.map do |s|
+            # $1=repo freezedate, $2=build_number, $3=aws snapshot timestamp
+            s['nickname'] =~ /_(\d{8,})_(\d+)_(\d+)/
+            [s,$1,$2.to_i,$3]
+          end
+          sorted_snaps.sort! { |a,b| a[1..3] <=> b[1..3] }
+
+          snapshot = sorted_snaps.last[0]
+          if snapshot['nickname'] =~ /(base_image_#{os}_#{ver}_#{arch}_(\d{8,})_(\d+))_/
+            lineage = $1
+            Chef::Log.info("Found #{sorted_snaps.length} snapshots, using latest with lineage #{lineage}")
+            node[:rightimage][:timestamp] = $2
+            node[:rightimage][:build_number] = $3
+          else
+            raise "Unable to parse lineage out of snapshot name #{snap["nickname"]}"
+          end
+        else
+          raise "No snapshots found matching lineage base_image_#{os}_#{ver}_#{arch}_*. You have to first run a build with build_mode set to base to generate a base image snapshot"
+        end
       end
     end
   end

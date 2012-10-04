@@ -8,7 +8,7 @@ class Chef::Recipe
 end
 
 # Install any dependencies
-node[:rightimage][:host_packages].split.each { |p| package p }
+node[:rightimage][:host_packages].each { |p| package p.strip }
 
 # Most of the heavy lifting, install the os from scratch
 rightimage_os node[:rightimage][:platform] do
@@ -91,6 +91,12 @@ EOC
       echo -n "IPv6 already disabled"
     fi
   EOF
+end
+
+# prevents rsyslog from dropping messages from rightlink w-4912
+directory("#{guest_root}/etc/rsyslog.d"){ recursive true }
+bash "turn off rsyslog rate limiting" do
+  code "echo '$SystemLogRateLimitInterval 0' > #{guest_root}/etc/rsyslog.d/10-removeratelimit.conf"
 end
 
 bash "setup_motd" do

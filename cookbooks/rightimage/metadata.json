@@ -293,7 +293,8 @@
         "rightimage::upload_image_s3",
         "rightimage::base_upload",
         "rightimage::image_tests",
-        "rightimage::report_upload"
+        "rightimage::report_upload",
+        "rightimage::s3index_update"
       ],
       "display_name": "aws_secret_access_key",
       "description": "aws_secret_access_key"
@@ -359,7 +360,8 @@
         "rightimage::upload_image_s3",
         "rightimage::base_upload",
         "rightimage::image_tests",
-        "rightimage::report_upload"
+        "rightimage::report_upload",
+        "rightimage::s3index_update"
       ],
       "display_name": "aws_account_number",
       "description": "aws_account_number"
@@ -427,7 +429,9 @@
         "eucalyptus",
         "openstack",
         "rackspace",
-        "rackspace_managed",
+        "rackspace-managed",
+        "rackspace-v2",
+        "rackspace-managed-v2",
         "azure",
         "google"
       ],
@@ -548,7 +552,7 @@
 
       ],
       "display_name": "Datacenter ID",
-      "description": "Datacenter/Zone ID.  Defaults to 1.  Use US/UK for rackspace US/UK"
+      "description": "Datacenter/Zone ID.  Defaults to 1.  Use US/UK for rackspace. Use DFW/ORD/LON for rackspace-v2"
     },
     "rightimage/rebundle_git_revision": {
       "required": "optional",
@@ -663,7 +667,8 @@
         "rightimage::upload_image_s3",
         "rightimage::base_upload",
         "rightimage::image_tests",
-        "rightimage::report_upload"
+        "rightimage::report_upload",
+        "rightimage::s3index_update"
       ],
       "display_name": "aws_access_key_id",
       "description": "aws_access_key_id"
@@ -693,7 +698,7 @@
 
       ],
       "display_name": "Build timestamp and mirror freeze date",
-      "description": "Initial build date of this image.  Also doubles as the archive date from which to pull packages. Expected format is YYYYMMDDHHMM"
+      "description": "Initial build date of this image, and also the archive date from which to pull packages. Expected format is YYYYMMDDHHMM. If not supplied, will use latest available date."
     },
     "rightimage/rebundle_git_repository": {
       "required": "optional",
@@ -711,7 +716,7 @@
       "description": "Git repository to checkout from when building a rebundle image"
     },
     "rightimage/arch": {
-      "required": "required",
+      "required": "optional",
       "calculated": false,
       "choice": [
         "x86_64",
@@ -776,7 +781,7 @@
       "description": "The bucket to upload the image to."
     },
     "rightimage/platform": {
-      "required": "required",
+      "required": "optional",
       "calculated": false,
       "choice": [
         "centos",
@@ -865,7 +870,7 @@
       "description": "The EC2 region in which the image will reside"
     },
     "rightimage/platform_version": {
-      "required": "required",
+      "required": "optional",
       "calculated": false,
       "choice": [
         "5.4",
@@ -885,7 +890,7 @@
       "description": "The OS version to build into the virtual image."
     }
   },
-  "license": "none",
+  "license": "Apache v2.0",
   "suggestions": {
   },
   "platforms": {
@@ -919,6 +924,7 @@
     "rightimage::loopback_create": "creates and mounts loopback file system",
     "rightimage::block_device_backup": "creates an EBS snapshot from attached EBS volume",
     "rightimage::base_upload": "upload raw image to s3",
+    "rightimage::s3index_update": "Updates the index.html of the upload bucket",
     "rightimage::loopback_copy": "creates non-partitioned loopback fs image from a partitioned one",
     "rightimage::image_tests": "run some basic tests on mounted image such as grepping for credentials",
     "rightimage::base_os": "build a base image",

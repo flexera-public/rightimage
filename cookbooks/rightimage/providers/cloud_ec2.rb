@@ -16,19 +16,9 @@ action :configure do
   end 
 
   # Setup grub Version 1, ec2
-  template "#{guest_root}/boot/grub/grub.conf" do 
+  template "#{guest_root}/boot/grub/menu.lst" do
     source "menu.lst.erb"
     backup false 
-  end
-
-  file "#{guest_root}/boot/grub/menu.lst" do 
-    action :delete
-    backup false
-  end
-
-  link "#{guest_root}/boot/grub/menu.lst" do 
-    link_type :hard # soft symlinks don't work outside chrooted env
-    to "#{guest_root}/boot/grub/grub.conf"
   end
 
   #  - add get_ssh_key script
