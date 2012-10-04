@@ -273,6 +273,7 @@ EOF
   # Remove grub2 files
   bash "remove_grub2" do
     flags "-ex"
+    only_if { new_resource.platform_version.to_f > 10.04 }
     code <<-EOH
       guest_root=#{guest_root}
       chroot $guest_root apt-get -y purge grub2-common grub-pc grub-pc-bin
