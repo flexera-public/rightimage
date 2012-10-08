@@ -103,6 +103,9 @@ action :install do
   yum -c /tmp/yum.conf --installroot=#{guest_root} -y remove sendmail
 
   # install the guest packages in the chroot
+  if [ "5" == "#{node[:rightimage][:platform_version].to_i}" ]; then
+    yum -c /tmp/yum.conf --installroot=#{guest_root} --exclude='*.i386' -y install --enablerepo=ruby_custom #{node[:rightimage][:ruby_packages]}
+  fi
   yum -c /tmp/yum.conf --installroot=#{guest_root} -y install #{node[:rightimage][:guest_packages]} --exclude gcc-java
 
   yum -c /tmp/yum.conf --installroot=#{guest_root} -y remove bluez* gnome-bluetooth*
