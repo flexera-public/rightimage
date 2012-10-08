@@ -1,7 +1,7 @@
 = rightimage
 
-rightimage is a cookbook designed to make production quality rightscale images in the cloud 
+rightimage is a cookbook designed to make production quality RightScale images
 
 == Copyright
 
-Copyright (c) 2010 RightScale
+Copyright (c) 2012 RightScale
