@@ -19,9 +19,9 @@ restrict -6 ::1
 # Hosts on local network are less restricted.
 #restrict 192.168.1.0 mask 255.255.255.0 nomodify notrap
 
+server time.rightscale.com burst iburst
 server ec2-us-east.time.rightscale.com burst iburst
 server ec2-us-west.time.rightscale.com burst iburst
-server time.rightscale.com burst iburst
 
 #broadcast 192.168.1.255 autokey        # broadcast server
 #broadcastclient                        # broadcast client

@@ -49,13 +49,19 @@ action :install_tools do
     code <<-EOH
       guest_root=#{guest_root}
 
+      # Use of independent clock recommended by Citrix: http://support.citrix.com/article/CTX128034
+      # No longer needed/supported on CentOS 6/Ubuntu 12
       case #{new_resource.platform} in
       "centos"|"rhel")
-        grep "xen.independent_wallclock=1" $guest_root/etc/sysctl.conf
-        [ "$?" == "1" ] && echo "xen.independent_wallclock=1" >> $guest_root/etc/sysctl.conf
+        if [ #{new_resource.platform_version.to_i} -lt 6 ]; then
+          grep "xen.independent_wallclock=1" $guest_root/etc/sysctl.conf
+          [ "$?" == "1" ] && echo "xen.independent_wallclock=1" >> $guest_root/etc/sysctl.conf
+        fi
         ;;
       "ubuntu")
-        echo "xen.independent_wallclock=1" > $guest_root/etc/sysctl.d/60-rightscale-ntp.conf
+        if [ #{new_resource.platform_version.to_i} -lt 12 ]; then
+          echo "xen.independent_wallclock=1" > $guest_root/etc/sysctl.d/60-rightscale-ntp.conf
+        fi
         ;;
       esac
     EOH

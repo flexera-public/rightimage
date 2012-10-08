@@ -205,8 +205,11 @@ action :install do
   chroot #{guest_root} /sbin/chkconfig ip6tables off
 
   # Configure NTP - RightLink requires local time to be accurate (w-5025)
+  # Enable ntpd on startup
   chroot #{guest_root} chkconfig ntpd on
 
+  # Add -g option to ntpd to allow offset to exceed default panic threshold.
+  # This shouldn't actually be necessary due to the "tinker panic" option, but doesn't hurt.
   ntp_sys="#{guest_root}/etc/sysconfig/ntpd"
   set +e
   grep " -g" $ntp_sys
