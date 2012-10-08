@@ -46,7 +46,7 @@ module RightImage
       end
       # On 32 bit apt-get update fails if this directory doesn't exist
       if ::File.directory? "/var/cache/apt/archives"
-        FileUtils.mkdir("/var/cache/apt/archives/partial", :mode=>0755)
+        FileUtils.mkdir_p("/var/cache/apt/archives/partial", :mode=>0755)
       end
 
       DIRS_truncate.each do |dir|
