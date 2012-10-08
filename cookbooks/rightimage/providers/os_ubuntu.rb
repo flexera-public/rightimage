@@ -259,6 +259,49 @@ EOF
     EOH
   end
 
+  # - add in custom built libc packages, fixes "illegal instruction" core dump (w-12310)
+  directory "#{guest_root}/tmp/packages"
+  bash "install custom libc" do 
+    only_if { new_resource.platform_version.to_f == 10.04 && node[:rightimage][:arch] == "x86_64" }
+    packages = %w(
+      libc-bin_2.11.1-0ubuntu7.11_amd64.deb
+      libc-dev-bin_2.11.1-0ubuntu7.11_amd64.deb
+      libc6-dbg_2.11.1-0ubuntu7.11_amd64.deb
+      libc6-dev-i386_2.11.1-0ubuntu7.11_amd64.deb
+      libc6-dev_2.11.1-0ubuntu7.11_amd64.deb
+      libc6-i386_2.11.1-0ubuntu7.11_amd64.deb
+      libc6_2.11.1-0ubuntu7.11_amd64.deb
+      nscd_2.11.1-0ubuntu7.11_amd64.deb
+    ).join(" ")
+    cwd "#{guest_root}/tmp/packages"
+    flags "-ex"
+    code <<-EOH
+      mount -t proc none #{guest_root}/proc
+      mount --bind /dev #{guest_root}/dev
+      mount --bind /sys #{guest_root}/sys
+      base_url=http://rightscale-rightimage-misc.s3.amazonaws.com/ubuntu/10.04/
+      for p in #{packages}
+      do
+        curl -s -S -f -L --retry 7 -O $base_url$p 
+      done
+
+      cat <<EOF>#{guest_root}/tmp/packages/install_debs.sh
+  #!/bin/bash -ex
+  cd /tmp/packages
+  dpkg -i #{packages}
+  EOF
+      chmod a+x #{guest_root}/tmp/packages/install_debs.sh
+      chroot #{guest_root} /tmp/packages/install_debs.sh
+      # nscd deb starts up second version, will prevent loopback fs from dismounting
+      killall nscd
+      umount -lf #{guest_root}/dev || true
+      umount -lf #{guest_root}/proc || true
+      umount -lf #{guest_root}/sys || true
+      service nscd start
+    EOH
+  end
+
+
   cookbook_file "#{guest_root}/tmp/GPG-KEY-RightScale" do
     source "GPG-KEY-RightScale"
     backup false
@@ -273,6 +316,7 @@ EOF
   # Remove grub2 files
   bash "remove_grub2" do
     flags "-ex"
+    only_if { new_resource.platform_version.to_f > 10.04 }
     code <<-EOH
       guest_root=#{guest_root}
       dpkg --root $guest_root --purge grub2-common grub-pc grub-pc-bin grub-gfxpayload-lists

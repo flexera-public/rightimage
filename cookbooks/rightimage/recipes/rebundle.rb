@@ -112,10 +112,11 @@ bash "launch the remote instance" do
   region_opt = "--region #{region_opt}" if region_opt =~ /./
   resize_opt = node[:rightimage][:cloud] == "ec2" ? "--resize #{node[:rightimage][:root_size_gb]}" : ""
   flavor_opt = node[:rightimage][:cloud] == "ec2" ? "--flavor-id c1.medium" : ""
+  debug_opt = node[:rightimage][:debug] == "true" ? "--debug" : ""
   zone = node[:rightimage][:datacenter].to_s.empty? ? "US" : node[:rightimage][:datacenter]
   name_opt   = node[:rightimage][:cloud] =~ /rackspace/i ? "--hostname ri-rebundle-#{node[:rightimage][:platform]}-#{zone.downcase}" : ""
   code <<-EOH
-  #{ruby_bin_dir}/ruby bin/launch --provider #{node[:rightimage][:cloud]} --image-id #{node[:rightimage][:rebundle_base_image_id]} #{region_opt} #{flavor_opt} #{name_opt} #{resize_opt} --no-auto
+  #{ruby_bin_dir}/ruby bin/launch --provider #{node[:rightimage][:cloud]} --image-id #{node[:rightimage][:rebundle_base_image_id]} #{region_opt} #{flavor_opt} #{name_opt} #{resize_opt} #{debug_opt} --no-auto
   EOH
 end
 
@@ -126,17 +127,19 @@ bash "upload code to the remote instance" do
   if timestamp
     freeze_date_opt = "--freeze-date #{timestamp[0..3]}-#{timestamp[4..5]}-#{timestamp[6..7]}"
   end
+  debug_opt = node[:rightimage][:debug] == "true" ? "--debug" : ""
 
   code <<-EOH
-  #{ruby_bin_dir}/ruby bin/upload --rightlink #{node[:rightimage][:rightlink_version]} #{freeze_date_opt} --no-configure
+  #{ruby_bin_dir}/ruby bin/upload --rightlink #{node[:rightimage][:rightlink_version]} #{freeze_date_opt} #{debug_opt} --no-configure
   EOH
 end
 
 bash "configure the remote instance" do
   flags "-ex"
   cwd Rebundle::REBUNDLE_SOURCE_PATH
+  debug_opt = node[:rightimage][:debug] == "true" ? "--debug" : ""
   code <<-EOH
-  #{ruby_bin_dir}/ruby bin/configure --rightlink #{node[:rightimage][:rightlink_version]} 
+  #{ruby_bin_dir}/ruby bin/configure --rightlink #{node[:rightimage][:rightlink_version]} #{debug_opt}
   EOH
 end
 
