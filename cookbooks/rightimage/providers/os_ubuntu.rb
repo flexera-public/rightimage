@@ -324,7 +324,6 @@ EOF
     EOH
   end
 
-
   # TODO: Add cleanup
   bash "cleanup" do
     flags "-ex"
