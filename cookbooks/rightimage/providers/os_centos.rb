@@ -289,15 +289,6 @@ action :install do
     backup false
   end
 
-  # Configure NTP - RightLink requires local time to be accurate (w-5025)
-  template "#{guest_root}/etc/ntp.conf" do
-    source "ntp.conf.erb"
-    backup false
-    variables({
-      :driftfile => "/var/lib/ntp/drift"
-    })
-  end
-
   rightimage_os new_resource.platform do
     action :repo_unfreeze
   end

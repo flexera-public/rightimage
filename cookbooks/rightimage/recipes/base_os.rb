@@ -119,6 +119,15 @@ cookbook_file "#{guest_root}/etc/motd" do
   backup false
 end
 
+# Configure NTP - RightLink requires local time to be accurate (w-5025)
+template "#{guest_root}/etc/ntp.conf" do
+  source "ntp.conf.erb"
+  backup false
+  variables({
+    :driftfile => node[:rightimage][:platform] == "ubunutu" ? "/var/lib/ntp/ntp.drift" : "/var/lib/ntp/drift"
+  })
+end
+
 # Clean up GUEST_ROOT image
 rightimage guest_root do
   action :sanitize

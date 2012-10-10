@@ -280,15 +280,6 @@ EOF
     EOH
   end
 
-  # Configure NTP - RightLink requires local time to be accurate (w-5025)
-  template "#{guest_root}/etc/ntp.conf" do
-    source "ntp.conf.erb"
-    backup false
-    variables({
-      :driftfile => "/var/lib/ntp/ntp.drift"
-    })
-  end
-
   # TODO: Add cleanup
   bash "cleanup" do
     flags "-ex"
