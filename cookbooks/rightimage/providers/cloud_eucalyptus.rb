@@ -77,6 +77,11 @@ action :configure do
 
     EOH
   end
+end
+
+action :package do
+  # Euca needs loopback to be mounted still.
+  @run_context.include_recipe "rightimage::loopback_mount"
 
   bash "package guest image for eucalyptus" do 
     cwd "/mnt"
@@ -89,7 +94,7 @@ action :configure do
       KERNEL_VERSION=$(ls -t $guest_root/lib/modules|awk '{ printf "%s ", $0 }'|cut -d ' ' -f1-1)
       INITRD=#{new_resource.platform == "ubuntu" ? "initrd.img" : "initrd"}
 
-      rm -rf $package_dir
+      rm -rf $package_dir $cloud_package_root/$image_name.tar.gz
       mkdir -p $package_dir
       cd $cloud_package_root
       mkdir $package_dir/xen-kernel
@@ -99,9 +104,9 @@ action :configure do
       tar czvf $image_name.tar.gz $image_name 
     EOH
   end
-end
 
-action :package do
+  # Make sure to unmount the loopback here because it should not normally be mounted during package action.
+  @run_context.include_recipe "rightimage::loopback_unmount"
 end
 
 action :upload do
