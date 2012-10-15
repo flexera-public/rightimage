@@ -81,7 +81,11 @@ end
 
 action :package do
   # Euca needs loopback to be mounted still.
-  @run_context.include_recipe "rightimage::loopback_mount"
+  loopback_fs loopback_file(partitioned?) do
+    mount_point guest_root
+    partitioned partitioned?
+    action :mount
+  end
 
   bash "package guest image for eucalyptus" do 
     cwd "/mnt"
@@ -106,7 +110,10 @@ action :package do
   end
 
   # Make sure to unmount the loopback here because it should not normally be mounted during package action.
-  @run_context.include_recipe "rightimage::loopback_unmount"
+  loopback_fs loopback_file(partitioned?) do
+    mount_point guest_root
+    action :unmount
+  end
 end
 
 action :upload do

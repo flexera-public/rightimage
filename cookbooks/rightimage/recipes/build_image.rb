@@ -39,8 +39,7 @@ include_recipe "rightimage::rightscale_install"
 include_recipe "rightimage::cloud_add"
 include_recipe "rightimage::image_tests"
 include_recipe "rightimage::image_report"
-# Euca needs loopback to be mounted still.
-include_recipe "rightimage::loopback_unmount" unless node[:rightimage][:cloud] == "eucalyptus"
+include_recipe "rightimage::loopback_unmount"
 include_recipe "rightimage::cloud_package"
 include_recipe "rightimage::upload_image_s3"
 # Only create reports for public cloud images if they are uploaded.
