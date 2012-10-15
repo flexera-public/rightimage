@@ -42,6 +42,10 @@ module RightImage
           FileUtils.rm_rf f         
         end
       end
+      # On 32 bit apt-get update fails if this directory doesn't exist
+      if ::File.directory? "/var/cache/apt/archives"
+        FileUtils.mkdir_p("/var/cache/apt/archives/partial", :mode=>0755)
+      end
 
       DIRS_truncate_logs.each do |dir|
         files = ::Dir.glob(::File.join(@root, dir, "**", "*"))
