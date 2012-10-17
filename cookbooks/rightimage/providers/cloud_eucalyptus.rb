@@ -163,9 +163,6 @@ action :package do
       rm -rf $package_dir $cloud_package_root/$image_name.tar.gz
       mkdir -p $package_dir
       cd $cloud_package_root
-      mkdir $package_dir/xen-kernel
-      cp $guest_root/boot/vmlinuz-$KERNEL_VERSION $package_dir/xen-kernel
-      cp $guest_root/boot/$INITRD-$KERNEL_VERSION $package_dir/xen-kernel
       cp #{loopback_file(partitioned?)} $package_dir/$image_name.img
       tar czvf $image_name.tar.gz $image_name 
     EOH
@@ -183,13 +180,6 @@ action :upload do
 
   ## copy the generic image 
   bash "copy_image" do
-    if new_resource.platform == "centos"
-      eri = 'eri-0C573969'
-      eki = 'eki-B68E3694'
-    else #ubuntu
-      eri = 'eri-D8673679'
-      eki = 'eki-357F3D7F'
-    end
     flags "-ex"
     code <<-EOC
     image_name=#{image_name}
@@ -206,24 +196,6 @@ action :upload do
       echo "Image to upload found: "$image_path
     else
       echo "ERROR: no image found at "$image_path 
-      exit 1
-    fi
-    
-    kernel_name=$(ls $package_dir/$image_name/xen-kernel/ | grep vmlinuz | tail -n 1)
-    kernel_path=$package_dir/$image_name/xen-kernel/$kernel_name
-    if [ -a $kernel_path ]; then 
-      echo "Kernel to upload found: "$kernel_path
-    else
-      echo "ERROR: no kernel found at "$kernel_path 
-      exit 1
-    fi
-    
-    ramdisk_name=$(ls $package_dir/$image_name/xen-kernel/ | grep initrd | tail -n 1) 
-    ramdisk_path=$package_dir/$image_name/xen-kernel/$ramdisk_name
-    if [ -a $ramdisk_path ]; then 
-      echo "Ramdisk to upload found: "$ramdisk_path
-    else
-      echo "ERROR: no ramdisk found at "$ramdisk_path 
       exit 1
     fi
 
@@ -261,40 +233,13 @@ action :upload do
 
 
     # 
-    # Bundle kernel and ramdisk. Need to do this as the admin user
-    #
-    kernel_bucket=$image_name
-    
-# Skip uploading kernel and ramdisk while we are testing on a partner cloud.
-#
-#  # upload kernel
-#  echo `euca-bundle-image -i $kernel_path --kernel true`
-#  echo `euca-upload-bundle -b $kernel_bucket -m /tmp/$kernel_name.manifest.xml`
-#  kernel_output=`euca-register $kernel_bucket/$kernel_name.manifest.xml`
-#  echo $kernel_output
-#
-#  # upload ramdisk
-#  echo `euca-bundle-image -i $ramdisk_path --ramdisk true`
-#  echo `euca-upload-bundle -b $kernel_bucket -m /tmp/$ramdisk_name.manifest.xml`
-#  ramdisk_output=`euca-register $kernel_bucket/$ramdisk_name.manifest.xml`
-#  echo $ramdisk_output
-#
-#  ## collect kernel and ramdisk id's
-#  EKI=`echo -n $kernel_output | awk '{ print $2 }'`
-#  ERI=`echo -n $ramdisk_output | awk '{ print $2 }'`
-#  home3 euca centos
-#  EKI="eki-7D253A7E"
-#  ERI="eri-EE93379B"
-  EKI=#{eki}
-  ERI=#{eri}
-
-    # 
     # Upload image. 
     #
     image_bucket=$image_name
     image_name="`md5sum $image_path | awk '{ print $1 }'`-$image_name"
 
-    echo `euca-bundle-image -i $image_path -p $image_name --kernel $EKI --ramdisk $ERI`
+    # Use kernel windows for partitioned images (w-5126)
+    echo `euca-bundle-image -i $image_path -p $image_name --kernel windows`
     echo `euca-upload-bundle -b $image_bucket -m /tmp/$image_name.manifest.xml`
     image_out=`euca-register $image_bucket/$image_name.manifest.xml`
     echo $image_out
