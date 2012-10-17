@@ -40,6 +40,7 @@ bad_files="\
 "
 bad_files_skip_dirs="\
 -path #{node[:rightimage_tester][:root]}/var/cache/rightscale -or \
+-path #{node[:rightimage_tester][:root]}/usr/share/doc -or \
 -path #{node[:rightimage_tester][:root]}/root/.rightscale\
 "
 
