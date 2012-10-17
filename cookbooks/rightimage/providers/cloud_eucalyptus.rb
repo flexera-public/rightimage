@@ -235,7 +235,9 @@ action :upload do
     # 
     # Upload image. 
     #
-    image_bucket=$image_name
+    # Force-set bucket name for now since we are limited to the number of buckets created on the cloud.
+#    image_bucket=$image_name
+    image_bucket="rightscale-rightimages"
     image_name="`md5sum $image_path | awk '{ print $1 }'`-$image_name"
 
     # Use kernel windows for partitioned images (w-5126)
