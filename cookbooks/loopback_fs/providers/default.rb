@@ -25,12 +25,8 @@ action :create do
       sfdisk $loop_dev << EOF
 0,,L,*
 EOF
-      if [ "#{new_resource.partitioned}" == "true" ]; then
-        kpartx -a $loop_dev
-        loop_map="/dev/mapper/loop#{new_resource.device_number}p1"
-      else
-        loop_map=$loop_dev
-      fi
+      kpartx -a $loop_dev
+      loop_map="/dev/mapper/loop#{new_resource.device_number}p1"
       mke2fs -F -j $loop_map
       tune2fs -L $root_label $loop_map
       rm -rf $mount_point
@@ -77,12 +73,8 @@ action :mount do
 
       losetup $loop_dev $source
 
-      if [ "#{new_resource.partitioned}" == "true" ]; then
-        kpartx -a $loop_dev
-        loop_map="/dev/mapper/loop#{new_resource.device_number}p1"
-      else
-        loop_map=$loop_dev
-      fi
+      kpartx -a $loop_dev
+      loop_map="/dev/mapper/loop#{new_resource.device_number}p1"
 
       mkdir -p $mount_point
       mount $loop_map $mount_point
@@ -97,13 +89,6 @@ action :resize do
       new_resource.size_gb == source_size_gb
     end
     flags "-x"
-    if new_resource.partitioned
       raise "Resizing of partitioned images not supported yet for this cookbook"
-    else
-      code <<-EOH
-        e2fsck -p -f #{new_resource.source}
-        resize2fs #{new_resource.source} #{new_resource.size_gb*1024}M
-      EOH
-    end
   end
 end

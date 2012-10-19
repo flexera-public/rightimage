@@ -62,7 +62,7 @@ action :configure do
       echo "" >> $guest_root/boot/grub/device.map
 
       cat > device.map <<EOF
-(hd0) #{loopback_file(partitioned?)}
+(hd0) #{loopback_file}
 EOF
 
     ${grub_command} --batch --device-map=device.map <<EOF

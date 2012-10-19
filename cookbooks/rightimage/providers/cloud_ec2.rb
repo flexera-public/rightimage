@@ -127,9 +127,8 @@ action :upload do
 end
 
 def upload_ebs
-  loopback_fs loopback_file(partitioned?) do
+  loopback_fs loopback_file do
     mount_point guest_root
-    partitioned partitioned?
     action :mount
   end
 
@@ -311,7 +310,7 @@ EOF
     EOH
   end
 
-  loopback_fs loopback_file(partitioned?) do
+  loopback_fs loopback_file do
     mount_point guest_root
     action :unmount
   end
@@ -343,7 +342,7 @@ def upload_s3()
       mkdir -p "#{temp_root}/bundled"
 
       echo "Bundling..."
-      /home/ec2/bin/ec2-bundle-image --privatekey /tmp/AWS_X509_KEY.pem --cert /tmp/AWS_X509_CERT.pem --user #{node[:rightimage][:aws_account_number]} --image #{loopback_file(partitioned?)} --prefix #{image_name} --destination "#{temp_root}/bundled" --arch #{new_resource.arch} $kernel_opt $ramdisk_opt -B "ami=sda,root=/dev/sda,ephemeral0=sdb,swap=sda3"
+      /home/ec2/bin/ec2-bundle-image --privatekey /tmp/AWS_X509_KEY.pem --cert /tmp/AWS_X509_CERT.pem --user #{node[:rightimage][:aws_account_number]} --image #{loopback_file} --prefix #{image_name} --destination "#{temp_root}/bundled" --arch #{new_resource.arch} $kernel_opt $ramdisk_opt -B "ami=sda,root=/dev/sda,ephemeral0=sdb,swap=sda3"
      
       echo "Uploading..." 
       echo y | /home/ec2/bin/ec2-upload-bundle -b #{node[:rightimage][:image_upload_bucket]} -m "#{temp_root}/bundled/#{image_name}.manifest.xml" -a #{node[:rightimage][:aws_access_key_id]} -s #{node[:rightimage][:aws_secret_access_key]} --retry --batch

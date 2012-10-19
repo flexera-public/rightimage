@@ -18,7 +18,7 @@ action :package do
       BUNDLED_IMAGE="#{bundled_image}"
       BUNDLED_IMAGE_PATH="#{target_raw_root}/$BUNDLED_IMAGE"
 
-      qemu-img convert -O vmdk #{loopback_file(partitioned?)} $BUNDLED_IMAGE_PATH
+      qemu-img convert -O vmdk #{loopback_file} $BUNDLED_IMAGE_PATH
     EOH
   end
 

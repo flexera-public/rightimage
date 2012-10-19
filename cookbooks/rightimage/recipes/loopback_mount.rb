@@ -7,10 +7,9 @@ class Chef::Recipe
 end
 
 
-loopback_fs loopback_file(partitioned?) do
+loopback_fs loopback_file do
   mount_point guest_root
   size_gb node[:rightimage][:root_size_gb].to_i
-  partitioned partitioned?
   action :mount
 end
 

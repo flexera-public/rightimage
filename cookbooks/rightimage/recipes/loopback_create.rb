@@ -9,7 +9,6 @@ end
 
 loopback_fs loopback_file do
   mount_point guest_root
-  partitioned true
   size_gb node[:rightimage][:root_size_gb].to_i
   action :create
 end

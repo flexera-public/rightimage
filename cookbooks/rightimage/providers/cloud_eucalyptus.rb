@@ -59,7 +59,7 @@ action :configure do
       echo "" >> $guest_root/boot/grub/device.map
 
       cat > device.map <<EOF
-(hd0) #{loopback_file(partitioned?)}
+(hd0) #{loopback_file}
 EOF
 
     ${grub_command} --batch --device-map=device.map <<EOF
@@ -143,9 +143,8 @@ end
 
 action :package do
   # Euca needs loopback to be mounted still.
-  loopback_fs loopback_file(partitioned?) do
+  loopback_fs loopback_file do
     mount_point guest_root
-    partitioned partitioned?
     action :mount
   end
 
@@ -163,13 +162,13 @@ action :package do
       rm -rf $package_dir $cloud_package_root/$image_name.tar.gz
       mkdir -p $package_dir
       cd $cloud_package_root
-      cp #{loopback_file(partitioned?)} $package_dir/$image_name.img
+      cp #{loopback_file} $package_dir/$image_name.img
       tar czvf $image_name.tar.gz $image_name 
     EOH
   end
 
   # Make sure to unmount the loopback here because it should not normally be mounted during package action.
-  loopback_fs loopback_file(partitioned?) do
+  loopback_fs loopback_file do
     mount_point guest_root
     action :unmount
   end

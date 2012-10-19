@@ -106,34 +106,8 @@ module RightScale
         end
       end
 
-      def partition_number
-        number = 0
-        number = 1 if partitioned? && ubuntu? && node[:rightimage][:hypervisor] == "xen"
-        number
-      end
-
-      def partitioned?
-        case node[:rightimage][:cloud]
-        when "eucalyptus"
-          return FALSE
-        when "cloudstack"
-          case node[:rightimage][:hypervisor]
-          when "xen"
-            if ubuntu?
-              return TRUE
-            else
-              return FALSE
-            end
-          else
-            return TRUE
-          end
-        else
-          return TRUE
-        end
-      end
-
-      def do_loopback_resize
-        source_size_gb = (::File.size(loopback_file(partitioned?))/1024/1024/1024).to_f.round
+     def do_loopback_resize
+        source_size_gb = (::File.size(loopback_file)/1024/1024/1024).to_f.round
         node[:rightimage][:root_size_gb].to_i != source_size_gb
       end
 
@@ -145,17 +119,16 @@ module RightScale
         "/mnt/storage"
       end
 
-      def loopback_file(partitioned = true)
-        "#{target_raw_root}/#{loopback_filename(partitioned)}"
+      def loopback_file
+        "#{target_raw_root}/#{loopback_filename}"
       end
 
-      def loopback_rootname(partitioned = true)
-        nibble = partitioned ? "0" : ""
-        "#{ri_lineage}_hd0#{nibble}"
+      def loopback_rootname
+        "#{ri_lineage}_hd00"
       end
 
-      def loopback_filename(partitioned = true)
-        loopback_rootname(partitioned) + ".raw"
+      def loopback_filename
+        loopback_rootname + ".raw"
       end
 
       def temp_root
@@ -270,7 +243,7 @@ module RightScale
       end
 
       def grub_root
-        "(hd0" + ((partitioned?) ? ",#{partition_number}":"") + ")"
+        "(hd0,0)"
       end
 
       # Timestamp is used to name the snapshots that base images are stored to and restored from

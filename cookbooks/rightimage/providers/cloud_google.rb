@@ -114,7 +114,7 @@ action :package do
   # Chef file resource doesn't do this correctly for some reason
   bash "hard link to disk.raw" do
     cwd target_raw_root
-    code "ln #{loopback_file(true)} disk.raw"
+    code "ln #{loopback_file} disk.raw"
   end
   bash "zipping raw file" do
     cwd target_raw_root

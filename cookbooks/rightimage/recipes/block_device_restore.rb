@@ -15,7 +15,7 @@ if mounted?
   # the mounted? check can't be in a not_if, it errors out Marshal.dump->node 
   # when the persist flag is set because its can't serialize the Proc
   Chef::Log::info("Block device already mounted")
-elsif ::File.exists?(loopback_file(partitioned?))
+elsif ::File.exists?(loopback_file)
   Chef::Log::info("Already restored raw image from S3")
 else
   begin
@@ -27,9 +27,9 @@ else
     # Times 2.3 since we need to store 2 raw loopback files, and need a 
     # little extra space to gzip them, take snapshots, etc
     new_volume_size = (node[:rightimage][:root_size_gb].to_f*2.3).ceil
-    # This is a hack since our base snapshot size is 23, if we specify less
+    # This is a hack since our base snapshot size is 12, if we specify less
     # than that it'll error out with an exception.
-    new_volume_size = 23 if new_volume_size < 23
+    new_volume_size = 12 if new_volume_size < 12
     block_device ri_lineage do
       cloud "ec2"
       lineage ri_lineage
@@ -59,14 +59,14 @@ else
           require 'zlib'
           FileUtils.mkdir_p(target_raw_root)
           FileUtils.mkdir_p(temp_root)
-          url = "#{base_image_endpoint}/#{image_s3_path}#{loopback_filename(partitioned?)}.gz"
+          url = "#{base_image_endpoint}/#{image_s3_path}#{loopback_filename}.gz"
           Chef::Log.info("Restoring from URL: #{url}")
-          raw_gz_file = "#{temp_root}/#{loopback_filename(partitioned?)}.gz"
+          raw_gz_file = "#{temp_root}/#{loopback_filename}.gz"
           res = `curl -o #{raw_gz_file} --retry 7 --connect-timeout 10 --fail --silent --write-out %{http_code} #{url}`
           if res =~ /^2../
             Chef::Log.info("Downloaded file to #{raw_gz_file}, unzipping")
             fin = Zlib::GzipReader.new(::File.open(raw_gz_file))
-            ::File.open("#{target_raw_root}/#{loopback_filename(partitioned?)}","w") do |fout|
+            ::File.open("#{target_raw_root}/#{loopback_filename}","w") do |fout|
               until fin.eof?
                 fout.write(fin.read(1024*1024))
               end
@@ -81,14 +81,6 @@ else
       raise e
     end
   end
-end
-
-# We store an identical unpartitioned and partitioned base image in EBS snapshot
-# Any particular cloud will only use one or the other so delete the one we don't
-# need so we have space to work with
-file loopback_file(!partitioned?) do
-  backup false
-  action :delete
 end
 
 rightscale_marker :end
