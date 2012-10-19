@@ -81,14 +81,3 @@ action :mount do
     EOH
   end
 end
-
-action :resize do
-  bash "resize loopback fs #{new_resource.source}" do
-    not_if do
-      source_size_gb = (::File.size(new_resource.source)/1024/1024/1024).to_f.round
-      new_resource.size_gb == source_size_gb
-    end
-    flags "-x"
-      raise "Resizing of partitioned images not supported yet for this cookbook"
-  end
-end

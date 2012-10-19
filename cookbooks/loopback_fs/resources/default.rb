@@ -1,4 +1,4 @@
-actions :create, :unmount, :mount, :resize
+actions :create, :unmount, :mount
 
 attribute :source, :kind_of => String, :name_attribute => true
 attribute :size_gb, :kind_of => Integer, :default => 10
