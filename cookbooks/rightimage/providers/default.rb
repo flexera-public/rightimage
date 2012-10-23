@@ -7,9 +7,8 @@ action :sanitize do
   ruby_block "sanitize" do
     block do
       util = RightImage::Util.new(new_resource.name, Chef::Log)
-      util.sanitize()
-
-      puts `sync`
+      skip_files = [node[:rightimage][:fstab][:ephemeral][:mount]]
+      util.sanitize({:skip_files => skip_files})
     end
   end
   

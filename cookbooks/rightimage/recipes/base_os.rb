@@ -64,9 +64,6 @@ if [ "#{node[:rightimage][:platform]}" == "ubuntu" ]; then
   ln -sf /usr/bin/gem1.8 /usr/bin/gem
 fi
 
-gem install #{gem_install_source} xml-simple net-ssh net-sftp  --no-ri --no-rdoc
-gem install #{gem_install_source} rake $rake_ver --no-ri --no-rdoc
-updatedb
 CHROOT_SCRIPT
 chmod +x $ROOT/tmp/rubygems_install.sh
 chroot $ROOT /tmp/rubygems_install.sh > /dev/null 
@@ -117,6 +114,15 @@ cookbook_file "#{guest_root}/etc/motd" do
   not_if { ::File.directory? "#{guest_root}/etc/update-motd.d" }
   source "motd"
   backup false
+end
+
+# Configure NTP - RightLink requires local time to be accurate (w-5025)
+template "#{guest_root}/etc/ntp.conf" do
+  source "ntp.conf.erb"
+  backup false
+  variables({
+    :driftfile => node[:rightimage][:platform] == "ubunutu" ? "/var/lib/ntp/ntp.drift" : "/var/lib/ntp/drift"
+  })
 end
 
 # Clean up GUEST_ROOT image

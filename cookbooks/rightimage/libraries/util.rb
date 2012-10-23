@@ -3,14 +3,12 @@ module RightImage
 
   class Util
       
-    # Delete contents of these directories, including deleting subdirectories, but not the directory itself.
-    DIRS_delete = [ "/mnt", "/tmp", "/var/cache/apt/archives", "/var/cache/yum" ]
-    # Delete entire directory tree including the directory itself.
-    DIRS_delete_tree = [ "/root/.gem" ]
     # Truncate contents of all files in these directories.
-    DIRS_truncate = [ "/var/log", "/var/mail", "/var/spool/postfix" ]
-    # Delete these files.
-    FILES_delete = [ "/root/.gemrc" ]
+    DIRS_truncate_logs = [ "/var/log", "/var/mail", "/var/spool/postfix" ]
+    # Delete these files and directories
+    FILES_delete = [ "/root/.gemrc", "/root/.gem" ]
+    # Delete contents of these directories, including deleting subdirectories, but not the directory itself.
+    DIRS_clean = ["/mnt", "/tmp", "/var/cache/apt/archives", "/var/cache/yum" ]
     
     # Utility Class
     #
@@ -25,29 +23,34 @@ module RightImage
     
     # Cleaning up image
     #
-    def sanitize()
+    def sanitize(options = {})
       @log.info("Performing image sanitization routine...")
-      DIRS_delete_tree.each do |dir|
-        directory = ::File.join(@root, dir)
-
-        if ::File.directory?(directory)
-          @log.warn("Deleting directory tree: #{directory}")
-          FileUtils.rm_rf directory
+      skip_files = []
+      if options.key?(:skip_files)
+        options[:skip_files].each do |f|
+          skip_files << ::File.join(@root,f)
         end
       end
+      @log.info("Skipping #{skip_files.join(', ')}") unless skip_files.empty?
 
-      DIRS_delete.each do |dir|
+      DIRS_clean.each do |dir|
         files = ::Dir.glob(::File.join(@root, dir, "**", "*"))
         @log.warn("Contents found in #{dir}!") unless files.empty?
         files.each do |f| 
+          next if skip_files.include?(f)
           @log.warn("Deleting #{(::File.directory?(f))?"dir":"file"}: #{f}")
           FileUtils.rm_rf f         
         end
       end
+      # On 32 bit apt-get update fails if this directory doesn't exist
+      if ::File.directory? "/var/cache/apt/archives"
+        FileUtils.mkdir_p("/var/cache/apt/archives/partial", :mode=>0755)
+      end
 
-      DIRS_truncate.each do |dir|
+      DIRS_truncate_logs.each do |dir|
         files = ::Dir.glob(::File.join(@root, dir, "**", "*"))
         files.each do |f|
+          next if skip_files.include?(f)
           if ::File.file?(f) && ::File.size?(f)
             @log.warn("Truncating file: #{f}")
             ::File.truncate(f, 0)
@@ -57,14 +60,17 @@ module RightImage
 
       FILES_delete.each do |f|
         filename = ::File.join(@root, f)
+        next if skip_files.include?(filename)
 
-        if ::File.file?(filename)
+        if ::File.directory?(filename)
+          @log.warn("Deleting directory tree: #{filename}")
+          FileUtils.rm_rf filename
+        elsif ::File.file?(filename)
           @log.warn("Deleting file: #{filename}")
           ::File.delete(filename)
         end
       end
 
-      @log.info("Synching filesystem.")
       @log.info `sync`
       @log.info("Sanitize complete.")       
     end

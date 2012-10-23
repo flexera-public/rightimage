@@ -1,6 +1,6 @@
 <%= node[:rightimage][:root_mount][:dev] %> /         ext3    <%= node[:rightimage][:root_mount][:options] %>        <%= node[:rightimage][:root_mount][:dump] %> <%= node[:rightimage][:root_mount][:fsck] %>
 <% unless node[:rightimage][:fstab][:ephemeral][:dev] == nil %>
-<%= node[:rightimage][:fstab][:ephemeral][:dev] %>   /mnt/ephemeral      ext3    <%= node[:rightimage][:fstab][:ephemeral][:options] %>        0 0
+<%= node[:rightimage][:fstab][:ephemeral][:dev] %>   <%= node[:rightimage][:fstab][:ephemeral][:mount] %>      ext3    <%= node[:rightimage][:fstab][:ephemeral][:options] %>        0 0
 <% end %>
 <% unless node[:rightimage][:swap_mount] == nil -%>
 <%= node[:rightimage][:swap_mount] %>  swap      swap    <%= node[:rightimage][:fstab][:swap_mount_opts] %>        0 0

@@ -13,6 +13,7 @@ set[:rightimage][:guest_root] = "/mnt/image"
 set_unless[:rightimage][:hypervisor] = "xen"
 set[:rightimage][:mirror] = "cf-mirror.rightscale.com"
 set_unless[:rightimage][:cloud] = "ec2"
+set[:rightimage][:fstab][:ephemeral][:mount] = "/mnt/ephemeral"
 set[:rightimage][:fstab][:ephemeral][:options] = "defaults"
 set[:rightimage][:grub][:timeout] = "5"
 set[:rightimage][:grub][:kernel][:options] = "consoleblank=0"
@@ -46,6 +47,7 @@ rightimage[:guest_packages] << " libtool"
 rightimage[:guest_packages] << " libxml2"
 rightimage[:guest_packages] << " logrotate"
 rightimage[:guest_packages] << " nscd"
+rightimage[:guest_packages] << " ntp" # RightLink requires local time to be accurate (w-5025)
 rightimage[:guest_packages] << " openssh-server"
 rightimage[:guest_packages] << " openssl"
 rightimage[:guest_packages] << " screen"
@@ -154,15 +156,8 @@ when "centos","rhel"
   rightimage[:guest_packages] << " redhat-lsb"
   rightimage[:guest_packages] << " redhat-rpm-config"
   rightimage[:guest_packages] << " rpm-build"
-  rightimage[:guest_packages] << " ruby"
-  rightimage[:guest_packages] << " ruby-devel"
   rightimage[:guest_packages] << " ruby-docs"
-  rightimage[:guest_packages] << " ruby-irb"
-  rightimage[:guest_packages] << " ruby-libs"
   rightimage[:guest_packages] << " ruby-mode"
-  rightimage[:guest_packages] << " ruby-rdoc"
-  rightimage[:guest_packages] << " ruby-ri"
-  rightimage[:guest_packages] << " ruby-tcltk"
   rightimage[:guest_packages] << " sudo"
   rightimage[:guest_packages] << " swig"
   rightimage[:guest_packages] << " telnet"
@@ -171,6 +166,13 @@ when "centos","rhel"
   rightimage[:guest_packages] << " wget"
   rightimage[:guest_packages] << " xfsprogs"
   rightimage[:guest_packages] << " yum-utils"
+
+  # For Centos 5, install custom ruby (1.8.7). so keep these in a separate variable 
+  # These are the packages available on the rbel upstream mirror
+  set[:rightimage][:ruby_packages] = "ruby ruby-devel ruby-irb ruby-libs ruby-rdoc ruby-ri ruby-tcltk"
+  if el6?
+    rightimage[:guest_packages] << " " << rightimage[:ruby_packages]
+  end
 
   rightimage[:host_packages] << " swig"
 
