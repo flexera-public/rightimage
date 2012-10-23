@@ -139,7 +139,11 @@ module RightScale
         bucket = "rightscale-#{image_source_cloud}"
         bucket << "-dev" if node[:rightimage][:debug] == "true"
         bucket
-       end
+      end
+
+      def loopback_file_gz
+        "#{temp_root}/#{loopback_filename}.gz"
+      end
 
       def image_source_cloud
         "us-west-2"
