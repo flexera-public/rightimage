@@ -111,3 +111,5 @@ else
     end
   end
 end
+
+rightscale_marker :end
