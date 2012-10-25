@@ -109,10 +109,12 @@ chroot \\$1  sed -i s/root::/root:*:/ /etc/shadow
 chroot \\$1 ln -s /usr/bin/env /bin/env
 chroot \\$1 rm -f /etc/rc?.d/*hwclock*
 chroot \\$1 rm -f /etc/event.d/tty[2-6]
-if [ ! -L \\$1/usr/bin/ruby ]; then 
+if [ -e \\$1/usr/bin/ruby1.9.1 ] && [ ! -e \\$1/usr/bin/ruby ]; then 
+  chroot \\$1 ln -s /usr/bin/ruby1.9.1 /usr/bin/ruby
+fi
+if [ -e \\$1/usr/bin/ruby1.8 ] && [ ! -e \\$1/usr/bin/ruby ]; then 
   chroot \\$1 ln -s /usr/bin/ruby1.8 /usr/bin/ruby
 fi
-
 EOS
       chmod +x /tmp/configure_script
       #{bootstrap_cmd} --exec=/tmp/configure_script

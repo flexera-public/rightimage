@@ -106,6 +106,7 @@ action :install do
   if [ "5" == "#{node[:rightimage][:platform_version].to_i}" ]; then
     yum -c /tmp/yum.conf --installroot=#{guest_root} --exclude='*.i386' -y install --enablerepo=ruby_custom #{node[:rightimage][:ruby_packages]}
   fi
+
   yum -c /tmp/yum.conf --installroot=#{guest_root} -y install #{node[:rightimage][:guest_packages]} --exclude gcc-java
 
   yum -c /tmp/yum.conf --installroot=#{guest_root} -y remove bluez* gnome-bluetooth*
@@ -276,6 +277,7 @@ action :install do
         curl -s -S -f -L --retry 7 -O $base_url$p
       done
       # zlib bit keeps command from failing if all the packages are installed already
+#      yum -c /tmp/yum.conf --installroot=#{guest_root} -y remove #{node[:rightimage][:ruby_packages]}
       yum -c /tmp/yum.conf --installroot=#{guest_root} -y install #{packages} zlib
     EOH
   end
