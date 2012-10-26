@@ -51,22 +51,34 @@ if [[ $ruby_ver == *1.8.5* ]] ; then
   get_rubygems 1.3.3
   # Newer versions of rake will not work with older versions of Ruby
   rake_ver="-v 0.9.2";
-else
+  install_rubygems=Y
+elif [[ $ruby_ver == *1.8.7* ]] ; then
   get_rubygems 1.3.7
   rake_ver="";
+  install_rubygems=Y
 fi
+# else if ruby is 1.9 it comes packaged with rubygems normally
 
 cat <<-CHROOT_SCRIPT > $ROOT/tmp/rubygems_install.sh
 #!/bin/bash -ex
 cd /tmp/rubygems
 ruby setup.rb 
-if [ "#{node[:rightimage][:platform]}" == "ubuntu" ]; then
+CHROOT_SCRIPT
+
+cat <<-CHROOT_SCRIPT > $ROOT/tmp/rubygems_links.sh
+if [ ! -e /usr/bin/gem ] && [ -e /usr/bin/gem1.9.1 ]; then
+  ln -sf /usr/bin/gem1.9.1 /usr/bin/gem
+fi
+if [ ! -e /usr/bin/gem ] && [ -e /usr/bin/gem1.8 ]; then
   ln -sf /usr/bin/gem1.8 /usr/bin/gem
 fi
-
 CHROOT_SCRIPT
+
 chmod +x $ROOT/tmp/rubygems_install.sh
-chroot $ROOT /tmp/rubygems_install.sh > /dev/null 
+if [ "$install_rubygems" = "Y" ]; then
+  chroot $ROOT /tmp/rubygems_install.sh > /dev/null 
+fi
+chroot $ROOT /tmp/rubygems_links.sh > /dev/null 
 EOC
 end
 
