@@ -278,12 +278,19 @@ function get_rs_version() {
   fi
 }
 
-# We export this so /etc/init.d/rightscale startup script can see it and get
-# packages from the dev_bucket
+# We export these two variables so /etc/init.d/rightscale startup script can see it and get
+# packages and or patches from the dev_bucket. 
 export RS_SRC=
 function get_rs_src() {
-  if devsrc=`expr "$CLOUD_USERDATA" : '.*RS_src=\([-_.0-9a-z/]*\)'`; then
+  if devsrc=`expr "$CLOUD_USERDATA" : '.*RS_src=\([-_.0-9a-zA-Z/:]*\)'`; then
     RS_SRC=$devsrc
+  fi
+}
+
+export RS_PATCH_URL=
+function get_rs_patch_url() {
+  if devsrc=`expr "$CLOUD_USERDATA" : '.*RS_patch_url=\([-_.0-9a-zA-Z/:]*\)'`; then
+    RS_PATCH_URL=$devsrc
   fi
 }
 
@@ -430,6 +437,7 @@ function start() {
   configure_proxy # must be done AFTER getting userdata due to old curl that doesn't grok $no_proxy
   get_rs_version
   get_rs_src
+  get_rs_patch_url
   get_package_names
 
   # If RS_SRC is not defined in userdata, we're booting in "production mode."
