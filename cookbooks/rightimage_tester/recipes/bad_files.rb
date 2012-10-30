@@ -39,6 +39,7 @@ bad_files="\
 -name *.ssh\
 "
 bad_files_skip_dirs="\
+-path #{node[:rightimage_tester][:root]}/usr/lib/node_modules -or \
 -path #{node[:rightimage_tester][:root]}/var/cache/rightscale -or \
 -path #{node[:rightimage_tester][:root]}/root/.rightscale\
 "
