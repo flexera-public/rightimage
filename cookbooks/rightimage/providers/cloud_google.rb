@@ -92,7 +92,7 @@ action :configure do
 
       # Install Boto (for gsutil)
       chroot $guest_root easy_install pip
-      chroot $guest_root pip install boto
+      chroot $guest_root source /etc/profile && pip install boto
 
       wget http://dl.google.com/dl/compute/gcutil.tar.gz
       tar zxvf gcutil.tar.gz -C $guest_root/usr/local
