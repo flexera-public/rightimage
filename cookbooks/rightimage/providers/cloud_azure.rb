@@ -150,7 +150,7 @@ action :upload do
       fi
 
       # https://github.com/WindowsAzure/azure-sdk-for-node/issues/325
-      cd /usr/lib/nodejs/azure
+      cd /usr/lib/node_modules/azure
       npm uninstall xml2js
       npm install xml2js@0.1.14
     EOH
