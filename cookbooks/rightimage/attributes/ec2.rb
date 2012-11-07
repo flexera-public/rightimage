@@ -95,10 +95,10 @@ when "ec2"
   when "ap-southeast-2"
     case rightimage[:arch]
     when "i386" 
-      set[:rightimage][:aki_id] = "aki-33990e09"
+      set[:rightimage][:aki_id] = "aki-3f990e05"
       set[:rightimage][:ramdisk_id] = nil
     when "x86_64"
-      set[:rightimage][:aki_id] = "aki-31990e0b"
+      set[:rightimage][:aki_id] = "aki-3d990e07"
       set[:rightimage][:ramdisk_id] = nil
     end
   end
