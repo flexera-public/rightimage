@@ -155,9 +155,8 @@ bash "bundle instance" do
   flags "-ex"
   cwd Rebundle::REBUNDLE_SOURCE_PATH
   environment(cloud_credentials)
-  certs_opt = node[:rightimage][:cloud] == "ec2" ? "--aws-cert /tmp/AWS_X509_CERT.pem --aws-key /tmp/AWS_X509_KEY.pem" : ""
   code <<-EOH
-  #{ruby_bin_dir}/ruby bin/bundle --name #{node[:rightimage][:image_name]} #{certs_opt}
+  #{ruby_bin_dir}/ruby bin/bundle --name #{node[:rightimage][:image_name]}
   EOH
 end
 #

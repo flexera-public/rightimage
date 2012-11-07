@@ -106,6 +106,7 @@ action :install do
   if [ "5" == "#{node[:rightimage][:platform_version].to_i}" ]; then
     yum -c /tmp/yum.conf --installroot=#{guest_root} --exclude='*.i386' -y install --enablerepo=ruby_custom #{node[:rightimage][:ruby_packages]}
   fi
+
   yum -c /tmp/yum.conf --installroot=#{guest_root} -y install #{node[:rightimage][:guest_packages]} --exclude gcc-java
 
   yum -c /tmp/yum.conf --installroot=#{guest_root} -y remove bluez* gnome-bluetooth*
@@ -250,6 +251,37 @@ action :install do
       EOH
     end
   end
+
+  directory("#{guest_root}/tmp/packages") {recursive true}
+  bash "install ruby 1.9" do
+    packages = %w(
+      rubygem-rdoc-3.9.4-16.el6.noarch.rpm
+      rubygem-minitest-2.5.1-16.el6.noarch.rpm
+      rubygem-json-1.5.4-16.el6.x86_64.rpm
+      rubygem-io-console-0.3-16.el6.x86_64.rpm
+      rubygems-1.8.23-16.el6.noarch.rpm
+      rubygem-bigdecimal-1.1.0-16.el6.x86_64.rpm
+      ruby-tcltk-1.9.3.194-16.el6.x86_64.rpm
+      ruby-libs-1.9.3.194-16.el6.x86_64.rpm
+      ruby-irb-1.9.3.194-16.el6.noarch.rpm
+      ruby-doc-1.9.3.194-16.el6.x86_64.rpm
+      ruby-devel-1.9.3.194-16.el6.x86_64.rpm
+      ruby-1.9.3.194-16.el6.x86_64.rpm
+    ).join(" ")
+    cwd "#{guest_root}/tmp/packages"
+    flags "-ex"
+    code <<-EOH
+      base_url=http://rightscale-rightimage.s3.amazonaws.com/packages/el6/ruby1.9/
+      for p in #{packages}
+      do
+        curl -s -S -f -L --retry 7 -O $base_url$p
+      done
+      # zlib bit keeps command from failing if all the packages are installed already
+#      yum -c /tmp/yum.conf --installroot=#{guest_root} -y remove #{node[:rightimage][:ruby_packages]}
+      yum -c /tmp/yum.conf --installroot=#{guest_root} -y install #{packages} zlib
+    EOH
+  end
+
 
   cookbook_file "#{guest_root}/etc/pki/rpm-gpg/RPM-GPG-KEY-RightScale" do
     source "GPG-KEY-RightScale"

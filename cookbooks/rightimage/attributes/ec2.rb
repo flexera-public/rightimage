@@ -15,6 +15,8 @@ case rightimage[:region]
     set[:rightimage][:ec2_endpoint] = "https://ec2.eu-west-1.amazonaws.com"
   when "ap-southeast"
     set[:rightimage][:ec2_endpoint] = "https://ec2.ap-southeast-1.amazonaws.com"
+  when "ap-southeast-2"
+    set[:rightimage][:ec2_endpoint] = "https://ec2.ap-southeast-2.amazonaws.com"
   when "ap-northeast"
     set[:rightimage][:ec2_endpoint] = "https://ec2.ap-northeast-1.amazonaws.com"
   when "sa-east"
@@ -88,6 +90,15 @@ when "ec2"
       set[:rightimage][:ramdisk_id] = nil
     when "x86_64"
       set[:rightimage][:aki_id] = "aki-c88f51d5"
+      set[:rightimage][:ramdisk_id] = nil
+    end
+  when "ap-southeast-2"
+    case rightimage[:arch]
+    when "i386" 
+      set[:rightimage][:aki_id] = "aki-33990e09"
+      set[:rightimage][:ramdisk_id] = nil
+    when "x86_64"
+      set[:rightimage][:aki_id] = "aki-31990e0b"
       set[:rightimage][:ramdisk_id] = nil
     end
   end

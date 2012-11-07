@@ -109,10 +109,12 @@ chroot \\$1  sed -i s/root::/root:*:/ /etc/shadow
 chroot \\$1 ln -s /usr/bin/env /bin/env
 chroot \\$1 rm -f /etc/rc?.d/*hwclock*
 chroot \\$1 rm -f /etc/event.d/tty[2-6]
-if [ ! -L \\$1/usr/bin/ruby ]; then 
+if [ -e \\$1/usr/bin/ruby1.9.1 ] && [ ! -e \\$1/usr/bin/ruby ]; then 
+  chroot \\$1 ln -s /usr/bin/ruby1.9.1 /usr/bin/ruby
+fi
+if [ -e \\$1/usr/bin/ruby1.8 ] && [ ! -e \\$1/usr/bin/ruby ]; then 
   chroot \\$1 ln -s /usr/bin/ruby1.8 /usr/bin/ruby
 fi
-
 EOS
       chmod +x /tmp/configure_script
       #{bootstrap_cmd} --exec=/tmp/configure_script
@@ -217,6 +219,33 @@ export JAVA_HOME
 EOF
 
       chmod 775 $guest_root/etc/profile.d/java.sh
+    EOH
+  end
+
+
+
+  directory("#{guest_root}/tmp/packages") {recursive true}
+  bash "install ruby 1.9" do
+    packages = %w( 
+      ruby1.9.1_1.9.3.194-1_amd64.deb
+      ruby1.9.1-examples_1.9.3.194-1_all.deb
+      ruby1.9.1-dev_1.9.3.194-1_amd64.deb
+      ri1.9.1_1.9.3.194-1_all.deb
+      libtcltk-ruby1.9.1_1.9.3.194-1_amd64.deb
+      libruby1.9.1_1.9.3.194-1_amd64.deb
+    ).join(" ")
+    cwd "#{guest_root}/tmp/packages"
+    flags "-ex"
+    code <<-EOH
+      base_url=http://rightscale-rightimage.s3.amazonaws.com/packages/ubuntu/ruby1.9/
+      for p in #{packages}
+      do
+        curl -s -S -f -L --retry 7 -O $base_url$p
+      done
+      chroot #{guest_root} << EOF
+cd /tmp/packages
+dpkg -i #{packages}
+EOF
     EOH
   end
 
