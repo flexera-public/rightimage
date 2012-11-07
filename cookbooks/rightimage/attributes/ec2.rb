@@ -92,7 +92,6 @@ when "ec2"
       set[:rightimage][:aki_id] = "aki-c48f51d9"
       set[:rightimage][:ramdisk_id] = nil
     end
-  end
   when "ap-southeast-2"
     case rightimage[:arch]
     when "i386" 
@@ -102,4 +101,5 @@ when "ec2"
       set[:rightimage][:aki_id] = "aki-31990e0b"
       set[:rightimage][:ramdisk_id] = nil
     end
+  end
 end # case rightimage[:cloud]
