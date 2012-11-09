@@ -31,6 +31,8 @@ image_upload_bucket = node[:rightimage][:base_image_bucket]
 # Upload partitioned image
 rightimage_upload file_partitioned do
   provider "rightimage_upload_s3"
+  user node[:rightimage][:aws_access_key_id]
+  password node[:rightimage][:aws_secret_access_key]
   endpoint 's3-us-west-2.amazonaws.com'
   remote_path  "#{image_upload_bucket}/#{image_s3_path}"
   action :upload
@@ -39,6 +41,8 @@ end
 # Upload unpartitioned image
 rightimage_upload file_unpartitioned do
   provider "rightimage_upload_s3"
+  user node[:rightimage][:aws_access_key_id]
+  password node[:rightimage][:aws_secret_access_key]
   endpoint 's3-us-west-2.amazonaws.com'
   remote_path  "#{image_upload_bucket}/#{image_s3_path}"
   action :upload
