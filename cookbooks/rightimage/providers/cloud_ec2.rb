@@ -160,13 +160,16 @@ def upload_ebs
   # remaps to xvdx.  In CentOS/RHEL case, remapping bumps up letter by 4. See 
   # https://bugzilla.redhat.com/show_bug.cgi?id=729586 for explanation - PS
   local_device = "/dev/sdj"
-  case new_resource.platform
-  when "centos", "rhel"
-    local_device = "/dev/xvdn" if new_resource.platform_version.to_f >= 6.1
+  case node[:platform]
+  when "centos", "redhat"
+    if node[:platform_version].to_f.between?(6.1, 6.2)
+      local_device = "/dev/xvdn"
+    elsif node[:platform_version].to_f >= 6.3
+      local_device = "/dev/xvdj"
+    end
   when "ubuntu"
-    local_device = "/dev/xvdj" if new_resource.platform_version.to_f >= 10.10
+    local_device = "/dev/xvdj" if node[:platform_version].to_f >= 10.10
   end
-
 
   bash "attach ebs volume" do 
     not_if "cat /proc/partitions | grep #{local_device.split("/dev/")[1]}"
