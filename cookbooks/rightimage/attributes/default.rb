@@ -15,6 +15,8 @@ set_unless[:rightimage][:virtual_environment] = "xen"
 set[:rightimage][:mirror] = "cf-mirror.rightscale.com"
 set_unless[:rightimage][:sandbox_repo_tag] = "rightlink_package_#{rightimage[:rightlink_version]}"
 set_unless[:rightimage][:cloud] = "raw"
+set[:rightimage][:grub][:timeout] = "5"
+set[:rightimage][:grub][:kernel][:options] = "consoleblank=0"
 set[:rightimage][:root_mount][:label_dev] = "ROOT"
 set[:rightimage][:root_mount][:dev] = "LABEL=#{rightimage[:root_mount][:label_dev]}"
 set_unless[:rightimage][:image_source_bucket] = "rightscale-us-west-2"
@@ -83,6 +85,7 @@ case rightimage[:cloud]
     set[:rightimage][:root_mount][:dump] = "0" 
     set[:rightimage][:root_mount][:fsck] = "0" 
     set[:rightimage][:fstab][:ephemeral] = true
+    set[:rightimage][:grub][:timeout] = "0"
     # Might have to double check don't know if maverick should use kernel linux-image-ec2 or not
     if rightimage[:platform] == "ubuntu" and rightimage[:release_number].to_f >= 10.10
       set[:rightimage][:ephemeral_mount] = "/dev/xvdb" 
@@ -273,3 +276,8 @@ when "ec2"
     end
   end
 end # case rightimage[:cloud]
+
+set[:rightimage][:grub][:kernel][:options] << " console=hvc0" if rightimage[:virtual_environment] == "xen"
+
+# Specify if running in Xen domU or have grub detect automatically
+set[:rightimage][:grub][:indomU] = node[:rightimage][:virtual_environment] == "xen" ? "true":"detect"

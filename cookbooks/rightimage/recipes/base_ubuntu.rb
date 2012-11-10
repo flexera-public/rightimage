@@ -21,4 +21,25 @@ rs_utils_marker :begin
 
 include_recipe "rightimage::clean"
 include_recipe "rightimage::rightscale_install"
+
+## Required for OS to automatically update grub.conf upon installation of new kernel (w-4950) ##
+# Remove grub2 files
+bash "remove_grub2" do
+  flags "-x"
+  code <<-EOH
+    guest_root=#{guest_root}
+    dpkg --root $guest_root --purge grub2-common grub-pc grub-pc-bin
+    rm -rf $guest_root/boot/grub/menu.lst*
+  EOH
+end
+
+# Adds hooks to run update-grub when adding/removing a kernel.
+cookbook_file "#{guest_root}/etc/kernel-img.conf" do
+  # Xen uses grub-legacy-ec2 which installs the appropriate hooks.
+  not_if { node[:rightimage][:virtual_environment] == "xen" }
+  source "kernel-img.conf"
+  backup false
+end
+## END ##
+
 rs_utils_marker :end
