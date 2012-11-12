@@ -343,6 +343,18 @@ EOF
           return false
         end
       end
+
+      def grub_initrd
+        ::File.basename(Dir.glob("#{guest_root}/boot/initr*").sort_by { |f| File.mtime(f) }.last)
+      end
+
+      def grub_kernel
+        ::File.basename(Dir.glob("#{guest_root}/boot/vmlinuz*").sort_by { |f| File.mtime(f) }.last)
+      end
+
+      def grub_root
+        "(hd0" + (node[:rightimage][:cloud] == "ec2" ? "":",#{partition_number}") + ")"
+      end
     end
   end
 end

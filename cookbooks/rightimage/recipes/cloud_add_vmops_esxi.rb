@@ -59,7 +59,7 @@ rightimage_kernel "Install Ramdisk" do
 end
 
 # insert grub conf
-template "#{guest_root}/boot/grub/grub.conf" do 
+template "#{guest_root}/boot/grub/menu.lst" do
   source "menu.lst.erb"
   backup false 
 end
@@ -83,8 +83,6 @@ bash "setup grub" do
         grub_command="/sbin/grub"
         ;;
     esac
-
-    chroot $guest_root ln -sf /boot/grub/grub.conf /boot/grub/menu.lst
 
     echo "(hd0) #{node[:rightimage][:grub][:root_device]}" > $guest_root/boot/grub/device.map
     echo "" >> $guest_root/boot/grub/device.map

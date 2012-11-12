@@ -53,19 +53,9 @@ rightimage_kernel "Install PV Kernel for Hypervisor" do
 end
 
 log "  insert grub conf"
-template "#{guest_root}/boot/grub/grub.conf" do 
+template "#{guest_root}/boot/grub/menu.lst" do
   source "menu.lst.erb"
   backup false 
-end
-
-log "  Link menu.list to our grub.conf"
-file "#{guest_root}/boot/grub/menu.lst" do 
-  action :delete
-  backup false
-end
-
-link "#{guest_root}/boot/grub/menu.lst" do 
-  to "#{guest_root}/boot/grub/grub.conf"
 end
 
 include_recipe "rightimage::bootstrap_common_debug"
@@ -87,12 +77,8 @@ bash "configure for cloudstack" do
       echo "xvc0" >> $guest_root/etc/securetty
       ;;
     "ubuntu" )
-      # enable console access
-      cp $guest_root/etc/init/tty1.conf* $guest_root/etc/init/hvc0.conf
-      sed -i "s/tty1/hvc0/g" $guest_root/etc/init/hvc0.conf
-      echo "hvc0" >> $guest_root/etc/securetty
-
-      for i in $guest_root/etc/init/tty*; do
+      # Disable all ttys except for tty1 (console)
+      for i in $guest_root/etc/init/tty[2-9].conf; do
         mv $i $i.disabled;
       done
       ;;  
