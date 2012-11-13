@@ -22,4 +22,11 @@ node[:rightimage][:host_packages].split.each { |p| package p }
 
 include_recipe "rightimage::clean"
 include_recipe "rightimage::rightscale_install"
+
+## Required for OS to automatically update grub.conf upon installation of new kernel (w-4932) ##
+remote_file "#{guest_root}/etc/sysconfig/kernel" do
+  source "sysconfig-kernel"
+  backup false
+end
+
 rs_utils_marker :end

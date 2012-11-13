@@ -50,24 +50,30 @@ include_recipe "rightimage::base_#{node.rightimage.platform.downcase}"
 
 ## Required for OS to automatically update grub.conf upon installation of new kernel (w-4950/w-4932) ##
 # Create initial menu.lst otherwise update-grub can't continue.
+directory "#{guest_root}/boot/grub" do
+  owner "root"
+  group "root"
+  recursive true
+end
+
 template "#{guest_root}/boot/grub/menu.lst" do
   not_if { node[:rightimage][:cloud] == "euca" }
   source "menu.lst.erb"
   backup false
 end
 
-link "#{guest_root}/boot/grub/grub.conf" do
+execute "grub symlink" do
   not_if { node[:rightimage][:cloud] == "euca" }
-  link_type :hard
-  to "#{guest_root}/boot/grub/menu.lst"
+  command "chroot #{guest_root} ln -s /boot/grub/menu.lst /boot/grub/grub.conf"
+  creates "#{guest_root}/boot/grub/grub.conf"
 end
 
 # Grubby requires a symlink to /etc/grub.conf.
-link "#{guest_root}/etc/grub.conf" do
+execute "centos grub symlink" do
   not_if { node[:rightimage][:cloud] == "euca" }
   only_if { node[:rightimage][:platform] == "centos" }
-  link_type :hard
-  to "#{guest_root}/boot/grub/menu.lst"
+  command "chroot #{guest_root} ln -s /boot/grub/menu.lst /etc/grub.conf"
+  creates "#{guest_root}/etc/grub.conf"
 end
 ## END ##
 
