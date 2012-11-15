@@ -255,18 +255,18 @@ action :install do
   directory("#{guest_root}/tmp/packages") {recursive true}
   bash "install ruby 1.9" do
     packages = %w(
-      rubygem-rdoc-3.9.4-16.el6.noarch.rpm
-      rubygem-minitest-2.5.1-16.el6.noarch.rpm
-      rubygem-json-1.5.4-16.el6.x86_64.rpm
-      rubygem-io-console-0.3-16.el6.x86_64.rpm
-      rubygems-1.8.23-16.el6.noarch.rpm
-      rubygem-bigdecimal-1.1.0-16.el6.x86_64.rpm
-      ruby-tcltk-1.9.3.194-16.el6.x86_64.rpm
-      ruby-libs-1.9.3.194-16.el6.x86_64.rpm
-      ruby-irb-1.9.3.194-16.el6.noarch.rpm
-      ruby-doc-1.9.3.194-16.el6.x86_64.rpm
-      ruby-devel-1.9.3.194-16.el6.x86_64.rpm
-      ruby-1.9.3.194-16.el6.x86_64.rpm
+      rubygem-rdoc-3.9.4-22.el6.noarch.rpm
+      rubygem-minitest-2.5.1-22.el6.noarch.rpm
+      rubygem-json-1.5.4-22.el6.x86_64.rpm
+      rubygem-io-console-0.3-22.el6.x86_64.rpm
+      rubygems-1.8.23-22.el6.noarch.rpm
+      rubygem-bigdecimal-1.1.0-22.el6.x86_64.rpm
+      ruby-tcltk-1.9.3.327-22.el6.x86_64.rpm
+      ruby-libs-1.9.3.327-22.el6.x86_64.rpm
+      ruby-irb-1.9.3.327-22.el6.noarch.rpm
+      ruby-doc-1.9.3.327-22.el6.x86_64.rpm
+      ruby-devel-1.9.3.327-22.el6.x86_64.rpm
+      ruby-1.9.3.327-22.el6.x86_64.rpm
     ).join(" ")
     cwd "#{guest_root}/tmp/packages"
     flags "-ex"
