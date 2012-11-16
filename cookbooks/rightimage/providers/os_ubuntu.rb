@@ -227,12 +227,12 @@ EOF
   directory("#{guest_root}/tmp/packages") {recursive true}
   bash "install ruby 1.9" do
     packages = %w( 
-      ruby1.9.1_1.9.3.194-1_amd64.deb
-      ruby1.9.1-examples_1.9.3.194-1_all.deb
-      ruby1.9.1-dev_1.9.3.194-1_amd64.deb
-      ri1.9.1_1.9.3.194-1_all.deb
-      libtcltk-ruby1.9.1_1.9.3.194-1_amd64.deb
-      libruby1.9.1_1.9.3.194-1_amd64.deb
+      ruby1.9.1_1.9.3.327-1_amd64.deb
+      ruby1.9.1-examples_1.9.3.327-1_all.deb
+      ruby1.9.1-dev_1.9.3.327-1_amd64.deb
+      ri1.9.1_1.9.3.327-1_all.deb
+      libtcltk-ruby1.9.1_1.9.3.327-1_amd64.deb
+      libruby1.9.1_1.9.3.327-1_amd64.deb
     ).join(" ")
     cwd "#{guest_root}/tmp/packages"
     flags "-ex"
