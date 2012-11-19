@@ -94,8 +94,10 @@ action :configure do
       chroot $guest_root easy_install pip
       chroot $guest_root source /etc/profile && pip install boto
 
-      wget http://dl.google.com/dl/compute/gcutil.tar.gz
-      tar zxvf gcutil.tar.gz -C $guest_root/usr/local
+      gcutil=gcutil-1.4.1
+      wget https://google-compute-engine-tools.googlecode.com/files/$gcutil.tar.gz
+      tar zxvf $gcutil.tar.gz -C $guest_root/usr/local
+      chroot $guest_root ln -sf /usr/local/$gcutil /usr/local/gcutil
       echo 'export PATH=$PATH:/usr/local/gcutil' > $guest_root/etc/profile.d/gcutil.sh
 
       # Install GSUtil
