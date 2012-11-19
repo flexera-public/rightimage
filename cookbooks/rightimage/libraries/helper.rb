@@ -337,7 +337,7 @@ EOF
       end
 
       def rebundle?
-        if node[:rightimage][:cloud] == "ec2" and node[:rightimage][:platform] == "rhel"
+        if node[:rightimage][:cloud] == "ec2" and (node[:rightimage][:platform] == "rhel" || hvm?)
           return true
         elsif node[:rightimage][:cloud] == "rackspace"
           return true
