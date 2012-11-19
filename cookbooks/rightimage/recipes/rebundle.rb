@@ -89,8 +89,12 @@ bash "launch the remote instance" do
                end
 
   region_opt = "--region #{region_opt}" if region_opt =~ /./
-  resize_opt = node[:rightimage][:cloud] == "ec2" ? "--resize #{node[:rightimage][:root_size_gb]}" : ""
-  flavor_opt = node[:rightimage][:cloud] == "ec2" ? "--flavor-id c1.medium" : ""
+  resize_opt = node[:rightimage][:cloud] == "ec2" && !hvm? ? "--resize #{node[:rightimage][:root_size_gb]}" : ""
+  flavor_opt = case node[:rightimage][:cloud]
+               when "ec2"
+                 "--flavor-id " + (hvm? ? "cc1.4xlarge":"c1.medium")
+               else ""
+               end
   zone = node[:rightimage][:datacenter].to_s.empty? ? "US" : node[:rightimage][:datacenter]
   name_opt   = node[:rightimage][:cloud] == "rackspace" ? "--hostname ri-rebundle-#{node[:rightimage][:platform]}-#{zone.downcase}" : ""
   code <<-EOH
