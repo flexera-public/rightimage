@@ -202,6 +202,13 @@ attribute "rightimage/datacenter",
   :default => "1",
   :required => "optional"
 
+attribute "rightimage/virtualization",
+  :display_name => "Virtualization type",
+  :description => "Virtualization type (EC2 only).  Defaults to pvm.",
+  :choice => [ "hvm", "pvm" ],
+  :default => "pvm",
+  :required => "recommended"
+
 # AWS
 attribute "rightimage/aws_account_number",
   :display_name => "aws_account_number",

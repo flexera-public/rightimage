@@ -130,6 +130,21 @@
       "display_name": "Guest OS Release",
       "description": "The OS release/version to build into the virtual image."
     },
+    "rightimage/virtualization": {
+      "required": "recommended",
+      "calculated": false,
+      "choice": [
+        "hvm",
+        "pvm"
+      ],
+      "default": "pvm",
+      "type": "string",
+      "recipes": [
+
+      ],
+      "display_name": "Virtualization type",
+      "description": "Virtualization type (EC2 only).  Defaults to pvm."
+    },
     "rightimage/euca/x509_key": {
       "required": "required",
       "calculated": false,
