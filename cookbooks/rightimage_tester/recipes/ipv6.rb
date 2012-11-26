@@ -20,6 +20,7 @@
 rightscale_marker :begin
 
 rightimage_tester "Verify IPv6 disabled" do
+  not_if { node[:cloud][:provider] == "rackspace-ng" }
   command 'ifconfig lo | grep inet6; if [ "$?" == "0" ]; then exit 1; else exit 0; fi'
   action :test
 end

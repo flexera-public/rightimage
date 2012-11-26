@@ -24,13 +24,7 @@ rightimage guest_root do
   action :sanitize
 end
 
-if node[:rightimage][:build_mode] == "base"
-  file = loopback_file(true)
-else
-  file = loopback_file(partitioned?)
-end
-
-loopback_fs file do
+loopback_fs loopback_file do
   mount_point guest_root
   action :unmount
 end

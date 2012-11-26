@@ -21,60 +21,43 @@ log "Resize skipped, desired file size (#{node[:rightimage][:root_size_gb]}) and
   not_if { do_loopback_resize }
 end
 
-if partitioned?
-  loopback_fs loopback_file(true) do
-    only_if { do_loopback_resize }
-    mount_point guest_root
-    device_number 0
-    partitioned true
-    action :mount
-  end
+loopback_fs loopback_file do
+  only_if { do_loopback_resize }
+  mount_point guest_root
+  device_number 0
+  action :mount
+end
 
-  loopback_fs loopback_file(true)+".tmp" do
-    only_if { do_loopback_resize }
-    mount_point guest_root+"2"
-    device_number 1
-    partitioned true
-    size_gb node[:rightimage][:root_size_gb].to_i
-    action :create
-  end
+loopback_fs loopback_file+".tmp" do
+  only_if { do_loopback_resize }
+  mount_point guest_root+"2"
+  device_number 1
+  size_gb node[:rightimage][:root_size_gb].to_i
+  action :create
+end
 
-  bash "copy loopback fs" do
-    only_if { do_loopback_resize }
-    flags "-e"
-    code "rsync -a #{guest_root}/ #{guest_root+'2'}"
-  end
+bash "copy loopback fs" do
+  only_if { do_loopback_resize }
+  flags "-e"
+  code "rsync -a #{guest_root}/ #{guest_root+'2'}"
+end
 
-  loopback_fs loopback_file(true) do
-    only_if { do_loopback_resize }
-    mount_point guest_root
-    action :unmount
-  end
+loopback_fs loopback_file do
+  only_if { do_loopback_resize }
+  mount_point guest_root
+  action :unmount
+end
 
-  loopback_fs loopback_file(true)+".tmp" do
-    only_if { do_loopback_resize }
-    mount_point guest_root+"2"
-    action :unmount
-  end
+loopback_fs loopback_file+".tmp" do
+  only_if { do_loopback_resize }
+  mount_point guest_root+"2"
+  action :unmount
+end
 
-  bash "replace old file" do
-    only_if { do_loopback_resize }
-    flags "-ex"
-    code "mv #{loopback_file(true)}.tmp #{loopback_file(true)}"
-  end
-else
-  loopback_fs loopback_file(false) do
-    only_if { do_loopback_resize }
-    mount_point guest_root
-    action :unmount
-  end
-  loopback_fs loopback_file(false) do
-    only_if { do_loopback_resize }
-    mount_point guest_root
-    size_gb node[:rightimage][:root_size_gb].to_i
-    partitioned false
-    action :resize
-  end
+bash "replace old file" do
+  only_if { do_loopback_resize }
+  flags "-ex"
+  code "mv #{loopback_file}.tmp #{loopback_file}"
 end
 
 rightscale_marker :end

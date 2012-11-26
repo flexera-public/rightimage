@@ -250,8 +250,8 @@ case rightimage[:cloud]
       set[:rightimage][:root_mount][:dump] = "1" 
       set[:rightimage][:root_mount][:fsck] = "1" 
     when "kvm"
-      set[:rightimage][:fstab][:ephemeral][:dev] = "/dev/vdb"
-      set[:rightimage][:fstab][:ephemeral][:options] = "defaults"
+      set[:rightimage][:fstab][:ephemeral][:dev] = nil
+      set[:rightimage][:fstab][:ephemeral][:options] = nil
       set[:rightimage][:grub][:root_device] = "/dev/vda"
       set[:rightimage][:root_mount][:dump] = "1" 
       set[:rightimage][:root_mount][:fsck] = "1" 

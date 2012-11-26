@@ -162,9 +162,8 @@ action :upload do
 end
 
 def upload_ebs
-  loopback_fs loopback_file(false) do
+  loopback_fs loopback_file do
     mount_point guest_root
-    partitioned false
     action :mount
   end
 
@@ -195,13 +194,16 @@ def upload_ebs
   # remaps to xvdx.  In CentOS/RHEL case, remapping bumps up letter by 4. See 
   # https://bugzilla.redhat.com/show_bug.cgi?id=729586 for explanation - PS
   local_device = "/dev/sdj"
-  case new_resource.platform
-  when "centos", "rhel"
-    local_device = "/dev/xvdn" if new_resource.platform_version.to_f >= 6.1
+  case node[:platform]
+  when "centos", "redhat"
+    if node[:platform_version].to_f.between?(6.1, 6.2)
+      local_device = "/dev/xvdn"
+    elsif node[:platform_version].to_f >= 6.3
+      local_device = "/dev/xvdj"
+    end
   when "ubuntu"
-    local_device = "/dev/xvdj" if new_resource.platform_version.to_f >= 10.10
+    local_device = "/dev/xvdj" if node[:platform_version].to_f >= 10.10
   end
-
 
   bash "attach ebs volume" do 
     not_if "cat /proc/partitions | grep #{local_device.split("/dev/")[1]}"
@@ -243,6 +245,12 @@ def upload_ebs
       ebs_mount="/mnt/ebs_mount"
       mkdir -p $ebs_mount
       image_mount=#{guest_root}
+      local_device=#{local_device}
+
+      # Partition volume
+      sfdisk $local_device << EOF
+0,,L,*
+EOF
 
   ## partition volume (HVM only)
       if [ "$hvm" == "true" ]; then
@@ -253,10 +261,10 @@ def upload_ebs
       fi
 
   ## format and mount volume
-      mkfs.ext3 -F $device
+      mkfs.ext3 -F ${local_device}1
       root_label="#{node[:rightimage][:root_mount][:label_dev]}"
-      tune2fs -L $root_label $device
-      mount $device $ebs_mount
+      tune2fs -L $root_label ${local_device}1
+      mount ${local_device}1 $ebs_mount
 
   ## mount EBS volume, rsync, and unmount ebs volume
       rsync -a $image_mount/ $ebs_mount/ --exclude '/proc'
@@ -357,7 +365,7 @@ EOF
         $kernel_opt \
         $ramdisk_opt \
         $virt_type_opt \
-        --root-device-name /dev/sda1 `
+        --root-device-name /dev/sda `
 
   ## parse out image id
       image_id_ebs=`echo -n $image_out_ebs | awk '{ print $2 }'`
@@ -384,7 +392,7 @@ EOF
     EOH
   end
 
-  loopback_fs loopback_file(false) do
+  loopback_fs loopback_file do
     mount_point guest_root
     action :unmount
   end
@@ -416,7 +424,7 @@ def upload_s3()
       mkdir -p "#{temp_root}/bundled"
 
       echo "Bundling..."
-      /home/ec2/bin/ec2-bundle-image --privatekey /tmp/AWS_X509_KEY.pem --cert /tmp/AWS_X509_CERT.pem --user #{node[:rightimage][:aws_account_number]} --image #{loopback_file(partitioned?)} --prefix #{image_name} --destination "#{temp_root}/bundled" --arch #{new_resource.arch} $kernel_opt $ramdisk_opt -B "ami=sda1,root=/dev/sda1,ephemeral0=sdb,swap=sda3"
+      /home/ec2/bin/ec2-bundle-image --privatekey /tmp/AWS_X509_KEY.pem --cert /tmp/AWS_X509_CERT.pem --user #{node[:rightimage][:aws_account_number]} --image #{loopback_file} --prefix #{image_name} --destination "#{temp_root}/bundled" --arch #{new_resource.arch} $kernel_opt $ramdisk_opt -B "ami=sda,root=/dev/sda,ephemeral0=sdb,swap=sda3"
      
       echo "Uploading..." 
       echo y | /home/ec2/bin/ec2-upload-bundle -b #{node[:rightimage][:image_upload_bucket]} -m "#{temp_root}/bundled/#{image_name}.manifest.xml" -a #{node[:rightimage][:aws_access_key_id]} -s #{node[:rightimage][:aws_secret_access_key]} --retry --batch

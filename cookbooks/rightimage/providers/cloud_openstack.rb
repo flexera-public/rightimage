@@ -21,7 +21,7 @@ action :configure do
   end 
 
   # insert grub conf, and symlink
-  template "#{guest_root}/boot/grub/grub.conf" do
+  template "#{guest_root}/boot/grub/menu.lst" do
     source "menu.lst.erb"
     backup false 
   end
@@ -53,7 +53,7 @@ action :configure do
       echo "" >> $guest_root/boot/grub/device.map
 
       cat > device.map <<EOF
-(hd0) #{loopback_file(partitioned?)}
+(hd0) #{loopback_file}
 EOF
 
     ${grub_command} --batch --device-map=device.map <<EOF
