@@ -75,7 +75,7 @@ bash "query_image" do
   /usr/sbin/chroot #{guest_root} report_tool "print"
 
   # Move JSON file out of image to receive MD5 checksum.
-  mv #{guest_root}/tmp/report.js #{temp_root}/#{loopback_rootname(partitioned?)}.js
+  mv #{guest_root}/tmp/report.js #{temp_root}/#{loopback_rootname}.js
   
   # If rightimage_tools was installed, uninstall it.
   if [ "$found" == "false" ]; then

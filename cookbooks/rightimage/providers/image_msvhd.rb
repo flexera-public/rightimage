@@ -20,7 +20,7 @@ action :package do
       echo "Remove old image"
       rm -f $image
 
-      VBoxManage convertfromraw #{loopback_filename(partitioned?)} $image --format VHD
+      VBoxManage convertfromraw #{loopback_filename} $image --format VHD
     EOH
   end
 end

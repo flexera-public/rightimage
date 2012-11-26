@@ -9,38 +9,25 @@ class Chef::Resource::RubyBlock
 end
 
 # Inject base image MD5 checksums.
-# JSON file created for partitioned and unpartitioned cases.
 ruby_block "base_md5_checksums" do
   only_if { node[:rightimage][:build_mode] == "base" }
   # Skip if MD5 has already been taken.
-  # Evidenced by existing JSON file for non-partitioned image.
-  not_if { File.exists?("#{temp_root}/#{loopback_rootname( (not partitioned?) )}.js") }  
+  # Evidenced by existing JSON file.
+  not_if { File.exists?("#{temp_root}/#{loopback_rootname}.js") }
   block do
     require 'json'
 
     # Open existing JSON file placed in /mnt/rightimage-temp .
     hob = Hash.new
-    File.open("#{temp_root}/#{loopback_rootname(partitioned?)}.js","r") do |f|
+    File.open("#{temp_root}/#{loopback_rootname}.js","r") do |f|
       hob = JSON.load(f)
     end
 
-    # Checksum unpartioned.
-
     # Inject the MD5 checksum.
-    hob["image"]["compressed-md5"] = `md5sum #{temp_root}/#{loopback_filename(false)}.gz`.split[0]
+    hob["image"]["compressed-md5"] = `md5sum #{temp_root}/#{loopback_filename}.gz`.split[0]
 
-    # Write back to unpartitioned image's JSON.
-    File.open("#{temp_root}/#{loopback_rootname(false)}.js","w") do |f|
-      f.write(JSON.pretty_generate(hob))
-    end
-
-    # Checksum partitioned.
-
-    # Inject the MD5 checksum.
-    hob["image"]["compressed-md5"] = `md5sum #{temp_root}/#{loopback_filename(true)}.gz`.split[0]
-
-    # Write to partitioned image's JSON.
-    File.open("#{temp_root}/#{loopback_rootname(true)}.js","w") do |f|
+    # Write back to JSON.
+    File.open("#{temp_root}/#{loopback_rootname}.js","w") do |f|
       f.write(JSON.pretty_generate(hob))
     end
   end
@@ -60,7 +47,7 @@ ruby_block "full_image_report_additions" do
 
     # Open JSON file placed in /mnt/rightimage-temp by "rightimage::image_report".
     hob = Hash.new
-    File.open("#{temp_root}/#{loopback_rootname(partitioned?)}.js","r") do |f|
+    File.open("#{temp_root}/#{loopback_rootname}.js","r") do |f|
       hob = JSON.load(f)
     end
 
@@ -75,17 +62,9 @@ ruby_block "full_image_report_additions" do
       euca_image_path = "#{euca_dir}/#{image_name}.#{uncomp_image_ext}"
       hob["image"]["image-md5"] = `md5sum #{euca_image_path}`.split[0]
 
-      # Initial ramdisk.
-      initrd_path = Dir.glob("#{euca_dir}/xen-kernel/initrd*")[0]
-      hob["image"]["initrd-md5"] = `md5sum #{initrd_path}`.split[0]
-
-      # Compressed kernel.
-      vmlinuz_path = Dir.glob("#{euca_dir}/xen-kernel/vmlinuz*")[0]
-      hob["image"]["vmlinuz-md5"] = `md5sum #{vmlinuz_path}`.split[0]
-
     # EC2 and GCE don't change the names of their raw images.
     elsif node[:rightimage][:cloud] =~ /ec2|google/
-      hob["image"]["md5"] = `md5sum #{loopback_file(partitioned?)}`.split[0]
+      hob["image"]["md5"] = `md5sum #{loopback_file}`.split[0]
     # All other clouds.
     else
       uncompressed_full_image_path = "#{target_raw_root}/#{image_name}.#{uncomp_image_ext}"
@@ -144,20 +123,9 @@ end
 # Base image case:
 
 # Upload partitioned JSON file.
-json_partitioned = "#{temp_root}/#{loopback_rootname(false)}.js"
+json_partitioned = "#{temp_root}/#{loopback_rootname}.js"
 
 rightimage_upload json_partitioned do
-  provider "rightimage_upload_s3"
-  only_if { node[:rightimage][:build_mode] == "base" }
-  endpoint 's3-us-west-2.amazonaws.com'
-  remote_path  "#{image_upload_bucket}/#{image_s3_path}"
-  action :upload
-end
-
-# Upload unpartitioned JSON file.
-json_unpartitioned = "#{temp_root}/#{loopback_rootname(true)}.js"
-
-rightimage_upload json_unpartitioned do
   provider "rightimage_upload_s3"
   only_if { node[:rightimage][:build_mode] == "base" }
   endpoint 's3-us-west-2.amazonaws.com'

@@ -1,5 +1,5 @@
 class Chef::Resource::RubyBlock
-  include RightScale::RightImage::Helper
+   include RightScale::RightImage::Helper
 end
 
 action :upload do

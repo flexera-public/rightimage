@@ -45,7 +45,7 @@ end
 action :install_tools do
   # RightLink requires local time to be accurate (w-5025
   bash "setup NTP" do
-    flags "-x"
+    flags "-ex"
     code <<-EOH
       guest_root=#{guest_root}
 
@@ -54,8 +54,10 @@ action :install_tools do
       case #{new_resource.platform} in
       "centos"|"rhel")
         if [ #{new_resource.platform_version.to_i} -lt 6 ]; then
+          set +e
           grep "xen.independent_wallclock=1" $guest_root/etc/sysctl.conf
           [ "$?" == "1" ] && echo "xen.independent_wallclock=1" >> $guest_root/etc/sysctl.conf
+          set -e
         fi
         ;;
       "ubuntu")
