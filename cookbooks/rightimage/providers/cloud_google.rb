@@ -97,7 +97,8 @@ action :configure do
       gcutil=gcutil-1.4.1
       wget https://google-compute-engine-tools.googlecode.com/files/$gcutil.tar.gz
       tar zxvf $gcutil.tar.gz -C $guest_root/usr/local
-      chroot $guest_root ln -sf /usr/local/$gcutil /usr/local/gcutil
+      rm -rf $guest_root/usr/local/gcutil
+      mv $guest_root/usr/local/$gcutil $guest_root/usr/local/gcutil
       echo 'export PATH=$PATH:/usr/local/gcutil' > $guest_root/etc/profile.d/gcutil.sh
 
       # Install GSUtil
@@ -149,10 +150,13 @@ action :upload do
   bash "install gcutil" do
     creates "/usr/local/gcutil/gcutil"
     code <<-EOF
-  wget http://dl.google.com/dl/compute/gcutil.tar.gz
-  tar zxvf gcutil.tar.gz -C /usr/local
-  echo 'export PATH=$PATH:/usr/local/gcutil' > /etc/profile.d/gcutil.sh
-  source /etc/profile.d/gcutil.sh
+      gcutil=gcutil-1.4.1
+      wget https://google-compute-engine-tools.googlecode.com/files/$gcutil.tar.gz
+      tar zxvf $gcutil.tar.gz -C /usr/local
+      rm -rf /usr/local/gcutil
+      mv /usr/local/$gcutil /usr/local/gcutil
+      echo 'export PATH=$PATH:/usr/local/gcutil' > /etc/profile.d/gcutil.sh
+      source /etc/profile.d/gcutil.sh
 EOF
   end
 
