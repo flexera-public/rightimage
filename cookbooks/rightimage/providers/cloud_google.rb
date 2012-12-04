@@ -30,6 +30,13 @@ action :configure do
       action :create
       backup false
     end
+    # implement support for disk path aliases (w-5221)
+    cookbook_file "#{guest_root}/lib/udev/rules.d/65-gce-disk-naming.rules" do
+      source "google_disk_naming_rules"
+      owner "root"
+      group "root"
+      backup false
+    end
   else
     raise "Unsupported platform/version combination #{new_resource.platform} #{new_resource.platform_version}"
   end
