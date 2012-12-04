@@ -129,6 +129,8 @@ rightimage_upload json_partitioned do
   provider "rightimage_upload_s3"
   only_if { node[:rightimage][:build_mode] == "base" }
   endpoint 's3-us-west-2.amazonaws.com'
+  user node[:rightimage][:aws_access_key_id]
+  password node[:rightimage][:aws_secret_access_key]
   remote_path  "#{image_upload_bucket}/#{image_s3_path}"
   action :upload
 end
@@ -141,6 +143,8 @@ rightimage_upload json_full_image do
   provider "rightimage_upload_s3"
   only_if { node[:rightimage][:build_mode] == "full" }
   endpoint 's3-us-west-1.amazonaws.com'
+  user node[:rightimage][:aws_access_key_id]
+  password node[:rightimage][:aws_secret_access_key]
   remote_path  "#{image_upload_bucket}/#{image_s3_path}"
   action :upload
 end
