@@ -1,0 +1,12 @@
+# Copyright 2011 Google Inc. All Rights Reserved.
+#
+# Name the attached disks as the specified by deviceName.
+
+ACTION!="add|change", GOTO="gce_disk_naming_end"
+SUBSYSTEM!="block", GOTO="gce_disk_naming_end"
+
+KERNEL=="sd*|vd*", IMPORT{program}="scsi_id --export --whitelisted -d $tempnode"
+KERNEL=="sd*|vd*", ENV{ID_SERIAL_SHORT}=="?*", ENV{DEVTYPE}=="disk", SYMLINK+="$env{ID_SERIAL_SHORT}", SYMLINK+="disk/by-id/google-$env{ID_SERIAL_SHORT}"
+KERNEL=="sd*|vd*", ENV{ID_SERIAL_SHORT}=="?*", ENV{DEVTYPE}=="partition", SYMLINK+="$env{ID_SERIAL_SHORT}-part%n", SYMLINK+="disk/by-id/google-$env{ID_SERIAL_SHORT}-part%n"
+
+LABEL="gce_disk_naming_end"
