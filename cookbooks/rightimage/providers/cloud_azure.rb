@@ -138,8 +138,7 @@ action :upload do
         apt-get -y install nodejs npm
         ;;
       "centos"|"rhel")
-        yum -y --nogpgcheck install http://nodejs.tchol.org/repocfg/el/nodejs-stable-release.noarch.rpm
-        yum -y install nodejs-compat-symlinks npm
+        rpm -Uvh http://rightscale-rightimage.s3-website-us-east-1.amazonaws.com/packages/el6/nodejs-0.8.16-1.x86_64.rpm
         ;;
       esac
       npm -g ls | grep azure
