@@ -110,7 +110,7 @@ EOH
         ;;
       esac
       set -e
-      chroot $guest_root npm install azure -g
+      chroot $guest_root npm install azure-cli@0.6.8 -g
 
       # Remove .swp files
       find $guest_root/root/.npm $guest_root/usr/lib/node $guest_root/usr/lib/node_modules -name *.swp -exec rm -rf {} \\;
@@ -143,14 +143,8 @@ action :upload do
       npm -g ls | grep azure
       if [ "$?" == "1" ]; then
         set -e
-        # Freeze to version 0.6.0 for now, 0.6.2 kept erroring out during blob upload
-        npm install azure@0.6.0 -g
+        npm install azure-cli@0.6.8 -g
       fi
-
-      # https://github.com/WindowsAzure/azure-sdk-for-node/issues/325
-      cd /usr/lib/node_modules/azure
-      npm uninstall xml2js
-      npm install xml2js@0.1.14
     EOH
   end
 
