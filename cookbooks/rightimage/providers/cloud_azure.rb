@@ -106,15 +106,14 @@ EOH
         chroot $guest_root apt-get -y install nodejs npm
         ;;
       "centos"|"rhel")
-        yum --installroot $guest_root -y --nogpgcheck install http://nodejs.tchol.org/repocfg/el/nodejs-stable-release.noarch.rpm
-        chroot $guest_root yum -y install nodejs-compat-symlinks npm
+        chroot $guest_root rpm -Uvh http://rightscale-rightimage.s3-website-us-east-1.amazonaws.com/packages/el6/nodejs-0.8.16-1.x86_64.rpm
         ;;
       esac
       set -e
-      chroot $guest_root npm install azure -g
+      chroot $guest_root npm install azure-cli@0.6.8 -g
 
       # Remove .swp files
-      find $guest_root/root/.npm $guest_root/usr/lib/nodejs -name *.swp -exec rm -rf {} \\;
+      find $guest_root/root/.npm $guest_root/usr/lib/node $guest_root/usr/lib/node_modules -name *.swp -exec rm -rf {} \\;
     EOH
   end
 end
@@ -138,21 +137,14 @@ action :upload do
         apt-get -y install nodejs npm
         ;;
       "centos"|"rhel")
-        yum -y --nogpgcheck install http://nodejs.tchol.org/repocfg/el/nodejs-stable-release.noarch.rpm
-        yum -y install nodejs-compat-symlinks npm
+        rpm -Uvh http://rightscale-rightimage.s3-website-us-east-1.amazonaws.com/packages/el6/nodejs-0.8.16-1.x86_64.rpm
         ;;
       esac
       npm -g ls | grep azure
       if [ "$?" == "1" ]; then
         set -e
-        # Freeze to version 0.6.0 for now, 0.6.2 kept erroring out during blob upload
-        npm install azure@0.6.0 -g
+        npm install azure-cli@0.6.8 -g
       fi
-
-      # https://github.com/WindowsAzure/azure-sdk-for-node/issues/325
-      cd /usr/lib/node_modules/azure
-      npm uninstall xml2js
-      npm install xml2js@0.1.14
     EOH
   end
 
