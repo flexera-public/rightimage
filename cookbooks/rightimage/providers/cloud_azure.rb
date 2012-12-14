@@ -106,15 +106,14 @@ EOH
         chroot $guest_root apt-get -y install nodejs npm
         ;;
       "centos"|"rhel")
-        yum --installroot $guest_root -y --nogpgcheck install http://nodejs.tchol.org/repocfg/el/nodejs-stable-release.noarch.rpm
-        chroot $guest_root yum -y install nodejs-compat-symlinks npm
+        chroot $guest_root rpm -Uvh http://rightscale-rightimage.s3-website-us-east-1.amazonaws.com/packages/el6/nodejs-0.8.16-1.x86_64.rpm
         ;;
       esac
       set -e
       chroot $guest_root npm install azure -g
 
       # Remove .swp files
-      find $guest_root/root/.npm $guest_root/usr/lib/nodejs -name *.swp -exec rm -rf {} \\;
+      find $guest_root/root/.npm $guest_root/usr/lib/node $guest_root/usr/lib/node_modules -name *.swp -exec rm -rf {} \\;
     EOH
   end
 end
