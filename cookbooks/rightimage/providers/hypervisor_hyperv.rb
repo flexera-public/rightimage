@@ -97,6 +97,8 @@ action :install_tools do
       "ubuntu")
         # Install linux-tools and hv-kvp-daemon-init to support platform changes. (w-5338)
         chroot $guest_root apt-get -y install walinuxagent linux-tools hv-kvp-daemon-init
+        # Agent is running inside the chroot after package installed.  Need to kill to be able to unmount the loopback.
+        killall waagent
         ;;
       "centos"|"rhel")
         chroot $guest_root yum -y install https://devs-us-west.s3.amazonaws.com/caryp/azure/WALinuxAgent-1.2-1.noarch.rpm
