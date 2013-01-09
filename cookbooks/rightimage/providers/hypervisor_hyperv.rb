@@ -77,16 +77,6 @@ action :install_kernel do
 end
 
 action :install_tools do
-  package_name =
-    case node[:rightimage][:platform]
-    when "centos", "rhel" then "WALinuxAgent-1.0-1.noarch.rpm"
-    when "ubuntu" then "WALinuxAgent-1.0-1_all.deb"
-    end
-
-  remote_file "#{LIS_DIR_HOST}/#{package_name}" do
-    source "http://devs-us-west.s3.amazonaws.com/caryp/azure/#{package_name}"
-  end
-  
   bash "install WAZ agent" do
     not_if_check = case node[:rightimage][:platform]
                    when "centos", "rhel" then "rpm --root #{guest_root} -qa WALinuxAgent|grep WA"
@@ -94,17 +84,17 @@ action :install_tools do
                    end
 
     flags "-ex"
-    cwd LIS_DIR_HOST
     not_if not_if_check
     code <<-EOH
       guest_root=#{guest_root}
 
+      # Install agent version 1.2 to support platform changes. (w-5337)
       case "#{new_resource.platform}" in
       "ubuntu")
-        dpkg --root $guest_root --install #{LIS_DIR_HOST}/#{package_name}
+        chroot $guest_root apt-get -y install walinuxagent
         ;;
       "centos"|"rhel")
-        yum -c /tmp/yum.conf --installroot=$guest_root -y install #{LIS_DIR_HOST}/#{package_name}
+        chroot $guest_root yum -y install https://devs-us-west.s3.amazonaws.com/caryp/azure/WALinuxAgent-1.2-1.noarch.rpm
         ;;
       esac
     EOH
