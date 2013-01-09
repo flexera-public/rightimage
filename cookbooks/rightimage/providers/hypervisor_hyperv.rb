@@ -55,6 +55,24 @@ action :install_kernel do
       set -e
     EOH
   end
+
+  # To work on the Azure platform, you need packages from at least 12/22/2012 (w-5336)
+  # NOTE: ONLY NEEDED FOR v13.2.1
+  template "#{guest_root}/etc/apt/sources.list.d/rightscale-azure.sources.list" do
+    only_if { node[:rightimage][:platform] == "ubuntu" }
+    source "sources-azure.list.erb"
+    backup false
+  end
+
+  template "#{guest_root}/etc/apt/preferences.d/azure" do
+    only_if { node[:rightimage][:platform] == "ubuntu" }
+    source "apt-pref-azure.erb"
+    backup false
+  end
+
+  execute "chroot #{guest_root} apt-get update" do
+    only_if { node[:rightimage][:platform] == "ubuntu" }
+  end
  
 end
 
