@@ -85,6 +85,7 @@ action :install_tools do
   template "#{guest_root}/etc/default/walinuxagent" do
     only_if { node[:rightimage][:platform] == "ubuntu" }
     source "walinuxagent.erb"
+    backup false
     variables({
       :enabled => "0"
     })
@@ -120,6 +121,7 @@ action :install_tools do
   # Re-enable agent.
   template "#{guest_root}/etc/default/walinuxagent" do
     only_if { node[:rightimage][:platform] == "ubuntu" }
+    backup false
     source "walinuxagent.erb"
     variables({
       :enabled => "1"
