@@ -124,7 +124,9 @@ EOH
       chroot $guest_root npm install azure-cli@0.6.8 -g
 
       # Remove .swp files
-      find $guest_root/root/.npm $guest_root/usr/lib/node $guest_root/usr/lib/node_modules -name *.swp -exec rm -rf {} \\;
+      if [ "#{new_resource.platform}" == "centos" ]; then
+        find $guest_root/root/.npm $guest_root/usr/lib/node $guest_root/usr/lib/node_modules -name *.swp -exec rm -rf {} \\;
+      fi
     EOH
   end
 end
