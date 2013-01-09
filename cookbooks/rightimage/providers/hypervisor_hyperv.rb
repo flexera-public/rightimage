@@ -95,7 +95,8 @@ action :install_tools do
       # Install agent version 1.2 to support platform changes. (w-5337)
       case "#{new_resource.platform}" in
       "ubuntu")
-        chroot $guest_root apt-get -y install walinuxagent
+        # Install linux-tools and hv-kvp-daemon-init to support platform changes. (w-5338)
+        chroot $guest_root apt-get -y install walinuxagent linux-tools hv-kvp-daemon-init
         ;;
       "centos"|"rhel")
         chroot $guest_root yum -y install https://devs-us-west.s3.amazonaws.com/caryp/azure/WALinuxAgent-1.2-1.noarch.rpm
