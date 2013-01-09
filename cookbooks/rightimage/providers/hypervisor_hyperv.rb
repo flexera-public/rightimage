@@ -73,7 +73,11 @@ action :install_kernel do
   execute "chroot #{guest_root} apt-get update" do
     only_if { node[:rightimage][:platform] == "ubuntu" }
   end
- 
+
+  execute "chroot #{guest_root} apt-get -y install linux-backports-modules-hv-precise-virtual" do
+    only_if { node[:rightimage][:platform] == "ubuntu" }
+  end
+
 end
 
 action :install_tools do
