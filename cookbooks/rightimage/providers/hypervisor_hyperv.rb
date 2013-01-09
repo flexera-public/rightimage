@@ -81,6 +81,15 @@ action :install_kernel do
 end
 
 action :install_tools do
+  # Disable agent for now since in a chroot.  Installation fails if it is left enabled.
+  template "#{guest_root}/etc/default/walinuxagent" do
+    only_if { node[:rightimage][:platform] == "ubuntu" }
+    source "walinuxagent.erb"
+    variables({
+      :enabled => "0"
+    })
+  end
+
   bash "install WAZ agent" do
     not_if_check = case node[:rightimage][:platform]
                    when "centos", "rhel" then "rpm --root #{guest_root} -qa WALinuxAgent|grep WA"
@@ -96,14 +105,24 @@ action :install_tools do
       case "#{new_resource.platform}" in
       "ubuntu")
         # Install linux-tools and hv-kvp-daemon-init to support platform changes. (w-5338)
-        chroot $guest_root apt-get -y install walinuxagent linux-tools hv-kvp-daemon-init
-        # Agent is running inside the chroot after package installed.  Need to kill to be able to unmount the loopback.
-        killall waagent
+        chroot $guest_root apt-get -y install linux-tools hv-kvp-daemon-init
+
+        # Tell package manager to use the old config file.
+        chroot $guest_root apt-get -y -o Dpkg::Options::="--force-confold" install walinuxagent
         ;;
       "centos"|"rhel")
         chroot $guest_root yum -y install https://devs-us-west.s3.amazonaws.com/caryp/azure/WALinuxAgent-1.2-1.noarch.rpm
         ;;
       esac
     EOH
+  end
+
+  # Re-enable agent.
+  template "#{guest_root}/etc/default/walinuxagent" do
+    only_if { node[:rightimage][:platform] == "ubuntu" }
+    source "walinuxagent.erb"
+    variables({
+      :enabled => "1"
+    })
   end
 end
