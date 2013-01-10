@@ -1,4 +1,3 @@
-
 action :install do
   kiwi_dir = "/mnt/kiwi" 
 
@@ -78,6 +77,16 @@ action :install do
   kiwi --force-new-root  --prepare #{kiwi_dir} --root #{guest_root} --logfile terminal
 
   EOS
+  end
+
+  template "#{guest_root}/etc/ssh/sshd_config" do
+    source "sshd_config.erb"
+    backup false
+    variables({
+      :permit_root_login => "without-password",
+      :password_authentication => "no",
+      :path => "/usr/libexec/openssh/sftp-server"
+    })
   end
 end
 
