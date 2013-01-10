@@ -22,7 +22,7 @@ image_s3_path = guest_platform+"/"+guest_platform_version+"/"+guest_arch+"/"+tim
 image_upload_bucket = node[:rightimage][:base_image_bucket]
 
 # Upload partitioned image
-rightimage_upload file_partitioned do
+rightimage_upload loopback_file_gz do
   provider "rightimage_upload_s3"
   user node[:rightimage][:aws_access_key_id]
   password node[:rightimage][:aws_secret_access_key]
