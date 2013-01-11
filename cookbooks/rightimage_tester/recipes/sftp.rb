@@ -51,7 +51,7 @@ bash "Verify SFTP" do
   code <<-EOH
     # Verify path in sshd config is correct.
     path=`grep sftp /etc/ssh/sshd_config |  awk '{ print $3 }'`
-    if [ ! -f $path ]; then 
+    if [ ! -f "$path" ]; then
       echo "SSHd config points to invalid path: $path";
       exit 1
     fi
