@@ -233,12 +233,12 @@ case rightimage[:cloud]
     end
   when "azure"
     set[:rightimage][:grub][:timeout] = "0"
+    # Ensure that all SCSI devices mounted in your kernel include an I/O timeout of 300 seconds or more. (w-5331)
+    set[:rightimage][:grub][:kernel][:options] << " rootdelay=300 console=ttyS0"
 
     case rightimage[:platform]
     when "centos"
       set[:rightimage][:grub][:kernel][:options] << " numa=off"
-    when "ubuntu"
-      set[:rightimage][:grub][:kernel][:options] << " ata_piix.disable_driver"
     end
   else 
     case rightimage[:hypervisor]
