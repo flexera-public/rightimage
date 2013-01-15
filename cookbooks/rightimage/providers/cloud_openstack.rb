@@ -151,24 +151,18 @@ action :upload do
 
       openstack_user = node[:rightimage][:openstack][:user]
       openstack_password = node[:rightimage][:openstack][:password]
-      openstack_host = node[:rightimage][:openstack][:hostname].split(":")[0]
+      openstack_host = node[:rightimage][:openstack][:hostname].split(":")[0].sub(/http(s)?:\/\//,"")
       openstack_api_port = node[:rightimage][:openstack][:hostname].split(":")[1] || "5000"
-      openstack_glance_port = "9292"
-
-      Chef::Log.info("Getting openstack api token for user #{openstack_user}@#{openstack_host}:#{openstack_api_port}")
-      auth_resp = `curl -d '{"auth":{"passwordCredentials":{"username": "#{openstack_user}", "password": "#{openstack_password}"}}}' -H "Content-type: application/json" http://#{openstack_host}:#{openstack_api_port}/v2.0/tokens` 
-      Chef::Log.info("got response for auth req: #{auth_resp}")
-      auth_hash = JSON.parse(auth_resp)
-      access_token = auth_hash["access"]["token"]["id"]
 
       # Don't use location=file://path/to/file like you might think, thats the name of the location to store the file on the server that hosts the images, not this machine
-      cmd = %Q(env PATH=$PATH:/usr/local/bin glance add --auth_token=#{access_token} --url=http://#{openstack_host}:#{openstack_glance_port}/v2.0 name=#{image_name} is_public=true disk_format=qcow2 container_format=ovf < #{local_file})
-      Chef::Log.debug(cmd)
+      cmd = %Q(env PATH=$PATH:/usr/local/bin glance -I '#{openstack_user}' -K '#{openstack_password}' -N http://#{openstack_host}:#{openstack_api_port}/v2.0 -T #{openstack_user} --silent-upload add name=#{image_name} is_public=true disk_format=qcow2 container_format=ovf < #{local_file})
+      Chef::Log.info "Executing command: "
+      Chef::Log.info "glance -I '#{openstack_user}' -K 'PASSWORD' -N http://#{openstack_host}:#{openstack_api_port}/v2.0 -T #{openstack_user} --silent-upload add name=#{image_name} is_public=true disk_format=qcow2 container_format=ovf < #{local_file}"
       upload_resp = `#{cmd}`
       Chef::Log.info("got response for upload req: #{upload_resp} to cloud.")
 
       if upload_resp =~ /added/i 
-        image_id = upload_resp.scan(/ID:\s(\d+)/i).first
+        image_id = Array(upload_resp.scan(/ID:\s([0-9a-f-]+)/i)).flatten.first
         Chef::Log.info("Successfully uploaded image #{image_id} to cloud.")
         
         # add to global id store for use by other recipes
