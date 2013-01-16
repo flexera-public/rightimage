@@ -7,6 +7,7 @@ action :install_kernel do
  
   bash "install xen kernel" do
     flags "-ex"
+    not_if { hvm? }
     ubuntu_kernel_packages = 'linux-image-virtual linux-headers-virtual grub-legacy-ec2'
     if new_resource.platform_version <= 10.04
       ubuntu_kernel_packages = 'linux-image-ec2 linux-headers-ec2 grub-legacy-ec2'
@@ -38,6 +39,25 @@ action :install_kernel do
           chroot $guest_root apt-get clean
           ;;
         esac
+    EOH
+  end
+
+  bash "install grub" do
+    flags "-ex"
+    only_if { hvm? }
+    code <<-EOH
+      guest_root=#{guest_root}
+
+      case #{node[:rightimage][:platform]} in
+      "ubuntu")
+        pkg_cmd="apt-get -y install"
+        ;;
+      *)
+        pkg_cmd="yum -y install"
+        ;;
+      esac
+
+      chroot $guest_root $pkg_cmd grub
     EOH
   end
 end

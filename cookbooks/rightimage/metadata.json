@@ -233,6 +233,21 @@
       "display_name": "API URL",
       "description": "The rightscale account specific api url to use.  Ex. https://my.rightscale.com/api/acct/1234 (where 1234 is your account id)"
     },
+    "rightimage/virtualization": {
+      "required": "recommended",
+      "calculated": false,
+      "choice": [
+        "hvm",
+        "pvm"
+      ],
+      "default": "pvm",
+      "type": "string",
+      "recipes": [
+
+      ],
+      "display_name": "Virtualization type",
+      "description": "Virtualization type (EC2 only).  Defaults to pvm."
+    },
     "rightimage/cloudstack/version": {
       "required": "required",
       "calculated": false,

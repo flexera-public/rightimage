@@ -63,6 +63,23 @@ action :configure do
     done
     EOH
   end 
+
+  bash "setup grub" do
+    only_if { hvm? }
+    flags "-ex"
+    code <<-EOH
+      guest_root="#{guest_root}"
+
+      case "#{new_resource.platform}" in
+        "ubuntu")
+          chroot $guest_root cp -p /usr/lib/grub/x86_64-pc/* /boot/grub
+          ;;
+        "centos"|"rhel")
+          chroot $guest_root cp -p /usr/share/grub/x86_64-redhat/* /boot/grub
+          ;;
+      esac
+EOH
+  end
 end
 
 action :package do
@@ -70,7 +87,7 @@ end
 
 
 action :upload do
-  is_ebs = new_resource.image_type =~ /ebs/i or new_resource.image_name =~ /_EBS/
+  is_ebs = new_resource.image_type =~ /ebs/i or new_resource.image_name =~ /_EBS/ or hvm?
 
   bash "setup keyfiles" do
     not_if { ::File.exists? "/tmp/AWS_X509_KEY.pem" }
@@ -92,6 +109,24 @@ action :upload do
         echo $images
         exit 1
       fi 
+    EOH
+  end
+
+  cookbook_file "/tmp/ec2-api-nda.zip" do
+    only_if { hvm? }
+    source "ec2-api-tools-1.5.2.4-nda.zip"
+    action :create
+    backup false
+  end
+
+  bash "install NDA tools" do
+    only_if { hvm? }
+    creates "/tmp/ec2-api-nda"
+    flags "-ex"
+    code <<-EOH
+      mkdir -p /tmp/ec2-api-nda
+      unzip /tmp/ec2-api-*nda.zip -d /tmp/ec2-api-nda
+      mv /tmp/ec2-api-nda/*/* /tmp/ec2-api-nda
     EOH
   end
 
@@ -204,6 +239,7 @@ def upload_ebs
     flags "-e"
     code <<-EOH
       #{setup_ec2_tools_env}
+      hvm=#{hvm?}
       set -x
       vol_id=`cat /var/tmp/ebs_volume_id`
       ebs_mount="/mnt/ebs_mount"
@@ -216,6 +252,14 @@ def upload_ebs
 0,,L,*
 EOF
 
+  ## partition volume (HVM only)
+      if [ "$hvm" == "true" ]; then
+        echo "1,,L,*" | sfdisk #{local_device}
+        device="#{local_device}1"
+      else
+        device="#{local_device}"
+      fi
+
   ## format and mount volume
       mkfs.ext3 -F ${local_device}1
       root_label="#{node[:rightimage][:root_mount][:label_dev]}"
@@ -224,6 +268,28 @@ EOF
 
   ## mount EBS volume, rsync, and unmount ebs volume
       rsync -a $image_mount/ $ebs_mount/ --exclude '/proc'
+
+      if [ "$hvm" == "true" ]; then
+        case "#{new_resource.platform}" in
+        "ubuntu")
+          grub_command="/usr/sbin/grub"
+          ;;
+        "centos"|"rhel")
+          grub_command="/sbin/grub"
+          ;;
+        esac
+
+        cat > device.map <<EOF
+(hd0) #{local_device}
+EOF
+
+        ${grub_command} --batch --device-map=device.map <<EOF
+root (hd0,0)
+setup (hd0)
+quit
+EOF
+      fi
+
   ## recreate the /proc mountpoint
       mkdir -p $ebs_mount/proc
   #    mount --bind /proc $ebs_mount/proc
@@ -249,6 +315,7 @@ EOF
     code <<-EOH
       #{setup_ec2_tools_env}
       set -x
+      hvm="#{hvm?}"
       snap_id=`cat /var/tmp/ebs_snapshot_id`
       vol_id=`cat /var/tmp/ebs_volume_id`
   ## loop and wait for snapshot to become available, up to 60 minutes
@@ -264,19 +331,28 @@ EOF
 
   ## calculate options
       kernel_opt=""
-      if [ -n "#{node[:rightimage][:aki_id]}" ]; then
+      if [[ -n "#{node[:rightimage][:aki_id]}" && "$hvm" == "false" ]]; then
         kernel_opt="--kernel #{node[:rightimage][:aki_id]}"
       fi 
 
       ramdisk_opt=""
-      if [ -n "#{node[:rightimage][:ramdisk_id]}" ]; then
+      if [[ -n "#{node[:rightimage][:ramdisk_id]}" && "$hvm" == "false" ]]; then
         ramdisk_opt="--ramdisk #{node[:rightimage][:ramdisk_id]}"
+      fi
+
+      if [ "$hvm" == "true" ]; then
+        ec2_path=/tmp/ec2-api-nda
+        virt_type_opt="--virtualization-type hvm"
+        export EC2_HOME=$ec2_path
+      else
+        ec2_path=/home/ec2
+        virt_type_opt=""
       fi
 
   ## calculate ec2 region
       region=#{node[:ec2][:placement][:availability_zone].chop}
 
-      image_out_ebs=`/home/ec2/bin/ec2-register \
+      image_out_ebs=`${ec2_path}/bin/ec2-register \
         --private-key /tmp/AWS_X509_KEY.pem \
         --cert /tmp/AWS_X509_CERT.pem \
         --region $region \
@@ -288,6 +364,7 @@ EOF
         --snapshot $snap_id \
         $kernel_opt \
         $ramdisk_opt \
+        $virt_type_opt \
         --root-device-name /dev/sda `
 
   ## parse out image id
@@ -310,6 +387,8 @@ EOF
         --cert /tmp/AWS_X509_CERT.pem \
         --url #{node[:rightimage][:ec2_endpoint]} \
         --region $region 
+
+      rm -f /var/tmp/ebs_volume_id
     EOH
   end
 

@@ -21,6 +21,7 @@ set[:rightimage][:root_mount][:label_dev] = "ROOT"
 set[:rightimage][:root_mount][:dev] = "LABEL=#{rightimage[:root_mount][:label_dev]}"
 set[:rightimage][:root_mount][:options] = "defaults"
 set_unless[:rightimage][:image_source_bucket] = "rightscale-us-west-2"
+set_unless[:rightimage][:virtualization] = "pvm"
 set_unless[:rightimage][:base_image_bucket] = "rightscale-rightimage-base-dev"
 set_unless[:rightimage][:platform] = guest_platform
 set_unless[:rightimage][:platform_version] = guest_platform_version
@@ -280,14 +281,18 @@ end
 # http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=637234#40
 set[:rightimage][:root_mount][:options] = "errors=remount-ro,barrier=0" if rightimage[:platform] == "ubuntu" && rightimage[:platform_version].to_f >= 12.04 && rightimage[:hypervisor] == "xen"
 
-set[:rightimage][:grub][:kernel][:options] << " console=hvc0" if rightimage[:hypervisor] == "xen"
+if hvm?
+  set[:rightimage][:grub][:kernel][:options] << " console=ttyS0"
+elsif rightimage[:hypervisor] == "xen"
+  set[:rightimage][:grub][:kernel][:options] << " console=hvc0"
+end
 
 # Start device naming from xvda instead of xvde (w-4893)
 # https://bugzilla.redhat.com/show_bug.cgi?id=729586
 set[:rightimage][:grub][:kernel][:options] << " xen_blkfront.sda_is_xvda=1" if rightimage[:platform] == "centos" && rightimage[:platform_version].to_f >= 6.3
 
 # Specify if running in Xen domU or have grub detect automatically
-set[:rightimage][:grub][:indomU] = node[:rightimage][:hypervisor] == "xen" ? "true":"detect"
+set[:rightimage][:grub][:indomU] = (node[:rightimage][:hypervisor] == "xen" && !hvm?)? "true":"detect"
 
 # Set path to SFTP
 set[:rightimage][:sshd][:sftp_path] = node[:rightimage][:platform] == "ubuntu" ? "/usr/lib/openssh/sftp-server" : "/usr/libexec/openssh/sftp-server"
