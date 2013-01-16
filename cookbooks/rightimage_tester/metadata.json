@@ -71,6 +71,7 @@
     "rightimage_tester::dupe_mounts": "Check for duplicate mounts.",
     "rightimage_tester::banned_packages": "Ensure no banned packages installed.",
     "rightimage_tester::xfs_crash": "Ensure instance does not crash when using XFS.",
+    "rightimage_tester::sftp": "Ensure can sftp into self.",
     "rightimage_tester::packages": "Ensure packages can be installed.",
     "rightimage_tester::ldconfig": "Ensure ldconfig runs.",
     "rightimage_tester::java": "Check java installation.",

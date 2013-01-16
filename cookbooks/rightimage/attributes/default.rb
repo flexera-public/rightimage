@@ -293,3 +293,6 @@ set[:rightimage][:grub][:kernel][:options] << " xen_blkfront.sda_is_xvda=1" if r
 
 # Specify if running in Xen domU or have grub detect automatically
 set[:rightimage][:grub][:indomU] = (node[:rightimage][:hypervisor] == "xen" && !hvm?)? "true":"detect"
+
+# Set path to SFTP
+set[:rightimage][:sshd][:sftp_path] = node[:rightimage][:platform] == "ubuntu" ? "/usr/lib/openssh/sftp-server" : "/usr/libexec/openssh/sftp-server"
