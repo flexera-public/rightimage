@@ -139,7 +139,7 @@ action :upload do
       export PATH=$PATH:/usr/local/bin
       easy_install#{cmd_append} pip
       easy_install#{cmd_append} -U distribute
-      pip#{cmd_append} install glance
+      pip#{cmd_append} install python-glanceclient
     EOH
   end
 
