@@ -116,12 +116,12 @@ action :upload do
   packages = case node[:platform]
              when "centos", "redhat" then
                if node[:platform_version].to_f >= 6.0
-                 %w(python-setuptools python-devel python-libs)
+                 %w(python-setuptools python-devel python-libs openssl-devel)
                else
-                 %w(python26-distribute python26-devel python26-libs)
+                 %w(python26-distribute python26-devel python26-libs openssl-devel)
                end
              when "ubuntu" then
-               %w(python-dev python-setuptools)
+               %w(python-dev python-setuptools libssl-dev)
              end
 
   packages.each { |p| package p }
