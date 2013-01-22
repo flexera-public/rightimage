@@ -116,12 +116,12 @@ action :upload do
   packages = case node[:platform]
              when "centos", "redhat" then
                if node[:platform_version].to_f >= 6.0
-                 %w(python-setuptools python-devel python-libs)
+                 %w(python-setuptools python-devel python-libs openssl-devel)
                else
-                 %w(python26-distribute python26-devel python26-libs)
+                 %w(python26-distribute python26-devel python26-libs openssl-devel)
                end
              when "ubuntu" then
-               %w(python-dev python-setuptools)
+               %w(python-dev python-setuptools libssl-dev)
              end
 
   packages.each { |p| package p }
@@ -155,13 +155,13 @@ action :upload do
       openstack_api_port = node[:rightimage][:openstack][:hostname].split(":")[1] || "5000"
 
       # Don't use location=file://path/to/file like you might think, thats the name of the location to store the file on the server that hosts the images, not this machine
-      cmd = %Q(env PATH=$PATH:/usr/local/bin glance -I '#{openstack_user}' -K '#{openstack_password}' -N http://#{openstack_host}:#{openstack_api_port}/v2.0 -T #{openstack_user} --silent-upload add name=#{image_name} is_public=true disk_format=qcow2 container_format=ovf < #{local_file})
+      cmd = %Q(env PATH=$PATH:/usr/local/bin glance --os-username '#{openstack_user}' --os-password '#{openstack_password}' --os-auth-url http://#{openstack_host}:#{openstack_api_port}/v2.0 --os-tenant-name #{openstack_user} image-create --name #{image_name} --is-public True --disk-format qcow2 --container-format ovf --file #{local_file})
       Chef::Log.info "Executing command: "
-      Chef::Log.info "glance -I '#{openstack_user}' -K 'PASSWORD' -N http://#{openstack_host}:#{openstack_api_port}/v2.0 -T #{openstack_user} --silent-upload add name=#{image_name} is_public=true disk_format=qcow2 container_format=ovf < #{local_file}"
+      Chef::Log.info cmd
       upload_resp = `#{cmd}`
       Chef::Log.info("got response for upload req: #{upload_resp} to cloud.")
 
-      if upload_resp =~ /added/i 
+      if upload_resp =~ /active/i
         image_id = Array(upload_resp.scan(/ID:\s([0-9a-f-]+)/i)).flatten.first
         Chef::Log.info("Successfully uploaded image #{image_id} to cloud.")
         
