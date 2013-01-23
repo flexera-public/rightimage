@@ -344,9 +344,11 @@ EOF
         ec2_path=/tmp/ec2-api-nda
         virt_type_opt="--virtualization-type hvm"
         export EC2_HOME=$ec2_path
+        root_device="/dev/sda1"
       else
         ec2_path=/home/ec2
         virt_type_opt=""
+        root_device="/dev/sda"
       fi
 
   ## calculate ec2 region
@@ -365,7 +367,7 @@ EOF
         $kernel_opt \
         $ramdisk_opt \
         $virt_type_opt \
-        --root-device-name /dev/sda `
+        --root-device-name $root_device `
 
   ## parse out image id
       image_id_ebs=`echo -n $image_out_ebs | awk '{ print $2 }'`
