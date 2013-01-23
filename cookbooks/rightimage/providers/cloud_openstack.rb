@@ -162,7 +162,7 @@ action :upload do
       Chef::Log.info("got response for upload req: #{upload_resp} to cloud.")
 
       if upload_resp =~ /active/i
-        image_id = Array(upload_resp.scan(/ID:\s([0-9a-f-]+)/i)).flatten.first
+        image_id = Array(upload_resp.scan(/ID\s*[:|]\s+([0-9a-f-]+)/i).flatten.first
         Chef::Log.info("Successfully uploaded image #{image_id} to cloud.")
         
         # add to global id store for use by other recipes
