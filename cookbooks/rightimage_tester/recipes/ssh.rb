@@ -26,24 +26,23 @@ directory "/root/.ssh" do
   action :create
 end 
 
-cookbook_file "/root/.ssh/id_rsa" do
-  source "id_rsa"
-  mode 0600
-  backup false
-end
+bash "Create keys" do
+  not_if "test -f /root/.ssh/id_rsa_tester"
+  flags "-ex"
+  code <<-EOH
+    # Generate unique key (w-5395)
+    ssh-keygen -b 1024 -f /root/.ssh/id_rsa_tester -N '' -q -t rsa
 
-cookbook_file "/root/.ssh/id_rsa.pub" do
-  source "id_rsa.pub"
-  mode 0600
-  backup false
+    # Add key to authorized_keys to allow connections to self
+    echo "" >> /root/.ssh/authorized_keys # Ensure new-line before adding
+    cat /root/.ssh/id_rsa_tester.pub >> /root/.ssh/authorized_keys
+  EOH
 end
 
 bash "Test ssh" do
   flags "-ex"
   code <<-EOH
-    echo "" >> /root/.ssh/authorized_keys # Ensure new-line before adding
-    cat /root/.ssh/id_rsa.pub >> /root/.ssh/authorized_keys
-    ssh -t -t -o StrictHostKeyChecking=no localhost tty
+    ssh -t -t -o StrictHostKeyChecking=no -i /root/.ssh/id_rsa_tester localhost tty
   EOH
 end
 
@@ -58,10 +57,10 @@ bash "Test ssh part 2" do
         #
         # SLES Doesn't set EC2_HOME but the EC2 tools are installed
         #
-        ssh localhost -C 'ec2-instance-id || exit 1'
+        ssh -i /root/.ssh/id_rsa_tester localhost -C 'ec2-instance-id || exit 1'
         ;;
       *) 
-        ssh localhost -C 'if [[ -z "$EC2_HOME" ]]; then exit 1; fi'
+        ssh -i /root/.ssh/id_rsa_tester localhost -C 'if [[ -z "$EC2_HOME" ]]; then exit 1; fi'
         ;;
     esac
   EOH
