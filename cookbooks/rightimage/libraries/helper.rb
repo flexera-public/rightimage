@@ -322,6 +322,19 @@ module RightScale
           raise "No snapshots found matching lineage base_image_#{os}_#{ver}_#{arch}_*. You have to first run a build with build_mode set to base to generate a base image snapshot"
         end
       end
+
+      def version_compare(str1, str2)
+        str1_bits = str1.split(".").map(&:to_i)
+        str2_bits = str2.split(".").map(&:to_i)
+        # zero pad one string or the other if they are not the same length
+        if str1_bits.size > str2_bits.size
+          (str1_bits.size - str2_bits.size).times { str2_bits << 0 }
+        elsif str2_bits.size > str1_bits.size
+          (str2_bits.size - str1_bits.size).times { str1_bits << 0 }
+        end
+        str1_bits <=> str2_bits
+      end
+
     end
   end
 end

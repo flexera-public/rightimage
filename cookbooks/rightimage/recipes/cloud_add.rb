@@ -50,25 +50,6 @@ template "#{guest_root}/etc/fstab" do
   backup false
 end
 
-directory "#{guest_root}/etc/rightscale.d" do
-  action :create
-  recursive true
-end
-
-execute "echo -n #{node[:rightimage][:cloud]} > #{guest_root}/etc/rightscale.d/cloud" do 
-  creates "#{guest_root}/etc/rightscale.d/cloud"
-end
-
-directory "#{guest_root}/var/spool/cloud" do
-  action :create
-  recursive true
-end
-
-log "Add RightLink 5.6 backwards compatibility symlink"
-execute "chroot #{guest_root} ln -s /var/spool/cloud /var/spool/#{node[:rightimage][:cloud]}" do
-  creates "#{guest_root}/var/spool/#{node[:rightimage][:cloud]}"
-end
-
 include_recipe "rightimage::enable_debug" if node[:rightimage][:debug] == "true"
 
 rightimage_os node[:rightimage][:platform] do
