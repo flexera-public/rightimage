@@ -1,0 +1,307 @@
+#!/bin/bash
+# Copyright (c) 2013 by RightScale Inc., all rights reserved
+# chkconfig: 2345 95 01
+# description: RightScale RightLink updater. \
+#   This script is used to update the rightlink package at boot time, as a \
+#   debugging aid.  If you have any questions feel free to contact RightScale.
+#
+## suse init info
+### BEGIN INIT INFO
+# Provides:          rightimage
+# Required-Start:    $syslog $remote_fs $network $named
+# Required-Stop:     $syslog $remote_fs
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: RightLink agent updater
+# Description:       Updates the RightLink agent when a rs_agent_dev:package= tag is provided
+# X-Start-Before:    amazon rightlink rightscale rightboot
+# X-Stop-After:      amazon
+### END INIT INFO
+
+#############################################################################
+## Setup environment used by the remainder of this script
+#############################################################################
+
+#Set Root Home and working directory for temp files
+export WORKING_DIR=/var/cache/rightscale/tarballs
+# TBD: find out where this is going to reside for real, once its determined
+# TBD: finish up support for repos
+export RIGHTLINK_DEV_REPO=http://rightlink-dev.s3.amazonaws.com
+
+function init_os_state() {
+  if [ -e /usr/bin/lsb_release ]; then
+    # For LSB-compliant distros, query lsb_release...
+    case `lsb_release -si` in
+      Ubuntu*|Debian*)
+        export RS_BASE_OS=debian
+        export PKG_MGR_INSTALL='apt-get install -y'
+        export PKG_MGR_REMOVE='apt-get purge -y'
+        export DEBIAN_FRONTEND=noninteractive
+        ;;
+      CentOS*|Fedora*|RedHat*|EnterpriseEnterprise*)
+        export RS_BASE_OS=redhat
+        export PKG_MGR_INSTALL='yum install -y'
+        export PKG_MGR_REMOVE='yum remove -y'
+        ;;
+      SUSE*)
+        export RS_BASE_OS=suse
+        export PKG_MGR_INSTALL='zypper install -y'
+        export PKG_MGR_REMOVE='zypper remove -y'
+        ;;
+      *)
+        export RS_BASE_OS=unknown
+        ;;
+    esac
+  elif [ -e /etc/fedora-release ]; then
+    #Fedora doesn't always have lsb_release, but it does have a release file
+    export RS_BASE_OS=redhat
+    export PKG_MGR_INSTALL='yum install -y'
+    export PKG_MGR_REMOVE='yum remove -y'
+  else
+    #Don't know our distro whatsoever...
+    export RS_BASE_OS=unknown
+  fi
+
+  # Get the architecture used by the packaging system on this machine
+  if [ "$RS_BASE_OS" == "debian" ]; then
+    #Debian's package manager tells us its architecture directly
+    export RS_ARCH=`dpkg --print-architecture || echo unknown`
+  else
+    #For RedHat and other distros, we need to guess using a heuristic based on the
+    #output of uname.
+    export RS_ARCH=`uname -i || echo unknown`
+
+    #On some systems, uname -i fails
+    if [ "$RS_ARCH" == "unknown" ]; then
+      export RS_ARCH=`uname -m || echo unknown`
+    fi
+
+    #Sometimes i686 is reported; this is equivalent to i386 for our purposes
+    if [ "$RS_ARCH" == "i686" ]; then
+      export RS_ARCH="i386"
+    fi
+  fi
+
+  # Source function library and networking configuration for Redhat-based distros
+  if [ "$RS_BASE_OS" == "redhat" ]; then
+    . /etc/rc.d/init.d/functions
+    [ -r /etc/sysconfig/network ] && . /etc/sysconfig/network
+  fi
+
+  ###############################################################################
+  ## Determine whether the script has everything it needs to continue
+  ###############################################################################
+
+  if [ "$RS_BASE_OS" == "unknown" -o "$RS_ARCH" == "unknown" ]; then
+    logger -st RightScale "Unsupported OS/architecture $RS_BASE_OS/$RS_ARCH; exiting."
+    exit 2
+  fi
+
+  # Check that networking is up. (Only works on Redhat-based systems.)
+  [ "${NETWORKING}" == "no" ] && exit 1
+}
+
+###############################################################################
+## Define some functions to be called by the start() function (see below)
+###############################################################################
+
+
+function configure_proxy() {
+  if [ -f /etc/profile.d/http_proxy.sh ]; then
+    . /etc/profile.d/http_proxy.sh
+  fi
+}
+
+function wait_for_metadata() {
+  local cloud_file=/etc/rightscale.d/cloud
+  if [ -s $cloud_file ]; then 
+    local rs_cloud=`cat $cloud_file`
+    /opt/rightscale/bin/cloud --name $rs_cloud --action bootstrap > /dev/null
+    result=$?
+    if [ $result -ne 0 ]; then
+      logger -st RightScale "WARNING: Failed to get userdata for cloud $rs_cloud"
+    fi
+  else
+    logger -st RightScale "WARNING: Cloud was not defined in $cloud_file, can not get userdata"
+  fi
+}
+
+function populate_rs_variables() {
+  source /var/spool/cloud/user-data.sh
+}
+
+function download_tarball() {
+  local working_dir=$1
+  local url=$2
+  local curl_opt=(-s -S -f -L --retry 7)
+  local net_wait_count=0
+
+  local tarball_name=`basename $url`
+  local file_on_disk=$working_dir/$tarball_name
+  local code=500
+  mkdir -p $working_dir
+  while [ "$code" -ge "500" ]; do
+    logger -st RightScale "Downloading $temp_tarball_name from $url"
+    code=`curl "${curl_opt[@]}" -w '%{http_code}' -o $file_on_disk $url`
+    logger -st RightScale "curl returned code: $code"
+    # 000 denotes network unreachable, wait up to 30 seconds for
+    # networking to be set up, but only once.  This works around
+    # a race condition for azure
+    if [ "$code" -eq "000" ] && [ $net_wait_count -lt 30 ]; then
+      logger -st RightScale "Networking not set yet, waiting up to 30 seconds for it to appear"
+    fi
+    while [ "$code" -eq "000" ] && [ $net_wait_count -lt 30 ]; do
+      sleep 1
+      net_wait_count=`expr $net_wait_count + 1`
+      code=`curl "${curl_opt[@]}" -w '%{http_code}' -o $file_on_disk $url`
+    done
+    final_tarball_name=$(basename $url)
+  done
+
+  if [ ! -e $file_on_disk ]; then
+    logger -st RightScale "ERROR: Failed to download tarball from from $1"
+    exit 1;
+  fi
+}
+
+function remove_me() {
+  my_name=`readlink -e $0`
+
+  if [ "$RS_BASE_OS" == "debian" ]; then
+    update-rc.d -f `basename $my_name` remove
+  elif [ "$RS_BASE_OS" == "redhat" ]; then
+    chkconfig --del `basename $my_name`
+  fi
+}
+
+function enable_repos() {
+  local url=$1
+  if [ "$RS_BASE_OS" = "redhat" ]; then
+    cat >/etc/yum.repos.d/rightlink.repo<<-EOF
+[rightlink]
+name=RightScale RightLink
+baseurl=$1
+enabled=1
+gpgcheck=0
+priority=1
+EOF
+  elif [ "$RS_BASE_OS" = "debian" ]; then
+    local codename=`lsb_release -cs`
+    if [ -z "$codename" ]; then
+      logger -st RightScale "ERROR: Need lsb_release installed to use package override mode!"
+      exit 1
+    fi
+    echo "deb $url $codename main" > /etc/sources.list.d/rightlink.list
+    apt-get update
+  else
+    logger -st RightScale "Package override tag currently not supported on SUSE"
+    exit 1
+  fi
+}
+
+function disable_repos() {
+  if [ "$RS_BASE_OS" = "redhat" ]; then
+    sed -i s/enabled=1/enabled=0/ /etc/yum.repos.d/rightlink.repo
+  elif [ "$RS_BASE_OS" = "debian" ]; then
+    sed -i s/^deb/#deb/ /etc/sources.list.d/rightlink.list
+    apt-get update
+  fi
+}
+
+function install_packages() {
+  local version=$1
+
+  if [ -z "$version" ]; then
+    logger -st RightScale "Installing packages rightlink, rightlink-sandbox with latest version in repo"
+    $PKG_MGR_INSTALL rightlink rightlink-sandbox
+  else
+    logger -st RightScale "Installing packages rightlink, rightlink-sandbox with version=$version"
+    if [ "$RS_BASE_OS" = "debian" ]; then
+      $PKG_MGR_INSTALL rightlink=$version rightlink-sandbox=$version
+    else
+      $PKG_MGR_INSTALL rightlink-$version rightlink-sandbox-$version
+    fi
+  fi
+  result=$?
+  if [ $result -ne 0 ]; then
+    logger -st RightScale "Failed to install package.  Cannot continue."
+    exit 1
+  fi
+}
+
+function install_tarball() {
+  $PKG_MGR_REMOVE rightlink || true
+  mkdir -p /opt
+  tar -C /opt/ -zxf $1/$2
+
+  chmod +x /opt/rightscale/bin/*
+
+  if [[ -e /opt/rightscale/bin/post_install_dev.sh ]]; then
+    /opt/rightscale/bin/post_install_dev.sh
+  else
+    /opt/rightscale/bin/post_install.sh
+  fi
+}
+
+function start() {
+  logger -st RightScale "Running RightLink Updater"
+
+  init_os_state
+  configure_proxy
+  wait_for_metadata
+  populate_rs_variables
+
+  # If RS_SRC is not defined in userdata, we're booting in "production mode."
+  # In this case, we will use the rightlink already on disk.
+  # If RS_SRC is defined in userdata, we're booting in "development mode."
+  # RS_SRC must be a url pointing to either a tarball or yum/apt repo, in
+  # which case we either:
+  #  If a tarball: Upgrade the package from an http URL pointing to a 
+  #    yum/debian repo
+  #  If a repo: Remove the rightimage-base package, and untar the tarball to 
+  #    /opt/rightscale
+
+  if [ -n "$RS_SRC" ]; then 
+    if [[ $RS_SRC =~ \.tar|\.tgz|\.tbz ]]; then 
+      logger -st RightScale "Fetching and installing RightLink development tarball from $RS_SRC"
+      tarball_name=`basename $RS_SRC`
+      download_tarball $WORKING_DIR $RS_SRC
+      install_tarball $WORKING_DIR $tarball_name
+    elif [[ $RS_SRC =~ http ]]; then 
+      logger -st RightScale "Installing RightLink development packages from repo $RS_SRC"
+      enable_repos $RS_SRC
+      install_packages
+      disable_repos
+    else
+      logger -st RightScale "Installing RightLink development packages with version $RS_SRC from dev repo $RIGHTLINK_DEV_REPO"
+      enable_repos $RIGHTLINK_DEV_REPO
+      install_packages $RS_SRC
+      disable_repos
+    fi
+    remove_me
+    service rightboot start
+    service rightscale start
+    service rightlink start
+  else
+    logger -st RightScale "No RS_SRC value found, proceeding with normal RightLink startup"
+  fi
+  exit 0
+}
+
+function stop() {
+  exit 0
+}
+
+# See how we were called.
+case "$1" in
+  start)
+    start
+    ;;
+  stop)
+    stop
+    ;;
+  *)
+    echo "Usage: $0 start|stop"
+    exit 255
+    ;;
+esac
