@@ -101,7 +101,7 @@ action :configure do
       chroot $guest_root easy_install pip
       chroot $guest_root source /etc/profile && pip install boto
 
-      gcutil=gcutil-1.4.1
+      gcutil=gcutil-#{node[:rightimage][:google][:gcutil_version]}
       wget https://google-compute-engine-tools.googlecode.com/files/$gcutil.tar.gz
       tar zxvf $gcutil.tar.gz -C $guest_root/usr/local
       rm -rf $guest_root/usr/local/gcutil
@@ -157,7 +157,7 @@ action :upload do
   bash "install gcutil" do
     creates "/usr/local/gcutil/gcutil"
     code <<-EOF
-      gcutil=gcutil-1.4.1
+      gcutil=gcutil-#{node[:rightimage][:google][:gcutil_version]}
       wget https://google-compute-engine-tools.googlecode.com/files/$gcutil.tar.gz
       tar zxvf $gcutil.tar.gz -C /usr/local
       rm -rf /usr/local/gcutil
@@ -213,16 +213,20 @@ EOF
     EOF
   end
 
-  bash "register image" do
-    flags "-ex"
-    code <<-EOF
-#      echo "Image registration not supported yet, register image with command: "
-#      echo "gcutil addimage #{new_resource.image_name} http://commondatastorage.googleapis.com/#{node[:rightimage][:image_upload_bucket]}/#{new_resource.image_name}.tar.gz --project_id=#{node[:rightimage][:google][:project_id]}"
-
-      /usr/local/gcutil/gcutil addimage #{new_resource.image_name} \
-      "http://commondatastorage.googleapis.com/#{node[:rightimage][:image_upload_bucket]}/#{new_resource.image_name}.tar.gz" \
-      --project_id=#{node[:rightimage][:google][:project_id]}
-    EOF
+  ruby_block "register image" do
+    block do
+      require 'json'
+      kernels = JSON.parse(`/usr/local/gcutil/gcutil listkernels --project=google --format=json`)
+      kernels_sorted = kernels["items"].sort_by {|k| k["creationTimestamp"]}
+      gce_kernel = kernels_sorted.reverse.first["name"]
+      
+      command = "/usr/local/gcutil/gcutil addimage \"#{new_resource.image_name}\" " + 
+        "\"http://commondatastorage.googleapis.com/#{node[:rightimage][:image_upload_bucket]}/#{new_resource.image_name}.tar.gz\" " +
+        "--preferred_kernel=projects/google/global/kernels/#{gce_kernel} " +
+        "--project=#{node[:rightimage][:google][:project_id]}"
+      Chef::Log.info("Running command: #{command}")
+      `#{command}`
+    end
   end
 
   # Needed for do_create_mci, the primary key is the image_name
