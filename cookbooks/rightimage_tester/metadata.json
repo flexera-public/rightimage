@@ -20,6 +20,21 @@
       "display_name": "Test SSH Security?",
       "description": "If set, checks various SSHd security settings.  Should be set to false on Rackspace Managed or Dev images."
     },
+    "rightimage_tester/root_size": {
+      "required": "optional",
+      "calculated": false,
+      "choice": [
+        "10",
+        "25"
+      ],
+      "default": "10",
+      "type": "string",
+      "recipes": [
+
+      ],
+      "display_name": "Root Filesystem Size",
+      "description": "If set, verifies root filesystem size.  Specify size in GB."
+    },
     "rightimage_tester/aws_secret_access_key": {
       "required": "required",
       "calculated": false,
@@ -32,6 +47,21 @@
       ],
       "display_name": "AWS Secret Access Key",
       "description": "AWS Secret Access Key"
+    },
+    "rightimage_tester/test_ipv6": {
+      "required": "optional",
+      "calculated": false,
+      "choice": [
+        "true",
+        "false"
+      ],
+      "default": "true",
+      "type": "string",
+      "recipes": [
+
+      ],
+      "display_name": "Verify IPv6 disabled?",
+      "description": "If set, verifies IPv6 is diabled.  Should be set to false on Softlayer."
     },
     "rightimage_tester/aws_access_key_id": {
       "required": "required",

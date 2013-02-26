@@ -55,6 +55,13 @@ attribute "rightimage_tester/root_size",
   :default => "10",
   :required => "optional"
 
+attribute "rightimage_tester/test_ipv6",
+  :display_name => "Verify IPv6 disabled?",
+  :description => "If set, verifies IPv6 is diabled.  Should be set to false on Softlayer.",
+  :choice => [ "true", "false" ],
+  :default => "true",
+  :required => "optional"
+
 attribute "rightimage_tester/test_ssh_security",
   :display_name => "Test SSH Security?",
   :description => "If set, checks various SSHd security settings.  Should be set to false on Rackspace Managed or Dev images.",
