@@ -48,6 +48,13 @@ attribute "rightimage_tester/aws_secret_access_key",
   :required => "required",
   :recipes => [ "rightimage_tester::special_strings" ]
 
+attribute "rightimage_tester/root_size",
+  :display_name => "Root Filesystem Size",
+  :description => "If set, verifies root filesystem size.  Specify size in GB.",
+  :choice => [ "10", "25" ],
+  :default => "10",
+  :required => "optional"
+
 attribute "rightimage_tester/test_ssh_security",
   :display_name => "Test SSH Security?",
   :description => "If set, checks various SSHd security settings.  Should be set to false on Rackspace Managed or Dev images.",

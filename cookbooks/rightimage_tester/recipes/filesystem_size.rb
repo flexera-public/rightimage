@@ -20,13 +20,21 @@
 rightscale_marker :begin
 
 # EBS images end up at 7.9GB due to adding a swap partition
-bash "Verify root filesystem size is between 8GB and 11GB" do
+bash "Verify root filesystem size" do
   flags "-ex"
   code <<-EOH
     size=$(df -P /|grep /|awk '{print $2}')
     echo "SIZE: $size"
 
-   [ "$size" -ge 8000000 ] && [ "$size" -le 11000000 ]
+    # Input set in GB. Give a leeway of 2GB each way. Convert input to GB.
+    test_size="#{node[:rightimage_tester][:root_size]}"
+    if [ -z "$test_size" -o "$test_size" == "0" ]; then
+      echo "Root filesystem size set to 0.  Skipping test"
+    else
+      test_size_lower="$(($test_size - 2))"
+      test_size_upper="$(($test_size + 2))"
+      [ "$size" -ge ${test_size_lower}000000 ] && [ "$size" -le ${test_size_upper}000000 ]
+    fi
   EOH
 end
 
