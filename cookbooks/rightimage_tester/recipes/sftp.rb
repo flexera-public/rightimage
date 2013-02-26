@@ -19,32 +19,8 @@
 
 rightscale_marker :begin
 
-directory "/root/.ssh" do
-  owner "root"
-  group "root"
-  mode "0700"
-  action :create
-end 
-
-cookbook_file "/root/.ssh/id_rsa" do
-  source "id_rsa"
-  mode 0600
-  backup false
-end
-
-cookbook_file "/root/.ssh/id_rsa.pub" do
-  source "id_rsa.pub"
-  mode 0600
-  backup false
-end
-
-bash "Add SSH Key" do
-  flags "-ex"
-  code <<-EOH
-    echo "" >> /root/.ssh/authorized_keys # Ensure new-line before adding
-    cat /root/.ssh/id_rsa.pub >> /root/.ssh/authorized_keys
-  EOH
-end
+# Ensure SSH test has run that generated the SSH key to use here.
+include_recipe "rightimage_tester::ssh"
 
 bash "Verify SFTP" do
   flags "-x"
@@ -59,7 +35,7 @@ bash "Verify SFTP" do
     # Test SFTP.
     set -e
     echo "blah" > /tmp/sftptest
-    scp /tmp/sftptest localhost:/tmp/sftptest2
+    scp -i /root/.ssh/id_rsa_tester /tmp/sftptest localhost:/tmp/sftptest2
     set +e
 
     # Should have errored out if an issue, but double-check that file is there.
