@@ -6,7 +6,7 @@
   "maintainer_email": "support@rightscale.com",
   "attributes": {
     "rightimage_tester/test_ssh_security": {
-      "required": "optional",
+      "required": "recommended",
       "calculated": false,
       "choice": [
         "true",
@@ -21,7 +21,7 @@
       "description": "If set, checks various SSHd security settings.  Should be set to false on Rackspace Managed or Dev images."
     },
     "rightimage_tester/root_size": {
-      "required": "optional",
+      "required": "recommended",
       "calculated": false,
       "choice": [
         "10",
@@ -49,7 +49,7 @@
       "description": "AWS Secret Access Key"
     },
     "rightimage_tester/test_ipv6": {
-      "required": "optional",
+      "required": "recommended",
       "calculated": false,
       "choice": [
         "true",
