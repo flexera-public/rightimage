@@ -24,8 +24,7 @@
       "required": "recommended",
       "calculated": false,
       "choice": [
-        "10",
-        "25"
+
       ],
       "default": "10",
       "type": "string",
