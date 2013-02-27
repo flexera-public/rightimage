@@ -50,10 +50,9 @@ attribute "rightimage_tester/aws_secret_access_key",
 
 attribute "rightimage_tester/root_size",
   :display_name => "Root Filesystem Size",
-  :description => "If set, verifies root filesystem size.  Specify size in GB.",
-  :choice => [ "10", "25" ],
+  :description => "If set, verifies root filesystem size.  Specify size in GB.  Most RightImages are 10GB.",
   :default => "10",
-  :required => "optional",
+  :required => "recommended",
   :recipes => [ "rightimage_tester::filesystem_size" ]
 
 attribute "rightimage_tester/test_ipv6",
@@ -61,7 +60,7 @@ attribute "rightimage_tester/test_ipv6",
   :description => "If set, verifies IPv6 is diabled.  Should be set to false on Softlayer.",
   :choice => [ "true", "false" ],
   :default => "true",
-  :required => "optional",
+  :required => "recommended",
   :recipes => [ "rightimage_tester::ipv6" ]
 
 attribute "rightimage_tester/test_ssh_security",
@@ -69,4 +68,5 @@ attribute "rightimage_tester/test_ssh_security",
   :description => "If set, checks various SSHd security settings.  Should be set to false on Rackspace Managed or Dev images.",
   :choice => [ "true", "false" ],
   :default => "true",
-  :required => "optional"
+  :required => "recommended",
+  :recipes => [ "rightimage_tester::sshd_config" ]

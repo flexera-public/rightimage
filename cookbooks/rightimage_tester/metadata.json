@@ -6,7 +6,7 @@
   "maintainer_email": "support@rightscale.com",
   "attributes": {
     "rightimage_tester/test_ssh_security": {
-      "required": "optional",
+      "required": "recommended",
       "calculated": false,
       "choice": [
         "true",
@@ -15,17 +15,16 @@
       "default": "true",
       "type": "string",
       "recipes": [
-
+        "rightimage_tester::sshd_config"
       ],
       "display_name": "Test SSH Security?",
       "description": "If set, checks various SSHd security settings.  Should be set to false on Rackspace Managed or Dev images."
     },
     "rightimage_tester/root_size": {
-      "required": "optional",
+      "required": "recommended",
       "calculated": false,
       "choice": [
-        "10",
-        "25"
+
       ],
       "default": "10",
       "type": "string",
@@ -33,7 +32,7 @@
         "rightimage_tester::filesystem_size"
       ],
       "display_name": "Root Filesystem Size",
-      "description": "If set, verifies root filesystem size.  Specify size in GB."
+      "description": "If set, verifies root filesystem size.  Specify size in GB.  Most RightImages are 10GB."
     },
     "rightimage_tester/aws_secret_access_key": {
       "required": "required",
@@ -49,7 +48,7 @@
       "description": "AWS Secret Access Key"
     },
     "rightimage_tester/test_ipv6": {
-      "required": "optional",
+      "required": "recommended",
       "calculated": false,
       "choice": [
         "true",

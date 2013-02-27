@@ -31,9 +31,10 @@ bash "Verify root filesystem size" do
     if [ -z "$test_size" -o "$test_size" == "0" ]; then
       echo "Root filesystem size set to 0.  Skipping test"
     else
-      test_size_lower="$(($test_size - 2))"
-      test_size_upper="$(($test_size + 2))"
-      [ "$size" -ge ${test_size_lower}000000 ] && [ "$size" -le ${test_size_upper}000000 ]
+      # df unit size defaults to 1024 bytes.  Convert to GB.
+      test_size_lower="$(($(($test_size - 2)) * 1024 * 1024))"
+      test_size_upper="$(($(($test_size + 2)) * 1024 * 1024))"
+      [ "$size" -ge ${test_size_lower} ] && [ "$size" -le ${test_size_upper} ]
     fi
   EOH
 end
