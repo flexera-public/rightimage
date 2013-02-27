@@ -15,7 +15,7 @@
       "default": "true",
       "type": "string",
       "recipes": [
-
+        "rightimage_tester::sshd_config"
       ],
       "display_name": "Test SSH Security?",
       "description": "If set, checks various SSHd security settings.  Should be set to false on Rackspace Managed or Dev images."

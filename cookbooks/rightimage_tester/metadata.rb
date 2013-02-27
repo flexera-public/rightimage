@@ -68,4 +68,5 @@ attribute "rightimage_tester/test_ssh_security",
   :description => "If set, checks various SSHd security settings.  Should be set to false on Rackspace Managed or Dev images.",
   :choice => [ "true", "false" ],
   :default => "true",
-  :required => "recommended"
+  :required => "recommended",
+  :recipes => [ "rightimage_tester::sshd_config" ]
