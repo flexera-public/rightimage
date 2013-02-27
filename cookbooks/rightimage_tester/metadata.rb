@@ -50,7 +50,7 @@ attribute "rightimage_tester/aws_secret_access_key",
 
 attribute "rightimage_tester/root_size",
   :display_name => "Root Filesystem Size",
-  :description => "If set, verifies root filesystem size.  Specify size in GB.",
+  :description => "If set, verifies root filesystem size.  Specify size in GB.  Most RightImages are 10GB.",
   :default => "10",
   :required => "recommended",
   :recipes => [ "rightimage_tester::filesystem_size" ]
