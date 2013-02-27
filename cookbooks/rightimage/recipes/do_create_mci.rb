@@ -6,10 +6,6 @@ end
 
 
 SANDBOX_BIN_DIR = "/opt/rightscale/sandbox/bin"
-# Not necesary, rightimage_tools install in default should take care
-# of all this
-##{SANBDBOX_BIN_DIR}/gem install rest_connection -v 0.1.9
-##{SANBDBOX_BIN_DIR}/gem install rightimage_tools -v 0.2.2
 
 # Lay down the RightScale API credentials
 directory "/root/.rest_connection"
@@ -52,6 +48,7 @@ script "Create MCI or Add to MCI" do
       mci_tool.add_image_to_mci(
         :cloud_id=>#{cloud_id},
         :image_id=>id,
+        :rightlink_version=>"#{node[:rightimage][:rightlink_version]}",
         :name=>mci_name)
     end
   EOF
