@@ -88,6 +88,7 @@
   },
   "recipes": {
     "rightimage_tester::special_strings": "Check for special strings.",
+    "rightimage_tester::rackconnect": "Check for Rackspace Rackconnect automation failures.",
     "rightimage_tester::ephemeral": "Ensure ephemeral drive mounted.",
     "rightimage_tester::dependencies": "Ensure dependencies are installed.",
     "rightimage_tester::bad_files": "Check for bad files.",
