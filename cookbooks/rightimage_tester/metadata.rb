@@ -27,7 +27,9 @@ recipe "rightimage_tester::java", "Check java installation."
 recipe "rightimage_tester::ldconfig", "Ensure ldconfig runs."
 recipe "rightimage_tester::modprobe", "Ensure modprobe runs."
 recipe "rightimage_tester::packages", "Ensure packages can be installed."
+recipe "rightimage_tester::rackconnect", "Check for Rackspace Rackconnect automation failures."
 recipe "rightimage_tester::reboot", "Ensure instance reboots."
+recipe "rightimage_tester::rightlink_core", "Ensure no RightLink core files."
 recipe "rightimage_tester::rubygems", "Check rubygems installation."
 recipe "rightimage_tester::special_strings","Check for special strings."
 recipe "rightimage_tester::sftp", "Ensure can sftp into self."
@@ -48,9 +50,25 @@ attribute "rightimage_tester/aws_secret_access_key",
   :required => "required",
   :recipes => [ "rightimage_tester::special_strings" ]
 
+attribute "rightimage_tester/root_size",
+  :display_name => "Root Filesystem Size",
+  :description => "If set, verifies root filesystem size.  Specify size in GB.  Most RightImages are 10GB.",
+  :default => "10",
+  :required => "recommended",
+  :recipes => [ "rightimage_tester::filesystem_size" ]
+
+attribute "rightimage_tester/test_ipv6",
+  :display_name => "Verify IPv6 disabled?",
+  :description => "If set, verifies IPv6 is diabled.  Should be set to false on Softlayer.",
+  :choice => [ "true", "false" ],
+  :default => "true",
+  :required => "recommended",
+  :recipes => [ "rightimage_tester::ipv6" ]
+
 attribute "rightimage_tester/test_ssh_security",
   :display_name => "Test SSH Security?",
   :description => "If set, checks various SSHd security settings.  Should be set to false on Rackspace Managed or Dev images.",
   :choice => [ "true", "false" ],
   :default => "true",
-  :required => "optional"
+  :required => "recommended",
+  :recipes => [ "rightimage_tester::sshd_config" ]

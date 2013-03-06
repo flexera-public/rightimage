@@ -6,7 +6,7 @@
   "maintainer_email": "support@rightscale.com",
   "attributes": {
     "rightimage_tester/test_ssh_security": {
-      "required": "optional",
+      "required": "recommended",
       "calculated": false,
       "choice": [
         "true",
@@ -15,10 +15,24 @@
       "default": "true",
       "type": "string",
       "recipes": [
-
+        "rightimage_tester::sshd_config"
       ],
       "display_name": "Test SSH Security?",
       "description": "If set, checks various SSHd security settings.  Should be set to false on Rackspace Managed or Dev images."
+    },
+    "rightimage_tester/root_size": {
+      "required": "recommended",
+      "calculated": false,
+      "choice": [
+
+      ],
+      "default": "10",
+      "type": "string",
+      "recipes": [
+        "rightimage_tester::filesystem_size"
+      ],
+      "display_name": "Root Filesystem Size",
+      "description": "If set, verifies root filesystem size.  Specify size in GB.  Most RightImages are 10GB."
     },
     "rightimage_tester/aws_secret_access_key": {
       "required": "required",
@@ -32,6 +46,21 @@
       ],
       "display_name": "AWS Secret Access Key",
       "description": "AWS Secret Access Key"
+    },
+    "rightimage_tester/test_ipv6": {
+      "required": "recommended",
+      "calculated": false,
+      "choice": [
+        "true",
+        "false"
+      ],
+      "default": "true",
+      "type": "string",
+      "recipes": [
+        "rightimage_tester::ipv6"
+      ],
+      "display_name": "Verify IPv6 disabled?",
+      "description": "If set, verifies IPv6 is diabled.  Should be set to false on Softlayer."
     },
     "rightimage_tester/aws_access_key_id": {
       "required": "required",
@@ -59,6 +88,7 @@
   },
   "recipes": {
     "rightimage_tester::special_strings": "Check for special strings.",
+    "rightimage_tester::rackconnect": "Check for Rackspace Rackconnect automation failures.",
     "rightimage_tester::ephemeral": "Ensure ephemeral drive mounted.",
     "rightimage_tester::dependencies": "Ensure dependencies are installed.",
     "rightimage_tester::bad_files": "Check for bad files.",
@@ -84,6 +114,7 @@
     "rightimage_tester::crontab": "Check crontab configuration.",
     "rightimage_tester::ssh": "Ensure can ssh into self.",
     "rightimage_tester::rubygems": "Check rubygems installation.",
+    "rightimage_tester::rightlink_core": "Ensure no RightLink core files.",
     "rightimage_tester::hostname": "Ensure hostname set.",
     "rightimage_tester::apt_config": "Check apt configuration.",
     "rightimage_tester::ipv6": "Ensure IPv6 is disabled."

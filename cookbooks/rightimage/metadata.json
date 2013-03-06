@@ -63,7 +63,8 @@
         "rightimage::build_image",
         "rightimage::rightscale_rightlink",
         "rightimage::rebundle",
-        "rightimage::rightscale_install"
+        "rightimage::rightscale_install",
+        "rightimage::do_create_mci"
       ],
       "display_name": "RightLink Version",
       "description": "The RightLink version we are building into our image"
@@ -226,10 +227,10 @@
 
       ],
       "type": "string",
-      "recommended": true,
       "recipes": [
         "rightimage::do_create_mci"
       ],
+      "recommended": true,
       "display_name": "API URL",
       "description": "The rightscale account specific api url to use.  Ex. https://my.rightscale.com/api/acct/1234 (where 1234 is your account id)"
     },
@@ -321,10 +322,10 @@
 
       ],
       "type": "string",
-      "recommended": true,
       "recipes": [
         "rightimage::do_create_mci"
       ],
+      "recommended": true,
       "display_name": "API Password",
       "description": "Rightscale API password."
     },
@@ -695,10 +696,10 @@
 
       ],
       "type": "string",
-      "recommended": true,
       "recipes": [
         "rightimage::do_create_mci"
       ],
+      "recommended": true,
       "display_name": "API User",
       "description": "RightScale API username. Ex. you@rightscale.com"
     },
@@ -858,10 +859,10 @@
 
       ],
       "type": "string",
-      "recommended": true,
       "recipes": [
         "rightimage::do_create_mci"
       ],
+      "recommended": true,
       "display_name": "RightScale Cloud ID (integer)",
       "description": "The numeric ID in RightScale for the cloud which we will create this image for. For example, 6 = AWS Oregon, 232 = Rackspace"
     },

@@ -102,7 +102,7 @@ attribute "rightimage/region",
 attribute "rightimage/rightlink_version",
   :display_name => "RightLink Version",
   :description => "The RightLink version we are building into our image",
-  :recipes => [ "rightimage::default", "rightimage::build_image", "rightimage::rightscale_rightlink", "rightimage::rebundle", "rightimage::rightscale_install"],
+  :recipes => [ "rightimage::default", "rightimage::build_image", "rightimage::rightscale_rightlink", "rightimage::rebundle", "rightimage::rightscale_install", "rightimage::do_create_mci"],
   :required => true
   
 attribute "rightimage/image_upload_bucket",
