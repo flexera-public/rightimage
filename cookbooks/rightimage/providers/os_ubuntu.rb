@@ -57,7 +57,6 @@ action :install do
   else
     bootstrap_cmd << " --arch amd64"
   end
-  node[:rightimage][:guest_packages].each { |p| bootstrap_cmd << " --addpkg #{p.split}"}
 
   Chef::Log.info "vmbuilder bootstrap command is: " + bootstrap_cmd
 
@@ -157,6 +156,10 @@ EOS
       mkdir -p $guest_root/var/man
       chroot $guest_root chown -R man:root /var/man
   EOH
+  end
+
+  bash "install rightimage-extras package" do 
+    code "chroot $guest_root apt-get install rightimage-extras -y"
   end
 
   # disable loading pata_acpi module - currently breaks acpid from discovering volumes attached to CDC KVM hypervisor, from bootstrap_centos, should be applicable to ubuntu though
@@ -366,10 +369,18 @@ EOF
 end
 
 action :repo_freeze do
+  mirror_date = "#{timestamp[0..3]}/#{timestamp[4..5]}/#{timestamp[6..7]}"
+  mirror_url = "http://#{node[:rightimage][:mirror]}/ubuntu_daily/#{mirror_date}/"
+  if node[:rightimage][:rightscale_mirror_url].to_s.empty?
+    rightscale_mirror_url = "http://#{node[:rightimage][:mirror]}/rightscale_software_ubuntu/#{mirror_date}/"
+  else
+    rightscale_mirror_url = node[:rightimage][:rightscale_mirror_url]
+  end
   template "#{guest_root}/etc/apt/sources.list" do
     source "sources.list.erb"
     variables(
-      :mirror_date => "#{timestamp[0..3]}/#{timestamp[4..5]}/#{timestamp[6..7]}",
+      :mirror_url => mirror_url,
+      :rightscale_mirror_url => rightscale_mirror_url,
       :platform_codename => platform_codename
     )
     backup false
@@ -380,10 +391,18 @@ action :repo_freeze do
 end
 
 action :repo_unfreeze do
+  mirror_date = "latest"
+  mirror_url = "http://#{node[:rightimage][:mirror]}/ubuntu_daily/#{mirror_date}/"
+  if node[:rightimage][:rightscale_mirror_url].to_s.empty?
+    rightscale_mirror_url = "http://#{node[:rightimage][:mirror]}/rightscale_software_ubuntu/#{mirror_date}/"
+  else
+    rightscale_mirror_url = node[:rightimage][:rightscale_mirror_url]
+  end
   template "#{guest_root}/etc/apt/sources.list" do
     source "sources.list.erb"
     variables(
-      :mirror_date => "latest",
+      :mirror_url => mirror_url,
+      :rightscale_mirror_url => rightscale_mirror_url,
       :platform_codename => platform_codename
     )
     backup false

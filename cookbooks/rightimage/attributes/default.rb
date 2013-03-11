@@ -12,6 +12,7 @@ set[:rightimage][:build_dir] = "/mnt/vmbuilder"
 set[:rightimage][:guest_root] = "/mnt/image"
 set_unless[:rightimage][:hypervisor] = "xen"
 set[:rightimage][:mirror] = "cf-mirror.rightscale.com"
+set_unless[:rightimage][:rightscale_mirror_url] = ""
 set_unless[:rightimage][:cloud] = "ec2"
 set[:rightimage][:fstab][:ephemeral][:mount] = "/mnt/ephemeral"
 set[:rightimage][:fstab][:ephemeral][:options] = "defaults"
@@ -35,141 +36,27 @@ when "hyperv" then set[:rightimage][:image_type] = "msvhd"
 else raise ArgumentError, "don't know what image format to use for #{node[:rightimage][:hypervisor]}!"
 end
 
-set[:rightimage][:guest_packages] = []
-rightimage[:guest_packages] << " acpid"
-rightimage[:guest_packages] << " autoconf"
-rightimage[:guest_packages] << " automake"
-rightimage[:guest_packages] << " bison"
-rightimage[:guest_packages] << " curl" # RightLink
-rightimage[:guest_packages] << " flex"
-rightimage[:guest_packages] << " libtool"
-rightimage[:guest_packages] << " libxml2"
-rightimage[:guest_packages] << " logrotate"
-rightimage[:guest_packages] << " nscd"
-rightimage[:guest_packages] << " ntp" # RightLink requires local time to be accurate (w-5025)
-rightimage[:guest_packages] << " openssh-server"
-rightimage[:guest_packages] << " openssl"
-rightimage[:guest_packages] << " screen"
-rightimage[:guest_packages] << " subversion"
-rightimage[:guest_packages] << " sysstat"
-rightimage[:guest_packages] << " tmux"
-rightimage[:guest_packages] << " unzip"
-
 set[:rightimage][:host_packages] = []
 
 # set base os packages
 case rightimage[:platform]
 when "ubuntu"
-  rightimage[:guest_packages] << " binutils"
-  rightimage[:guest_packages] << " build-essential"
-  rightimage[:guest_packages] << " ca-certificates"
-  rightimage[:guest_packages] << " dhcp3-client"
-  rightimage[:guest_packages] << " dmsetup"
-  rightimage[:guest_packages] << " emacs"
-  rightimage[:guest_packages] << " git-core" # RightLink
-  rightimage[:guest_packages] << " iptraf"
-  rightimage[:guest_packages] << " irb"
-  rightimage[:guest_packages] << " libarchive-dev" # RightLink
-  rightimage[:guest_packages] << " liberror-perl"
-  rightimage[:guest_packages] << " libopenssl-ruby1.8"
-  rightimage[:guest_packages] << " libreadline-ruby1.8"
-  rightimage[:guest_packages] << " libshadow-ruby1.8"
-  rightimage[:guest_packages] << " libxml2-dev" # RightLink
-  rightimage[:guest_packages] << " libxslt1-dev" # RightLink
-  rightimage[:guest_packages] << " mailutils"
-  rightimage[:guest_packages] << " ncurses-dev"
-  rightimage[:guest_packages] << " postfix"
-  rightimage[:guest_packages] << " rake"
-  rightimage[:guest_packages] << " rdoc1.8"
-  rightimage[:guest_packages] << " readline-common"
-  rightimage[:guest_packages] << " rsync"
-  rightimage[:guest_packages] << " ruby1.8"
-  rightimage[:guest_packages] << " ruby1.8-dev"
-  rightimage[:guest_packages] << " sqlite3"
-  rightimage[:guest_packages] << " ubuntu-standard"
-  rightimage[:guest_packages] << " vim"
-  rightimage[:guest_packages] << " zlib1g-dev"
-  # ruby 1.9 requirements
-  rightimage[:guest_packages] << " libyaml-0-2"
-  rightimage[:guest_packages] << " tcl8.5"
-  rightimage[:guest_packages] << " tk8.5"
-
-  case rightimage[:platform_version]
-  when "8.04"
-  when "10.04"
-  when "10.10"
-    rightimage[:guest_packages] << " libdigest-sha1-perl"
-    rightimage[:guest_packages] << " libreadline5-dev"
-    rightimage[:guest_packages] << " linux-headers-virtual"
-  else
-    rightimage[:guest_packages] << " libreadline-gplv2-dev"
-  end
-
   rightimage[:host_packages] << " ca-certificates"
   rightimage[:host_packages] << " openjdk-6-jre"
   rightimage[:host_packages] << " openssl"
 
-  case rightimage[:platform_version]
-  when "8.04"
-    rightimage[:guest_packages] << " debian-helper-scripts"
-    rightimage[:guest_packages] << " sysv-rc-conf"
-    rightimage[:host_packages] << " ubuntu-vm-builder"
-  when "9.10"
+  if rightimage[:platform_version].to_f >= 10.10
+    rightimage[:host_packages] << " devscripts"
+  end
+
+  if rightimage[:platform_version].to_f == 10.04
     rightimage[:host_packages] << " python-vm-builder-ec2"
-  when "10.04"
-    if rightimage[:cloud] == "ec2"
-      rightimage[:host_packages] << " devscripts"
-      rightimage[:host_packages] << " python-vm-builder-ec2"
-    else
-      rightimage[:host_packages] << " devscripts"
-    end
-  when "10.10"
-    rightimage[:guest_packages] << " linux-image-virtual"
-    rightimage[:host_packages] << " devscripts"
-  when "12.04"
-    rightimage[:guest_packages] << " linux-image-virtual"
-    rightimage[:host_packages] << " devscripts"
+  end
+
+  if rightimage[:platform_version].to_f == 12.04
     rightimage[:host_packages] << " liburi-perl"
-    # extra-virtual contains the UDF kernel module (DVD format), needed for azure
-    rightimage[:guest_packages] << " linux-image-extra-virtual"
-  else
-     rightimage[:host_packages] << " devscripts"
   end
 when "centos","rhel"
-  rightimage[:guest_packages] << " bwm-ng"
-  rightimage[:guest_packages] << " compat-gcc-34-g77"
-  rightimage[:guest_packages] << " compat-libstdc++-296"
-  rightimage[:guest_packages] << " createrepo"
-  rightimage[:guest_packages] << " cvs"
-  rightimage[:guest_packages] << " dhclient"
-  rightimage[:guest_packages] << " fping"
-  rightimage[:guest_packages] << " gcc*"
-  rightimage[:guest_packages] << " git" # RightLink
-  rightimage[:guest_packages] << " libarchive-devel" # RightLink
-  rightimage[:guest_packages] << " libxml2-devel" # RightLink
-  rightimage[:guest_packages] << " libxslt"
-  rightimage[:guest_packages] << " libxslt-devel" # RightLink
-  rightimage[:guest_packages] << " lynx"
-  rightimage[:guest_packages] << " mlocate"
-  rightimage[:guest_packages] << " mutt"
-  rightimage[:guest_packages] << " nano"
-  rightimage[:guest_packages] << " openssh-askpass"
-  rightimage[:guest_packages] << " openssh-clients"
-  rightimage[:guest_packages] << " pkgconfig"
-  rightimage[:guest_packages] << " redhat-lsb"
-  rightimage[:guest_packages] << " redhat-rpm-config"
-  rightimage[:guest_packages] << " rpm-build"
-  rightimage[:guest_packages] << " sudo"
-  rightimage[:guest_packages] << " swig"
-  rightimage[:guest_packages] << " telnet"
-  rightimage[:guest_packages] << " vim-common"
-  rightimage[:guest_packages] << " vim-enhanced"
-  rightimage[:guest_packages] << " wget"
-  rightimage[:guest_packages] << " xfsprogs"
-  rightimage[:guest_packages] << " yum-utils"
-  # Ruby 1.9 req2
-  rightimage[:guest_packages] << " libyaml"
-
   # For Centos 5, install custom ruby (1.8.7). so keep these in a separate variable 
   # These are the packages available on the rbel upstream mirror
   set[:rightimage][:ruby_packages] = "ruby ruby-devel ruby-irb ruby-libs ruby-rdoc ruby-ri ruby-tcltk"
@@ -188,12 +75,9 @@ when "centos","rhel"
     end
 
   extra_el_packages.split.each do |p|
-    rightimage[:guest_packages] << " #{p}"
     rightimage[:host_packages] << " #{p}"
   end
 when "suse"
-  rightimage[:guest_packages] << " gcc"
-
   rightimage[:host_packages] << " kiwi"
 end
 

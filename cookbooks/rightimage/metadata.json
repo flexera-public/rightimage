@@ -611,6 +611,20 @@
       "display_name": "Azure Storage Account",
       "description": "Storage account to upload the image to. Required when supplying a Shared Key"
     },
+    "rightimage/rightscale_mirror_url": {
+      "required": "optional",
+      "calculated": false,
+      "choice": [
+
+      ],
+      "default": "",
+      "type": "string",
+      "recipes": [
+
+      ],
+      "display_name": "RightScale software repository url",
+      "description": "This sets the URL to use for the RightScale software repository. If left blank, will use the official RightScale repository.  This is used to test new packages"
+    },
     "rightimage/rackspace/api_token": {
       "required": "required",
       "calculated": false,

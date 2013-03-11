@@ -94,10 +94,7 @@ action :install do
   chroot #{guest_root} authconfig --enableshadow --useshadow --enablemd5 --updateall
   yum -c /tmp/yum.conf -y clean all
   yum -c /tmp/yum.conf -y makecache
-  # used to install a full set of packages on local os, it screws up if you want to use a freezedate
-  # that's older than the host os.  its probably not even necessary anymore, so comment out for now - PS
-  #  old comment re this was: "install guest packages on CentOS 5.2 i386 host to work around yum problem"
-  # yum -c /tmp/yum.conf -y install #{node[:rightimage][:guest_packages]} --exclude gcc-java
+
   # Install postfix separately, don't want to use centosplus version which bundles mysql
   yum -c /tmp/yum.conf --installroot=#{guest_root} -y install postfix --disablerepo=centosplus
   yum -c /tmp/yum.conf --installroot=#{guest_root} -y remove sendmail
@@ -107,7 +104,7 @@ action :install do
     yum -c /tmp/yum.conf --installroot=#{guest_root} --exclude='*.i386' -y install --enablerepo=ruby_custom #{node[:rightimage][:ruby_packages]}
   fi
 
-  yum -c /tmp/yum.conf --installroot=#{guest_root} -y install #{node[:rightimage][:guest_packages]} --exclude gcc-java
+  yum -c /tmp/yum.conf --installroot=#{guest_root} -y install rightimage-extras --exclude gcc-java
 
   yum -c /tmp/yum.conf --installroot=#{guest_root} -y remove bluez* gnome-bluetooth*
   yum -c /tmp/yum.conf --installroot=#{guest_root} -y clean all
@@ -353,19 +350,28 @@ action :repo_freeze do
     action :create
   end
 
+  mirror_date = timestamp[0..7] 
+  if node[:rightimage][:rightscale_mirror_url].to_s.empty?
+    rightscale_mirror_url = "http://#{node[:rightimage][:mirror]}/rightscale_software/epel/#{node[:rightimage][:platform_version].to_i}/#{node[:rightimage][:arch]}/archive/#{mirror_date}/"
+  else
+    rightscale_mirror_url = node[:rightimage][:rightscale_mirror_url]
+  end
+
   ["/tmp/yum.conf", "#{repo_dir}/#{el_repo_file}"].each do |location|
     template location do
       source "yum.conf.erb"
       backup false
       variables ({
         :bootstrap => true,
-        :mirror_date => timestamp[0..7]
+        :rightscale_mirror_url => rightscale_mirror_url,
+        :mirror_date => mirror_date
       })
     end
   end
 end
 
 action :repo_unfreeze do
+
   template "#{guest_root}/etc/yum.repos.d/#{el_repo_file}" do
     source "yum.conf.erb"
     backup false

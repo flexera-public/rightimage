@@ -156,6 +156,12 @@ attribute "rightimage/timestamp",
   :description => "Initial build date of this image, and also the archive date from which to pull packages. Expected format is YYYYMMDDHHMM. If not supplied, will use latest available date.",
   :required => "recommended"
 
+attribute "rightimage/rightscale_mirror_url",
+  :display_name => "RightScale software repository url",
+  :description => "This sets the URL to use for the RightScale software repository. If left blank, will use the official RightScale repository.  This is used to test new packages",
+  :default => "",
+  :required => "optional"
+
 attribute "rightimage/build_number",
   :display_name => "Build number",
   :description => "Build number of this image.  Defaults to 0",
