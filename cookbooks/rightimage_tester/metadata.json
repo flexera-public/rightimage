@@ -107,6 +107,7 @@
     "rightimage_tester::java": "Check java installation.",
     "rightimage_tester::image_name": "Check image name.",
     "rightimage_tester::blank_passwords": "Ensure no blank passwords.",
+    "rightimage_tester::resolvconf": "Verify resolvconf tail empty.",
     "rightimage_tester::filesystem_permissions": "Check filesystem permissions.",
     "rightimage_tester::bashrc": "Ensure bashrc is sourced.",
     "rightimage_tester::sshd_config": "Check sshd configuration.",

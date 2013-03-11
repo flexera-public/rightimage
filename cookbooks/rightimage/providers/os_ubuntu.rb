@@ -357,6 +357,11 @@ EOF
   bash "cleanup" do
     flags "-ex"
     code <<-EOH
+      guest_root=#{guest_root}
+
+      # Remove resolv.conf leftovers (w-5554)
+      rm -rf $guest_root/etc/resolvconf/resolv.conf.d/original $guest_root/etc/resolvconf/resolv.conf.d/tail
+      touch $guest_root/etc/resolvconf/resolv.conf.d/tail
 
       chroot #{guest_root} rm -rf /etc/init/plymouth*
       chroot #{guest_root} apt-get update

@@ -20,7 +20,7 @@ end
 # Common base image configurations 
 bash "resolv.conf" do
   code <<-EOH
-    echo "nameserver 8.8.4.4" >> #{guest_root}/etc/resolv.conf
+    echo "nameserver 8.8.4.4" > #{guest_root}/etc/resolv.conf
   EOH
 end
 
