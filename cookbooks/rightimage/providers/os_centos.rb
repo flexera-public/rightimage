@@ -254,6 +254,8 @@ action :install do
 
   directory("#{guest_root}/tmp/packages") {recursive true}
   bash "install ruby 1.9" do
+    # Ruby 1.9 packages are 64-bit only
+    not_if { node[:rightimage][:arch] == "i386" }
     packages = %w(
       rubygem-rdoc-3.9.4-22.el6.noarch.rpm
       rubygem-minitest-2.5.1-22.el6.noarch.rpm

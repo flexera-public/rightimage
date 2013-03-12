@@ -226,6 +226,8 @@ EOF
 
   directory("#{guest_root}/tmp/packages") {recursive true}
   bash "install ruby 1.9" do
+    # Ruby 1.9 packages are 64-bit only
+    not_if { node[:rightimage][:arch] == "i386" }
     packages = %w( 
       ruby1.9.1_1.9.3.327-1_amd64.deb
       ruby1.9.1-examples_1.9.3.327-1_all.deb
