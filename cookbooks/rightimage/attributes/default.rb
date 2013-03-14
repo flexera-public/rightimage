@@ -267,6 +267,12 @@ end
 
 # set rightscale stuff
 set_unless[:rightimage][:rightlink_version] = ""
+# TBD set these to official ones when they become available
+if node[:rightimage][:platform] == "ubuntu"
+  set_unless[:rightimage][:rightlink_repo_url] = "http://s3.amazonaws.com/rightscale_rightlink_dev/deb_test_repo_pete"
+else
+  set_unless[:rightimage][:rightlink_repo_url] = "http://s3.amazonaws.com/rightscale_rightlink_dev/rpm_repo_test"
+end
 
 # generate command to install getsshkey init script 
 case rightimage[:platform]

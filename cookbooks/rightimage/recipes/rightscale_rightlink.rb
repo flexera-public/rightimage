@@ -111,8 +111,8 @@ end
 def install_rightlink
   # Setup repos
   if node[:rightimage][:platform] == "centos"
-    # Hard code this for now, TBD make dynamic
     node[:rightimage][:rightlink_repo_url] = "http://s3.amazonaws.com/rightscale_rightlink_dev/rpm_repo_test"
+    node[:rightimage][:rightlink_repo_url] = "http://s3.amazonaws.com/rightscale_rightlink_dev/deb_test_repo_pete"
     template "#{guest_root}/etc/yum.repos.d/rightlink.repo" do
       source "rightlink.repo.erb"
       variables({:enabled => true, :repo_url => node[:rightimage][:rightlink_repo_url]})
@@ -126,21 +126,31 @@ def install_rightlink
       backup false
     end
   else
-    node[:rightimage][:rightlink_repo_url] = "http://s3.amazonaws.com/rightscale_rightlink_dev/deb_test_repo"
-    template "#{guest_root}/etc/sources.list.d/rightlink.list" do
+    platform_codename = platform_codename(node[:rightimage][:platform_version])
+    template "#{guest_root}/etc/apt/sources.list.d/rightlink.list" do
       source "rightlink.list.erb"
-      variables({:enabled => true, :repo_url => node[:rightimage][:rightlink_repo_url]})
+      variables({
+        :enabled => true,
+        :platform_codename => platform_codename,
+        :repo_url => node[:rightimage][:rightlink_repo_url]
+      })
       backup false
     end
     execute "chroot #{guest_root} apt-get -y update"
-    execute "chroot #{guest_root} apt-get -y install rightlink-cloud-#{node[:rightimage][:cloud]}"
-    execute "chroot #{guest_root} apt-get -y install rightlink=#{node[:rightimage][:rightlink_version]}"
-    template "#{guest_root}/etc/sources.list.d/rightlink.list" do
+    # Force yes forces the package to be installed even if its unsigned. Needed for dev packages. TBD 
+    # figure out a better strategy for handling this case
+    execute "chroot #{guest_root} apt-get -y --force-yes install rightlink-cloud-#{node[:rightimage][:cloud]}"
+    execute "chroot #{guest_root} apt-get -y --force-yes install rightlink=#{node[:rightimage][:rightlink_version]}"
+    template "#{guest_root}/etc/apt/sources.list.d/rightlink.list" do
       source "rightlink.list.erb"
-      variables({:enabled => false, :repo_url => node[:rightimage][:rightlink_repo_url]})
+      variables({
+        :enabled => false,
+        :platform_codename => platform_codename,
+        :repo_url => node[:rightimage][:rightlink_repo_url]
+      })
       backup false
     end
-    exec "chroot #{guest_root} apt-get -y update"
+    execute "chroot #{guest_root} apt-get -y update"
   end
 
   execute "insert_rightlink_version" do 
@@ -156,10 +166,10 @@ log "Building image with RightLink package #{node[:rightimage][:rightlink_versio
 if node[:rightimage][:rightlink_version].to_i < 5
   raise "rightlink versions < 5 not supported"
 elsif version_compare(node[:rightimage][:rightlink_version],"5.9") < 0
-  log "Using repo based RightLink installation method"
+  log "Using legacy (direct package install) RightLink installation method"
   install_rightlink_legacy
 else
-  log "Using legacy (direct package install) RightLink installation method"
+  log "Using repo based RightLink installation method"
   install_rightlink
 end
 

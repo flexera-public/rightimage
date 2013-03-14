@@ -99,6 +99,12 @@ attribute "rightimage/region",
   :choice => [ "us-east", "us-west", "us-west-2", "eu-west", "ap-southeast", "ap-southeast-2", "ap-northeast", "sa-east" ],
   :required => true
   
+attribute "rightimage/rightlink_repo_url",
+  :display_name => "RightLink Repository Url",
+  :description => "URL to debian or yum repository. Defaults to use standard RightScale repositories if left blank",
+  :recipes => [ "rightimage::default", "rightimage::build_image", "rightimage::rightscale_rightlink", "rightimage::rebundle", "rightimage::rightscale_install"],
+  :required => "optional"
+  
 attribute "rightimage/rightlink_version",
   :display_name => "RightLink Version",
   :description => "The RightLink version we are building into our image",
