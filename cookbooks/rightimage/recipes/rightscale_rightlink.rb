@@ -111,8 +111,6 @@ end
 def install_rightlink
   # Setup repos
   if node[:rightimage][:platform] == "centos"
-    node[:rightimage][:rightlink_repo_url] = "http://s3.amazonaws.com/rightscale_rightlink_dev/rpm_repo_test"
-    node[:rightimage][:rightlink_repo_url] = "http://s3.amazonaws.com/rightscale_rightlink_dev/deb_test_repo_pete"
     template "#{guest_root}/etc/yum.repos.d/rightlink.repo" do
       source "rightlink.repo.erb"
       variables({:enabled => true, :repo_url => node[:rightimage][:rightlink_repo_url]})
