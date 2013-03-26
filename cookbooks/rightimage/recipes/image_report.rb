@@ -29,7 +29,7 @@ ruby_block "create_hint_file" do
   block do
     hint = Hash.new
     # Pull from Chef input.
-    hint["freeze-date"] = "#{timestamp}"[0..7]
+    hint["freeze-date"] = mirror_freeze_date
     # Current date.
     hint["build-date"] = Time.new.strftime("%Y%m%d")
     # Pull from chef input if full image.
