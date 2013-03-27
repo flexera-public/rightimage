@@ -9,6 +9,8 @@ depends "loopback_fs"
 depends "rightscale"
 depends "block_device"
 
+depends "rightimage_cloud_vagrant"
+
 recipe "rightimage::default", "starts builds image automatically at boot. See 'manual_mode' input to enable." 
 recipe "rightimage::build_image", "build image based on host platform"
 recipe "rightimage::build_base", "build base image based on host platform"
@@ -165,7 +167,7 @@ attribute "rightimage/build_number",
 attribute "rightimage/hypervisor",
   :display_name => "Hypervisor",
   :description => "Which hypervisor is this image for?",
-  :choice => [ "xen", "kvm", "esxi", "hyperv" ],
+  :choice => [ "xen", "kvm", "esxi", "hyperv", "virtualbox" ],
   :required => "required"
 
 attribute "rightimage/datacenter",

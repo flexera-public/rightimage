@@ -41,6 +41,8 @@ module RightScale
           "vmdk.ova"
         when "hyperv"
           "vhd"
+        when "virtualbox"
+          "box"
         end
       end
 
@@ -60,6 +62,8 @@ module RightScale
           "vmdk"
         when "hyperv"
           "vhd"
+        when "virtualbox"
+          "box"
         end
       end
 
@@ -132,7 +136,7 @@ module RightScale
       end
 
       def temp_root
-        "/mnt/rightimage-temp"
+        "/mnt/ephemeral/rightimage-temp"
       end
 
       def image_source_bucket

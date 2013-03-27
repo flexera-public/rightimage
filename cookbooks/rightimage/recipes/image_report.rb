@@ -9,11 +9,13 @@ class Chef::Resource::RubyBlock
 end
 
 # Current rightimage_tools gem filename.
-RI_TOOL_GEM = Dir.entries(File.dirname(__FILE__)+"/../files/default/").grep(/rightimage_tools.*.gem/)
+RI_TOOL_GEM = Dir.entries(File.dirname(__FILE__)+"/../files/default/").grep(/rightimage_tools.*.gem/).first
 
 # Stage rightimge_tools gem in image.
 cookbook_file "#{guest_root}/tmp/#{RI_TOOL_GEM}" do
-  mode "0755"
+  source RI_TOOL_GEM
+  mode "0644"
+  backup false
 end
 
 # This folder does not exist yet, so create it.
@@ -53,44 +55,31 @@ directory temp_root do
   recursive true
 end
 
-bash "query_image" do
-  cwd "/"
+bash "run_report_tool" do
   code <<-EOH
-  # If rightimage_tools is not installed, install it. Otherwise, don't.
-  found="$(/usr/sbin/chroot #{guest_root} gem list rightimage_tools | grep -i rightimage_tools)"
-  # Found is nil if rightimage_tools wasn't installed in image.
-  if [ -z "$found" ]; then
-    # Install gem into image without documentation.  
-    /usr/sbin/chroot #{guest_root} gem install --no-rdoc --no-ri /tmp/#{RI_TOOL_GEM}
-    # Sentinel for uninstall at end.
-    found="false"
-  fi
-
-  # Run report tool in image chroot.
+  /usr/sbin/chroot #{guest_root} gem install --no-rdoc --no-ri /tmp/#{RI_TOOL_GEM}
 
   # Extra path for Ubuntu.
   PATH=$PATH:/usr/local/bin
   
   # Prints report to log.
-  /usr/sbin/chroot #{guest_root} report_tool "print"
+  /usr/sbin/chroot #{guest_root} report_tool print
 
   # Move JSON file out of image to receive MD5 checksum.
   mv #{guest_root}/tmp/report.js #{temp_root}/#{loopback_rootname}.js
   
-  # If rightimage_tools was installed, uninstall it.
-  if [ "$found" == "false" ]; then
-    /usr/sbin/chroot #{guest_root} gem uninstall rightimage_tools
-  fi
-
-  # For base and full images, uninstall all gems when finished.
-  if [ "#{node[:rightimage][:build_mode]}" == "base" ] || [ "#{node[:rightimage][:build_mode]}" == "full" ]; then
-    chroot /mnt/image/ gem list | cut -d" " -f1 | chroot /mnt/image/ xargs gem uninstall -aIx
-  fi
+  # Uninstall rightimage tools and some related gems.  Note that cloud providers
+  # may install their own rubygems, so don't remove everything
+  for gem in rest_connection right_api_client right_aws right_http_connection rightimage_tools; do 
+    /usr/sbin/chroot #{guest_root} gem uninstall -aIx $gem || true
+  done
   EOH
 end
 
 # Clean up report tool.
-file "#{guest_root}/tmp/report_tool.rb" do action :delete end
-file "#{guest_root}/tmp/#{RI_TOOL_GEM}" do action :delete end
+file "#{guest_root}/tmp/#{RI_TOOL_GEM}" do
+  backup false
+  action :delete 
+end
 
 rightscale_marker :end

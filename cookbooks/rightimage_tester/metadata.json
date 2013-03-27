@@ -17,8 +17,8 @@
       "recipes": [
 
       ],
-      "display_name": "Test SSH Security?",
-      "description": "If set, checks various SSHd security settings.  Should be set to false on Rackspace Managed or Dev images."
+      "description": "If set, checks various SSHd security settings.  Should be set to false on Rackspace Managed or Dev images.",
+      "display_name": "Test SSH Security?"
     },
     "rightimage_tester/aws_secret_access_key": {
       "required": "required",
@@ -30,8 +30,8 @@
       "recipes": [
         "rightimage_tester::special_strings"
       ],
-      "display_name": "AWS Secret Access Key",
-      "description": "AWS Secret Access Key"
+      "description": "AWS Secret Access Key",
+      "display_name": "AWS Secret Access Key"
     },
     "rightimage_tester/aws_access_key_id": {
       "required": "required",
@@ -43,8 +43,8 @@
       "recipes": [
         "rightimage_tester::special_strings"
       ],
-      "display_name": "AWS Access Key ID",
-      "description": "AWS Access Key ID"
+      "description": "AWS Access Key ID",
+      "display_name": "AWS Access Key ID"
     }
   },
   "license": "Apache v2.0",

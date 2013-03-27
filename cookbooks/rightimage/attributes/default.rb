@@ -32,6 +32,7 @@ when "xen" then set[:rightimage][:image_type] = "vhd"
 when "esxi" then set[:rightimage][:image_type] = "vmdk"
 when "kvm" then set[:rightimage][:image_type] = "qcow2"
 when "hyperv" then set[:rightimage][:image_type] = "msvhd"
+when "virtualbox" then set[:rightimage][:image_type] = "box"
 else raise ArgumentError, "don't know what image format to use for #{node[:rightimage][:hypervisor]}!"
 end
 
@@ -240,6 +241,8 @@ case rightimage[:cloud]
     when "ubuntu"
       set[:rightimage][:grub][:kernel][:options] << " ata_piix.disable_driver"
     end
+  when "vagrant"
+# stuff here
   else 
     case rightimage[:hypervisor]
     when "xen"
