@@ -157,7 +157,7 @@ attribute "rightimage/mirror_freeze_date",
 
 attribute "rightimage/build_id",
   :display_name => "Build ID",
-  :description => "Unique identifier for the a base image, when building a base image.  Usually the ServerTemplate lineage for which image is intended",
+  :description => "Unique identifier for the a image. When building a full image, this build_id must match the build_id of the base image you wish to use. The ID can't include underscores.  This value is usually the RightImage version, such as 13.2.1, or a combination of the version and the developers name or git sha used to build the code, such as 13.2.1-aef01c2d",
   :default => "0",
   :required => "recommended"
 
