@@ -1,4 +1,3 @@
-
 action :install do
   kiwi_dir = "/mnt/kiwi" 
 

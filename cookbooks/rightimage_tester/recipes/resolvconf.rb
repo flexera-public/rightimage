@@ -1,8 +1,8 @@
 #
 # Cookbook Name:: rightimage_tester
-# Recipe:: ipv6 
+# Recipe:: resolvconf 
 #
-# Copyright 2011, RightScale, Inc.
+# Copyright 2013, RightScale, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,9 +19,9 @@
 
 rightscale_marker :begin
 
-rightimage_tester "Verify IPv6 disabled" do
-  not_if { node[:rightimage_tester][:test_ipv6] == "false" }
-  command 'ifconfig lo | grep inet6; if [ "$?" == "0" ]; then exit 1; else exit 0; fi'
+rightimage_tester "Verify resolvconf tail empty" do
+  only_if "test -d /etc/resolvconf/resolv.conf.d"
+  command "[ ! -s /etc/resolvconf/resolv.conf.d/tail ]"
   action :test
 end
 

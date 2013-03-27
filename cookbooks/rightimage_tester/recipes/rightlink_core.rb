@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: rightimage_tester
-# Recipe:: ipv6 
+# Recipe:: rightlink_core
 #
 # Copyright 2011, RightScale, Inc.
 #
@@ -19,9 +19,8 @@
 
 rightscale_marker :begin
 
-rightimage_tester "Verify IPv6 disabled" do
-  not_if { node[:rightimage_tester][:test_ipv6] == "false" }
-  command 'ifconfig lo | grep inet6; if [ "$?" == "0" ]; then exit 1; else exit 0; fi'
+rightimage_tester "Ensure no RightLink core files" do
+  command '[ "$(ls -A /opt/rightscale/crash)" ] && exit 1 || exit 0'
   action :test
 end
 
