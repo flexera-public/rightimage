@@ -222,35 +222,6 @@ EOF
     EOH
   end
 
-
-
-  directory("#{guest_root}/tmp/packages") {recursive true}
-  bash "install ruby 1.9" do
-    # Ruby 1.9 packages are 64-bit only
-    not_if { node[:rightimage][:arch] == "i386" }
-    packages = %w( 
-      ruby1.9.1_1.9.3.327-1_amd64.deb
-      ruby1.9.1-examples_1.9.3.327-1_all.deb
-      ruby1.9.1-dev_1.9.3.327-1_amd64.deb
-      ri1.9.1_1.9.3.327-1_all.deb
-      libtcltk-ruby1.9.1_1.9.3.327-1_amd64.deb
-      libruby1.9.1_1.9.3.327-1_amd64.deb
-    ).join(" ")
-    cwd "#{guest_root}/tmp/packages"
-    flags "-ex"
-    code <<-EOH
-      base_url=http://rightscale-rightimage.s3.amazonaws.com/packages/ubuntu/ruby1.9/
-      for p in #{packages}
-      do
-        curl -s -S -f -L --retry 7 -O $base_url$p
-      done
-      chroot #{guest_root} << EOF
-cd /tmp/packages
-dpkg -i #{packages}
-EOF
-    EOH
-  end
-
   # Set DHCP timeout
   bash "dhcp timeout" do
     flags "-ex"
