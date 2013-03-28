@@ -29,9 +29,10 @@ ruby_block "create_hint_file" do
   block do
     hint = Hash.new
     # Pull from Chef input.
-    hint["freeze-date"] = "#{timestamp}"[0..7]
+    hint["freeze-date"] = mirror_freeze_date
     # Current date.
     hint["build-date"] = Time.new.strftime("%Y%m%d")
+    hint["build-id"] = "#{node[:rightimage][:build_id]}"
     # Pull from chef input if full image.
     if node[:rightimage][:build_mode] == "full"
       hint["rightlink-version"] = "#{node[:rightimage][:rightlink_version]}"
