@@ -75,6 +75,7 @@ fi
 CHROOT_SCRIPT
 
 chmod +x $ROOT/tmp/rubygems_install.sh
+chmod +x $ROOT/tmp/rubygems_links.sh
 if [ "$install_rubygems" = "Y" ]; then
   chroot $ROOT /tmp/rubygems_install.sh > /dev/null 
 fi
