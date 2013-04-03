@@ -347,6 +347,7 @@ action :repo_freeze do
   template "#{guest_root}/etc/apt/sources.list" do
     source "sources.list.erb"
     variables(
+      :bootstrap => true,
       :mirror_date => "#{mirror_freeze_date[0..3]}/#{mirror_freeze_date[4..5]}/#{mirror_freeze_date[6..7]}",
       :platform_codename => platform_codename
     )
@@ -361,6 +362,7 @@ action :repo_unfreeze do
   template "#{guest_root}/etc/apt/sources.list" do
     source "sources.list.erb"
     variables(
+      :bootstrap => false,
       :mirror_date => "latest",
       :platform_codename => platform_codename
     )

@@ -91,7 +91,7 @@ attribute "rightimage/arch",
 attribute "rightimage/cloud",
   :display_name => "Target Cloud",
   :description => "The supported cloud for the virtual image. If unset, build a generic base image.",
-  :choice => [ "ec2", "cloudstack", "eucalyptus", "openstack", "rackspace", "rackspace-managed", "rackspace-v2", "rackspace-managed-v2", "azure", "google"],
+  :choice => [ "ec2", "cloudstack", "eucalyptus", "openstack", "rackspace", "rackspace-open-cloud", "azure", "google"],
   :required => "recommended"
   
 attribute "rightimage/region",
@@ -171,9 +171,17 @@ attribute "rightimage/hypervisor",
 
 attribute "rightimage/datacenter",
   :display_name => "Datacenter ID",
-  :description => "Datacenter/Zone ID.  Defaults to 1.  Use US/UK for rackspace. Use DFW/ORD/LON for rackspace-v2",
+  :description => "Datacenter/Zone ID.  Defaults to 1.  Use US/UK for Rackspace Legacy. Use DFW/ORD/LON for Rackspace Open Cloud.",
   :default => "1",
   :required => "recommended"
+
+attribute "rightimage/cloud_options",
+  :display_name => "Cloud options",
+  :description => "Cloud specific options.  Currently only applicable to Rackspace clouds.  Select 'managed' for Managed enabled accounts, 'rackconnect' for RackConnect enabled accounts.",
+  :choice => ["", "managed", "rackconnect", "rackconnect,managed"],
+  :default => "",
+  :required => "recommended",
+  :recipes => [ "rightimage::rebundle", "rightimage::default" ]
 
 # Optional, parameters for auto creation of mci
 attribute "rightscale/api_user",
