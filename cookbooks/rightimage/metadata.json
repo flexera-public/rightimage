@@ -2,6 +2,7 @@
   "dependencies": {
     "loopback_fs": ">= 0.0.0",
     "rightscale": ">= 0.0.0",
+    "rightimage_cloud_vagrant": ">= 0.0.0",
     "rightimage_tester": ">= 0.0.0",
     "block_device": ">= 0.0.0"
   },
@@ -29,7 +30,8 @@
         "xen",
         "kvm",
         "esxi",
-        "hyperv"
+        "hyperv",
+        "virtualbox"
       ],
       "type": "string",
       "recipes": [
@@ -125,20 +127,6 @@
       "display_name": "aws_509_cert",
       "description": "aws_509_cert"
     },
-    "rightimage/build_number": {
-      "required": "recommended",
-      "calculated": false,
-      "choice": [
-
-      ],
-      "default": "0",
-      "type": "string",
-      "recipes": [
-
-      ],
-      "display_name": "Build number",
-      "description": "Build number of this image.  Defaults to 0"
-    },
     "rightimage/rebundle_base_image_id": {
       "required": "optional",
       "calculated": false,
@@ -227,10 +215,10 @@
 
       ],
       "type": "string",
+      "recommended": true,
       "recipes": [
         "rightimage::do_create_mci"
       ],
-      "recommended": true,
       "display_name": "API URL",
       "description": "The rightscale account specific api url to use.  Ex. https://my.rightscale.com/api/acct/1234 (where 1234 is your account id)"
     },
@@ -322,10 +310,10 @@
 
       ],
       "type": "string",
+      "recommended": true,
       "recipes": [
         "rightimage::do_create_mci"
       ],
-      "recommended": true,
       "display_name": "API Password",
       "description": "Rightscale API password."
     },
@@ -381,6 +369,24 @@
       ],
       "display_name": "aws_account_number",
       "description": "aws_account_number"
+    },
+    "rightimage/cloud_options": {
+      "required": "recommended",
+      "calculated": false,
+      "choice": [
+        "",
+        "managed",
+        "rackconnect",
+        "rackconnect,managed"
+      ],
+      "default": "",
+      "type": "string",
+      "recipes": [
+        "rightimage::rebundle",
+        "rightimage::default"
+      ],
+      "display_name": "Cloud options",
+      "description": "Cloud specific options.  Currently only applicable to Rackspace clouds.  Select 'managed' for Managed enabled accounts, 'rackconnect' for RackConnect enabled accounts."
     },
     "rightimage/build_mode": {
       "required": "required",
@@ -445,9 +451,7 @@
         "eucalyptus",
         "openstack",
         "rackspace",
-        "rackspace-managed",
-        "rackspace-v2",
-        "rackspace-managed-v2",
+        "rackspace-open-cloud",
         "azure",
         "google"
       ],
@@ -462,9 +466,7 @@
       "required": "optional",
       "calculated": false,
       "choice": [
-        "10",
-        "4",
-        "2"
+
       ],
       "default": "10",
       "type": "string",
@@ -481,7 +483,8 @@
         "rightimage::loopback_create",
         "rightimage::cloud_add",
         "rightimage::cloud_upload",
-        "rightimage::cloud_package"
+        "rightimage::cloud_package",
+        "rightimage::rebundle"
       ],
       "display_name": "Root Size GB",
       "description": "Sets the size of the virtual image. Units are in GB."
@@ -568,7 +571,7 @@
 
       ],
       "display_name": "Datacenter ID",
-      "description": "Datacenter/Zone ID.  Defaults to 1.  Use US/UK for rackspace. Use DFW/ORD/LON for rackspace-v2"
+      "description": "Datacenter/Zone ID.  Defaults to 1.  Use US/UK for Rackspace Legacy. Use DFW/ORD/LON for Rackspace Open Cloud."
     },
     "rightimage/rebundle_git_revision": {
       "required": "optional",
@@ -696,14 +699,28 @@
 
       ],
       "type": "string",
+      "recommended": true,
       "recipes": [
         "rightimage::do_create_mci"
       ],
-      "recommended": true,
       "display_name": "API User",
       "description": "RightScale API username. Ex. you@rightscale.com"
     },
-    "rightimage/timestamp": {
+    "rightimage/build_id": {
+      "required": "recommended",
+      "calculated": false,
+      "choice": [
+
+      ],
+      "default": "0",
+      "type": "string",
+      "recipes": [
+
+      ],
+      "display_name": "Build ID",
+      "description": "Unique identifier for the a image. When building a full image, this build_id must match the build_id of the base image you wish to use. The ID can't include underscores.  This value is usually the RightImage version, such as 13.2.1, or a combination of the version and the developers name or git sha used to build the code, such as 13.2.1-aef01c2d"
+    },
+    "rightimage/mirror_freeze_date": {
       "required": "recommended",
       "calculated": false,
       "choice": [
@@ -713,8 +730,8 @@
       "recipes": [
 
       ],
-      "display_name": "Build timestamp and mirror freeze date",
-      "description": "Initial build date of this image, and also the archive date from which to pull packages. Expected format is YYYYMMDDHHMM. If not supplied, will use latest available date."
+      "display_name": "Mirror freeze date",
+      "description": "Day from which to pull OS, rightscale, and rubygem packages. Expected format is YYYYMMDD. If not supplied, will use latest available date."
     },
     "rightimage/rebundle_git_repository": {
       "required": "optional",
@@ -859,10 +876,10 @@
 
       ],
       "type": "string",
+      "recommended": true,
       "recipes": [
         "rightimage::do_create_mci"
       ],
-      "recommended": true,
       "display_name": "RightScale Cloud ID (integer)",
       "description": "The numeric ID in RightScale for the cloud which we will create this image for. For example, 6 = AWS Oregon, 232 = Rackspace"
     },
@@ -895,6 +912,7 @@
         "5.8",
         "6.2",
         "6.3",
+        "6.4",
         "10.04",
         "10.10",
         "12.04"

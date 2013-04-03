@@ -120,6 +120,7 @@ gpgcheck=1
 enabled=1
 gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL<%= epel_key_name %>
 
+<% if @bootstrap == false -%>
 [rightscale-epel]
 name = none
 baseurl = http://<%= node[:rightimage][:mirror] %>/rightscale_software/epel/<%= node[:rightimage][:platform_version].to_i %>/<%= node[:rightimage][:arch] %>/archive/<%= @mirror_date %>/
@@ -132,3 +133,4 @@ enabled=1
 gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-RightScale
 # set metadata to expire faster then main
 metadata_expire=30
+<% end -%>

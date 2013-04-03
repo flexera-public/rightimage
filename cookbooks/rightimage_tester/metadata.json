@@ -17,8 +17,8 @@
       "recipes": [
         "rightimage_tester::sshd_config"
       ],
-      "display_name": "Test SSH Security?",
-      "description": "If set, checks various SSHd security settings.  Should be set to false on Rackspace Managed or Dev images."
+      "description": "If set, checks various SSHd security settings.  Should be set to false on Rackspace Managed or Dev images.",
+      "display_name": "Test SSH Security?"
     },
     "rightimage_tester/root_size": {
       "required": "recommended",
@@ -44,8 +44,8 @@
       "recipes": [
         "rightimage_tester::special_strings"
       ],
-      "display_name": "AWS Secret Access Key",
-      "description": "AWS Secret Access Key"
+      "description": "AWS Secret Access Key",
+      "display_name": "AWS Secret Access Key"
     },
     "rightimage_tester/test_ipv6": {
       "required": "recommended",
@@ -72,8 +72,8 @@
       "recipes": [
         "rightimage_tester::special_strings"
       ],
-      "display_name": "AWS Access Key ID",
-      "description": "AWS Access Key ID"
+      "description": "AWS Access Key ID",
+      "display_name": "AWS Access Key ID"
     }
   },
   "license": "Apache v2.0",
@@ -107,6 +107,7 @@
     "rightimage_tester::java": "Check java installation.",
     "rightimage_tester::image_name": "Check image name.",
     "rightimage_tester::blank_passwords": "Ensure no blank passwords.",
+    "rightimage_tester::resolvconf": "Verify resolvconf tail empty.",
     "rightimage_tester::filesystem_permissions": "Check filesystem permissions.",
     "rightimage_tester::bashrc": "Ensure bashrc is sourced.",
     "rightimage_tester::sshd_config": "Check sshd configuration.",
