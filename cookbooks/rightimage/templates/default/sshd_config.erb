@@ -93,7 +93,11 @@ AcceptEnv LC_IDENTIFICATION LC_ALL
 #X11Forwarding no
 #X11DisplayOffset 10
 #X11UseLocalhost yes
+<% if node[:rightimage][:platform] == "ubuntu" -%>
+PrintMotd no
+<% else -%>
 #PrintMotd yes
+<% end -%>
 #PrintLastLog yes
 #TCPKeepAlive yes
 #UseLogin no

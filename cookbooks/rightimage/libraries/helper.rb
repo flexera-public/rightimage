@@ -42,6 +42,8 @@ module RightScale
           "vmdk.ova"
         when "hyperv"
           "vhd"
+        when "virtualbox"
+          "box"
         end
       end
 
@@ -61,11 +63,14 @@ module RightScale
           "vmdk"
         when "hyperv"
           "vhd"
+        when "virtualbox"
+          "box"
         end
       end
 
       def ri_lineage
-        ["base_image",guest_platform,guest_platform_version,guest_arch,timestamp,build_number].join("_")
+        # build id can't contain any underscores or block device lineage parsing will fail
+        ["base_image",guest_platform,guest_platform_version,guest_arch,mirror_freeze_date,build_id].join("_")
       end
 
       # call this guest_platform, not platform, otherwise can introduce a 
@@ -99,9 +104,9 @@ module RightScale
         end
       end
 
-      def build_number
-        if node[:rightimage][:build_number] =~ /./
-          node[:rightimage][:build_number]
+      def build_id
+        if node[:rightimage][:build_id] =~ /./
+          node[:rightimage][:build_id].gsub("_","-")
         else
           "0"
         end
@@ -133,7 +138,7 @@ module RightScale
       end
 
       def temp_root
-        "/mnt/rightimage-temp"
+        "/mnt/ephemeral/rightimage-temp"
       end
 
       def image_source_bucket
@@ -240,7 +245,7 @@ module RightScale
       end
 
       def gem_install_source
-        "--source http://#{node[:rightimage][:mirror]}/rubygems/archive/#{timestamp[0..7]}/"
+        "--source http://#{node[:rightimage][:mirror]}/rubygems/archive/#{mirror_freeze_date}/"
       end
 
       def grub_initrd
@@ -255,38 +260,38 @@ module RightScale
         "(hd0,0)"
       end
 
-      # Timestamp is used to name the snapshots that base images are stored to and restored from
-      # For base images, we'll use the specified timestamp or default to the latest date
-      # For full images, we'll restored from the specified timestamp, or else poll the API for
+      # Mirror freeze date is used to name the snapshots that base images are stored to and restored from
+      # For base images, we'll use the specified freezedate or default to the latest date
+      # For full images, we'll restored from the specified freezedate, or else poll the API for
       # the latest snapshot and use that.
-      def timestamp
-        return @@timestamp if defined?(@@timestamp)
+      def mirror_freeze_date
+        return @@mirror_freeze_date if defined?(@@mirror_freeze_date)
 
-        if !node[:rightimage][:timestamp].to_s.empty?
-          @@timestamp = node[:rightimage][:timestamp]
+        if !node[:rightimage][:mirror_freeze_date].to_s.empty?
+          @@mirror_freeze_date = node[:rightimage][:mirror_freeze_date]
         elsif node[:rightimage][:build_mode] == "base"
           # Minus one day, today's mirror may not be ready depending on the time
           # use 0 for hour and minute fields, if we run block_device_create and block_device_backup
           # separately during development we would like the value to remain stable.
           # bit of a hack, maybe store this value to disk somewhere?
           ts = Time.now - (3600*24)
-          @@timestamp = "%04d%02d%02d%02d%02d" % [ts.year,ts.month,ts.day,0,0]
-          Chef::Log::info("Using latest available mirror date (#{@@timestamp}) as timestamp input")
+          @@mirror_freeze_date = "%04d%02d%02d" % [ts.year,ts.month,ts.day]
+          Chef::Log::info("Using latest available mirror date (#{@@mirror_freeze_date}) as mirror_freeze_date input")
         elsif node[:rightimage][:build_mode] == "migrate"
-          @@timestamp = nil
+          @@mirror_freeze_date = nil
         elsif rebundle?
           Chef::Log::info("Using latest available mirror date for rebundle")
-          @@timestamp = nil
+          @@mirror_freeze_date = nil
         elsif node[:rightimage][:build_mode] == "full"
-          set_timestamp_from_snapshot
-          @@timestamp = node[:rightimage][:timestamp]
+          set_mirror_freeze_date_from_snapshot
+          @@mirror_freeze_date = node[:rightimage][:mirror_freeze_date]
         else
           raise "Undefined build_mode #{node[:rightimage][:build_mode]}, must be base, migrate, or full"
         end
-        return @@timestamp
+        return @@mirror_freeze_date
       end
 
-      def set_timestamp_from_snapshot
+      def set_mirror_freeze_date_from_snapshot
         require 'rest_client'
         require 'json'
         require '/var/spool/cloud/user-data'
@@ -295,7 +300,7 @@ module RightScale
         ver = node[:rightimage][:platform_version]
         arch = node[:rightimage][:arch]
 
-        Chef::Log.info("A timestamp was not supplied, attempting to restore from the latest snapshot")
+        Chef::Log.info("A mirror_freeze_date was not supplied, attempting to restore from the latest snapshot")
         Chef::Log.info("Searching for snapshots with the form base_image_#{os}_#{ver}_#{arch}")
 
         url = ENV['RS_API_URL']
@@ -303,23 +308,29 @@ module RightScale
         snapshots = JSON.load(body)
 
         filtered_snaps = snapshots.select do |s| 
-          s['nickname'] =~ /base_image_#{os}_#{ver}_#{arch}_(\d{8,})_(\d+)_(\d+)/ &&
+          s['nickname'] =~ /base_image_#{os}_#{ver}_#{arch}_(\d{8,12})_([^_]+)_(.+)/ &&
           s['aws_status'] == "completed"
         end
         if filtered_snaps.length > 0
           sorted_snaps = filtered_snaps.map do |s|
-            # $1=repo freezedate, $2=build_number, $3=aws snapshot timestamp
-            s['nickname'] =~ /_(\d{8,})_(\d+)_(\d+)/
-            [s,$1,$2.to_i,$3]
+            # $1=repo freezedate, $2=build_id, $3=aws snapshot timestamp
+            s['nickname'] =~ /_(\d{8,12})_([^_]+)_(.+)/
+            freezedate = $1
+            build_id = $2
+            timestamp = $3
+            if timestamp =~ /_(\d{8,})$/
+              timestamp = $1
+            end
+            [s,freezedate,build_id,timestamp]
           end
           sorted_snaps.sort! { |a,b| a[1..3] <=> b[1..3] }
 
           snapshot = sorted_snaps.last[0]
-          if snapshot['nickname'] =~ /(base_image_#{os}_#{ver}_#{arch}_(\d{8,})_(\d+))_/
+          if snapshot['nickname'] =~ /(base_image_#{os}_#{ver}_#{arch}_(\d{8,12})_([^_]+))_/
             lineage = $1
             Chef::Log.info("Found #{sorted_snaps.length} snapshots, using latest with lineage #{lineage}")
-            node[:rightimage][:timestamp] = $2
-            node[:rightimage][:build_number] = $3
+            node[:rightimage][:mirror_freeze_date] = $2[0..7]
+            node[:rightimage][:build_id] = $3
           else
             raise "Unable to parse lineage out of snapshot name #{snap["nickname"]}"
           end

@@ -113,7 +113,7 @@ end
 
 # Upload vars.
 if (node[:rightimage][:build_mode] == "base")
-  image_s3_path = "#{guest_platform}/#{guest_platform_version}/#{guest_arch}/#{timestamp[0..3]}"
+  image_s3_path = "#{guest_platform}/#{guest_platform_version}/#{guest_arch}/#{mirror_freeze_date[0..3]}"
   image_upload_bucket = node[:rightimage][:base_image_bucket]
 elsif (node[:rightimage][:build_mode] == "full")
   image_s3_path = node[:rightimage][:hypervisor]+"/#{guest_platform}/#{guest_platform_version}"

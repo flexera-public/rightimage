@@ -9,6 +9,8 @@ depends "loopback_fs"
 depends "rightscale"
 depends "block_device"
 
+depends "rightimage_cloud_vagrant"
+
 recipe "rightimage::default", "starts builds image automatically at boot. See 'manual_mode' input to enable." 
 recipe "rightimage::build_image", "build image based on host platform"
 recipe "rightimage::build_base", "build base image based on host platform"
@@ -52,9 +54,8 @@ recipe "rightimage::s3index_update", "Updates the index.html of the upload bucke
 attribute "rightimage/root_size_gb",
   :display_name => "Root Size GB",
   :description => "Sets the size of the virtual image. Units are in GB.",
-  :choice => [ "10", "4", "2" ],
   :default => "10",
-  :recipes => [ "rightimage::default", "rightimage::build_base", "rightimage::build_image", "rightimage::loopback_copy", "rightimage::block_device_backup","rightimage::block_device_create",  "rightimage::block_device_restore", "rightimage::loopback_resize", "rightimage::loopback_mount", "rightimage::loopback_create", "rightimage::cloud_add", "rightimage::cloud_upload", "rightimage::cloud_package"]
+  :recipes => [ "rightimage::default", "rightimage::build_base", "rightimage::build_image", "rightimage::loopback_copy", "rightimage::block_device_backup","rightimage::block_device_create",  "rightimage::block_device_restore", "rightimage::loopback_resize", "rightimage::loopback_mount", "rightimage::loopback_create", "rightimage::cloud_add", "rightimage::cloud_upload", "rightimage::cloud_package", "rightimage::rebundle" ]
 
 attribute "rightimage/manual_mode",
   :display_name => "Manual Mode",
@@ -78,7 +79,7 @@ attribute "rightimage/platform",
 attribute "rightimage/platform_version",
   :display_name => "Guest OS Version",
   :description => "The OS version to build into the virtual image.",
-  :choice => [ "5.4", "5.6", "5.8", "6.2", "6.3", "10.04", "10.10", "12.04" ],
+  :choice => [ "5.4", "5.6", "5.8", "6.2", "6.3", "6.4", "10.04", "10.10", "12.04" ],
   :required => "optional"
  
 attribute "rightimage/arch",
@@ -90,7 +91,7 @@ attribute "rightimage/arch",
 attribute "rightimage/cloud",
   :display_name => "Target Cloud",
   :description => "The supported cloud for the virtual image. If unset, build a generic base image.",
-  :choice => [ "ec2", "cloudstack", "eucalyptus", "openstack", "rackspace", "rackspace-managed", "rackspace-v2", "rackspace-managed-v2", "azure", "google"],
+  :choice => [ "ec2", "cloudstack", "eucalyptus", "openstack", "rackspace", "rackspace-open-cloud", "azure", "google"],
   :required => "recommended"
   
 attribute "rightimage/region",
@@ -151,26 +152,26 @@ attribute "rightimage/debug",
   :default => "false",
   :required => "optional"
 
-attribute "rightimage/timestamp",
-  :display_name => "Build timestamp and mirror freeze date",
-  :description => "Initial build date of this image, and also the archive date from which to pull packages. Expected format is YYYYMMDDHHMM. If not supplied, will use latest available date.",
+attribute "rightimage/mirror_freeze_date",
+  :display_name => "Mirror freeze date",
+  :description => "Day from which to pull OS, rightscale, and rubygem packages. Expected format is YYYYMMDD. If not supplied, will use latest available date.",
   :required => "recommended"
 
-attribute "rightimage/build_number",
-  :display_name => "Build number",
-  :description => "Build number of this image.  Defaults to 0",
+attribute "rightimage/build_id",
+  :display_name => "Build ID",
+  :description => "Unique identifier for the a image. When building a full image, this build_id must match the build_id of the base image you wish to use. The ID can't include underscores.  This value is usually the RightImage version, such as 13.2.1, or a combination of the version and the developers name or git sha used to build the code, such as 13.2.1-aef01c2d",
   :default => "0",
   :required => "recommended"
 
 attribute "rightimage/hypervisor",
   :display_name => "Hypervisor",
   :description => "Which hypervisor is this image for?",
-  :choice => [ "xen", "kvm", "esxi", "hyperv" ],
+  :choice => [ "xen", "kvm", "esxi", "hyperv", "virtualbox" ],
   :required => "required"
 
 attribute "rightimage/datacenter",
   :display_name => "Datacenter ID",
-  :description => "Datacenter/Zone ID.  Defaults to 1.  Use US/UK for rackspace. Use DFW/ORD/LON for rackspace-v2",
+  :description => "Datacenter/Zone ID.  Defaults to 1.  Use US/UK for Rackspace Legacy. Use DFW/ORD/LON for Rackspace Open Cloud.",
   :default => "1",
   :required => "recommended"
 
@@ -180,6 +181,14 @@ attribute "rightimage/virtualization",
   :choice => [ "hvm", "pvm" ],
   :default => "pvm",
   :required => "recommended"
+
+attribute "rightimage/cloud_options",
+  :display_name => "Cloud options",
+  :description => "Cloud specific options.  Currently only applicable to Rackspace clouds.  Select 'managed' for Managed enabled accounts, 'rackconnect' for RackConnect enabled accounts.",
+  :choice => ["", "managed", "rackconnect", "rackconnect,managed"],
+  :default => "",
+  :required => "recommended",
+  :recipes => [ "rightimage::rebundle", "rightimage::default" ]
 
 # Optional, parameters for auto creation of mci
 attribute "rightscale/api_user",

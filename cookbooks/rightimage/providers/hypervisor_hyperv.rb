@@ -9,21 +9,22 @@ action :install_kernel do
   LIS_PKG = "microsoft-hyper-v-rhel63.3.4-1.20120727.x86_64.rpm"
 
   directory LIS_DIR_HOST do
+    only_if { el6? && node[:rightimage][:platform_version].to_f < 6.4 }
     recursive true
   end
 
   remote_file "#{LIS_DIR_HOST}/#{LIS_KMOD}" do
-    only_if { node[:rightimage][:platform] == "centos" }
+    only_if { el6? && node[:rightimage][:platform_version].to_f < 6.4 }
     source "http://devs-us-west.s3.amazonaws.com/caryp/azure/#{LIS_KMOD}"
   end
 
   remote_file "#{LIS_DIR_HOST}/#{LIS_PKG}" do
-    only_if { node[:rightimage][:platform] == "centos" }
+    only_if { el6? && node[:rightimage][:platform_version].to_f < 6.4 }
     source "http://devs-us-west.s3.amazonaws.com/caryp/azure/#{LIS_PKG}"
   end
 
   bash "install Linux Integration Services package" do
-    only_if { node[:rightimage][:platform] == "centos" }
+    only_if { el6? && node[:rightimage][:platform_version].to_f < 6.4 }
     flags "-ex"
     cwd LIS_DIR_HOST
     code <<-EOH
@@ -59,7 +60,6 @@ action :install_kernel do
   execute "chroot #{guest_root} apt-get -y install linux-backports-modules-hv-precise-virtual" do
     only_if { node[:rightimage][:platform] == "ubuntu" }
   end
-
 end
 
 action :install_tools do
@@ -94,7 +94,7 @@ action :install_tools do
         chroot $guest_root apt-get -y -o Dpkg::Options::="--force-confold" install walinuxagent
         ;;
       "centos"|"rhel")
-        chroot $guest_root yum -y install https://devs-us-west.s3.amazonaws.com/caryp/azure/WALinuxAgent-1.2-1.noarch.rpm
+        chroot $guest_root yum -y install https://devs-us-west.s3.amazonaws.com/caryp/azure/WALinuxAgent-1.3.2-1.noarch.rpm
         ;;
       esac
     EOH
