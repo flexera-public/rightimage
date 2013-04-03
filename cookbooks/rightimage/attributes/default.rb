@@ -90,10 +90,6 @@ when "ubuntu"
   rightimage[:guest_packages] << " ubuntu-standard"
   rightimage[:guest_packages] << " vim"
   rightimage[:guest_packages] << " zlib1g-dev"
-  # ruby 1.9 requirements
-  rightimage[:guest_packages] << " libyaml-0-2"
-  rightimage[:guest_packages] << " tcl8.5"
-  rightimage[:guest_packages] << " tk8.5"
 
   case rightimage[:platform_version]
   when "8.04"
@@ -160,6 +156,8 @@ when "centos","rhel"
   rightimage[:guest_packages] << " redhat-lsb"
   rightimage[:guest_packages] << " redhat-rpm-config"
   rightimage[:guest_packages] << " rpm-build"
+  rightimage[:guest_packages] << " ruby-docs"
+  rightimage[:guest_packages] << " ruby-mode"
   rightimage[:guest_packages] << " sudo"
   rightimage[:guest_packages] << " swig"
   rightimage[:guest_packages] << " telnet"
@@ -168,12 +166,13 @@ when "centos","rhel"
   rightimage[:guest_packages] << " wget"
   rightimage[:guest_packages] << " xfsprogs"
   rightimage[:guest_packages] << " yum-utils"
-  # Ruby 1.9 req2
-  rightimage[:guest_packages] << " libyaml"
 
   # For Centos 5, install custom ruby (1.8.7). so keep these in a separate variable 
   # These are the packages available on the rbel upstream mirror
   set[:rightimage][:ruby_packages] = "ruby ruby-devel ruby-irb ruby-libs ruby-rdoc ruby-ri ruby-tcltk"
+  if el6?
+    rightimage[:guest_packages] << " " << rightimage[:ruby_packages]
+  end
 
   rightimage[:host_packages] << " swig"
 

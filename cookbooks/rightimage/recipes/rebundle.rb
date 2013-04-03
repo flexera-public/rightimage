@@ -124,8 +124,8 @@ bash "upload code to the remote instance" do
   flags "-ex"
   cwd Rebundle::REBUNDLE_SOURCE_PATH
   freeze_date_opt = ""
-  if timestamp
-    freeze_date_opt = "--freeze-date #{timestamp[0..3]}-#{timestamp[4..5]}-#{timestamp[6..7]}"
+  if mirror_freeze_date
+    freeze_date_opt = "--freeze-date #{mirror_freeze_date[0..3]}-#{mirror_freeze_date[4..5]}-#{mirror_freeze_date[6..7]}"
   end
   debug_opt = node[:rightimage][:debug] == "true" ? "--debug" : ""
 
