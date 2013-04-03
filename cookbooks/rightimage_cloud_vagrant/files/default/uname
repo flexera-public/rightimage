@@ -1,0 +1,17 @@
+#!/usr/bin/env ruby
+
+# The VBoxGuestAdditions script will create custom kernel modules and install 
+# them based upon the output of uname -r.  The problem with this is that uname
+# gets its data from /proc, which gets is populated by the host kernel, instead
+# of the guest.  This stub returns the correct data so it uses the kernel 
+# sources of the guest os
+
+if ARGV[0] == "-r"
+  kernels = `ls /boot/ | grep vmlinuz | sort -r | head -n 1`.chomp
+  raise "Could not find kernel version !" unless kernels =~ /vmlinuz/
+  package_name = kernels.split.first
+  headers_version = package_name.sub("vmlinuz-","")
+  puts headers_version
+else
+  exec("/bin/realuname", *ARGV)
+end

@@ -242,6 +242,9 @@ function get_cloud_userdata() {
       # rs_agent_dev:package tag will not be honored and only the rightlink package that is present on
       # the image will be installed. (w-4626)
       ;;
+    none*)
+      logger -st RightScale "Cloud family $RS_CLOUD detected. Not expecting any user data. Use rs_connect utility to connect with RightScale."
+      ;;
     *)
       logger -st RightScale "Unable to query user data - unknown cloud family $RS_CLOUD. Cannot continue."
       exit 1
