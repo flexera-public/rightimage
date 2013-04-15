@@ -1,0 +1,31 @@
+{
+  "dependencies": {
+    "rightimage_image_virtualbox": ">= 0.0.0",
+    "rightimage_hypervisor_virtualbox": ">= 0.0.0"
+  },
+  "name": "rightimage_cloud_vagrant",
+  "maintainer_email": "support@rightscale.com",
+  "attributes": {
+  },
+  "license": "none",
+  "suggestions": {
+  },
+  "platforms": {
+  },
+  "maintainer": "RightScale, Inc.",
+  "long_description": "",
+  "version": "1.0.0",
+  "recommendations": {
+  },
+  "recipes": {
+  },
+  "groupings": {
+  },
+  "conflicting": {
+  },
+  "replacing": {
+  },
+  "description": "Cloud provider cookbook for building RightImage vagrant boxes",
+  "providing": {
+  }
+}
