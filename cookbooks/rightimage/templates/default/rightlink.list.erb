@@ -1,2 +1,2 @@
 ## RightLink Repository
-<%= @enabled ? "" : "#"%>deb <%=@repo_url%> <%= @platform_codename %> main
+<%= @enabled ? "" : "#"%>deb [arch=<%=@arch%>] <%=@repo_url%> <%=@platform_codename%> main

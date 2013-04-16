@@ -8,40 +8,26 @@ class Chef::Resource
   include RightScale::RightImage::Helper
 end
 
-def install_seed_script(legacy = false)
-  if legacy
-    seed_script = "rightimage"
+
+def repo_url_generator
+  repo_url_base = node[:rightimage][:rightlink_repo_url]
+  if repo_url_base =~ /^rightlink-(staging|production|integration)$/
+    repo_type = $1
+    url = "http://rightlink-#{repo_type}.s3.amazonaws.com/"
+    if repo_type == "integration"
+      url << "nightly/"
+    end
+    if node[:rightimage][:platform] =~ /ubuntu/     
+      url << "apt/"
+    else
+      platform = node[:rightimage][:platform_version].to_i
+      arch = node[:rightimage][:arch]
+      url << "yum/1/el/#{platform}/#{arch}/"
+    end
   else
-    seed_script = "rightimage_repo"
+    url = repo_url_base
   end
-
-  log "Place rightlink seed script into image"
-  cookbook_file "#{guest_root}/etc/init.d/rightimage" do
-    source seed_script
-    backup false
-    mode "0755"
-  end
-
-  if legacy
-    log "Clean old install"
-    execute "rm -rf #{guest_root}/opt/rightscale/"
-    execute "chmod 0440 #{guest_root}/root/.rightscale/*"
-  end
-
-  log "Setup seed script to run on boot"
-  bash "install_rightlink" do 
-    flags "-ex"
-    code <<-EOC
-      case "#{node[:rightimage][:platform]}" in 
-        "ubuntu" )
-          chroot #{guest_root} update-rc.d rightimage start 96 2 3 4 5 . stop 1 0 1 6 .
-          ;; 
-        * )
-          chroot #{guest_root} chkconfig --add rightimage
-          ;;
-      esac
-    EOC
-  end
+  return url
 end
 
 def install_rightlink_legacy
@@ -105,32 +91,63 @@ def install_rightlink_legacy
     command  "echo -n " + node[:rightimage][:rightlink_version] + " > " + guest_root + "/etc/rightscale.d/rightscale-release"
   end
 
-  install_seed_script(true) 
+  log "Place rightlink seed script into image"
+  cookbook_file "#{guest_root}/etc/init.d/rightimage" do
+    source "rightimage"
+    backup false
+    mode "0755"
+  end
+
+  log "Clean old install"
+  execute "rm -rf #{guest_root}/opt/rightscale/"
+  execute "chmod 0440 #{guest_root}/root/.rightscale/*"
+
+  log "Setup seed script to run on boot"
+  bash "install seed script" do 
+    flags "-ex"
+    code <<-EOC
+      case "#{node[:rightimage][:platform]}" in 
+        "ubuntu" )
+          chroot #{guest_root} update-rc.d rightimage start 96 2 3 4 5 . stop 1 0 1 6 .
+          ;; 
+        * )
+          chroot #{guest_root} chkconfig --add rightimage
+          ;;
+      esac
+    EOC
+  end
 end
 
 def install_rightlink
   # Setup repos
+  repo_url = repo_url_generator
   if node[:rightimage][:platform] == "centos"
     template "#{guest_root}/etc/yum.repos.d/rightlink.repo" do
       source "rightlink.repo.erb"
-      variables({:enabled => true, :repo_url => node[:rightimage][:rightlink_repo_url]})
+      variables({:enabled => true, :repo_url => repo_url})
       backup false
     end
     execute "chroot #{guest_root} yum -y install rightlink-cloud-#{node[:rightimage][:cloud]}"
     execute "chroot #{guest_root} yum -y install rightlink-#{node[:rightimage][:rightlink_version]}"
     template "#{guest_root}/etc/yum.repos.d/rightlink.repo" do
       source "rightlink.repo.erb"
-      variables({:enabled => false, :repo_url => node[:rightimage][:rightlink_repo_url]})
+      variables({:enabled => false, :repo_url => repo_url})
       backup false
     end
   else
     platform_codename = platform_codename(node[:rightimage][:platform_version])
+    if node[:rightimage][:arch] =~ /x86_64/
+      platform_arch = "amd64"
+    else
+      platform_arch = "i386"
+    end
     template "#{guest_root}/etc/apt/sources.list.d/rightlink.list" do
       source "rightlink.list.erb"
       variables({
         :enabled => true,
+        :arch => platform_arch, 
         :platform_codename => platform_codename,
-        :repo_url => node[:rightimage][:rightlink_repo_url]
+        :repo_url => repo_url
       })
       backup false
     end
@@ -144,18 +161,13 @@ def install_rightlink
       variables({
         :enabled => false,
         :platform_codename => platform_codename,
-        :repo_url => node[:rightimage][:rightlink_repo_url]
+        :repo_url => repo_url
       })
       backup false
     end
     execute "chroot #{guest_root} apt-get -y update"
   end
 
-  execute "insert_rightlink_version" do 
-    command  "echo -n " + node[:rightimage][:rightlink_version] + " > " + guest_root + "/etc/rightscale.d/rightscale-release"
-  end
-
-  install_seed_script(false)
 end
 
 

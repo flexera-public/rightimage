@@ -102,8 +102,14 @@ attribute "rightimage/region",
   
 attribute "rightimage/rightlink_repo_url",
   :display_name => "RightLink Repository Url",
-  :description => "URL to debian or yum repository. Defaults to use standard RightScale repositories if left blank",
+  :description => "URL to base of rightlink repository, defaults to use staging.  If you want to download RightLink from a custom location, override this input and supply the full repo url, i.e. http://s3.amazonaws.com/rightscale_rightlink_dev/adhoc/yum/",
   :recipes => [ "rightimage::default", "rightimage::build_image", "rightimage::rightscale_rightlink", "rightimage::rebundle", "rightimage::rightscale_install"],
+  :choice => [
+    "rightlink-staging",
+    "rightlink-integration",
+    "rightlink-production"
+    ],
+  :default => "rightlink-staging",
   :required => "optional"
   
 attribute "rightimage/rightlink_version",
