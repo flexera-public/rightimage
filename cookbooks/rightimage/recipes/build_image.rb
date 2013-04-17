@@ -37,13 +37,17 @@ include_recipe "rightimage::loopback_mount"
 include_recipe "rightimage::clean"
 include_recipe "rightimage::cloud_add"
 include_recipe "rightimage::rightscale_install"
-include_recipe "rightimage::image_tests"
-include_recipe "rightimage::image_report"
+unless node[:rightimage][:bare_image] == "true"
+  include_recipe "rightimage::image_tests"
+  include_recipe "rightimage::image_report"
+end
 include_recipe "rightimage::loopback_unmount"
 include_recipe "rightimage::cloud_package"
 include_recipe "rightimage::upload_image_s3"
 # Only create reports for public cloud images if they are uploaded.
-if not node[:rightimage][:cloud] =~ /ec2|google|azure/
-  include_recipe "rightimage::report_upload"
+unless node[:rightimage][:bare_image] == "true"
+  if not node[:rightimage][:cloud] =~ /ec2|google|azure/
+    include_recipe "rightimage::report_upload"
+  end
 end
 rightscale_marker :end

@@ -57,7 +57,9 @@ action :install do
   else
     bootstrap_cmd << " --arch amd64"
   end
-  node[:rightimage][:guest_packages].each { |p| bootstrap_cmd << " --addpkg #{p.split}"}
+  if node[:rightimage][:bare_image] != "true"
+    node[:rightimage][:guest_packages].each { |p| bootstrap_cmd << " --addpkg #{p.split}"}
+  end
 
   Chef::Log.info "vmbuilder bootstrap command is: " + bootstrap_cmd
 
@@ -179,49 +181,51 @@ EOS
     EOH
   end
 
-  java_temp = "/tmp/java"
+  if node[:rightimage][:bare_image] != "true"
+    java_temp = "/tmp/java"
 
-  directory java_temp do
-    action :delete
-    recursive true
+    directory java_temp do
+      action :delete
+      recursive true
+    end
+
+    directory java_temp do
+      action :create
+    end
+
+    bash "install sun java" do
+      cwd java_temp
+      flags "-ex"
+      code <<-EOH
+        guest_root=#{guest_root}
+        java_home="/usr/lib/jvm/java-6-sun"
+        java_ver="31"
+
+        if [ "#{node[:rightimage][:arch]}" == x86_64 ] ; then
+          java_arch="x64"
+        else
+          java_arch="i586"
+        fi
+
+        java_file=jdk-6u$java_ver-linux-$java_arch.bin
+
+        wget http://s3.amazonaws.com/rightscale_software/java/$java_file
+        chmod +x /tmp/java/$java_file
+        echo "\\n" | /tmp/java/$java_file
+        rm -rf $guest_root${java_home}
+        mkdir -p $guest_root${java_home}
+        mv /tmp/java/jdk1.6.0_$java_ver/* $guest_root${java_home}
+
+        cat >$guest_root/etc/profile.d/java.sh <<EOF
+  JAVA_HOME=$java_home
+  export JAVA_HOME
+  EOF
+
+        chmod 775 $guest_root/etc/profile.d/java.sh
+      EOH
+    end
   end
-
-  directory java_temp do
-    action :create
-  end
-
-  bash "install sun java" do
-    cwd java_temp
-    flags "-ex"
-    code <<-EOH
-      guest_root=#{guest_root}
-      java_home="/usr/lib/jvm/java-6-sun"
-      java_ver="31"
-
-      if [ "#{node[:rightimage][:arch]}" == x86_64 ] ; then
-        java_arch="x64"
-      else
-        java_arch="i586"
-      fi
-
-      java_file=jdk-6u$java_ver-linux-$java_arch.bin
-
-      wget http://s3.amazonaws.com/rightscale_software/java/$java_file
-      chmod +x /tmp/java/$java_file
-      echo "\\n" | /tmp/java/$java_file
-      rm -rf $guest_root${java_home}
-      mkdir -p $guest_root${java_home}
-      mv /tmp/java/jdk1.6.0_$java_ver/* $guest_root${java_home}
-
-      cat >$guest_root/etc/profile.d/java.sh <<EOF
-JAVA_HOME=$java_home
-export JAVA_HOME
-EOF
-
-      chmod 775 $guest_root/etc/profile.d/java.sh
-    EOH
-  end
-
+  
   # Set DHCP timeout
   bash "dhcp timeout" do
     flags "-ex"
