@@ -107,13 +107,13 @@ attribute "rightimage/region",
   :choice => [ "us-east", "us-west", "us-west-2", "eu-west", "ap-southeast", "ap-southeast-2", "ap-northeast", "sa-east" ],
   :required => true
   
-attribute "rightimage/rightlink_repo_url",
-  :display_name => "RightLink Repository Url",
-  :description => "URL to base of rightlink repository, defaults to use staging.  If you want to download RightLink from a custom location, override this input and supply the full repo url, i.e. http://s3.amazonaws.com/rightscale_rightlink_dev/adhoc/yum/",
+attribute "rightimage/rightlink_repo",
+  :display_name => "RightLink Repository",
+  :description => "Rightlink repository to use. For adhoc repos, supply the value 'adhoc-NAME', such as adhoc-pete.",
   :recipes => [ "rightimage::default", "rightimage::build_image", "rightimage::rightscale_rightlink", "rightimage::rebundle", "rightimage::rightscale_install"],
   :choice => [
     "rightlink-staging",
-    "rightlink-integration",
+    "rightlink-nightly",
     "rightlink-production"
     ],
   :default => "rightlink-staging",

@@ -10,22 +10,26 @@ end
 
 
 def repo_url_generator
-  repo_url_base = node[:rightimage][:rightlink_repo_url]
-  if repo_url_base =~ /^rightlink-(staging|production|integration)$/
+  repo_url_base = node[:rightimage][:rightlink_repo]
+  if repo_url_base =~ /^rightlink-(staging|production|nightly)$/
     repo_type = $1
-    url = "http://rightlink-#{repo_type}.s3.amazonaws.com/"
-    if repo_type == "integration"
-      url << "nightly/"
-    end
-    if node[:rightimage][:platform] =~ /ubuntu/     
-      url << "apt/"
+    if repo_type == "nightly"
+      url = "http://rightlink-integration.s3.amazonaws.com/nightly"
     else
-      platform = node[:rightimage][:platform_version].to_i
-      arch = node[:rightimage][:arch]
-      url << "yum/1/el/#{platform}/#{arch}/"
+      url = "http://rightlink-#{repo_type}.s3.amazonaws.com/"
     end
+  elsif repo_url_base =~ /^adhoc-(\w+)$/
+    repo_name = $1
+    url = "http://rightlink-integration.s3.amazonaws.com/ad_hoc/#{repo_name}"
+  else 
+    raise "Unknown rightlink_repo passed in (#{rightlink_repo})."
+  end
+  if node[:rightimage][:platform] =~ /ubuntu/     
+   url << "apt/"
   else
-    url = repo_url_base
+    platform = node[:rightimage][:platform_version].to_i
+    arch = node[:rightimage][:arch]
+    url << "yum/1/el/#{platform}/#{arch}/"
   end
   return url
 end

@@ -270,7 +270,7 @@ end
 # set rightscale stuff
 set_unless[:rightimage][:rightlink_version] = ""
 
-set_unless[:rightimage][:rightlink_repo_url] = "rightlink-staging"
+set_unless[:rightimage][:rightlink_repo] = "rightlink-staging"
 
 
 # generate command to install getsshkey init script 
