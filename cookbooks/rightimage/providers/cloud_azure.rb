@@ -112,7 +112,7 @@ EOH
       case "#{new_resource.platform}" in
       "ubuntu")
         chroot $guest_root apt-get -y install python-software-properties
-        chroot $guest_root add-apt-repository -y ppa:chris-lea/node.js
+        chroot $guest_root add-apt-repository -y ppa:chris-lea/node.js-legacy
         chroot $guest_root apt-get update
         chroot $guest_root apt-get -y install nodejs npm
         ;;
@@ -143,7 +143,7 @@ action :upload do
       case "#{new_resource.platform}" in
       "ubuntu")
         apt-get -y install python-software-properties
-        add-apt-repository -y ppa:chris-lea/node.js
+        add-apt-repository -y ppa:chris-lea/node.js-legacy
         apt-get update
         apt-get -y install nodejs npm
         ;;
