@@ -14,13 +14,13 @@ def repo_url_generator
   if repo_url_base =~ /^rightlink-(staging|production|nightly)$/
     repo_type = $1
     if repo_type == "nightly"
-      url = "http://rightlink-integration.s3.amazonaws.com/nightly"
+      url = "http://rightlink-integration.s3.amazonaws.com/nightly/"
     else
       url = "http://rightlink-#{repo_type}.s3.amazonaws.com/"
     end
   elsif repo_url_base =~ /^adhoc-(\w+)$/
     repo_name = $1
-    url = "http://rightlink-integration.s3.amazonaws.com/ad_hoc/#{repo_name}"
+    url = "http://rightlink-integration.s3.amazonaws.com/adhoc/#{repo_name}/"
   else 
     raise "Unknown rightlink_repo passed in (#{rightlink_repo})."
   end
@@ -32,6 +32,10 @@ def repo_url_generator
     url << "yum/1/el/#{platform}/#{arch}/"
   end
   return url
+end
+
+def gpg_check_generator
+  node[:rightimage][:rightlink_repo] =~ /staging|production/
 end
 
 def install_rightlink_legacy
@@ -122,20 +126,21 @@ def install_rightlink_legacy
   end
 end
 
-def install_rightlink
+def install_rightlink()
   # Setup repos
   repo_url = repo_url_generator
+  gpg_check = gpg_check_generator
   if node[:rightimage][:platform] == "centos"
     template "#{guest_root}/etc/yum.repos.d/rightlink.repo" do
       source "rightlink.repo.erb"
-      variables({:enabled => true, :repo_url => repo_url})
+      variables({:enabled => true, :gpg_check => gpg_check, :repo_url => repo_url})
       backup false
     end
     execute "chroot #{guest_root} yum -y install rightlink-cloud-#{node[:rightimage][:cloud]}"
-    execute "chroot #{guest_root} yum -y install rightlink-#{node[:rightimage][:rightlink_version]}"
+    execute "chroot #{guest_root} yum -y install rightlink-#{node[:rightimage][:rightlink_version]} rightlink-sandbox-#{node[:rightimage][:rightlink_version]}"
     template "#{guest_root}/etc/yum.repos.d/rightlink.repo" do
       source "rightlink.repo.erb"
-      variables({:enabled => false, :repo_url => repo_url})
+      variables({:enabled => false, :gpg_check => gpg_check, :repo_url => repo_url})
       backup false
     end
   else
@@ -156,10 +161,10 @@ def install_rightlink
       backup false
     end
     execute "chroot #{guest_root} apt-get -y update"
-    # Force yes forces the package to be installed even if its unsigned. Needed for dev packages. TBD 
-    # figure out a better strategy for handling this case
-    execute "chroot #{guest_root} apt-get -y --force-yes install rightlink-cloud-#{node[:rightimage][:cloud]}"
-    execute "chroot #{guest_root} apt-get -y --force-yes install rightlink=#{node[:rightimage][:rightlink_version]}"
+    # Force yes forces the package to be installed even if its unsigned.
+    force_yes = gpg_check ? "" : "--force-yes"
+    execute "chroot #{guest_root} apt-get -y #{force_yes} install rightlink-cloud-#{node[:rightimage][:cloud]}"
+    execute "chroot #{guest_root} apt-get -y #{force_yes} install rightlink=#{node[:rightimage][:rightlink_version]} rightlink-sandbox=#{node[:rightimage][:rightlink_version]}"
     template "#{guest_root}/etc/apt/sources.list.d/rightlink.list" do
       source "rightlink.list.erb"
       variables({

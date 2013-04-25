@@ -4,5 +4,5 @@
 name=RightScale RightLink
 baseurl=<%= @repo_url %>
 enabled=<%= @enabled ? "1":"0" %>
-gpgcheck=1
+gpgcheck=<%= @gpg_check ? "1":"0" %>
 priority=1
