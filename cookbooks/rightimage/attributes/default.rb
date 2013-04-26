@@ -197,6 +197,16 @@ when "suse"
   rightimage[:host_packages] << " kiwi"
 end
 
+if rightimage[:bare_image] == "true"
+  # set base os packages
+  case rightimage[:platform]
+  when "ubuntu"
+    rightimage[:guest_packages] = %w(acpid openssh-client openssh-server language-selector-common ubuntu-standard)
+  when "centos", "rhel"
+    rightimage[:guest_packages] = []
+  end
+end
+
 # set cloud stuff
 # TBD Refactor this block to use consistent naming, figure out how to move logic into cloud providers
 case rightimage[:cloud]

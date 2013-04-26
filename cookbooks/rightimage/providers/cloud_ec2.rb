@@ -36,6 +36,7 @@ action :configure do
   #  - add cloud tools
   bash "install_ec2_tools" do 
     creates "#{guest_root}/home/ec2/bin"
+    not_if { node[:rightimage][:bare_image] == "true" }
     flags "-ex"
     code <<-EOH
       ROOT=#{guest_root}

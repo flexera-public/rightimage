@@ -137,7 +137,7 @@ def install_rightlink()
       backup false
     end
     execute "chroot #{guest_root} yum -y install rightlink-cloud-#{node[:rightimage][:cloud]}"
-    execute "chroot #{guest_root} yum -y install rightlink-#{node[:rightimage][:rightlink_version]} rightlink-sandbox-#{node[:rightimage][:rightlink_version]}"
+    execute "chroot #{guest_root} yum -y install rightlink rightlink-sandbox"
     template "#{guest_root}/etc/yum.repos.d/rightlink.repo" do
       source "rightlink.repo.erb"
       variables({:enabled => false, :gpg_check => gpg_check, :repo_url => repo_url})
@@ -160,11 +160,18 @@ def install_rightlink()
       })
       backup false
     end
-    execute "chroot #{guest_root} apt-get -y update"
+    # Selectively update the repo only, quicker
+    update_repo_cmd = 'apt-get update -y' 
+    update_repo_cmd << ' -o Dir::Etc::sourcelist="/etc/apt/sources.list.d/rightlink.list"'
+    update_repo_cmd << ' -o Dir::Etc::sourceparts="-"'
+    update_repo_cmd << ' -o APT::Get::List-Cleanup="0"'
+       
+    execute "chroot #{guest_root} #{update_repo_cmd}"
+
     # Force yes forces the package to be installed even if its unsigned.
     force_yes = gpg_check ? "" : "--force-yes"
     execute "chroot #{guest_root} apt-get -y #{force_yes} install rightlink-cloud-#{node[:rightimage][:cloud]}"
-    execute "chroot #{guest_root} apt-get -y #{force_yes} install rightlink=#{node[:rightimage][:rightlink_version]} rightlink-sandbox=#{node[:rightimage][:rightlink_version]}"
+    execute "chroot #{guest_root} apt-get -y #{force_yes} install rightlink rightlink-sandbox"
     template "#{guest_root}/etc/apt/sources.list.d/rightlink.list" do
       source "rightlink.list.erb"
       variables({
@@ -174,14 +181,13 @@ def install_rightlink()
       })
       backup false
     end
-    execute "chroot #{guest_root} apt-get -y update"
+    execute "chroot #{guest_root} #{update_repo_cmd}"
   end
 
 end
 
 
 
-log "Building image with RightLink package #{node[:rightimage][:rightlink_version]}"
 if node[:rightimage][:rightlink_version].to_i < 5
   raise "rightlink versions < 5 not supported"
 elsif version_compare(node[:rightimage][:rightlink_version],"5.9") < 0

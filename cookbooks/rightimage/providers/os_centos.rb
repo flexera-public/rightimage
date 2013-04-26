@@ -143,8 +143,10 @@ action :install do
   ## fix logrotate
   touch #{guest_root}/var/log/boot.log
 
-  ## enable name server caching daemon on boot
-  chroot #{guest_root} chkconfig --level 2345 nscd on
+  if [ "#{node[:rightimage][:bare_image]}" != "true" ]; then
+    ## enable name server caching daemon on boot
+    chroot #{guest_root} chkconfig --level 2345 nscd on
+  fi
 
   echo "Disabling TTYs"
   perl -p -i -e 's/(.*tty2)/#\1/' #{guest_root}/etc/inittab
