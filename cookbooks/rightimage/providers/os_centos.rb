@@ -95,10 +95,6 @@ action :install do
   yum -c /tmp/yum.conf -y clean all
   yum -c /tmp/yum.conf -y makecache
   if [ "#{node[:rightimage][:bare_image]}" != "true" ]; then 
-    # used to install a full set of packages on local os, it screws up if you want to use a freezedate
-    # that's older than the host os.  its probably not even necessary anymore, so comment out for now - PS
-    #  old comment re this was: "install guest packages on CentOS 5.2 i386 host to work around yum problem"
-    # yum -c /tmp/yum.conf -y install #{node[:rightimage][:guest_packages]} --exclude gcc-java
     # Install postfix separately, don't want to use centosplus version which bundles mysql
     yum -c /tmp/yum.conf --installroot=#{guest_root} -y install postfix --disablerepo=centosplus
     yum -c /tmp/yum.conf --installroot=#{guest_root} -y remove sendmail
@@ -107,11 +103,9 @@ action :install do
     if [ "5" == "#{node[:rightimage][:platform_version].to_i}" ]; then
       yum -c /tmp/yum.conf --installroot=#{guest_root} --exclude='*.i386' -y install --enablerepo=ruby_custom #{node[:rightimage][:ruby_packages]}
     fi
-
-    yum -c /tmp/yum.conf --installroot=#{guest_root} -y install #{node[:rightimage][:guest_packages]} --exclude gcc-java
-
-    yum -c /tmp/yum.conf --installroot=#{guest_root} -y remove bluez* gnome-bluetooth*
   fi
+  yum -c /tmp/yum.conf --installroot=#{guest_root} -y install #{node[:rightimage][:guest_packages].join(" ")} --exclude gcc-java
+  yum -c /tmp/yum.conf --installroot=#{guest_root} -y remove bluez* gnome-bluetooth*
   yum -c /tmp/yum.conf --installroot=#{guest_root} -y clean all
 
   ## stop crap from going in the logs...    
