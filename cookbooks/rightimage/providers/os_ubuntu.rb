@@ -215,10 +215,8 @@ EOS
         mkdir -p $guest_root${java_home}
         mv /tmp/java/jdk1.6.0_$java_ver/* $guest_root${java_home}
 
-        cat >$guest_root/etc/profile.d/java.sh <<EOF
-  JAVA_HOME=$java_home
-  export JAVA_HOME
-  EOF
+        echo "JAVA_HOME=$java_home" > $guest_root/etc/profile.d/java.sh
+        echo "export JAVA_HOME" >> $guest_root/etc/profile.d/java.sh
 
         chmod 775 $guest_root/etc/profile.d/java.sh
       EOH
