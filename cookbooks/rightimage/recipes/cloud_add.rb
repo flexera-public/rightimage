@@ -115,6 +115,32 @@ rightimage guest_root do
   action :sanitize
 end
 
+bash "execute crontabs" do
+  flags "-ex"
+  code <<-EOF
+    guest_root="#{guest_root}"
+    # Pre-run all crontabs so future runs will be quicker (w-5672)
+    # apt cron has a randomized sleep set, so to work around that we'll set RANDOM=0
+    script=/tmp/prerun_cron.sh
+    path=$guest_root/$script
+    cat <<-CHROOT_SCRIPT > $path
+cmd="cd / && RANDOM=0 run-parts";
+
+for dir in /etc/cron.hourly /etc/cron.daily /etc/cron.weekly /etc/cron.monthly; do
+  echo "DIR: \\$dir";
+  eval \\$cmd \\$dir;
+done
+
+# Delete rotated logs
+find /var/log -name "*.[0-9]*" -exec rm -- {} \\;
+CHROOT_SCRIPT
+
+  chmod +x $path
+  chroot $guest_root $script
+  rm -f $path
+  EOF
+end
+
 directory "#{guest_root}#{node[:rightimage][:fstab][:ephemeral][:mount]}" do
   not_if { node[:rightimage][:fstab][:ephemeral][:dev] == nil }
   action :create
