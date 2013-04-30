@@ -36,7 +36,14 @@ module RightScale
             "vhd.bz2"
           end)
         when "kvm"
-          (node[:rightimage][:cloud] == "google" ? "tar.gz":"qcow2.bz2")
+          case node[:rightimage][:cloud]
+          when "google"
+            "tar.gz"
+          when "openstack"
+            "qcow2"
+          else
+            "qcow2.bz2"
+          end
         when "esxi"
           "vmdk.ova"
         when "hyperv"
