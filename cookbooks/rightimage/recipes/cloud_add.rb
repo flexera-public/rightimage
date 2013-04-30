@@ -110,11 +110,6 @@ rightimage_os node[:rightimage][:platform] do
   action :repo_unfreeze
 end
 
-# Clean up guest image
-rightimage guest_root do
-  action :sanitize
-end
-
 bash "execute crontabs" do
   flags "-ex"
   code <<-EOF
@@ -139,6 +134,11 @@ CHROOT_SCRIPT
   chroot $guest_root $script
   rm -f $path
   EOF
+end
+
+# Clean up guest image
+rightimage guest_root do
+  action :sanitize
 end
 
 directory "#{guest_root}#{node[:rightimage][:fstab][:ephemeral][:mount]}" do
