@@ -147,7 +147,10 @@ action :upload do
     block do
       require 'json'
       filename = "#{image_name}.qcow2"
-      local_file = "#{target_raw_root}/#{filename}"
+
+      aws_url  = "rightscale-openstack-dev.s3.amazonaws.com"
+      aws_path = node[:rightimage][:hypervisor]+"/"+node[:rightimage][:platform]+"/"+node[:rightimage][:platform_version].to_s
+      image_url = "http://#{aws_url}/#{aws_path}/#{filename}"
 
       openstack_user = node[:rightimage][:openstack][:user]
       openstack_password = node[:rightimage][:openstack][:password]
@@ -155,7 +158,7 @@ action :upload do
       openstack_api_port = node[:rightimage][:openstack][:hostname].split(":")[1] || "5000"
 
       # Don't use location=file://path/to/file like you might think, thats the name of the location to store the file on the server that hosts the images, not this machine
-      cmd = %Q(env PATH=$PATH:/usr/local/bin glance --os-username '#{openstack_user}' --os-password '#{openstack_password}' --os-auth-url http://#{openstack_host}:#{openstack_api_port}/v2.0 --os-tenant-name #{openstack_user} image-create --name #{image_name} --is-public True --disk-format qcow2 --container-format bare --file #{local_file})
+      cmd = %Q(env PATH=$PATH:/usr/local/bin glance --os-username '#{openstack_user}' --os-password '#{openstack_password}' --os-auth-url http://#{openstack_host}:#{openstack_api_port}/v2.0 --os-tenant-name #{openstack_user} image-create --name #{image_name} --is-public True --disk-format qcow2 --container-format bare --copy-from #{image_url})
       Chef::Log.info "Executing command: "
       Chef::Log.info cmd
       upload_resp = `#{cmd}`
