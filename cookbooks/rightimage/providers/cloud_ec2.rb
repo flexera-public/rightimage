@@ -212,7 +212,9 @@ def upload_ebs
       local_device=#{local_device}
 
       # Partition volume
-      sfdisk $local_device << EOF
+      # Use --no-reread option to avoid intermittent failures when re-reading
+      # the partition table at the end. (w-5644)
+      sfdisk --no-reread $local_device << EOF
 0,,L,*
 EOF
 
