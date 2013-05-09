@@ -341,13 +341,6 @@ attribute "rightimage/cloudstack/cdc_secret_key",
   :required => "required",
   :recipes => [ "rightimage::cloud_upload" ]
 
-attribute "rightimage/cloudstack/version",
-  :display_name => "CloudStack Version",
-  :description => "CloudStack version.",
-  :required => "required",
-  :choice => [ "2", "3" ],
-  :recipes => [ "rightimage::cloud_upload" ]
-
 # RackSpace
 attribute "rightimage/rackspace/account",
   :display_name => "Rackspace Account ID",

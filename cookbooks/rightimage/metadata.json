@@ -222,20 +222,6 @@
       "display_name": "API URL",
       "description": "The rightscale account specific api url to use.  Ex. https://my.rightscale.com/api/acct/1234 (where 1234 is your account id)"
     },
-    "rightimage/cloudstack/version": {
-      "required": "required",
-      "calculated": false,
-      "choice": [
-        "2",
-        "3"
-      ],
-      "type": "string",
-      "recipes": [
-        "rightimage::cloud_upload"
-      ],
-      "display_name": "CloudStack Version",
-      "description": "CloudStack version."
-    },
     "rightimage/euca/x509_key": {
       "required": "required",
       "calculated": false,
