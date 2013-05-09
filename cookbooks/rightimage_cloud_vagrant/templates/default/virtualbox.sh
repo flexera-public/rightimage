@@ -6,7 +6,7 @@
 #  yum groupinstall "X Window System" -y
 #fi
 # Installing the virtualbox guest additions
-VBOX_VERSION="4.2.4"
+VBOX_VERSION="4.2.12"
 file=/tmp/VBoxGuestAdditions.iso
 if [ ! -f $file ]; then
   curl -o $file --fail --silent --location http://download.virtualbox.org/virtualbox/$VBOX_VERSION/VBoxGuestAdditions_$VBOX_VERSION.iso
