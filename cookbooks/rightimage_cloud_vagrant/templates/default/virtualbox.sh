@@ -6,7 +6,7 @@
 #  yum groupinstall "X Window System" -y
 #fi
 # Installing the virtualbox guest additions
-VBOX_VERSION="4.2.4"
+VBOX_VERSION="4.2.12"
 file=/tmp/VBoxGuestAdditions.iso
 if [ ! -f $file ]; then
   curl -o $file --fail --silent --location http://download.virtualbox.org/virtualbox/$VBOX_VERSION/VBoxGuestAdditions_$VBOX_VERSION.iso
@@ -25,11 +25,14 @@ cp /bin/fakeuname /bin/uname
 set +e
 # Let it error out, if we don't have xwindows installed
 sh /mnt/VBoxLinuxAdditions.run
-set -e
-if [ ! -e /lib/modules/`/bin/fakeuname -r`/updates/dkms/vboxguest.ko ]; then
+
+module=$(find /lib/modules/`/bin/fakeuname -r` -name vboxguest.ko | grep "ko")
+if [ -z "$module" ]; then
   echo "Virtualbox guest additions kernel module was not built!"
   exit 1
 fi
+set -e
+
 mv /bin/realuname /bin/uname
 rm -rf /bin/fakeuname
 sync

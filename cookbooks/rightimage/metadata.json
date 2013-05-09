@@ -424,7 +424,8 @@
         "rackspace",
         "rackspace-open-cloud",
         "azure",
-        "google"
+        "google",
+        "vagrant"
       ],
       "type": "string",
       "recipes": [
