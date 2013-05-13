@@ -1,0 +1,16 @@
+# IMPORTANT NOTE:
+#   ALL GEM DEPENDENCIES MUST CALL OUT THE SPECIFIC VERSION OF THE GEM REQUIRED
+#
+source "http://rubygems.org"
+
+#gem "right_cloud_api",
+#  :git => "git@github.com:rightscale/right_cloud_api_private.git",
+#  :branch => "master"
+
+gem "virtualmonkey",
+  :git => "git@github.com:rightscale/virtualmonkey.git",
+  :branch => "master"
+
+#gem "right_http_connection"
+#gem "right_aws", "3.0.4"
+
