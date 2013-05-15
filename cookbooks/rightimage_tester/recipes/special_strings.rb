@@ -89,7 +89,7 @@ skip_dirs=(
 #{node[:rightimage_tester][:root]}/var/lib/gems
 #{node[:rightimage_tester][:root]}/var/lib/ureadahead
 #{node[:rightimage_tester][:root]}/usr/local/lib/python2.7/dist-packages/boto
-#{node[:rightimage_tester][:root]}/opt/rightscale/sandbox/lib/ruby/gems
+#{node[:rightimage_tester][:root]}/opt/rightscale/sandbox/lib/ruby/
 )
 
 # List of files to ignore.
