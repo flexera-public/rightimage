@@ -98,7 +98,7 @@ attribute "rightimage/arch",
 attribute "rightimage/cloud",
   :display_name => "Target Cloud",
   :description => "The supported cloud for the virtual image. If unset, build a generic base image.",
-  :choice => [ "ec2", "cloudstack", "eucalyptus", "openstack", "rackspace", "rackspace-open-cloud", "azure", "google"],
+  :choice => [ "ec2", "cloudstack", "eucalyptus", "openstack", "rackspace", "rackspace-open-cloud", "azure", "google", "vagrant"],
   :required => "recommended"
   
 attribute "rightimage/region",
@@ -358,13 +358,6 @@ attribute "rightimage/cloudstack/cdc_secret_key",
   :display_name => "CloudStack Secret Key",
   :description => "CloudStack secret key.",
   :required => "required",
-  :recipes => [ "rightimage::cloud_upload" ]
-
-attribute "rightimage/cloudstack/version",
-  :display_name => "CloudStack Version",
-  :description => "CloudStack version.",
-  :required => "required",
-  :choice => [ "2", "3" ],
   :recipes => [ "rightimage::cloud_upload" ]
 
 # RackSpace
