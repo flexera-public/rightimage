@@ -45,9 +45,4 @@ rightimage_cloud node[:rightimage][:cloud] do
   action :upload
 end
 
-# Only create reports for public cloud images if they are uploaded.
-if node[:rightimage][:cloud] =~ /ec2|google|azure/
-  include_recipe "rightimage::report_upload"
-end
-
 rightscale_marker :end

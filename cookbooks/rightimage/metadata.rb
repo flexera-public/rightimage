@@ -64,6 +64,13 @@ attribute "rightimage/manual_mode",
   :default => "true",
   :recipes => [ "rightimage::default" ]
 
+attribute "rightimage/bare_image",
+  :display_name => "Create Bare Image",
+  :description => "If true, image will not contain any additional packages beyond a stock os install, other than rightlink.  Used for debug/testing",
+  :choice => [ "true", "false" ],
+  :default => "false",
+  :required => "optional"
+
 attribute "rightimage/build_mode",
   :display_name => "Build Mode",
   :description => "Build base image, full image, or migrate existing image.",
@@ -100,9 +107,21 @@ attribute "rightimage/region",
   :choice => [ "us-east", "us-west", "us-west-2", "eu-west", "ap-southeast", "ap-southeast-2", "ap-northeast", "sa-east" ],
   :required => true
   
+attribute "rightimage/rightlink_repo",
+  :display_name => "RightLink Repository",
+  :description => "Rightlink repository to use. For adhoc repos, supply the value 'adhoc-NAME', such as adhoc-pete.",
+  :recipes => [ "rightimage::default", "rightimage::build_image", "rightimage::rightscale_rightlink", "rightimage::rebundle", "rightimage::rightscale_install"],
+  :choice => [
+    "rightlink-staging",
+    "rightlink-nightly",
+    "rightlink-production"
+    ],
+  :default => "rightlink-staging",
+  :required => "optional"
+  
 attribute "rightimage/rightlink_version",
   :display_name => "RightLink Version",
-  :description => "The RightLink version we are building into our image",
+  :description => "RightLink version to install.",
   :recipes => [ "rightimage::default", "rightimage::build_image", "rightimage::rightscale_rightlink", "rightimage::rebundle", "rightimage::rightscale_install", "rightimage::do_create_mci"],
   :required => true
   

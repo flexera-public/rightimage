@@ -1,0 +1,8 @@
+# This repo governs the install of the RightLink software package
+
+[rightlink]
+name=RightScale RightLink
+baseurl=<%= @repo_url %>
+enabled=<%= @enabled ? "1":"0" %>
+gpgcheck=<%= @gpg_check ? "1":"0" %>
+priority=1

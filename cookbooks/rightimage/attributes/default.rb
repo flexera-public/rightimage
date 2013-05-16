@@ -25,7 +25,7 @@ set_unless[:rightimage][:base_image_bucket] = "rightscale-rightimage-base-dev"
 set_unless[:rightimage][:platform] = guest_platform
 set_unless[:rightimage][:platform_version] = guest_platform_version
 set_unless[:rightimage][:arch] = guest_arch
-
+set_unless[:rightimage][:bare_image] = "false"
 
 case node[:rightimage][:hypervisor]
 when "xen" then set[:rightimage][:image_type] = "vhd"
@@ -197,6 +197,16 @@ when "suse"
   rightimage[:host_packages] << " kiwi"
 end
 
+if rightimage[:bare_image] == "true"
+  # set base os packages
+  case rightimage[:platform]
+  when "ubuntu"
+    rightimage[:guest_packages] = %w(acpid openssh-clients openssh-server language-selector-common ubuntu-standard)
+  when "centos", "rhel"
+    rightimage[:guest_packages] = %w(acpid openssh-server openssl dhclient)
+  end
+end
+
 # set cloud stuff
 # TBD Refactor this block to use consistent naming, figure out how to move logic into cloud providers
 case rightimage[:cloud]
@@ -269,6 +279,9 @@ end
 
 # set rightscale stuff
 set_unless[:rightimage][:rightlink_version] = ""
+
+set_unless[:rightimage][:rightlink_repo] = "rightlink-staging"
+
 
 # generate command to install getsshkey init script 
 case rightimage[:platform]

@@ -94,21 +94,17 @@ action :install do
   chroot #{guest_root} authconfig --enableshadow --useshadow --enablemd5 --updateall
   yum -c /tmp/yum.conf -y clean all
   yum -c /tmp/yum.conf -y makecache
-  # used to install a full set of packages on local os, it screws up if you want to use a freezedate
-  # that's older than the host os.  its probably not even necessary anymore, so comment out for now - PS
-  #  old comment re this was: "install guest packages on CentOS 5.2 i386 host to work around yum problem"
-  # yum -c /tmp/yum.conf -y install #{node[:rightimage][:guest_packages]} --exclude gcc-java
-  # Install postfix separately, don't want to use centosplus version which bundles mysql
-  yum -c /tmp/yum.conf --installroot=#{guest_root} -y install postfix --disablerepo=centosplus
-  yum -c /tmp/yum.conf --installroot=#{guest_root} -y remove sendmail
+  if [ "#{node[:rightimage][:bare_image]}" != "true" ]; then 
+    # Install postfix separately, don't want to use centosplus version which bundles mysql
+    yum -c /tmp/yum.conf --installroot=#{guest_root} -y install postfix --disablerepo=centosplus
+    yum -c /tmp/yum.conf --installroot=#{guest_root} -y remove sendmail
 
-  # install the guest packages in the chroot
-  if [ "5" == "#{node[:rightimage][:platform_version].to_i}" ]; then
-    yum -c /tmp/yum.conf --installroot=#{guest_root} --exclude='*.i386' -y install --enablerepo=ruby_custom #{node[:rightimage][:ruby_packages]}
+    # install the guest packages in the chroot
+    if [ "5" == "#{node[:rightimage][:platform_version].to_i}" ]; then
+      yum -c /tmp/yum.conf --installroot=#{guest_root} --exclude='*.i386' -y install --enablerepo=ruby_custom #{node[:rightimage][:ruby_packages]}
+    fi
   fi
-
-  yum -c /tmp/yum.conf --installroot=#{guest_root} -y install #{node[:rightimage][:guest_packages]} --exclude gcc-java
-
+  yum -c /tmp/yum.conf --installroot=#{guest_root} -y install #{node[:rightimage][:guest_packages].join(" ")} --exclude gcc-java
   yum -c /tmp/yum.conf --installroot=#{guest_root} -y remove bluez* gnome-bluetooth*
   yum -c /tmp/yum.conf --installroot=#{guest_root} -y clean all
 
@@ -141,8 +137,10 @@ action :install do
   ## fix logrotate
   touch #{guest_root}/var/log/boot.log
 
-  ## enable name server caching daemon on boot
-  chroot #{guest_root} chkconfig --level 2345 nscd on
+  if [ "#{node[:rightimage][:bare_image]}" != "true" ]; then
+    ## enable name server caching daemon on boot
+    chroot #{guest_root} chkconfig --level 2345 nscd on
+  fi
 
   echo "Disabling TTYs"
   perl -p -i -e 's/(.*tty2)/#\1/' #{guest_root}/etc/inittab
@@ -168,33 +166,34 @@ action :install do
   chroot #{guest_root} chkconfig --level 234 rsyslog on
 
   #Install the JDK from S3.
-  if [ "#{node[:rightimage][:arch]}" == x86_64 ] ; then 
-    java_arch="amd64"
-  else 
-    java_arch="i586"
+  if [ "#{node[:rightimage][:bare_image]}" != "true" ]; then
+    if [ "#{node[:rightimage][:arch]}" == x86_64 ] ; then 
+      java_arch="amd64"
+    else 
+      java_arch="i586"
+    fi
+
+    java_ver="6u31"
+    javadb_ver="10.6.2-1.1"
+
+    array=( jdk-$java_ver-linux-$java_arch.rpm sun-javadb-common-$javadb_ver.i386.rpm sun-javadb-client-$javadb_ver.i386.rpm sun-javadb-core-$javadb_ver.i386.rpm sun-javadb-demo-$javadb_ver.i386.rpm )
+    set +e
+    for i in "${array[@]}"; do
+      ret=$(rpm --root #{guest_root} -Uvh http://s3.amazonaws.com/rightscale_software/java/$i 2>&1)
+      [ "$?" == "0" ] && continue
+      echo "$ret" | grep "already installed"
+      [ "$?" != "0" ] && exit 1
+    done
+    set -e
+
+    #Add JAVA_HOME to the system profile
+    echo "Configuring Java Home" 
+    echo "export JAVA_HOME=/usr/java/default" >> #{guest_root}/etc/profile.d/java.sh
+    chmod +x #{guest_root}/etc/profile.d/java.sh
+
+    # Remove system java
+    yum -y --installroot=#{guest_root} remove java
   fi
-
-  java_ver="6u31"
-  javadb_ver="10.6.2-1.1"
-
-  array=( jdk-$java_ver-linux-$java_arch.rpm sun-javadb-common-$javadb_ver.i386.rpm sun-javadb-client-$javadb_ver.i386.rpm sun-javadb-core-$javadb_ver.i386.rpm sun-javadb-demo-$javadb_ver.i386.rpm )
-  set +e
-  for i in "${array[@]}"; do
-    ret=$(rpm --root #{guest_root} -Uvh http://s3.amazonaws.com/rightscale_software/java/$i 2>&1)
-    [ "$?" == "0" ] && continue
-    echo "$ret" | grep "already installed"
-    [ "$?" != "0" ] && exit 1
-  done
-  set -e
-
-  #Add JAVA_HOME to the system profile
-  echo "Configuring Java Home" 
-  echo "export JAVA_HOME=/usr/java/default" >> #{guest_root}/etc/profile.d/java.sh
-  chmod +x #{guest_root}/etc/profile.d/java.sh
-
-  # Remove system java
-  yum -y --installroot=#{guest_root} remove java
-
   #Disable FSCK on the image
   touch #{guest_root}/fastboot
 
