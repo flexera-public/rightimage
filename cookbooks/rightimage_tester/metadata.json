@@ -17,8 +17,8 @@
       "recipes": [
         "rightimage_tester::sshd_config"
       ],
-      "description": "If set, checks various SSHd security settings.  Should be set to false on Rackspace Managed or Dev images.",
-      "display_name": "Test SSH Security?"
+      "display_name": "Test SSH Security?",
+      "description": "If set, checks various SSHd security settings.  Should be set to false on Rackspace Managed or Dev images."
     },
     "rightimage_tester/root_size": {
       "required": "recommended",
@@ -44,8 +44,8 @@
       "recipes": [
         "rightimage_tester::special_strings"
       ],
-      "description": "AWS Secret Access Key",
-      "display_name": "AWS Secret Access Key"
+      "display_name": "AWS Secret Access Key",
+      "description": "AWS Secret Access Key"
     },
     "rightimage_tester/test_ipv6": {
       "required": "recommended",
@@ -72,8 +72,8 @@
       "recipes": [
         "rightimage_tester::special_strings"
       ],
-      "description": "AWS Access Key ID",
-      "display_name": "AWS Access Key ID"
+      "display_name": "AWS Access Key ID",
+      "description": "AWS Access Key ID"
     }
   },
   "license": "Apache v2.0",
@@ -118,6 +118,7 @@
     "rightimage_tester::rightlink_core": "Ensure no RightLink core files.",
     "rightimage_tester::hostname": "Ensure hostname set.",
     "rightimage_tester::apt_config": "Check apt configuration.",
+    "rightimage_tester::apparmor": "Ensure apparmor is not installed.",
     "rightimage_tester::ipv6": "Ensure IPv6 is disabled."
   },
   "groupings": {

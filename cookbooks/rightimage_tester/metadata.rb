@@ -7,6 +7,7 @@ version          "0.1.0"
 depends "rightscale"
 
 recipe "rightimage_tester::default", ""
+recipe "rightimage_tester::apparmor", "Ensure apparmor is not installed."
 recipe "rightimage_tester::apt_config", "Check apt configuration."
 recipe "rightimage_tester::bad_files", "Check for bad files."
 recipe "rightimage_tester::banned_packages", "Ensure no banned packages installed."
