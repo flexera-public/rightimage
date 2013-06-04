@@ -88,6 +88,7 @@
   },
   "recipes": {
     "rightimage_tester::special_strings": "Check for special strings.",
+    "rightimage_tester::rackconnect": "Check for Rackspace Rackconnect automation failures.",
     "rightimage_tester::ephemeral": "Ensure ephemeral drive mounted.",
     "rightimage_tester::dependencies": "Ensure dependencies are installed.",
     "rightimage_tester::bad_files": "Check for bad files.",
@@ -101,11 +102,13 @@
     "rightimage_tester::banned_packages": "Ensure no banned packages installed.",
     "rightimage_tester::xfs_crash": "Ensure instance does not crash when using XFS.",
     "rightimage_tester::sftp": "Ensure can sftp into self.",
+    "rightimage_tester::selinux": "Ensure SELinux is disabled.",
     "rightimage_tester::packages": "Ensure packages can be installed.",
     "rightimage_tester::ldconfig": "Ensure ldconfig runs.",
     "rightimage_tester::java": "Check java installation.",
     "rightimage_tester::image_name": "Check image name.",
     "rightimage_tester::blank_passwords": "Ensure no blank passwords.",
+    "rightimage_tester::resolvconf": "Verify resolvconf tail empty.",
     "rightimage_tester::filesystem_permissions": "Check filesystem permissions.",
     "rightimage_tester::bashrc": "Ensure bashrc is sourced.",
     "rightimage_tester::sshd_config": "Check sshd configuration.",
@@ -116,6 +119,7 @@
     "rightimage_tester::rightlink_core": "Ensure no RightLink core files.",
     "rightimage_tester::hostname": "Ensure hostname set.",
     "rightimage_tester::apt_config": "Check apt configuration.",
+    "rightimage_tester::apparmor": "Ensure apparmor is not installed.",
     "rightimage_tester::ipv6": "Ensure IPv6 is disabled."
   },
   "groupings": {

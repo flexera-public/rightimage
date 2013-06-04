@@ -20,7 +20,7 @@ end
 # Common base image configurations 
 bash "resolv.conf" do
   code <<-EOH
-    echo "nameserver 8.8.4.4" >> #{guest_root}/etc/resolv.conf
+    echo "nameserver 8.8.4.4" > #{guest_root}/etc/resolv.conf
   EOH
 end
 
@@ -34,7 +34,7 @@ template "#{guest_root}/etc/ssh/sshd_config" do
 end
 
 bash "install_rubygems" do 
-  not_if  "chroot #{guest_root} which gem"
+  not_if  { system("chroot #{guest_root} which gem") || node[:rightimage][:bare_image] == "true" }
   flags "-ex"
   code <<-EOC
 ROOT=#{guest_root}
@@ -75,6 +75,7 @@ fi
 CHROOT_SCRIPT
 
 chmod +x $ROOT/tmp/rubygems_install.sh
+chmod +x $ROOT/tmp/rubygems_links.sh
 if [ "$install_rubygems" = "Y" ]; then
   chroot $ROOT /tmp/rubygems_install.sh > /dev/null 
 fi

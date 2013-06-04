@@ -1,17 +1,32 @@
-deb <%= @mirror_url %> <%= @platform_codename %> main restricted universe multiverse
-#deb-src http://archive.ubuntu.com/ubuntu/ <%= @platform_codename %> main restricted universe multiverse
+<% mirror_urls = [
+  'http://'+@mirror_url,
+  'http://mirror.rightscale.com',
+  'http://ec2-us-east-mirror.rightscale.com',
+  'http://ec2-us-west-mirror.rightscale.com'
+] -%>
 
-## MAJOR BUG FIX UPDATES produced after the final release
-deb <%= @mirror_url %> <%= @platform_codename %>-updates main restricted universe multiverse
-#deb-src http://archive.ubuntu.com/ubuntu/ <%= @platform_codename %>-updates main restricted universe multiverse
+<% mirror_types = [
+  {:suffix =>'', :enabled=>true, :desc => ''},
+  {:suffix =>'-updates', :enabled=>true, :description => 'MAJOR BUG FIX UPDATES produced after the final release'},
+  {:suffix =>'-security', :enabled=>true, :description => 'UBUNTU SECURITY UPDATES'},
+  {:suffix =>'-backports', :enabled=>false, :description => 'BACKPORTS REPOSITORY (Unsupported.  May contain illegal packages.  Use at own risk.)'}
+] -%>
 
-## UBUNTU SECURITY UPDATES
-deb <%= @mirror_url %> <%= @platform_codename %>-security main restricted universe multiverse
-#deb-src http://archive.ubuntu.com/ubuntu/ <%= @platform_codename %>-security main restricted universe multiverse
+<% mirror_types.each do |attr| -%>
+## <%=attr[:description] %>
+<% mirror_urls.each do |mirror_url| -%>
+<%=attr[:enabled]? "" : "#"%>deb <%=mirror_url%>/ubuntu_daily/<%=@mirror_date%>/ <%=@platform_codename%><%=attr[:suffix]%> main restricted universe multiverse
+<% end -%>
+#deb-src http://archive.ubuntu.com/ubuntu/ <%=@platform_codename%><%=attr[:suffix]%> main restricted universe multiverse
+<% end -%>
 
-## BACKPORTS REPOSITORY (Unsupported.  May contain illegal packages.  Use at own risk.)
-#deb <%= @mirror_url %> <%= @platform_codename %>-backports main restricted universe multiverse
-#deb-src http://archive.ubuntu.com/ubuntu/ <%= @platform_codename %>-backports main restricted universe multiverse
-
+<% if @bootstrap == false -%>
 ## RIGHTSCALE REPOSITORY
-deb <%= @rightscale_mirror_url %> <%= @platform_codename %> main
+<% if @dev_mirror_url.to_s.empty? -%>
+<% mirror_urls.each do |mirror_url| -%>
+deb <%=mirror_url%>/rightscale_software_ubuntu/<%=@mirror_date%>/ <%=@platform_codename%> main 
+<% end -%>
+<% else -%>
+deb <%= @dev_mirror_url %> <%= @platform_codename %> main
+<% end -%>
+

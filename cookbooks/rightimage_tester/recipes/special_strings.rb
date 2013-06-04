@@ -78,6 +78,7 @@ skip_dirs=(
 #{node[:rightimage_tester][:root]}/usr/java
 #{node[:rightimage_tester][:root]}/usr/lib
 #{node[:rightimage_tester][:root]}/usr/lib64
+#{node[:rightimage_tester][:root]}/usr/local/lib
 #{node[:rightimage_tester][:root]}/usr/share/doc
 #{node[:rightimage_tester][:root]}/var/cache/rightscale
 #{node[:rightimage_tester][:root]}/var/lib/rightscale/right_link/certs
@@ -85,8 +86,10 @@ skip_dirs=(
 #{node[:rightimage_tester][:root]}/usr/local/gsutil
 #{node[:rightimage_tester][:root]}/usr/local/gcutil
 #{node[:rightimage_tester][:root]}/usr/share
+#{node[:rightimage_tester][:root]}/var/lib/gems
 #{node[:rightimage_tester][:root]}/var/lib/ureadahead
 #{node[:rightimage_tester][:root]}/usr/local/lib/python2.7/dist-packages/boto
+#{node[:rightimage_tester][:root]}/opt/rightscale/sandbox/lib/ruby
 )
 
 # List of files to ignore.

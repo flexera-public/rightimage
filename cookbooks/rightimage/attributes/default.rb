@@ -26,13 +26,14 @@ set_unless[:rightimage][:base_image_bucket] = "rightscale-rightimage-base-dev"
 set_unless[:rightimage][:platform] = guest_platform
 set_unless[:rightimage][:platform_version] = guest_platform_version
 set_unless[:rightimage][:arch] = guest_arch
-
+set_unless[:rightimage][:bare_image] = "false"
 
 case node[:rightimage][:hypervisor]
 when "xen" then set[:rightimage][:image_type] = "vhd"
 when "esxi" then set[:rightimage][:image_type] = "vmdk"
 when "kvm" then set[:rightimage][:image_type] = "qcow2"
 when "hyperv" then set[:rightimage][:image_type] = "msvhd"
+when "virtualbox" then set[:rightimage][:image_type] = "box"
 else raise ArgumentError, "don't know what image format to use for #{node[:rightimage][:hypervisor]}!"
 end
 
@@ -60,6 +61,9 @@ when "centos","rhel"
   # For Centos 5, install custom ruby (1.8.7). so keep these in a separate variable 
   # These are the packages available on the rbel upstream mirror
   set[:rightimage][:ruby_packages] = "ruby ruby-devel ruby-irb ruby-libs ruby-rdoc ruby-ri ruby-tcltk"
+  if el6?
+    rightimage[:guest_packages] << " " << rightimage[:ruby_packages]
+  end
 
   rightimage[:host_packages] << " swig"
 
@@ -79,6 +83,16 @@ when "centos","rhel"
   end
 when "suse"
   rightimage[:host_packages] << " kiwi"
+end
+
+if rightimage[:bare_image] == "true"
+  # set base os packages
+  case rightimage[:platform]
+  when "ubuntu"
+    rightimage[:guest_packages] = %w(acpid openssh-clients openssh-server language-selector-common ubuntu-standard)
+  when "centos", "rhel"
+    rightimage[:guest_packages] = %w(acpid openssh-server openssl dhclient)
+  end
 end
 
 # set cloud stuff
@@ -124,6 +138,8 @@ case rightimage[:cloud]
     when "centos"
       set[:rightimage][:grub][:kernel][:options] << " numa=off"
     end
+  when "vagrant"
+# stuff here
   else 
     case rightimage[:hypervisor]
     when "xen"
@@ -151,6 +167,9 @@ end
 
 # set rightscale stuff
 set_unless[:rightimage][:rightlink_version] = ""
+
+set_unless[:rightimage][:rightlink_repo] = "rightlink-staging"
+
 
 # generate command to install getsshkey init script 
 case rightimage[:platform]

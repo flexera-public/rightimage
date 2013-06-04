@@ -40,7 +40,7 @@ action :install do
     EOH
   end
 
-  mirror_date = "#{timestamp[0..3]}/#{timestamp[4..5]}/#{timestamp[6..7]}"
+  mirror_date = "#{mirror_freeze_date[0..3]}/#{mirror_freeze_date[4..5]}/#{mirror_freeze_date[6..7]}"
   mirror_url = "http://#{node[:rightimage][:mirror]}/ubuntu_daily/#{mirror_date}"
 
   bootstrap_cmd = "/usr/bin/vmbuilder xen ubuntu -o \
@@ -182,76 +182,49 @@ EOS
     EOH
   end
 
-  java_temp = "/tmp/java"
+  if node[:rightimage][:bare_image] != "true"
+    java_temp = "/tmp/java"
 
-  directory java_temp do
-    action :delete
-    recursive true
+    directory java_temp do
+      action :delete
+      recursive true
+    end
+
+    directory java_temp do
+      action :create
+    end
+
+    bash "install sun java" do
+      cwd java_temp
+      flags "-ex"
+      code <<-EOH
+        guest_root=#{guest_root}
+        java_home="/usr/lib/jvm/java-6-sun"
+        java_ver="31"
+
+        if [ "#{node[:rightimage][:arch]}" == x86_64 ] ; then
+          java_arch="x64"
+        else
+          java_arch="i586"
+        fi
+
+        java_file=jdk-6u$java_ver-linux-$java_arch.bin
+
+        wget http://s3.amazonaws.com/rightscale_software/java/$java_file
+        chmod +x /tmp/java/$java_file
+        echo "\\n" | /tmp/java/$java_file
+        rm -rf $guest_root${java_home}
+        mkdir -p $guest_root${java_home}
+        mv /tmp/java/jdk1.6.0_$java_ver/* $guest_root${java_home}
+
+        echo "JAVA_HOME=$java_home" > $guest_root/etc/profile.d/java.sh
+        echo "export JAVA_HOME" >> $guest_root/etc/profile.d/java.sh
+
+        chmod 775 $guest_root/etc/profile.d/java.sh
+      EOH
+    end
   end
-
-  directory java_temp do
-    action :create
-  end
-
-  bash "install sun java" do
-    cwd java_temp
-    flags "-ex"
-    code <<-EOH
-      guest_root=#{guest_root}
-      java_home="/usr/lib/jvm/java-6-sun"
-      java_ver="31"
-
-      if [ "#{node[:rightimage][:arch]}" == x86_64 ] ; then
-        java_arch="x64"
-      else
-        java_arch="i586"
-      fi
-
-      java_file=jdk-6u$java_ver-linux-$java_arch.bin
-
-      wget http://s3.amazonaws.com/rightscale_software/java/$java_file
-      chmod +x /tmp/java/$java_file
-      echo "\\n" | /tmp/java/$java_file
-      rm -rf $guest_root${java_home}
-      mkdir -p $guest_root${java_home}
-      mv /tmp/java/jdk1.6.0_$java_ver/* $guest_root${java_home}
-
-      cat >$guest_root/etc/profile.d/java.sh <<EOF
-JAVA_HOME=$java_home
-export JAVA_HOME
-EOF
-
-      chmod 775 $guest_root/etc/profile.d/java.sh
-    EOH
-  end
-
-
-
-  directory("#{guest_root}/tmp/packages") {recursive true}
-  bash "install ruby 1.9" do
-    packages = %w( 
-      ruby1.9.1_1.9.3.327-1_amd64.deb
-      ruby1.9.1-examples_1.9.3.327-1_all.deb
-      ruby1.9.1-dev_1.9.3.327-1_amd64.deb
-      ri1.9.1_1.9.3.327-1_all.deb
-      libtcltk-ruby1.9.1_1.9.3.327-1_amd64.deb
-      libruby1.9.1_1.9.3.327-1_amd64.deb
-    ).join(" ")
-    cwd "#{guest_root}/tmp/packages"
-    flags "-ex"
-    code <<-EOH
-      base_url=http://rightscale-rightimage.s3.amazonaws.com/packages/ubuntu/ruby1.9/
-      for p in #{packages}
-      do
-        curl -s -S -f -L --retry 7 -O $base_url$p
-      done
-      chroot #{guest_root} << EOF
-cd /tmp/packages
-dpkg -i #{packages}
-EOF
-    EOH
-  end
-
+  
   # Set DHCP timeout
   bash "dhcp timeout" do
     flags "-ex"
@@ -360,6 +333,11 @@ EOF
   bash "cleanup" do
     flags "-ex"
     code <<-EOH
+      guest_root=#{guest_root}
+
+      # Remove resolv.conf leftovers (w-5554)
+      rm -rf $guest_root/etc/resolvconf/resolv.conf.d/original $guest_root/etc/resolvconf/resolv.conf.d/tail
+      touch $guest_root/etc/resolvconf/resolv.conf.d/tail
 
       chroot #{guest_root} rm -rf /etc/init/plymouth*
       chroot #{guest_root} apt-get update
@@ -370,17 +348,13 @@ end
 
 action :repo_freeze do
   mirror_date = "#{timestamp[0..3]}/#{timestamp[4..5]}/#{timestamp[6..7]}"
-  mirror_url = "http://#{node[:rightimage][:mirror]}/ubuntu_daily/#{mirror_date}/"
-  if node[:rightimage][:rightscale_mirror_url].to_s.empty?
-    rightscale_mirror_url = "http://#{node[:rightimage][:mirror]}/rightscale_software_ubuntu/#{mirror_date}/"
-  else
-    rightscale_mirror_url = node[:rightimage][:rightscale_mirror_url]
-  end
+
   template "#{guest_root}/etc/apt/sources.list" do
     source "sources.list.erb"
     variables(
-      :mirror_url => mirror_url,
-      :rightscale_mirror_url => rightscale_mirror_url,
+      :mirror_url => node[:rightimage][:mirror],
+      :dev_mirror_url => node[:rightimage][:rightscale_mirror_url],
+      :bootstrap => true,
       :platform_codename => platform_codename
     )
     backup false
@@ -392,17 +366,13 @@ end
 
 action :repo_unfreeze do
   mirror_date = "latest"
-  mirror_url = "http://#{node[:rightimage][:mirror]}/ubuntu_daily/#{mirror_date}/"
-  if node[:rightimage][:rightscale_mirror_url].to_s.empty?
-    rightscale_mirror_url = "http://#{node[:rightimage][:mirror]}/rightscale_software_ubuntu/#{mirror_date}/"
-  else
-    rightscale_mirror_url = node[:rightimage][:rightscale_mirror_url]
-  end
+
   template "#{guest_root}/etc/apt/sources.list" do
     source "sources.list.erb"
     variables(
-      :mirror_url => mirror_url,
-      :rightscale_mirror_url => rightscale_mirror_url,
+      :mirror_url => node[:rightimage][:mirror],
+      :dev_mirror_url => node[:rightimage][:rightscale_mirror_url],
+      :bootstrap => false,
       :platform_codename => platform_codename
     )
     backup false

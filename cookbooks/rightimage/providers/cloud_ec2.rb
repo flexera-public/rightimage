@@ -36,6 +36,7 @@ action :configure do
   #  - add cloud tools
   bash "install_ec2_tools" do 
     creates "#{guest_root}/home/ec2/bin"
+    not_if { node[:rightimage][:bare_image] == "true" }
     flags "-ex"
     code <<-EOH
       ROOT=#{guest_root}
@@ -212,7 +213,9 @@ def upload_ebs
       local_device=#{local_device}
 
       # Partition volume
-      sfdisk $local_device << EOF
+      # Use --no-reread option to avoid intermittent failures when re-reading
+      # the partition table at the end. (w-5644)
+      sfdisk --no-reread $local_device << EOF
 0,,L,*
 EOF
 
