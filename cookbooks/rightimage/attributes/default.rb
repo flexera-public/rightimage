@@ -61,9 +61,6 @@ when "centos","rhel"
   # For Centos 5, install custom ruby (1.8.7). so keep these in a separate variable 
   # These are the packages available on the rbel upstream mirror
   set[:rightimage][:ruby_packages] = "ruby ruby-devel ruby-irb ruby-libs ruby-rdoc ruby-ri ruby-tcltk"
-  if el6?
-    rightimage[:guest_packages] << " " << rightimage[:ruby_packages]
-  end
 
   rightimage[:host_packages] << " swig"
 
@@ -87,13 +84,22 @@ end
 
 if rightimage[:bare_image] == "true"
   # set base os packages
+  guest_packages =
   case rightimage[:platform]
-  when "ubuntu"
-    rightimage[:guest_packages] = %w(acpid openssh-clients openssh-server language-selector-common ubuntu-standard)
-  when "centos", "rhel"
-    rightimage[:guest_packages] = %w(acpid openssh-server openssl dhclient)
+  when "ubuntu" then %w(acpid openssh-clients openssh-server language-selector-common ubuntu-standard)
+  when "centos", "rhel" then %w(acpid openssh-server openssl dhclient)
+  end
+else
+  # set base os packages
+  guest_packages =
+  case rightimage[:platform]
+  when "ubuntu" then %w(rightimage-extras)
+  when "centos" then %w(rightimage-extras xfsprogs)
+  when "rhel" then %w(rightimage-extras)
   end
 end
+
+set[:rightimage][:guest_packages] = guest_packages
 
 # set cloud stuff
 # TBD Refactor this block to use consistent naming, figure out how to move logic into cloud providers

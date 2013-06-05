@@ -1,5 +1,34 @@
 # TBD, don't use bash blocks, just execute the code w/err handling since we're in a provider already
 
+def bind_devices_script
+  <<-EOF
+  mount_point="#{new_resource.mount_point}"
+  mkdir -p $mount_point/proc
+  umount $mount_point/proc || true
+  mount --bind /proc $mount_point/proc
+
+  mkdir -p $mount_point/sys
+  umount $mount_point/sys || true
+  mount --bind /sys $mount_point/sys
+
+  umount $mount_point/dev/pts || true
+
+
+  /sbin/MAKEDEV -d $mount_point/dev -x console
+  /sbin/MAKEDEV -d $mount_point/dev -x null
+  /sbin/MAKEDEV -d $mount_point/dev -x zero
+  /sbin/MAKEDEV -d $mount_point/dev ptmx
+  /sbin/MAKEDEV -d $mount_point/dev urandom
+
+  mkdir -p $mount_point/dev/pts
+  mkdir -p $mount_point/sys/block
+
+  chroot $mount_point mount -t devpts none /dev/pts || true
+  #test -e /dev/ptmx 
+  EOF
+end
+
+
 action :create do
   # Subtle bug: chef will reuse resources based on the string passed in, so 
   # add in new_resource.source into the bash block name to make it unique
@@ -32,6 +61,9 @@ EOF
       rm -rf $mount_point
       mkdir -p $mount_point
       mount $loop_map $mount_point
+
+      # Handle binding of special files
+      #{bind_devices_script}
     EOH
   end
 end
@@ -48,6 +80,8 @@ action :unmount do
       umount -lf $mount_point/dev || true
       umount -lf $mount_point/proc || true
       umount -lf $mount_point/sys || true
+      umount -lf $mount_point/dev/pts || true
+
       umount -lf $mount_point || true
 
       [ -e "$loop_map" ] && kpartx -d $loop_dev
@@ -78,6 +112,9 @@ action :mount do
 
       mkdir -p $mount_point
       mount $loop_map $mount_point
+
+      # Handle binding of special files
+      #{bind_devices_script}
     EOH
   end
 end

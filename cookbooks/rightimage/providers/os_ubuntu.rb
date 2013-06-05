@@ -125,8 +125,8 @@ EOS
         image_temp=`cat /mnt/vmbuilder/xen.conf  | grep xvda1 | grep -v root  | cut -c 25- | cut -c -9`
       fi
 
-      loop_name="loop1"
-      loop_dev="/dev/$loop_name"
+
+      loop_dev="/dev/loop1"
 
       base_raw_path="/mnt/vmbuilder/root.img"
 
@@ -134,11 +134,14 @@ EOS
       umount -lf $loop_dev || true
       # Cleanup loopback stuff
       set +e
-      losetup -a | grep $loop_name
+      losetup -a | grep $loop_dev
       [ "$?" == "0" ] && losetup -d $loop_dev
       set -e
 
       qemu-img convert -O raw /mnt/vmbuilder/$image_temp $base_raw_path
+
+
+
       losetup $loop_dev $base_raw_path
 
       guest_root=#{guest_root}
@@ -148,19 +151,19 @@ EOS
       mount -o loop $loop_dev  $random_dir
       umount $guest_root/proc || true
       rm -rf $guest_root/*
-      rsync -a $random_dir/ $guest_root/
+      rsync -a $random_dir/ $guest_root/ --exclude '/proc' --exclude '/dev' --exclude '/sys'
       umount $random_dir
       sync
       losetup -d $loop_dev
       rm -rf $random_dir
+
       mkdir -p $guest_root/var/man
       chroot $guest_root chown -R man:root /var/man
+
+
   EOH
   end
 
-  bash "install rightimage-extras package" do 
-    code "chroot $guest_root apt-get install rightimage-extras -y"
-  end
 
   # disable loading pata_acpi module - currently breaks acpid from discovering volumes attached to CDC KVM hypervisor, from bootstrap_centos, should be applicable to ubuntu though
   bash "blacklist pata_acpi" do
@@ -170,10 +173,23 @@ EOS
     EOF
   end
 
+
+  cookbook_file "#{guest_root}/tmp/GPG-KEY-RightScale" do
+    source "GPG-KEY-RightScale"
+    backup false
+  end
+
+  log "Adding rightscale gpg key to keyring"
+  bash "install rightscale gpg key" do
+    flags "-ex"
+    code "chroot #{guest_root} apt-key add /tmp/GPG-KEY-RightScale"
+  end
+
   #  - configure mirrors
   rightimage_os new_resource.platform do
     action :repo_unfreeze
   end
+
 
   bash "Restore original ext4 in /etc/mke2fs.conf" do
     flags "-ex"
@@ -264,6 +280,7 @@ EOS
     EOH
   end
 
+
   # - add in custom built libc packages, fixes "illegal instruction" core dump (w-12310)
   directory "#{guest_root}/tmp/packages"
   bash "install custom libc" do 
@@ -307,16 +324,10 @@ EOS
   end
 
 
-  cookbook_file "#{guest_root}/tmp/GPG-KEY-RightScale" do
-    source "GPG-KEY-RightScale"
-    backup false
+  bash "install guest packages" do 
+    code "chroot #{guest_root} apt-get install #{node[:rightimage][:guest_packages].join(" ")} -y"
   end
 
-  log "Adding rightscale gpg key to keyring"
-  bash "install rightscale gpg key" do
-    flags "-ex"
-    code "chroot #{guest_root} apt-key add /tmp/GPG-KEY-RightScale"
-  end
 
   # Remove grub2 files
   bash "remove_grub2" do
@@ -347,13 +358,14 @@ EOS
 end
 
 action :repo_freeze do
-  mirror_date = "#{timestamp[0..3]}/#{timestamp[4..5]}/#{timestamp[6..7]}"
+  mirror_date = "#{mirror_freeze_date[0..3]}/#{mirror_freeze_date[4..5]}/#{mirror_freeze_date[6..7]}"
 
   template "#{guest_root}/etc/apt/sources.list" do
     source "sources.list.erb"
     variables(
       :mirror_url => node[:rightimage][:mirror],
       :dev_mirror_url => node[:rightimage][:rightscale_mirror_url],
+      :mirror_date => mirror_date,
       :bootstrap => true,
       :platform_codename => platform_codename
     )
@@ -372,6 +384,7 @@ action :repo_unfreeze do
     variables(
       :mirror_url => node[:rightimage][:mirror],
       :dev_mirror_url => node[:rightimage][:rightscale_mirror_url],
+      :mirror_date => mirror_date,
       :bootstrap => false,
       :platform_codename => platform_codename
     )

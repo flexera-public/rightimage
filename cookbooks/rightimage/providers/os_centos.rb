@@ -58,38 +58,17 @@ action :install do
   bash "bootstrap_centos" do 
     flags "-ex"
     code <<-EOF
-  ## yum is getting mad that /etc/fstab does not exist and that /proc is not mounted
+  ## Some yum prereqs
   mkdir -p #{guest_root}/etc
   touch #{guest_root}/etc/fstab
+  mkdir -p #{guest_root}/var/log
+  touch #{guest_root}/var/log/yum.log
 
-  mkdir -p #{guest_root}/proc
-  umount #{guest_root}/proc || true
-  mount --bind /proc #{guest_root}/proc
-
-  mkdir -p #{guest_root}/sys
-  umount #{guest_root}/sys || true
-  mount --bind /sys #{guest_root}/sys
-
-  umount #{guest_root}/dev/pts || true
 
   ## bootstrap base OS
   yum -c /tmp/yum.conf --installroot=#{guest_root} -y groupinstall Base 
 
-  /sbin/MAKEDEV -d #{guest_root}/dev -x console
-  /sbin/MAKEDEV -d #{guest_root}/dev -x null
-  /sbin/MAKEDEV -d #{guest_root}/dev -x zero
-  /sbin/MAKEDEV -d #{guest_root}/dev ptmx
-  /sbin/MAKEDEV -d #{guest_root}/dev urandom
 
-  mkdir -p #{guest_root}/dev/pts
-  mkdir -p #{guest_root}/sys/block
-  mkdir -p #{guest_root}/var/log
-  touch #{guest_root}/var/log/yum.log
-
-  mkdir -p #{guest_root}/proc
-  chroot #{guest_root} mount -t devpts none /dev/pts || true
-  test -e /dev/ptmx #|| chroot $imagedir mknod --mode 666 /dev/ptmx c 5 2
-                
   # Shadow file needs to be setup prior install additional packages
   chroot #{guest_root} authconfig --enableshadow --useshadow --enablemd5 --updateall
   yum -c /tmp/yum.conf -y clean all
@@ -104,7 +83,7 @@ action :install do
     if [ "5" == "#{node[:rightimage][:platform_version].to_i}" ]; then
       yum -c /tmp/yum.conf --installroot=#{guest_root} --exclude='*.i386' -y install --enablerepo=ruby_custom #{node[:rightimage][:ruby_packages]}
     fi
-    yum -c /tmp/yum.conf --installroot=#{guest_root} -y install rightimage-extras --exclude gcc-java
+    yum -c /tmp/yum.conf --installroot=#{guest_root} -y install #{node[:rightimage][:guest_packages].join(" ")} --exclude gcc-java
   fi
   yum -c /tmp/yum.conf --installroot=#{guest_root} -y remove bluez* gnome-bluetooth*
   yum -c /tmp/yum.conf --installroot=#{guest_root} -y clean all
@@ -304,14 +283,7 @@ action :install do
       chroot #{guest_root} rpm --rebuilddb
     EOH
   end
-
-  bash "cleanup" do
-    code <<-EOH
-      umount -lf #{guest_root}/proc || true
-      umount -lf #{guest_root}/sys || true
-      umount -lf #{guest_root}/dev/pts || true
-    EOH
-  end    
+ 
 end
 
 action :repo_freeze do
@@ -322,7 +294,7 @@ action :repo_freeze do
     action :create
   end
 
-  mirror_date = timestamp[0..7] 
+  mirror_date = mirror_freeze_date[0..7] 
 
   ["/tmp/yum.conf", "#{repo_dir}/#{el_repo_file}"].each do |location|
     template location do
