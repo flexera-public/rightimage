@@ -15,6 +15,37 @@ class Chef::Recipe
   include RightScale::RightImage::Helper
 end
 
+require 'chef/log'
+require 'chef/mixin/shell_out'
+class Chef::Provider
+  include Chef::Mixin::ShellOut
+end
+
+
+
+def loopback_package_install(packages)
+  init_scripts = ['/sbin/start-stop-daemon', '/sbin/initctl']
+  begin
+    init_scripts.each do |script|
+      shell_out!("chroot #{guest_root} dpkg-divert --add --rename --local #{script}")
+      ::File.open("#{guest_root}/#{script}","w") do |f|
+        f.puts('#!/bin/sh')
+        f.puts('echo')
+        f.puts("echo 'Warning: Fake #{script} called, doing nothing'")
+      end
+      shell_out!("chmod 755 #{guest_root}/#{script}")
+    end
+    package_list = Array(packages).join(" ")
+    Chef::Log.info("Installing #{package_list} into #{guest_root}")
+    shell_out!("chroot #{guest_root} apt-get install -y #{package_list}")
+  ensure
+    init_scripts.each do |script|
+      shell_out!("rm #{guest_root}/#{script}")
+      shell_out!("chroot #{guest_root} dpkg-divert --remove --rename #{script}")
+    end
+  end
+end
+
 action :install do
   platform_codename = platform_codename(new_resource.platform_version)
   #create bootstrap command
@@ -322,27 +353,10 @@ EOS
   end
 
 
-  bash "install guest packages" do 
-    code <<-EOF
-    chroot #{guest_root} dpkg-divert --add --rename --local /sbin/start-stop-daemon
-    chroot #{guest_root} dpkg-divert --add --rename --local /sbin/initctl
-echo \
-"#!/bin/sh
-echo
-echo \"Warning: Fake start-stop-daemon called, doing nothing\"" > "#{guest_root}/sbin/start-stop-daemon"
-    chmod 755 "#{guest_root}/sbin/start-stop-daemon"
-
-echo \
-"#!/bin/sh
-echo
-echo \"Warning: Fake initctl called, doing nothing\"" > "#{guest_root}/sbin/initctl"
-    chmod 755 "#{guest_root}/sbin/initctl"
-
-    chroot #{guest_root} apt-get install #{node[:rightimage][:guest_packages].join(" ")} -y
-    rm #{guest_root}/sbin/initctl #{guest_root}/sbin/start-stop-daemon
-    chroot #{guest_root} dpkg-divert --remove --rename /sbin/initctl
-    chroot #{guest_root} dpkg-divert --remove --rename /sbin/start-stop-daemon
-    EOF
+  ruby_block "install guest packages" do 
+    block do
+      loopback_package_install node[:rightimage][:guest_packages]
+    end
   end
 
 

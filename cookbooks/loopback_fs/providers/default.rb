@@ -86,8 +86,9 @@ action :unmount do
 
       if [ "#{node[:platform]}" = "ubuntu" ]; then
         if [ -e $mount_point/dev ]; then 
-          cd $mount_point/dev 
+          pushd $mount_point/dev 
           /sbin/MAKEDEV -d null ptmx console zero urandom
+          popd
         fi
       fi
       umount -lf $mount_point/dev/pts || true
@@ -97,8 +98,6 @@ action :unmount do
 
       umount -lf $mount_point || true
 
-      sync
-      sleep 5
 
       [ -e "$loop_map" ] && kpartx -d $loop_dev
       set +e
