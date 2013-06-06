@@ -13,18 +13,24 @@ def bind_devices_script
 
   umount $mount_point/dev/pts || true
 
+  if [ "#{node[:platform]}" = "ubuntu" ]; then
+    mkdir -p $mount_point/dev
+    cd $mount_point/dev 
+    /sbin/MAKEDEV null ptmx console zero urandom
+  else
+    /sbin/MAKEDEV -d $mount_point/dev -x console
+    /sbin/MAKEDEV -d $mount_point/dev -x null
+    /sbin/MAKEDEV -d $mount_point/dev -x zero
+    /sbin/MAKEDEV -d $mount_point/dev ptmx
+    /sbin/MAKEDEV -d $mount_point/dev urandom
 
-  /sbin/MAKEDEV -d $mount_point/dev -x console
-  /sbin/MAKEDEV -d $mount_point/dev -x null
-  /sbin/MAKEDEV -d $mount_point/dev -x zero
-  /sbin/MAKEDEV -d $mount_point/dev ptmx
-  /sbin/MAKEDEV -d $mount_point/dev urandom
+  fi
+
 
   mkdir -p $mount_point/dev/pts
   mkdir -p $mount_point/sys/block
-
-  chroot $mount_point mount -t devpts none /dev/pts || true
-  #test -e /dev/ptmx 
+    # not necessary?
+    #test -e /dev/ptmx  && chroot $mount_point mount -t devpts none /dev/pts || true
   EOF
 end
 
@@ -77,12 +83,22 @@ action :unmount do
       mount_point="#{new_resource.mount_point}"
 
       sync
+
+      if [ "#{node[:platform]}" = "ubuntu" ]; then
+        if [ -e $mount_point/dev ]; then 
+          cd $mount_point/dev 
+          /sbin/MAKEDEV -d null ptmx console zero urandom
+        fi
+      fi
+      umount -lf $mount_point/dev/pts || true
       umount -lf $mount_point/dev || true
       umount -lf $mount_point/proc || true
       umount -lf $mount_point/sys || true
-      umount -lf $mount_point/dev/pts || true
 
       umount -lf $mount_point || true
+
+      sync
+      sleep 5
 
       [ -e "$loop_map" ] && kpartx -d $loop_dev
       set +e

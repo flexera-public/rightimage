@@ -65,9 +65,8 @@ action :install do
   touch #{guest_root}/var/log/yum.log
 
 
-  ## bootstrap base OS
-  yum -c /tmp/yum.conf --installroot=#{guest_root} -y groupinstall Base 
-
+  ## bootstrap base OS.  
+  yum -c /tmp/yum.conf  --installroot=#{guest_root} --disablerepo=rightscale-epel -y groupinstall Base 
 
   # Shadow file needs to be setup prior install additional packages
   chroot #{guest_root} authconfig --enableshadow --useshadow --enablemd5 --updateall
@@ -76,7 +75,7 @@ action :install do
 
   if [ "#{node[:rightimage][:bare_image]}" != "true" ]; then 
     # Install postfix separately, don't want to use centosplus version which bundles mysql
-    yum -c /tmp/yum.conf --installroot=#{guest_root} -y install postfix --disablerepo=centosplus
+    yum -c /tmp/yum.conf --installroot=#{guest_root} -y install postfix --disablerepo=centosplus --disablerepo=rightscale-epel
     yum -c /tmp/yum.conf --installroot=#{guest_root} -y remove sendmail
 
     # install the guest packages in the chroot
@@ -300,7 +299,7 @@ action :repo_freeze do
     template location do
       source "yum.conf.erb"
       backup false
-      variables ({
+      variables({
         :bootstrap => true,
         :mirror => node[:rightimage][:mirror],
         :dev_mirror_url => node[:rightimage][:rightscale_mirror_url],
@@ -315,7 +314,7 @@ action :repo_unfreeze do
   template "#{guest_root}/etc/yum.repos.d/#{el_repo_file}" do
     source "yum.conf.erb"
     backup false
-    variables ({
+    variables({
       :bootstrap => false,
       :mirror => node[:rightimage][:mirror],
       :dev_mirror_url => node[:rightimage][:rightscale_mirror_url],

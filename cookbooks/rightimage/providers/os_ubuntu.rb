@@ -149,9 +149,7 @@ EOS
       random_dir=/tmp/rightimage-$RANDOM
       mkdir $random_dir
       mount -o loop $loop_dev  $random_dir
-      umount $guest_root/proc || true
-      rm -rf $guest_root/*
-      rsync -a $random_dir/ $guest_root/ --exclude '/proc' --exclude '/dev' --exclude '/sys'
+      rsync -a --delete $random_dir/ $guest_root/ --exclude '/proc' --exclude '/dev' --exclude '/sys'
       umount $random_dir
       sync
       losetup -d $loop_dev
@@ -325,7 +323,26 @@ EOS
 
 
   bash "install guest packages" do 
-    code "chroot #{guest_root} apt-get install #{node[:rightimage][:guest_packages].join(" ")} -y"
+    code <<-EOF
+    chroot #{guest_root} dpkg-divert --add --rename --local /sbin/start-stop-daemon
+    chroot #{guest_root} dpkg-divert --add --rename --local /sbin/initctl
+echo \
+"#!/bin/sh
+echo
+echo \"Warning: Fake start-stop-daemon called, doing nothing\"" > "#{guest_root}/sbin/start-stop-daemon"
+    chmod 755 "#{guest_root}/sbin/start-stop-daemon"
+
+echo \
+"#!/bin/sh
+echo
+echo \"Warning: Fake initctl called, doing nothing\"" > "#{guest_root}/sbin/initctl"
+    chmod 755 "#{guest_root}/sbin/initctl"
+
+    chroot #{guest_root} apt-get install #{node[:rightimage][:guest_packages].join(" ")} -y
+    rm #{guest_root}/sbin/initctl #{guest_root}/sbin/start-stop-daemon
+    chroot #{guest_root} dpkg-divert --remove --rename /sbin/initctl
+    chroot #{guest_root} dpkg-divert --remove --rename /sbin/start-stop-daemon
+    EOF
   end
 
 
@@ -351,7 +368,7 @@ EOS
       touch $guest_root/etc/resolvconf/resolv.conf.d/tail
 
       chroot #{guest_root} rm -rf /etc/init/plymouth*
-      chroot #{guest_root} apt-get update
+      chroot #{guest_root} apt-get update > /dev/null
       chroot #{guest_root} apt-get clean
     EOH
   end
@@ -373,7 +390,7 @@ action :repo_freeze do
   end
 
   # Need to apt-get update whenever the repo file is changed.
-  execute "chroot #{guest_root} apt-get -y update"
+  execute "chroot #{guest_root} apt-get -y update > /dev/null"
 end
 
 action :repo_unfreeze do
@@ -392,5 +409,5 @@ action :repo_unfreeze do
   end
 
   # Need to apt-get update whenever the repo file is changed.
-  execute "chroot #{guest_root} apt-get -y update"
+  execute "chroot #{guest_root} apt-get -y update > /dev/null"
 end
