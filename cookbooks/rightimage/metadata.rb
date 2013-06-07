@@ -180,7 +180,7 @@ attribute "rightimage/mirror_freeze_date",
 attribute "rightimage/rightscale_staging_mirror",
   :display_name => "Use RightScale staging mirror",
   :description => "Use the staging repo for RightScale Software repo. Used for development and testing",
-  :default => ["false"],
+  :default => "false",
   :choice => ["true", "false"],
   :required => "optional"
 
