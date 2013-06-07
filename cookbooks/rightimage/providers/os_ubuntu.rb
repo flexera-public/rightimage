@@ -22,7 +22,10 @@ class Chef::Provider
 end
 
 
-
+# Ubuntu packages may call triggers which autostart services after install.  
+# These services will open log files preventing the loopback filesystem from 
+# unmounting.  Do the same thing debootstrap does and stub out initctl and
+# such with dummy scripts temporarily
 def loopback_package_install(packages)
   init_scripts = ['/sbin/start-stop-daemon', '/sbin/initctl']
   begin
