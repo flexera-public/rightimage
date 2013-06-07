@@ -1,134 +1,134 @@
 {
-  "dependencies": {
-    "rightscale": ">= 0.0.0"
-  },
-  "name": "rightimage_tester",
-  "maintainer_email": "support@rightscale.com",
   "attributes": {
-    "rightimage_tester/test_ssh_security": {
-      "required": "recommended",
+    "rightimage_tester/aws_access_key_id": {
       "calculated": false,
       "choice": [
-        "true",
-        "false"
+
       ],
-      "default": "true",
-      "type": "string",
+      "description": "AWS Access Key ID",
+      "display_name": "AWS Access Key ID",
       "recipes": [
-        "rightimage_tester::sshd_config"
+        "rightimage_tester::special_strings"
       ],
-      "display_name": "Test SSH Security?",
-      "description": "If set, checks various SSHd security settings.  Should be set to false on Rackspace Managed or Dev images."
+      "required": "required",
+      "type": "string"
+    },
+    "rightimage_tester/aws_secret_access_key": {
+      "calculated": false,
+      "choice": [
+
+      ],
+      "description": "AWS Secret Access Key",
+      "display_name": "AWS Secret Access Key",
+      "recipes": [
+        "rightimage_tester::special_strings"
+      ],
+      "required": "required",
+      "type": "string"
     },
     "rightimage_tester/root_size": {
-      "required": "recommended",
       "calculated": false,
       "choice": [
 
       ],
       "default": "10",
-      "type": "string",
+      "description": "If set, verifies root filesystem size.  Specify size in GB.  Most RightImages are 10GB.",
+      "display_name": "Root Filesystem Size",
       "recipes": [
         "rightimage_tester::filesystem_size"
       ],
-      "display_name": "Root Filesystem Size",
-      "description": "If set, verifies root filesystem size.  Specify size in GB.  Most RightImages are 10GB."
-    },
-    "rightimage_tester/aws_secret_access_key": {
-      "required": "required",
-      "calculated": false,
-      "choice": [
-
-      ],
-      "type": "string",
-      "recipes": [
-        "rightimage_tester::special_strings"
-      ],
-      "display_name": "AWS Secret Access Key",
-      "description": "AWS Secret Access Key"
+      "required": "recommended",
+      "type": "string"
     },
     "rightimage_tester/test_ipv6": {
-      "required": "recommended",
       "calculated": false,
       "choice": [
         "true",
         "false"
       ],
       "default": "true",
-      "type": "string",
+      "description": "If set, verifies IPv6 is diabled.  Should be set to false on Softlayer.",
+      "display_name": "Verify IPv6 disabled?",
       "recipes": [
         "rightimage_tester::ipv6"
       ],
-      "display_name": "Verify IPv6 disabled?",
-      "description": "If set, verifies IPv6 is diabled.  Should be set to false on Softlayer."
+      "required": "recommended",
+      "type": "string"
     },
-    "rightimage_tester/aws_access_key_id": {
-      "required": "required",
+    "rightimage_tester/test_ssh_security": {
       "calculated": false,
       "choice": [
-
+        "true",
+        "false"
       ],
-      "type": "string",
+      "default": "true",
+      "description": "If set, checks various SSHd security settings.  Should be set to false on Rackspace Managed or Dev images.",
+      "display_name": "Test SSH Security?",
       "recipes": [
-        "rightimage_tester::special_strings"
+        "rightimage_tester::sshd_config"
       ],
-      "display_name": "AWS Access Key ID",
-      "description": "AWS Access Key ID"
+      "required": "recommended",
+      "type": "string"
     }
-  },
-  "license": "Apache v2.0",
-  "suggestions": {
-  },
-  "platforms": {
-  },
-  "maintainer": "RightScale, Inc.",
-  "long_description": "",
-  "version": "0.1.0",
-  "recommendations": {
-  },
-  "recipes": {
-    "rightimage_tester::special_strings": "Check for special strings.",
-    "rightimage_tester::rackconnect": "Check for Rackspace Rackconnect automation failures.",
-    "rightimage_tester::ephemeral": "Ensure ephemeral drive mounted.",
-    "rightimage_tester::dependencies": "Ensure dependencies are installed.",
-    "rightimage_tester::bad_files": "Check for bad files.",
-    "rightimage_tester::fstab": "Check fstab.",
-    "rightimage_tester::filesystem_size": "Check root filesystem size.",
-    "rightimage_tester::default": "",
-    "rightimage_tester::sudo": "Check sudo configuration.",
-    "rightimage_tester::gemrc": "Ensure /root/.gem and .gemrc doesn't exist.",
-    "rightimage_tester::modprobe": "Ensure modprobe runs.",
-    "rightimage_tester::dupe_mounts": "Check for duplicate mounts.",
-    "rightimage_tester::banned_packages": "Ensure no banned packages installed.",
-    "rightimage_tester::xfs_crash": "Ensure instance does not crash when using XFS.",
-    "rightimage_tester::sftp": "Ensure can sftp into self.",
-    "rightimage_tester::selinux": "Ensure SELinux is disabled.",
-    "rightimage_tester::packages": "Ensure packages can be installed.",
-    "rightimage_tester::ldconfig": "Ensure ldconfig runs.",
-    "rightimage_tester::java": "Check java installation.",
-    "rightimage_tester::image_name": "Check image name.",
-    "rightimage_tester::blank_passwords": "Ensure no blank passwords.",
-    "rightimage_tester::resolvconf": "Verify resolvconf tail empty.",
-    "rightimage_tester::filesystem_permissions": "Check filesystem permissions.",
-    "rightimage_tester::bashrc": "Ensure bashrc is sourced.",
-    "rightimage_tester::sshd_config": "Check sshd configuration.",
-    "rightimage_tester::reboot": "Ensure instance reboots.",
-    "rightimage_tester::crontab": "Check crontab configuration.",
-    "rightimage_tester::ssh": "Ensure can ssh into self.",
-    "rightimage_tester::rubygems": "Check rubygems installation.",
-    "rightimage_tester::rightlink_core": "Ensure no RightLink core files.",
-    "rightimage_tester::hostname": "Ensure hostname set.",
-    "rightimage_tester::apt_config": "Check apt configuration.",
-    "rightimage_tester::apparmor": "Ensure apparmor is not installed.",
-    "rightimage_tester::ipv6": "Ensure IPv6 is disabled."
-  },
-  "groupings": {
   },
   "conflicting": {
   },
-  "replacing": {
+  "dependencies": {
+    "rightscale": ">= 0.0.0"
   },
   "description": "A cookbook for testing RightImages",
+  "groupings": {
+  },
+  "license": "Apache v2.0",
+  "long_description": "",
+  "maintainer": "RightScale, Inc.",
+  "maintainer_email": "support@rightscale.com",
+  "name": "rightimage_tester",
+  "platforms": {
+  },
   "providing": {
-  }
+  },
+  "recipes": {
+    "rightimage_tester::apparmor": "Ensure apparmor is not installed.",
+    "rightimage_tester::apt_config": "Check apt configuration.",
+    "rightimage_tester::bad_files": "Check for bad files.",
+    "rightimage_tester::banned_packages": "Ensure no banned packages installed.",
+    "rightimage_tester::bashrc": "Ensure bashrc is sourced.",
+    "rightimage_tester::blank_passwords": "Ensure no blank passwords.",
+    "rightimage_tester::crontab": "Check crontab configuration.",
+    "rightimage_tester::default": "",
+    "rightimage_tester::dependencies": "Ensure dependencies are installed.",
+    "rightimage_tester::dupe_mounts": "Check for duplicate mounts.",
+    "rightimage_tester::ephemeral": "Ensure ephemeral drive mounted.",
+    "rightimage_tester::filesystem_permissions": "Check filesystem permissions.",
+    "rightimage_tester::filesystem_size": "Check root filesystem size.",
+    "rightimage_tester::fstab": "Check fstab.",
+    "rightimage_tester::gemrc": "Ensure /root/.gem and .gemrc doesn't exist.",
+    "rightimage_tester::hostname": "Ensure hostname set.",
+    "rightimage_tester::image_name": "Check image name.",
+    "rightimage_tester::ipv6": "Ensure IPv6 is disabled.",
+    "rightimage_tester::java": "Check java installation.",
+    "rightimage_tester::ldconfig": "Ensure ldconfig runs.",
+    "rightimage_tester::modprobe": "Ensure modprobe runs.",
+    "rightimage_tester::packages": "Ensure packages can be installed.",
+    "rightimage_tester::rackconnect": "Check for Rackspace Rackconnect automation failures.",
+    "rightimage_tester::reboot": "Ensure instance reboots.",
+    "rightimage_tester::resolvconf": "Verify resolvconf tail empty.",
+    "rightimage_tester::rightlink_core": "Ensure no RightLink core files.",
+    "rightimage_tester::rubygems": "Check rubygems installation.",
+    "rightimage_tester::selinux": "Ensure SELinux is disabled.",
+    "rightimage_tester::sftp": "Ensure can sftp into self.",
+    "rightimage_tester::special_strings": "Check for special strings.",
+    "rightimage_tester::ssh": "Ensure can ssh into self.",
+    "rightimage_tester::sshd_config": "Check sshd configuration.",
+    "rightimage_tester::sudo": "Check sudo configuration.",
+    "rightimage_tester::xfs_crash": "Ensure instance does not crash when using XFS."
+  },
+  "recommendations": {
+  },
+  "replacing": {
+  },
+  "suggestions": {
+  },
+  "version": "0.1.0"
 }
