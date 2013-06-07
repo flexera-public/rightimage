@@ -285,6 +285,7 @@ action :install do
  
 end
 
+
 action :repo_freeze do
   repo_dir = "#{guest_root}/etc/yum.repos.d"
 
@@ -302,7 +303,7 @@ action :repo_freeze do
       variables({
         :bootstrap => true,
         :mirror => node[:rightimage][:mirror],
-        :dev_mirror_url => node[:rightimage][:rightscale_mirror_url],
+        :use_staging_mirror => node[:rightimage][:rightscale_staging_mirror],
         :mirror_date => mirror_date
       })
     end
@@ -317,7 +318,7 @@ action :repo_unfreeze do
     variables({
       :bootstrap => false,
       :mirror => node[:rightimage][:mirror],
-      :dev_mirror_url => node[:rightimage][:rightscale_mirror_url],
+      :use_staging_mirror => node[:rightimage][:rightscale_staging_mirror],
       :mirror_date => "latest"
     })
   end

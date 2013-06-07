@@ -122,13 +122,13 @@ gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL<%= epel_key_name %>
 
 [rightscale-epel]
 name = none
-<% if @dev_mirror_url.to_s.empty? -%>
+<% if @rightscale_staging_mirror.to_s == "true" -%>
+baseurl = http://rightscale-software-staging.s3.amazonaws.com/centos/<%= node[:rightimage][:platform_version].to_i %>/<%= node[:rightimage][:arch] %>
+<% else -%>
 baseurl = http://<%= @mirror %>/rightscale_software/epel/<%= node[:rightimage][:platform_version].to_i %>/<%= node[:rightimage][:arch] %>/archive/<%= @mirror_date %>/
   http://mirror.rightscale.com/rightscale_software/epel/<%= node[:rightimage][:platform_version].to_i %>/<%= node[:rightimage][:arch] %>/archive/<%= @mirror_date %>/
   http://ec2-us-east-mirror.rightscale.com/rightscale_software/epel/<%= node[:rightimage][:platform_version].to_i %>/<%= node[:rightimage][:arch] %>/archive/<%= @mirror_date %>/
   http://ec2-us-west-mirror.rightscale.com/rightscale_software/epel/<%= node[:rightimage][:platform_version].to_i %>/<%= node[:rightimage][:arch] %>/archive/<%= @mirror_date %>/
-<% else -%>
-baseurl = <%= @dev_mirror_url %>
 <% end -%>
 failovermethod=priority
 gpgcheck=0

@@ -21,10 +21,10 @@ mirror_types.each do |attr| %>
 <% end %>
 
 ## RIGHTSCALE REPOSITORY
-<% if @dev_mirror_url.to_s.empty? %>
-<% mirror_urls.each do |mirror_url| %>
-deb <%=mirror_url%>/rightscale_software_ubuntu/<%=@mirror_date%>/ <%=@platform_codename%> main·
-<% end %>
+<% if @use_staging_mirror.to_s == "true" %>
+deb http://rightscale-software-staging.s3.amazonaws.com/ubuntu <%= @platform_codename %> main
 <% else %>
-deb <%= @dev_mirror_url %> <%= @platform_codename %> main
+<% mirror_urls.each do |mirror_url| %>
+deb <%=mirror_url%>/rightscale_software_ubuntu/<%=@mirror_date%>/ <%=@platform_codename%> main
+<% end %>
 <% end %>

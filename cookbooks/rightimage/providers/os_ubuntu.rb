@@ -395,7 +395,7 @@ action :repo_freeze do
     source "sources.list.erb"
     variables(
       :mirror_url => node[:rightimage][:mirror],
-      :dev_mirror_url => node[:rightimage][:rightscale_mirror_url],
+      :use_staging_mirror => node[:rightimage][:rightscale_staging_mirror],
       :mirror_date => mirror_date,
       :bootstrap => true,
       :platform_codename => platform_codename
@@ -414,7 +414,7 @@ action :repo_unfreeze do
     source "sources.list.erb"
     variables(
       :mirror_url => node[:rightimage][:mirror],
-      :dev_mirror_url => node[:rightimage][:rightscale_mirror_url],
+      :use_staging_mirror => node[:rightimage][:rightscale_staging_mirror],
       :mirror_date => mirror_date,
       :bootstrap => false,
       :platform_codename => platform_codename

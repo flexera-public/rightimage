@@ -176,10 +176,12 @@ attribute "rightimage/mirror_freeze_date",
   :description => "Day from which to pull OS, rightscale, and rubygem packages. Expected format is YYYYMMDD. If not supplied, will use latest available date.",
   :required => "recommended"
 
-attribute "rightimage/rightscale_mirror_url",
-  :display_name => "RightScale software repository url",
-  :description => "This sets the URL to use for the RightScale software repository. If left blank, will use the official RightScale repository.  This is used to test new packages",
-  :default => "",
+
+attribute "rightimage/rightscale_staging_mirror",
+  :display_name => "Use RightScale staging mirror",
+  :description => "Use the staging repo for RightScale Software repo. Used for development and testing",
+  :default => ["false"],
+  :choice => ["true", "false"],
   :required => "optional"
 
 attribute "rightimage/build_id",
