@@ -82,7 +82,9 @@ action :install do
     if [ "5" == "#{node[:rightimage][:platform_version].to_i}" ]; then
       yum -c /tmp/yum.conf --installroot=#{guest_root} --exclude='*.i386' -y install --enablerepo=ruby_custom #{node[:rightimage][:ruby_packages]}
     fi
-    yum -c /tmp/yum.conf --installroot=#{guest_root} -y install #{node[:rightimage][:guest_packages].join(" ")} --exclude gcc-java
+    for p in #{node[:rightimage][:guest_packages].join(" ")}; do
+      yum -c /tmp/yum.conf --exclude gcc-java -y install $p
+    done
   fi
   yum -c /tmp/yum.conf --installroot=#{guest_root} -y remove bluez* gnome-bluetooth*
   yum -c /tmp/yum.conf --installroot=#{guest_root} -y clean all
