@@ -83,7 +83,7 @@ action :install do
       yum -c /tmp/yum.conf --installroot=#{guest_root} --exclude='*.i386' -y install --enablerepo=ruby_custom #{node[:rightimage][:ruby_packages]}
     fi
     for p in #{node[:rightimage][:guest_packages].join(" ")}; do
-      yum -c /tmp/yum.conf --exclude gcc-java -y install $p
+      yum -c /tmp/yum.conf --installroot=#{guest_root} --exclude gcc-java -y install $p
     done
   fi
   yum -c /tmp/yum.conf --installroot=#{guest_root} -y remove bluez* gnome-bluetooth*
