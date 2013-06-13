@@ -66,6 +66,10 @@ action :install do
 
 
   ## bootstrap base OS.  
+  # We have to disable the rightscale-epel in the base install due to a subtle bug with
+  # ius packages being in the rightscale-epel mirror.  Base wants libopenssl.so which
+  # is gets supplied by the openssl10-libs package in ius, rather than the base openssl package.
+  # This causes a dependency conflict at a later point
   yum -c /tmp/yum.conf  --installroot=#{guest_root} --disablerepo=rightscale-epel -y groupinstall Base 
 
   # Shadow file needs to be setup prior install additional packages
