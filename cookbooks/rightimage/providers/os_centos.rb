@@ -86,6 +86,8 @@ action :install do
     if [ "5" == "#{node[:rightimage][:platform_version].to_i}" ]; then
       yum -c /tmp/yum.conf --installroot=#{guest_root} --exclude='*.i386' -y install --enablerepo=ruby_custom #{node[:rightimage][:ruby_packages]}
     fi
+    # Install these one by one... yum install doesn't fail unless every package
+    # fails, so grouping them on one lines hides errors
     for p in #{node[:rightimage][:guest_packages].join(" ")}; do
       yum -c /tmp/yum.conf --installroot=#{guest_root} --exclude gcc-java -y install $p
     done
