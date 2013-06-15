@@ -168,6 +168,7 @@ EOS
     EOF
   end
 
+
   #  - configure mirrors
   rightimage_os new_resource.platform do
     action :repo_unfreeze
@@ -235,6 +236,19 @@ EOS
       sed -i "s/#timeout.*/timeout 300;/" #{guest_root}/etc/dhcp$dhcp_ver/dhclient.conf
       rm -f #{guest_root}/var/lib/dhcp$dhcp_ver/*
     EOH
+  end
+
+  # dhclient on precise by default doesn't set the hostname on boot
+  # while dhcpd on ubuntu 10.04 does. Ubuntu 13.04 has a script in contrib
+  # called sethostname.sh that does the same thing that you can place your enter
+  # hooks.  You may have to manually install it though, so revisit the issue at 
+  # that point (w-5618)
+  if new_resource.platform_version.to_f.between?(12.04,12.10); then
+    cookbook_file "#{guest_root}/etc/dhcp/dhclient-enter-hooks.d/hostname" do
+      source "dhclient-hostname.sh"
+      backup false
+      mode "0644"
+    end
   end
 
   # Don't let SysV init start until more than lo0 is ready
