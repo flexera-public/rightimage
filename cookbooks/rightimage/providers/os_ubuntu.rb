@@ -181,48 +181,6 @@ EOS
     EOH
   end
 
-  if node[:rightimage][:bare_image] != "true"
-    java_temp = "/tmp/java"
-
-    directory java_temp do
-      action :delete
-      recursive true
-    end
-
-    directory java_temp do
-      action :create
-    end
-
-    bash "install sun java" do
-      cwd java_temp
-      flags "-ex"
-      code <<-EOH
-        guest_root=#{guest_root}
-        java_home="/usr/lib/jvm/java-6-sun"
-        java_ver="31"
-
-        if [ "#{node[:rightimage][:arch]}" == x86_64 ] ; then
-          java_arch="x64"
-        else
-          java_arch="i586"
-        fi
-
-        java_file=jdk-6u$java_ver-linux-$java_arch.bin
-
-        wget http://s3.amazonaws.com/rightscale_software/java/$java_file
-        chmod +x /tmp/java/$java_file
-        echo "\\n" | /tmp/java/$java_file
-        rm -rf $guest_root${java_home}
-        mkdir -p $guest_root${java_home}
-        mv /tmp/java/jdk1.6.0_$java_ver/* $guest_root${java_home}
-
-        echo "JAVA_HOME=$java_home" > $guest_root/etc/profile.d/java.sh
-        echo "export JAVA_HOME" >> $guest_root/etc/profile.d/java.sh
-
-        chmod 775 $guest_root/etc/profile.d/java.sh
-      EOH
-    end
-  end
   
   # Set DHCP timeout
   bash "dhcp timeout" do
