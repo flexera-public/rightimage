@@ -165,35 +165,6 @@ action :install do
   # Start rsyslog on startup
   chroot #{guest_root} chkconfig --level 234 rsyslog on
 
-  #Install the JDK from S3.
-  if [ "#{node[:rightimage][:bare_image]}" != "true" ]; then
-    if [ "#{node[:rightimage][:arch]}" == x86_64 ] ; then 
-      java_arch="amd64"
-    else 
-      java_arch="i586"
-    fi
-
-    java_ver="6u31"
-    javadb_ver="10.6.2-1.1"
-
-    array=( jdk-$java_ver-linux-$java_arch.rpm sun-javadb-common-$javadb_ver.i386.rpm sun-javadb-client-$javadb_ver.i386.rpm sun-javadb-core-$javadb_ver.i386.rpm sun-javadb-demo-$javadb_ver.i386.rpm )
-    set +e
-    for i in "${array[@]}"; do
-      ret=$(rpm --root #{guest_root} -Uvh http://s3.amazonaws.com/rightscale_software/java/$i 2>&1)
-      [ "$?" == "0" ] && continue
-      echo "$ret" | grep "already installed"
-      [ "$?" != "0" ] && exit 1
-    done
-    set -e
-
-    #Add JAVA_HOME to the system profile
-    echo "Configuring Java Home" 
-    echo "export JAVA_HOME=/usr/java/default" >> #{guest_root}/etc/profile.d/java.sh
-    chmod +x #{guest_root}/etc/profile.d/java.sh
-
-    # Remove system java
-    yum -y --installroot=#{guest_root} remove java
-  fi
   #Disable FSCK on the image
   touch #{guest_root}/fastboot
 
