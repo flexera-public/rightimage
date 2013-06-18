@@ -1,9 +1,16 @@
-## when pasting a key into a json file, make sure to use the following command: 
-## sed -e :a -e '$!N;s/\n/\\n/;ta' /path/to/key
-## this seems not to work on os x
 class Chef::Node
  include RightScale::RightImage::Helper
 end
+
+# Rightlink strips /usr/local/bin out of the default path for, which is where
+# Ubuntu installs python and ruby binstubs.  Setting JAVA_HOME to /usr here is
+# a bit of a hack, the ec2 tools really only want JAVA_HOME to be set to the grandparent
+# directory of the java executable.
+set[:rightimage][:script_env] = {
+  'PATH' => "/home/ec2/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+  'JAVA_HOME' => "/usr",
+  'EC2_HOME' => "/home/ec2"
+}
 
 set_unless[:rightimage][:debug] = false
 set[:rightimage][:lang] = "en_US.UTF-8"
