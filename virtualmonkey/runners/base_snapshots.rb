@@ -27,12 +27,14 @@ module VirtualMonkey
       def build_id
         if ENV.has_key?('RIGHTIMAGE_VERSION') && !ENV['RIGHTIMAGE_VERSION'].to_s.empty?
           version = ENV['RIGHTIMAGE_VERSION']
-          sha_full  = `git log -1 --pretty="%H"`
-          unless $?.success?
-            raise "Could not get sha for rightimage_private repo"
+          ::Dir.chdir(::File.dirname(__FILE__)) do
+            sha_full  = `git log -1 --pretty="%H"`
+            unless $?.success?
+              raise "Could not get sha for rightimage_private repo"
+            end
+            sha = sha_full.chomp[0..7]
+            return "#{version}-#{sha}"
           end
-          sha = sha_full.chomp[0..7]
-          return "#{version}-#{sha}"
         else
           return nil
         end
@@ -59,8 +61,10 @@ module VirtualMonkey
       # tags what the rightimage SHA we used to create the base image
       # was for later reproducibility
       def tag_repository(tag)
-        `git tag #{tag}` unless `git tag`.split.include?(tag)
-        `git push --tags`
+        ::Dir.chdir(::File.dirname(__FILE__)) do
+          `git tag #{tag}` unless `git tag`.split.include?(tag)
+          `git push --tags`
+        end
       end
 
       def base_builder_lookup_scripts
