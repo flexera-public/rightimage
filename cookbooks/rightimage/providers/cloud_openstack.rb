@@ -135,8 +135,8 @@ action :upload do
     if node[:platform] =~ /centos|rhel/ && node[:platform_version].to_f < 6.0
       cmd_append = "-2.6"
     end
+    environment(node[:rightimage][:script_env])
     code <<-EOH
-      export PATH=$PATH:/usr/local/bin
       easy_install#{cmd_append} pip
       easy_install#{cmd_append} -U distribute
       pip#{cmd_append} install -I python-glanceclient==0.9.0

@@ -8,8 +8,6 @@ class Chef::Recipe
   include RightScale::RightImage::Helper
 end
 
-gem_package_fog 
-
 # Path to file on disk
 full_image_path = target_raw_root+"/"+image_name+"."+image_file_ext
 
