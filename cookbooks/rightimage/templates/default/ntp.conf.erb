@@ -3,11 +3,7 @@
 
 tinker panic 0 dispersion 1.000
 
-<% if @platform == "ubuntu" -%>
-driftfile /var/lib/ntp/ntp.drift
-<% else -%>
-driftfile /var/lib/ntp/drift
-<% end -%>
+driftfile <%= @driftfile %>
  
 # Permit time synchronization with our time source, but do not
 # permit the source to query or modify the service on this system.
@@ -23,12 +19,10 @@ restrict -6 ::1
 # Hosts on local network are less restricted.
 #restrict 192.168.1.0 mask 255.255.255.0 nomodify notrap
 
-<% if @add_private_ntp_server -%>
 # This entry is a hook to use a private ntp server.  Optionally provide host
 # "time" in your DNS server configuration, such as adding it to /etc/hosts for
-# dnsmasq
+# dnsmasq.
 server time burst iburst
-<% end -%>
 server time.rightscale.com burst iburst
 server ec2-us-east.time.rightscale.com burst iburst
 server ec2-us-west.time.rightscale.com burst iburst
