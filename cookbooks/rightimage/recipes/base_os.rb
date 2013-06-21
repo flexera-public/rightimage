@@ -134,7 +134,7 @@ template "#{guest_root}/etc/ntp.conf" do
   source "ntp.conf.erb"
   backup false
   variables({
-    :driftfile => node[:rightimage][:platform] == "ubunutu" ? "/var/lib/ntp/ntp.drift" : "/var/lib/ntp/drift"
+    :driftfile => node[:rightimage][:platform] == "ubuntu" ? "/var/lib/ntp/ntp.drift" : "/var/lib/ntp/drift"
   })
 end
 
