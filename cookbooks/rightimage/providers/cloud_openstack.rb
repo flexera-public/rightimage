@@ -26,6 +26,17 @@ action :configure do
     backup false 
   end
 
+  # Add ntp server point to "time" as a hook for private clouds to specify their own
+  template "#{guest_root}/etc/ntp.conf" do
+    source "ntp.conf.erb"
+    backup false
+    variables({
+      :add_private_ntp_server => true,
+      :platform => new_resource.platform      
+    })
+  end
+
+
   Chef::Log::info "Add DHCP symlink for RightLink"
   execute "chroot #{guest_root} ln -s /var/lib/dhcp /var/lib/dhcp3" do
     only_if { ::File.exists?"#{guest_root}/var/lib/dhcp" }
