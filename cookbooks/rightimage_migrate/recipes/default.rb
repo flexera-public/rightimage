@@ -21,7 +21,7 @@ key = "/tmp/AWS_X509_KEY.pem"
 cert = "/tmp/AWS_X509_CERT.pem"
 
 bash "install_ec2_tools" do
-  not_if "which ec2-describe-images"
+  not_if ". /etc/profile && which ec2-describe-images"
   flags "-ex"
   code <<-EOH
     mkdir -p /home/ec2
@@ -43,8 +43,10 @@ end
 
 ruby_block "Migrate image" do
   block do
+    ENV['EC2_HOME'] = '/home/ec2'
+
     def describe_images_by_id(akid, sak, region, image_id)
-      output = `source /etc/profile && ec2-describe-images --aws-access-key "#{akid}" --aws-secret-key "#{sak}" --region "#{region}" --verbose "#{image_id}"`
+      output = `. /etc/profile && ec2-describe-images --aws-access-key "#{akid}" --aws-secret-key "#{sak}" --region "#{region}" --verbose "#{image_id}"`
       image_name = /<name>(.*)<\/name>/.match(output)[1]
       imageLocation = /<imageLocation>(.*)\/(.*)<\/imageLocation>/.match(output)
       bucket = imageLocation[1]
@@ -56,7 +58,7 @@ ruby_block "Migrate image" do
     end
 
     def describe_images_by_name(akid, sak, region, image_name)
-      output = `source /etc/profile && ec2-describe-images --aws-access-key "#{akid}" --aws-secret-key "#{sak}" --region "#{region}" --owner self --filter "name=#{image_name}" --verbose`
+      output = `. /etc/profile && ec2-describe-images --aws-access-key "#{akid}" --aws-secret-key "#{sak}" --region "#{region}" --owner self --filter "name=#{image_name}" --verbose`
       dupe_id = /<imageId>(.*)<\/imageId>/.match(output)
     
       if dupe_id
@@ -87,14 +89,14 @@ ruby_block "Migrate image" do
     Chef::Log.info("Migrating #{image_id} from #{source_region} to #{destination_region}")
     case source_image['image_type']
     when "ebs"
-      output = `source /etc/profile && ec2-copy-image --aws-access-key "#{akid}" --aws-secret-key "#{sak}" --source-region "#{source_region}" --source-ami-id "#{image_id}" --region "#{destination_region}"`
+      output = `. /etc/profile && ec2-copy-image --aws-access-key "#{akid}" --aws-secret-key "#{sak}" --source-region "#{source_region}" --source-ami-id "#{image_id}" --region "#{destination_region}"`
     when "instance-store"
-      output = `source /etc/profile && ec2-migrate-image --private-key "#{key}" --cert "#{cert}" --owner-akid "#{akid}" --owner-sak "#{sak}" --bucket "#{source_image['bucket']}" --destination-bucket "#{destination_bucket}" --manifest "#{source_image['manifest']}" --acl "aws-exec-read" --region "#{destination_region}"`
+      output = `. /etc/profile && ec2-migrate-image --private-key "#{key}" --cert "#{cert}" --owner-akid "#{akid}" --owner-sak "#{sak}" --bucket "#{source_image['bucket']}" --destination-bucket "#{destination_bucket}" --manifest "#{source_image['manifest']}" --acl "aws-exec-read" --region "#{destination_region}"`
       Chef::Log.info(output)
       raise "ec2-migrate-image failed" unless $?.success?
     
       Chef::Log.info("Registering image")
-      output = `source /etc/profile && ec2-register "#{destination_bucket}/#{source_image['manifest']}" --aws-access-key "#{akid}" --aws-secret-key "#{sak}" --name "#{source_image['image_name']}" --region "#{destination_region}"`
+      output = `. /etc/profile && ec2-register "#{destination_bucket}/#{source_image['manifest']}" --aws-access-key "#{akid}" --aws-secret-key "#{sak}" --name "#{source_image['image_name']}" --region "#{destination_region}"`
     else
       raise "Root device type #{source_image['image_type']} not supported"
     end
