@@ -88,8 +88,6 @@ unless node[:rightimage][:manual_mode] == "true"
     end
   when "base"
     include_recipe "rightimage::build_base"
-  when "migrate"
-    include_recipe "rightimage::ec2_download_bundle"
   end
 end
 rightscale_marker :end
