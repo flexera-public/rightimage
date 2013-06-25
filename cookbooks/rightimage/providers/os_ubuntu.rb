@@ -230,48 +230,6 @@ EOS
     EOH
   end
 
-  if node[:rightimage][:bare_image] != "true"
-    java_temp = "/tmp/java"
-
-    directory java_temp do
-      action :delete
-      recursive true
-    end
-
-    directory java_temp do
-      action :create
-    end
-
-    bash "install sun java" do
-      cwd java_temp
-      flags "-ex"
-      code <<-EOH
-        guest_root=#{guest_root}
-        java_home="/usr/lib/jvm/java-6-sun"
-        java_ver="31"
-
-        if [ "#{node[:rightimage][:arch]}" == x86_64 ] ; then
-          java_arch="x64"
-        else
-          java_arch="i586"
-        fi
-
-        java_file=jdk-6u$java_ver-linux-$java_arch.bin
-
-        wget http://s3.amazonaws.com/rightscale_software/java/$java_file
-        chmod +x /tmp/java/$java_file
-        echo "\\n" | /tmp/java/$java_file
-        rm -rf $guest_root${java_home}
-        mkdir -p $guest_root${java_home}
-        mv /tmp/java/jdk1.6.0_$java_ver/* $guest_root${java_home}
-
-        echo "JAVA_HOME=$java_home" > $guest_root/etc/profile.d/java.sh
-        echo "export JAVA_HOME" >> $guest_root/etc/profile.d/java.sh
-
-        chmod 775 $guest_root/etc/profile.d/java.sh
-      EOH
-    end
-  end
   
   # Set DHCP timeout
   bash "dhcp timeout" do
@@ -285,6 +243,19 @@ EOS
       sed -i "s/#timeout.*/timeout 300;/" #{guest_root}/etc/dhcp$dhcp_ver/dhclient.conf
       rm -f #{guest_root}/var/lib/dhcp$dhcp_ver/*
     EOH
+  end
+
+  # dhclient on precise by default doesn't set the hostname on boot
+  # while dhcpd on ubuntu 10.04 does. Ubuntu 13.04 has a script in contrib
+  # called sethostname.sh that does the same thing that you can place your enter
+  # hooks.  You may have to manually install it though, so revisit the issue at 
+  # that point (w-5618)
+  if new_resource.platform_version.to_f.between?(12.04,12.10); then
+    cookbook_file "#{guest_root}/etc/dhcp/dhclient-enter-hooks.d/hostname" do
+      source "dhclient-hostname.sh"
+      backup false
+      mode "0644"
+    end
   end
 
   # Don't let SysV init start until more than lo0 is ready

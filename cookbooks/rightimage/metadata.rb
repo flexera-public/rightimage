@@ -198,7 +198,7 @@ attribute "rightimage/hypervisor",
 
 attribute "rightimage/datacenter",
   :display_name => "Datacenter ID",
-  :description => "Datacenter/Zone ID.  Defaults to 1.  Use US/UK for Rackspace Legacy. Use DFW/ORD/LON for Rackspace Open Cloud.",
+  :description => "Datacenter/Zone ID.  Defaults to 1.  Use US/UK for Rackspace Legacy. Use DFW/ORD/LON/SYD for Rackspace Open Cloud.",
   :default => "1",
   :required => "recommended"
 
@@ -236,8 +236,8 @@ attribute "rightscale/cloud_id",
   :recommended => true
 
 attribute "rightscale/mci_name",
-   :display_name => "MCI Name",
-   :description => "MCI to add this image to. If empty, use image_name attribute",
+   :display_name => "MCI Name or ID",
+   :description => "MCI to add this image to. If an integer is specified, will be assumed to be RightScale ID.  If a string is specified, MCI name will be matched and created if not found. If empty, use image_name attribute",
    :default => "",
    :recipes => [ "rightimage::do_create_mci" ],
    :required => "optional"
