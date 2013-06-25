@@ -45,22 +45,31 @@ end
 ruby_block "Create MCI or Add to MCI" do
   block do
     cloud_id = node[:rightscale][:cloud_id]
-    if node[:rightscale][:mci_name] =~ /./
-      mci_base_name = node[:rightscale][:mci_name]
-    else
-      mci_base_name = node[:rightimage][:image_name]
-    end
-    raise "You must specify a mci_name or an image_name!" unless mci_base_name =~ /./
+
     raise "You must specify a cloud_id" unless cloud_id =~ /^\d+$/
     images = RightImage::IdList.new(Chef::Log).to_hash
     raise "FATAL: no image ids found. aborting." if images.empty?
 
     images.each do |id, params|
-      mci_name = mci_base_name.dup
-      if params["storage_type"] == "EBS"
-        mci_name << "_EBS" unless mci_name =~ /_EBS/
+      if node[:rightscale][:mci_name] =~ /^\d+$/
+        mci_id = node[:rightscale][:mci_name].to_s.dup
+        mci_param = "--id '#{mci_id}'"
+      elsif node[:rightscale][:mci_name] =~ /./
+        mci_name = node[:rightscale][:mci_name].to_s.dup
+        mci_param = "--name '#{mci_name}'"
+      else
+        mci_name = node[:rightimage][:image_name].to_s.dup
+        if params["storage_type"] == "EBS"
+          mci_name << "_EBS" unless mci_name =~ /_EBS/
+        end
+        mci_param = "--name '#{mci_name}'"
       end
-      cmd = "bundle exec bin/mci_add --name '#{mci_name}' --cloud-id '#{cloud_id}' --image-id '#{id}' --rightlink-version '#{node[:rightimage][:rightlink_version]}'"
+
+      if mci_param.include? "''"
+        raise "You must specify a mci_name or an image_name. mci_name may be a string corresponding to the name of the mci to add the image to, or a integer to add it to a specific MCI"
+      end
+
+      cmd = "bundle exec bin/mci_add #{mci_param} --cloud-id '#{cloud_id}' --image-id '#{id}' --rightlink-version '#{node[:rightimage][:rightlink_version]}'"
       Chef::Log.info("In '#{ri_tools_dir}', running cmd: #{cmd}")
       shell_out!(cmd, :cwd=>ri_tools_dir, :environment=>node[:rightimage][:script_env])      
     end

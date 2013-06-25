@@ -228,8 +228,8 @@ attribute "rightscale/cloud_id",
   :recommended => true
 
 attribute "rightscale/mci_name",
-   :display_name => "MCI Name",
-   :description => "MCI to add this image to. If empty, use image_name attribute",
+   :display_name => "MCI Name or ID",
+   :description => "MCI to add this image to. If an integer is specified, will be assumed to be RightScale ID.  If a string is specified, MCI name will be matched and created if not found. If empty, use image_name attribute",
    :default => "",
    :recipes => [ "rightimage::do_create_mci" ],
    :required => "optional"
