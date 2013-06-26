@@ -58,53 +58,40 @@ action :install do
   bash "bootstrap_centos" do 
     flags "-ex"
     code <<-EOF
-  ## yum is getting mad that /etc/fstab does not exist and that /proc is not mounted
+  ## Some yum prereqs
   mkdir -p #{guest_root}/etc
   touch #{guest_root}/etc/fstab
-
-  mkdir -p #{guest_root}/proc
-  umount #{guest_root}/proc || true
-  mount --bind /proc #{guest_root}/proc
-
-  mkdir -p #{guest_root}/sys
-  umount #{guest_root}/sys || true
-  mount --bind /sys #{guest_root}/sys
-
-  umount #{guest_root}/dev/pts || true
-
-  ## bootstrap base OS
-  yum -c /tmp/yum.conf --installroot=#{guest_root} -y groupinstall Base 
-
-  /sbin/MAKEDEV -d #{guest_root}/dev -x console
-  /sbin/MAKEDEV -d #{guest_root}/dev -x null
-  /sbin/MAKEDEV -d #{guest_root}/dev -x zero
-  /sbin/MAKEDEV -d #{guest_root}/dev ptmx
-  /sbin/MAKEDEV -d #{guest_root}/dev urandom
-
-  mkdir -p #{guest_root}/dev/pts
-  mkdir -p #{guest_root}/sys/block
   mkdir -p #{guest_root}/var/log
   touch #{guest_root}/var/log/yum.log
 
-  mkdir -p #{guest_root}/proc
-  chroot #{guest_root} mount -t devpts none /dev/pts || true
-  test -e /dev/ptmx #|| chroot $imagedir mknod --mode 666 /dev/ptmx c 5 2
-                
+
+  ## bootstrap base OS.  
+  # We have to disable the rightscale-epel in the base install due to a subtle bug with
+  # ius packages being in the rightscale-epel mirror.  Base wants libopenssl.so which
+  # is gets supplied by the openssl10-libs package in ius, rather than the base openssl package.
+  # This causes a dependency conflict at a later point
+  yum -c /tmp/yum.conf  --installroot=#{guest_root} --disablerepo=rightscale-epel -y groupinstall Base 
+
   # Shadow file needs to be setup prior install additional packages
   chroot #{guest_root} authconfig --enableshadow --useshadow --enablemd5 --updateall
   yum -c /tmp/yum.conf -y clean all
   yum -c /tmp/yum.conf -y makecache
+
   if [ "#{node[:rightimage][:bare_image]}" != "true" ]; then 
     # Install postfix separately, don't want to use centosplus version which bundles mysql
-    yum -c /tmp/yum.conf --installroot=#{guest_root} -y install postfix --disablerepo=centosplus
+    yum -c /tmp/yum.conf --installroot=#{guest_root} -y install postfix --disablerepo=centosplus --disablerepo=rightscale-epel
     yum -c /tmp/yum.conf --installroot=#{guest_root} -y remove sendmail
 
     # install the guest packages in the chroot
     if [ "5" == "#{node[:rightimage][:platform_version].to_i}" ]; then
       yum -c /tmp/yum.conf --installroot=#{guest_root} --exclude='*.i386' -y install --enablerepo=ruby_custom #{node[:rightimage][:ruby_packages]}
     fi
+    # Install these one by one... yum install doesn't fail unless every package
+    # fails, so grouping them on one lines hides errors
+    for p in #{node[:rightimage][:guest_packages].join(" ")}; do
+      yum -c /tmp/yum.conf --installroot=#{guest_root} --exclude gcc-java -y install $p
+    done
   fi
-  yum -c /tmp/yum.conf --installroot=#{guest_root} -y install #{node[:rightimage][:guest_packages].join(" ")} --exclude gcc-java
   yum -c /tmp/yum.conf --installroot=#{guest_root} -y remove bluez* gnome-bluetooth*
   yum -c /tmp/yum.conf --installroot=#{guest_root} -y clean all
 
@@ -274,15 +261,9 @@ action :install do
       chroot #{guest_root} rpm --rebuilddb
     EOH
   end
-
-  bash "cleanup" do
-    code <<-EOH
-      umount -lf #{guest_root}/proc || true
-      umount -lf #{guest_root}/sys || true
-      umount -lf #{guest_root}/dev/pts || true
-    EOH
-  end    
+ 
 end
+
 
 action :repo_freeze do
   repo_dir = "#{guest_root}/etc/yum.repos.d"
@@ -292,24 +273,31 @@ action :repo_freeze do
     action :create
   end
 
+  mirror_date = mirror_freeze_date[0..7] 
+
   ["/tmp/yum.conf", "#{repo_dir}/#{el_repo_file}"].each do |location|
     template location do
       source "yum.conf.erb"
       backup false
-      variables ({
+      variables({
         :bootstrap => true,
-        :mirror_date => mirror_freeze_date
+        :mirror => node[:rightimage][:mirror],
+        :use_staging_mirror => node[:rightimage][:rightscale_staging_mirror],
+        :mirror_date => mirror_date
       })
     end
   end
 end
 
 action :repo_unfreeze do
+
   template "#{guest_root}/etc/yum.repos.d/#{el_repo_file}" do
     source "yum.conf.erb"
     backup false
-    variables ({
+    variables({
       :bootstrap => false,
+      :mirror => node[:rightimage][:mirror],
+      :use_staging_mirror => node[:rightimage][:rightscale_staging_mirror],
       :mirror_date => "latest"
     })
   end
