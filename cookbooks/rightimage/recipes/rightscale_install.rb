@@ -8,16 +8,6 @@ class Chef::Resource
   include RightScale::RightImage::Helper
 end
 
-directory "#{guest_root}/etc/rightscale.d" 
-
-# Install rightscale package based on revision number
-if node[:rightimage][:rightlink_version] =~ /^4\.[0-9]*\.[0-9]*/
-  raise "rightlink versions < 5 not supported"
-else
-  log "Building image with RightLink package."
-  include_recipe "rightimage::rightscale_rightlink"
-end
-
 bash "insert_bashrc" do 
   # note that ubuntu uses /etc/bash.bashrc and sources it automatically for us
   # also note that .bashrc in /skel already has this code so it should work 
@@ -50,4 +40,11 @@ bash "set ec2 home var for all users" do
     fi
   EOS
 end
+
+include_recipe "rightimage::rightscale_rightlink"
+
+rightimage guest_root do
+  action :sanitize
+end
+
 rightscale_marker :end

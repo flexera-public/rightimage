@@ -19,12 +19,10 @@
 
 rightscale_marker :begin
 
-rightimage_tester "Verify JAVA_HOME environment variable" do
-  cmd = value_for_platform(
-    "ubuntu" => { "default" => '[ "$JAVA_HOME" = "/usr/lib/jvm/java-6-sun" ]' },
-    "default" => '[ "$JAVA_HOME" = "/usr/java/default" ]'
-  )
-  command ". /etc/profile && echo JAVA_HOME is set to: $JAVA_HOME; #{cmd}"
+rightimage_tester "Verify JAVA_HOME environment variable is set" do
+  only_if { node[:cloud][:provider] == "ec2" }
+  command ". /etc/profile && [ ! -z \"$JAVA_HOME\" ] && test -e $JAVA_HOME/bin/java"
   action :test
 end
+
 rightscale_marker :end

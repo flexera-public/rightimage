@@ -6,8 +6,6 @@ class Chef::Resource::Bash
   include RightScale::RightImage::Helper
 end
 
-gem_package_fog
-
 directory(::File.dirname(loopback_file_gz)) { recursive true }
 
 bash "compress partitioned base image" do
