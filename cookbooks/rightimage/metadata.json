@@ -1,277 +1,58 @@
 {
-  "dependencies": {
-    "loopback_fs": ">= 0.0.0",
-    "rightscale": ">= 0.0.0",
-    "rightimage_cloud_vagrant": ">= 0.0.0",
-    "rightimage_tester": ">= 0.0.0",
-    "block_device": ">= 0.0.0"
-  },
-  "name": "rightimage",
-  "maintainer_email": "support@rightscale.com",
   "attributes": {
-    "rightimage/rackspace/account": {
-      "required": "required",
+    "rightimage/arch": {
       "calculated": false,
       "choice": [
-
+        "x86_64",
+        "i386"
       ],
-      "type": "string",
-      "recipes": [
-        "rightimage::rebundle",
-        "rightimage::default"
-      ],
-      "display_name": "Rackspace Account ID",
-      "description": "Rackspace Account ID"
-    },
-    "rightimage/hypervisor": {
-      "required": "required",
-      "calculated": false,
-      "choice": [
-        "xen",
-        "kvm",
-        "esxi",
-        "hyperv",
-        "virtualbox"
-      ],
-      "type": "string",
+      "description": "The architecture for the virtual image.",
+      "display_name": "Guest OS Architecture",
       "recipes": [
 
       ],
-      "display_name": "Hypervisor",
-      "description": "Which hypervisor is this image for?"
-    },
-    "rightimage/image_name": {
-      "required": "required",
-      "calculated": false,
-      "choice": [
-
-      ],
-      "type": "string",
-      "recipes": [
-
-      ],
-      "display_name": "Image Name",
-      "description": "The name you want to give this new image."
-    },
-    "rightimage/rightlink_version": {
-      "required": "required",
-      "calculated": false,
-      "choice": [
-
-      ],
-      "type": "string",
-      "recipes": [
-        "rightimage::default",
-        "rightimage::build_image",
-        "rightimage::rightscale_rightlink",
-        "rightimage::rebundle",
-        "rightimage::rightscale_install",
-        "rightimage::do_create_mci"
-      ],
-      "display_name": "RightLink Version",
-      "description": "The RightLink version we are building into our image"
-    },
-    "rightimage/azure/shared_key": {
-      "required": "recommended",
-      "calculated": false,
-      "choice": [
-
-      ],
-      "type": "string",
-      "recipes": [
-        "rightimage::cloud_upload"
-      ],
-      "display_name": "Azure Shared Key",
-      "description": "Shared key for the storage account to upload the image to.  If supplied, will use Image Upload Bucket as the container to uplaod to.  If not supplied, will let Azure command line tool automatically determine a storage account and container to upload to. "
-    },
-    "rightimage/openstack/user": {
       "required": "optional",
-      "calculated": false,
-      "choice": [
-
-      ],
-      "default": "",
-      "type": "string",
-      "recipes": [
-        "rightimage::cloud_upload"
-      ],
-      "display_name": "Openstack User",
-      "description": "User to access API of Openstack Cloud Controller."
-    },
-    "rightimage/euca/x509_cert": {
-      "required": "required",
-      "calculated": false,
-      "choice": [
-
-      ],
-      "type": "string",
-      "recipes": [
-        "rightimage::cloud_upload"
-      ],
-      "display_name": "Eucalyptus x509 Certificate",
-      "description": "The contents of the file pointed to by the EC2_CERT value defined in your eucarc credentials file."
+      "type": "string"
     },
     "rightimage/aws_509_cert": {
-      "required": "required",
       "calculated": false,
       "choice": [
 
       ],
-      "type": "string",
+      "description": "aws_509_cert",
+      "display_name": "aws_509_cert",
       "recipes": [
         "rightimage::cloud_upload",
         "rightimage::rebundle",
         "rightimage::default",
         "rightimage::ec2_download_bundle"
       ],
-      "display_name": "aws_509_cert",
-      "description": "aws_509_cert"
-    },
-    "rightimage/rebundle_base_image_id": {
-      "required": "optional",
-      "calculated": false,
-      "choice": [
-
-      ],
-      "default": "",
-      "type": "string",
-      "recipes": [
-        "rightimage::default",
-        "rightimage::rebundle"
-      ],
-      "display_name": "Rebundle Base Image ID",
-      "description": "Cloud specific ID for the image to start with when building a rebundle image"
-    },
-    "rightimage/google/client_id": {
-      "required": "optional",
-      "calculated": false,
-      "choice": [
-
-      ],
-      "type": "string",
-      "recipes": [
-        "rightimage::cloud_upload"
-      ],
-      "display_name": "Google client id",
-      "description": "OAuth2 credentials client id for GCE. Pulled from gcutil conf"
-    },
-    "rightimage/google/gc_secret_access_key": {
-      "required": "optional",
-      "calculated": false,
-      "choice": [
-
-      ],
-      "type": "string",
-      "recipes": [
-        "rightimage::cloud_upload"
-      ],
-      "display_name": "Google secret_access_key",
-      "description": "Google storage (interoperable) secret access key"
-    },
-    "rightimage/azure/id": {
       "required": "required",
-      "calculated": false,
-      "choice": [
-
-      ],
-      "type": "string",
-      "recipes": [
-        "rightimage::cloud_upload"
-      ],
-      "display_name": "Azure Subscription ID",
-      "description": "Azure Subscription ID"
-    },
-    "rightimage/azure/cert": {
-      "required": "required",
-      "calculated": false,
-      "choice": [
-
-      ],
-      "type": "string",
-      "recipes": [
-        "rightimage::cloud_upload"
-      ],
-      "display_name": "Azure Management Certificate",
-      "description": "Azure Management Certificate"
-    },
-    "rightscale/mci_name": {
-      "required": "optional",
-      "calculated": false,
-      "choice": [
-
-      ],
-      "default": "",
-      "type": "string",
-      "recipes": [
-        "rightimage::do_create_mci"
-      ],
-      "display_name": "MCI Name",
-      "description": "MCI to add this image to. If empty, use image_name attribute"
-    },
-    "rightscale/api_url": {
-      "required": "optional",
-      "calculated": false,
-      "choice": [
-
-      ],
-      "type": "string",
-      "recommended": true,
-      "recipes": [
-        "rightimage::do_create_mci"
-      ],
-      "display_name": "API URL",
-      "description": "The rightscale account specific api url to use.  Ex. https://my.rightscale.com/api/acct/1234 (where 1234 is your account id)"
-    },
-    "rightimage/cloudstack/version": {
-      "required": "required",
-      "calculated": false,
-      "choice": [
-        "2",
-        "3"
-      ],
-      "type": "string",
-      "recipes": [
-        "rightimage::cloud_upload"
-      ],
-      "display_name": "CloudStack Version",
-      "description": "CloudStack version."
-    },
-    "rightimage/euca/x509_key": {
-      "required": "required",
-      "calculated": false,
-      "choice": [
-
-      ],
-      "type": "string",
-      "recipes": [
-        "rightimage::cloud_upload"
-      ],
-      "display_name": "Eucalyptus x509 Private Key",
-      "description": "The contents of the file pointed to by the EC2_PRIVATE_KEY value defined in your eucarc credentials file."
+      "type": "string"
     },
     "rightimage/aws_509_key": {
-      "required": "required",
       "calculated": false,
       "choice": [
 
       ],
-      "type": "string",
+      "description": "aws_509_key",
+      "display_name": "aws_509_key",
       "recipes": [
         "rightimage::cloud_upload",
         "rightimage::rebundle",
         "rightimage::default",
         "rightimage::ec2_download_bundle"
       ],
-      "display_name": "aws_509_key",
-      "description": "aws_509_key"
-    },
-    "rightimage/aws_secret_access_key": {
       "required": "required",
+      "type": "string"
+    },
+    "rightimage/aws_access_key_id": {
       "calculated": false,
       "choice": [
 
       ],
-      "type": "string",
+      "description": "aws_access_key_id",
+      "display_name": "aws_access_key_id",
       "recipes": [
         "rightimage::cloud_upload",
         "rightimage::rebundle",
@@ -285,150 +66,170 @@
         "rightimage::report_upload",
         "rightimage::s3index_update"
       ],
-      "display_name": "aws_secret_access_key",
-      "description": "aws_secret_access_key"
+      "required": "required",
+      "type": "string"
     },
-    "rightscale/api_password": {
-      "required": "optional",
+    "rightimage/aws_account_number": {
       "calculated": false,
       "choice": [
 
       ],
-      "type": "string",
-      "recommended": true,
+      "description": "aws_account_number",
+      "display_name": "aws_account_number",
       "recipes": [
-        "rightimage::do_create_mci"
+        "rightimage::cloud_upload",
+        "rightimage::rebundle",
+        "rightimage::default",
+        "rightimage::ec2_download_bundle",
+        "rightimage::build_base",
+        "rightimage::build_image",
+        "rightimage::upload_image_s3",
+        "rightimage::base_upload",
+        "rightimage::image_tests",
+        "rightimage::report_upload",
+        "rightimage::s3index_update"
       ],
-      "display_name": "API Password",
-      "description": "Rightscale API password."
+      "required": "required",
+      "type": "string"
     },
-    "rightimage/debug": {
-      "required": "optional",
+    "rightimage/aws_secret_access_key": {
+      "calculated": false,
+      "choice": [
+
+      ],
+      "description": "aws_secret_access_key",
+      "display_name": "aws_secret_access_key",
+      "recipes": [
+        "rightimage::cloud_upload",
+        "rightimage::rebundle",
+        "rightimage::default",
+        "rightimage::ec2_download_bundle",
+        "rightimage::build_base",
+        "rightimage::build_image",
+        "rightimage::upload_image_s3",
+        "rightimage::base_upload",
+        "rightimage::image_tests",
+        "rightimage::report_upload",
+        "rightimage::s3index_update"
+      ],
+      "required": "required",
+      "type": "string"
+    },
+    "rightimage/azure/cert": {
+      "calculated": false,
+      "choice": [
+
+      ],
+      "description": "Azure Management Certificate",
+      "display_name": "Azure Management Certificate",
+      "recipes": [
+        "rightimage::cloud_upload"
+      ],
+      "required": "required",
+      "type": "string"
+    },
+    "rightimage/azure/id": {
+      "calculated": false,
+      "choice": [
+
+      ],
+      "description": "Azure Subscription ID",
+      "display_name": "Azure Subscription ID",
+      "recipes": [
+        "rightimage::cloud_upload"
+      ],
+      "required": "required",
+      "type": "string"
+    },
+    "rightimage/azure/region": {
+      "calculated": false,
+      "choice": [
+        "West Europe",
+        "North Europe",
+        "Southeast Asia",
+        "East Asia",
+        "West US",
+        "East US"
+      ],
+      "default": "West US",
+      "display_name": "Azure Location",
+      "recipes": [
+        "rightimage::cloud_upload"
+      ],
+      "required": "recommended",
+      "type": "string"
+    },
+    "rightimage/azure/shared_key": {
+      "calculated": false,
+      "choice": [
+
+      ],
+      "description": "Shared key for the storage account to upload the image to.  If supplied, will use Image Upload Bucket as the container to uplaod to.  If not supplied, will let Azure command line tool automatically determine a storage account and container to upload to. ",
+      "display_name": "Azure Shared Key",
+      "recipes": [
+        "rightimage::cloud_upload"
+      ],
+      "required": "recommended",
+      "type": "string"
+    },
+    "rightimage/azure/storage_account": {
+      "calculated": false,
+      "choice": [
+
+      ],
+      "description": "Storage account to upload the image to. Required when supplying a Shared Key",
+      "display_name": "Azure Storage Account",
+      "recipes": [
+        "rightimage::cloud_upload"
+      ],
+      "required": "recommended",
+      "type": "string"
+    },
+    "rightimage/bare_image": {
       "calculated": false,
       "choice": [
         "true",
         "false"
       ],
       "default": "false",
-      "type": "string",
+      "description": "If true, image will not contain any additional packages beyond a stock os install, other than rightlink.  Used for debug/testing",
+      "display_name": "Create Bare Image",
       "recipes": [
 
       ],
-      "display_name": "Development Image?",
-      "description": "If set, a random root password will be set for debugging purposes. NOTE: you must include 'Dev' in the image name or the build with fail."
-    },
-    "rightimage/manual_mode": {
       "required": "optional",
-      "calculated": false,
-      "choice": [
-        "true",
-        "false"
-      ],
-      "default": "true",
-      "type": "string",
-      "recipes": [
-        "rightimage::default"
-      ],
-      "display_name": "Manual Mode",
-      "description": "Sets the template's operation mode. Ex. 'true' = don't build at boot time."
+      "type": "string"
     },
-    "rightimage/aws_account_number": {
-      "required": "required",
+    "rightimage/build_id": {
       "calculated": false,
       "choice": [
 
       ],
-      "type": "string",
+      "default": "0",
+      "description": "Unique identifier for the a image. When building a full image, this build_id must match the build_id of the base image you wish to use. The ID can't include underscores.  This value is usually the RightImage version, such as 13.2.1, or a combination of the version and the developers name or git sha used to build the code, such as 13.2.1-aef01c2d",
+      "display_name": "Build ID",
       "recipes": [
-        "rightimage::cloud_upload",
-        "rightimage::rebundle",
-        "rightimage::default",
-        "rightimage::ec2_download_bundle",
-        "rightimage::build_base",
-        "rightimage::build_image",
-        "rightimage::upload_image_s3",
-        "rightimage::base_upload",
-        "rightimage::image_tests",
-        "rightimage::report_upload",
-        "rightimage::s3index_update"
+
       ],
-      "display_name": "aws_account_number",
-      "description": "aws_account_number"
-    },
-    "rightimage/cloud_options": {
       "required": "recommended",
-      "calculated": false,
-      "choice": [
-        "",
-        "managed",
-        "rackconnect",
-        "rackconnect,managed"
-      ],
-      "default": "",
-      "type": "string",
-      "recipes": [
-        "rightimage::rebundle",
-        "rightimage::default"
-      ],
-      "display_name": "Cloud options",
-      "description": "Cloud specific options.  Currently only applicable to Rackspace clouds.  Select 'managed' for Managed enabled accounts, 'rackconnect' for RackConnect enabled accounts."
+      "type": "string"
     },
     "rightimage/build_mode": {
-      "required": "required",
       "calculated": false,
       "choice": [
         "base",
         "migrate",
         "full"
       ],
-      "type": "string",
-      "recipes": [
-
-      ],
+      "description": "Build base image, full image, or migrate existing image.",
       "display_name": "Build Mode",
-      "description": "Build base image, full image, or migrate existing image."
-    },
-    "rightimage/google/gc_access_key_id": {
-      "required": "optional",
-      "calculated": false,
-      "choice": [
+      "recipes": [
 
       ],
-      "type": "string",
-      "recipes": [
-        "rightimage::cloud_upload"
-      ],
-      "display_name": "Google access_key_id",
-      "description": "Google storage (interoperable) access key id"
-    },
-    "rightimage/cloudstack/cdc_secret_key": {
       "required": "required",
-      "calculated": false,
-      "choice": [
-
-      ],
-      "type": "string",
-      "recipes": [
-        "rightimage::cloud_upload"
-      ],
-      "display_name": "CloudStack Secret Key",
-      "description": "CloudStack secret key."
-    },
-    "rightimage/euca/access_key_id": {
-      "required": "required",
-      "calculated": false,
-      "choice": [
-
-      ],
-      "type": "string",
-      "recipes": [
-        "rightimage::cloud_upload"
-      ],
-      "display_name": "Eucalyptus Access Key",
-      "description": "The EC2_ACCESS_KEY value defined in your eucarc credentials file. User must have admin privileges."
+      "type": "string"
     },
     "rightimage/cloud": {
-      "required": "recommended",
       "calculated": false,
       "choice": [
         "ec2",
@@ -438,23 +239,615 @@
         "rackspace",
         "rackspace-open-cloud",
         "azure",
-        "google"
+        "google",
+        "vagrant"
       ],
-      "type": "string",
+      "description": "The supported cloud for the virtual image. If unset, build a generic base image.",
+      "display_name": "Target Cloud",
       "recipes": [
 
       ],
-      "display_name": "Target Cloud",
-      "description": "The supported cloud for the virtual image. If unset, build a generic base image."
+      "required": "recommended",
+      "type": "string"
+    },
+    "rightimage/cloud_options": {
+      "calculated": false,
+      "choice": [
+        "",
+        "managed",
+        "rackconnect",
+        "rackconnect,managed"
+      ],
+      "default": "",
+      "description": "Cloud specific options.  Currently only applicable to Rackspace clouds.  Select 'managed' for Managed enabled accounts, 'rackconnect' for RackConnect enabled accounts.",
+      "display_name": "Cloud options",
+      "recipes": [
+        "rightimage::rebundle",
+        "rightimage::default"
+      ],
+      "required": "recommended",
+      "type": "string"
+    },
+    "rightimage/cloudstack/cdc_api_key": {
+      "calculated": false,
+      "choice": [
+
+      ],
+      "description": "CloudStack API key.",
+      "display_name": "CloudStack API Key",
+      "recipes": [
+        "rightimage::cloud_upload"
+      ],
+      "required": "required",
+      "type": "string"
+    },
+    "rightimage/cloudstack/cdc_secret_key": {
+      "calculated": false,
+      "choice": [
+
+      ],
+      "description": "CloudStack secret key.",
+      "display_name": "CloudStack Secret Key",
+      "recipes": [
+        "rightimage::cloud_upload"
+      ],
+      "required": "required",
+      "type": "string"
+    },
+    "rightimage/cloudstack/cdc_url": {
+      "calculated": false,
+      "choice": [
+
+      ],
+      "description": "URL to your CloudStack Cloud Controller. (Ex. http://<server_ip>:8080/client/api)",
+      "display_name": "CloudStack API URL",
+      "recipes": [
+        "rightimage::cloud_upload"
+      ],
+      "required": "required",
+      "type": "string"
+    },
+    "rightimage/datacenter": {
+      "calculated": false,
+      "choice": [
+
+      ],
+      "default": "1",
+      "description": "Datacenter/Zone ID.  Defaults to 1.  Use US/UK for Rackspace Legacy. Use DFW/ORD/LON/SYD for Rackspace Open Cloud.",
+      "display_name": "Datacenter ID",
+      "recipes": [
+
+      ],
+      "required": "recommended",
+      "type": "string"
+    },
+    "rightimage/debug": {
+      "calculated": false,
+      "choice": [
+        "true",
+        "false"
+      ],
+      "default": "false",
+      "description": "If set, a random root password will be set for debugging purposes. NOTE: you must include 'Dev' in the image name or the build with fail.",
+      "display_name": "Development Image?",
+      "recipes": [
+
+      ],
+      "required": "optional",
+      "type": "string"
+    },
+    "rightimage/ec2/image_type": {
+      "calculated": false,
+      "choice": [
+        "InstanceStore",
+        "EBS"
+      ],
+      "default": "InstanceStore",
+      "description": "Type of EC2 Image cloud_upload recipe will create",
+      "display_name": "EC2 Image Type",
+      "recipes": [
+        "rightimage::build_image",
+        "rightimage::default",
+        "rightimage::cloud_upload"
+      ],
+      "required": "recommended",
+      "type": "string"
+    },
+    "rightimage/euca/access_key_id": {
+      "calculated": false,
+      "choice": [
+
+      ],
+      "description": "The EC2_ACCESS_KEY value defined in your eucarc credentials file. User must have admin privileges.",
+      "display_name": "Eucalyptus Access Key",
+      "recipes": [
+        "rightimage::cloud_upload"
+      ],
+      "required": "required",
+      "type": "string"
+    },
+    "rightimage/euca/euca_cert": {
+      "calculated": false,
+      "choice": [
+
+      ],
+      "description": "The contents of the file pointed to by the EUCALYPTUS_CERT value defined in your eucarc credentials file.",
+      "display_name": "Eucalyptus Cloud Certificate",
+      "recipes": [
+        "rightimage::cloud_upload"
+      ],
+      "required": "required",
+      "type": "string"
+    },
+    "rightimage/euca/euca_url": {
+      "calculated": false,
+      "choice": [
+
+      ],
+      "description": "Base URL to your Eucalyptus Cloud Controller. Don't include port. (Ex. http://<server_ip>)",
+      "display_name": "Eucalyptus URL",
+      "recipes": [
+        "rightimage::cloud_upload"
+      ],
+      "required": "required",
+      "type": "string"
+    },
+    "rightimage/euca/secret_access_key": {
+      "calculated": false,
+      "choice": [
+
+      ],
+      "description": "The EC2_SECRET_KEY value defined in your eucarc credentials file. User must have admin privileges.",
+      "display_name": "Eucalyptus Secret Access Key",
+      "recipes": [
+        "rightimage::cloud_upload"
+      ],
+      "required": "required",
+      "type": "string"
+    },
+    "rightimage/euca/user_id": {
+      "calculated": false,
+      "choice": [
+
+      ],
+      "description": "The EC2_USER_ID value defined in your eucarc credentials file. User must have admin privileges.",
+      "display_name": "Eucalyptus User ID",
+      "recipes": [
+        "rightimage::cloud_upload"
+      ],
+      "required": "required",
+      "type": "string"
+    },
+    "rightimage/euca/x509_cert": {
+      "calculated": false,
+      "choice": [
+
+      ],
+      "description": "The contents of the file pointed to by the EC2_CERT value defined in your eucarc credentials file.",
+      "display_name": "Eucalyptus x509 Certificate",
+      "recipes": [
+        "rightimage::cloud_upload"
+      ],
+      "required": "required",
+      "type": "string"
+    },
+    "rightimage/euca/x509_key": {
+      "calculated": false,
+      "choice": [
+
+      ],
+      "description": "The contents of the file pointed to by the EC2_PRIVATE_KEY value defined in your eucarc credentials file.",
+      "display_name": "Eucalyptus x509 Private Key",
+      "recipes": [
+        "rightimage::cloud_upload"
+      ],
+      "required": "required",
+      "type": "string"
+    },
+    "rightimage/google/client_id": {
+      "calculated": false,
+      "choice": [
+
+      ],
+      "description": "OAuth2 credentials client id for GCE. Pulled from gcutil conf",
+      "display_name": "Google client id",
+      "recipes": [
+        "rightimage::cloud_upload"
+      ],
+      "required": "optional",
+      "type": "string"
+    },
+    "rightimage/google/client_secret": {
+      "calculated": false,
+      "choice": [
+
+      ],
+      "description": "OAuth2 credentials client secret for GCE. Pulled from gcutil conf",
+      "display_name": "Google client secret",
+      "recipes": [
+        "rightimage::cloud_upload"
+      ],
+      "required": "optional",
+      "type": "string"
+    },
+    "rightimage/google/gc_access_key_id": {
+      "calculated": false,
+      "choice": [
+
+      ],
+      "description": "Google storage (interoperable) access key id",
+      "display_name": "Google access_key_id",
+      "recipes": [
+        "rightimage::cloud_upload"
+      ],
+      "required": "optional",
+      "type": "string"
+    },
+    "rightimage/google/gc_secret_access_key": {
+      "calculated": false,
+      "choice": [
+
+      ],
+      "description": "Google storage (interoperable) secret access key",
+      "display_name": "Google secret_access_key",
+      "recipes": [
+        "rightimage::cloud_upload"
+      ],
+      "required": "optional",
+      "type": "string"
+    },
+    "rightimage/google/project_id": {
+      "calculated": false,
+      "choice": [
+
+      ],
+      "description": "GCE Project ID to register this image for",
+      "display_name": "Google Project ID",
+      "recipes": [
+        "rightimage::cloud_upload"
+      ],
+      "required": "optional",
+      "type": "string"
+    },
+    "rightimage/google/refresh_token": {
+      "calculated": false,
+      "choice": [
+
+      ],
+      "description": "Refresh token value for GCE. Pulled form gcutil conf",
+      "display_name": "Google OAuth2 credentials refresh token",
+      "recipes": [
+        "rightimage::cloud_upload"
+      ],
+      "required": "optional",
+      "type": "string"
+    },
+    "rightimage/hypervisor": {
+      "calculated": false,
+      "choice": [
+        "xen",
+        "kvm",
+        "esxi",
+        "hyperv",
+        "virtualbox"
+      ],
+      "description": "Which hypervisor is this image for?",
+      "display_name": "Hypervisor",
+      "recipes": [
+
+      ],
+      "required": "required",
+      "type": "string"
+    },
+    "rightimage/image_name": {
+      "calculated": false,
+      "choice": [
+
+      ],
+      "description": "The name you want to give this new image.",
+      "display_name": "Image Name",
+      "recipes": [
+
+      ],
+      "required": "required",
+      "type": "string"
+    },
+    "rightimage/image_source_bucket": {
+      "calculated": false,
+      "choice": [
+
+      ],
+      "default": "rightscale-us-west-2",
+      "description": "When migrating an image, where to download the image from.",
+      "display_name": "Image Source Bucket",
+      "recipes": [
+        "rightimage::default",
+        "rightimage::ec2_download_bundle"
+      ],
+      "required": "optional",
+      "type": "string"
+    },
+    "rightimage/image_upload_bucket": {
+      "calculated": false,
+      "choice": [
+
+      ],
+      "description": "The bucket to upload the image to.",
+      "display_name": "Image Upload Bucket",
+      "recipes": [
+        "rightimage::base_upload",
+        "rightimage::build_base",
+        "rightimage::default",
+        "rightimage::build_image",
+        "rightimage::upload_image_s3",
+        "rightimage::ec2_download_bundle",
+        "rightimage::cloud_upload",
+        "rightimage::upload_image_s3"
+      ],
+      "required": "required",
+      "type": "string"
+    },
+    "rightimage/manual_mode": {
+      "calculated": false,
+      "choice": [
+        "true",
+        "false"
+      ],
+      "default": "true",
+      "description": "Sets the template's operation mode. Ex. 'true' = don't build at boot time.",
+      "display_name": "Manual Mode",
+      "recipes": [
+        "rightimage::default"
+      ],
+      "required": "optional",
+      "type": "string"
+    },
+    "rightimage/mirror_freeze_date": {
+      "calculated": false,
+      "choice": [
+
+      ],
+      "description": "Day from which to pull OS, rightscale, and rubygem packages. Expected format is YYYYMMDD. If not supplied, will use latest available date.",
+      "display_name": "Mirror freeze date",
+      "recipes": [
+
+      ],
+      "required": "recommended",
+      "type": "string"
+    },
+    "rightimage/openstack/hostname": {
+      "calculated": false,
+      "choice": [
+
+      ],
+      "default": "",
+      "description": "Hostname of Openstack Cloud Controller.",
+      "display_name": "Openstack Hostname",
+      "recipes": [
+        "rightimage::cloud_upload"
+      ],
+      "required": "optional",
+      "type": "string"
+    },
+    "rightimage/openstack/password": {
+      "calculated": false,
+      "choice": [
+
+      ],
+      "default": "",
+      "description": "Password for user to access API of Openstack Cloud Controller.",
+      "display_name": "Openstack Password",
+      "recipes": [
+        "rightimage::cloud_upload"
+      ],
+      "required": "optional",
+      "type": "string"
+    },
+    "rightimage/openstack/user": {
+      "calculated": false,
+      "choice": [
+
+      ],
+      "default": "",
+      "description": "User to access API of Openstack Cloud Controller.",
+      "display_name": "Openstack User",
+      "recipes": [
+        "rightimage::cloud_upload"
+      ],
+      "required": "optional",
+      "type": "string"
+    },
+    "rightimage/platform": {
+      "calculated": false,
+      "choice": [
+        "centos",
+        "ubuntu",
+        "suse",
+        "rhel"
+      ],
+      "description": "The operating system for the virtual image.",
+      "display_name": "Guest OS Platform",
+      "recipes": [
+
+      ],
+      "required": "optional",
+      "type": "string"
+    },
+    "rightimage/platform_version": {
+      "calculated": false,
+      "choice": [
+        "5.4",
+        "5.6",
+        "5.8",
+        "6.2",
+        "6.3",
+        "6.4",
+        "10.04",
+        "10.10",
+        "12.04"
+      ],
+      "description": "The OS version to build into the virtual image.",
+      "display_name": "Guest OS Version",
+      "recipes": [
+
+      ],
+      "required": "optional",
+      "type": "string"
+    },
+    "rightimage/rackspace/account": {
+      "calculated": false,
+      "choice": [
+
+      ],
+      "description": "Rackspace Account ID",
+      "display_name": "Rackspace Account ID",
+      "recipes": [
+        "rightimage::rebundle",
+        "rightimage::default"
+      ],
+      "required": "required",
+      "type": "string"
+    },
+    "rightimage/rackspace/api_token": {
+      "calculated": false,
+      "choice": [
+
+      ],
+      "description": "Rackspace API Token",
+      "display_name": "Rackspace API Token",
+      "recipes": [
+        "rightimage::rebundle",
+        "rightimage::default"
+      ],
+      "required": "required",
+      "type": "string"
+    },
+    "rightimage/rebundle_base_image_id": {
+      "calculated": false,
+      "choice": [
+
+      ],
+      "default": "",
+      "description": "Cloud specific ID for the image to start with when building a rebundle image",
+      "display_name": "Rebundle Base Image ID",
+      "recipes": [
+        "rightimage::default",
+        "rightimage::rebundle"
+      ],
+      "required": "optional",
+      "type": "string"
+    },
+    "rightimage/rebundle_git_repository": {
+      "calculated": false,
+      "choice": [
+
+      ],
+      "default": "",
+      "description": "Git repository to checkout from when building a rebundle image",
+      "display_name": "Rebundle Git Repository",
+      "recipes": [
+        "rightimage::default",
+        "rightimage::rebundle"
+      ],
+      "required": "optional",
+      "type": "string"
+    },
+    "rightimage/rebundle_git_revision": {
+      "calculated": false,
+      "choice": [
+
+      ],
+      "default": "",
+      "description": "Git repository revision to checkout from when building a rebundle image",
+      "display_name": "Rebundle Git Revision",
+      "recipes": [
+        "rightimage::default",
+        "rightimage::rebundle"
+      ],
+      "required": "optional",
+      "type": "string"
+    },
+    "rightimage/region": {
+      "calculated": false,
+      "choice": [
+        "us-east",
+        "us-west",
+        "us-west-2",
+        "eu-west",
+        "ap-southeast",
+        "ap-southeast-2",
+        "ap-northeast",
+        "sa-east"
+      ],
+      "description": "The EC2 region in which the image will reside",
+      "display_name": "EC2 Region",
+      "recipes": [
+
+      ],
+      "required": "required",
+      "type": "string"
+    },
+    "rightimage/rightlink_repo": {
+      "calculated": false,
+      "choice": [
+        "rightlink-staging",
+        "rightlink-nightly",
+        "rightlink-production"
+      ],
+      "default": "rightlink-staging",
+      "description": "Rightlink repository to use. For adhoc repos, supply the value 'adhoc-NAME', such as adhoc-pete.",
+      "display_name": "RightLink Repository",
+      "recipes": [
+        "rightimage::default",
+        "rightimage::build_image",
+        "rightimage::rightscale_rightlink",
+        "rightimage::rebundle",
+        "rightimage::rightscale_install"
+      ],
+      "required": "optional",
+      "type": "string"
+    },
+    "rightimage/rightlink_version": {
+      "calculated": false,
+      "choice": [
+
+      ],
+      "description": "RightLink version to install.",
+      "display_name": "RightLink Version",
+      "recipes": [
+        "rightimage::default",
+        "rightimage::build_image",
+        "rightimage::rightscale_rightlink",
+        "rightimage::rebundle",
+        "rightimage::rightscale_install",
+        "rightimage::do_create_mci"
+      ],
+      "required": "required",
+      "type": "string"
+    },
+    "rightimage/rightscale_staging_mirror": {
+      "calculated": false,
+      "choice": [
+        "true",
+        "false"
+      ],
+      "default": "false",
+      "description": "Use the staging repo for RightScale Software repo. Used for development and testing",
+      "display_name": "Use RightScale staging mirror",
+      "recipes": [
+
+      ],
+      "required": "optional",
+      "type": "string"
     },
     "rightimage/root_size_gb": {
-      "required": "optional",
       "calculated": false,
       "choice": [
 
       ],
       "default": "10",
-      "type": "string",
+      "description": "Sets the size of the virtual image. Units are in GB.",
+      "display_name": "Root Size GB",
       "recipes": [
         "rightimage::default",
         "rightimage::build_base",
@@ -471,492 +864,136 @@
         "rightimage::cloud_package",
         "rightimage::rebundle"
       ],
-      "display_name": "Root Size GB",
-      "description": "Sets the size of the virtual image. Units are in GB."
-    },
-    "rightimage/google/refresh_token": {
       "required": "optional",
+      "type": "string"
+    },
+    "rightscale/api_password": {
       "calculated": false,
       "choice": [
 
       ],
-      "type": "string",
+      "description": "Rightscale API password.",
+      "display_name": "API Password",
       "recipes": [
-        "rightimage::cloud_upload"
+        "rightimage::do_create_mci"
       ],
-      "display_name": "Google OAuth2 credentials refresh token",
-      "description": "Refresh token value for GCE. Pulled form gcutil conf"
-    },
-    "rightimage/azure/region": {
-      "required": "recommended",
-      "calculated": false,
-      "choice": [
-        "West Europe",
-        "North Europe",
-        "Southeast Asia",
-        "East Asia",
-        "West US",
-        "East US"
-      ],
-      "default": "West US",
-      "type": "string",
-      "recipes": [
-        "rightimage::cloud_upload"
-      ],
-      "display_name": "Azure Location"
-    },
-    "rightimage/cloudstack/cdc_api_key": {
-      "required": "required",
-      "calculated": false,
-      "choice": [
-
-      ],
-      "type": "string",
-      "recipes": [
-        "rightimage::cloud_upload"
-      ],
-      "display_name": "CloudStack API Key",
-      "description": "CloudStack API key."
-    },
-    "rightimage/euca/euca_cert": {
-      "required": "required",
-      "calculated": false,
-      "choice": [
-
-      ],
-      "type": "string",
-      "recipes": [
-        "rightimage::cloud_upload"
-      ],
-      "display_name": "Eucalyptus Cloud Certificate",
-      "description": "The contents of the file pointed to by the EUCALYPTUS_CERT value defined in your eucarc credentials file."
-    },
-    "rightimage/euca/secret_access_key": {
-      "required": "required",
-      "calculated": false,
-      "choice": [
-
-      ],
-      "type": "string",
-      "recipes": [
-        "rightimage::cloud_upload"
-      ],
-      "display_name": "Eucalyptus Secret Access Key",
-      "description": "The EC2_SECRET_KEY value defined in your eucarc credentials file. User must have admin privileges."
-    },
-    "rightimage/datacenter": {
-      "required": "recommended",
-      "calculated": false,
-      "choice": [
-
-      ],
-      "default": "1",
-      "type": "string",
-      "recipes": [
-
-      ],
-      "display_name": "Datacenter ID",
-      "description": "Datacenter/Zone ID.  Defaults to 1.  Use US/UK for Rackspace Legacy. Use DFW/ORD/LON/SYD for Rackspace Open Cloud."
-    },
-    "rightimage/rebundle_git_revision": {
+      "recommended": true,
       "required": "optional",
+      "type": "string"
+    },
+    "rightscale/api_url": {
       "calculated": false,
       "choice": [
 
       ],
-      "default": "",
-      "type": "string",
+      "description": "The rightscale account specific api url to use.  Ex. https://my.rightscale.com/api/acct/1234 (where 1234 is your account id)",
+      "display_name": "API URL",
       "recipes": [
-        "rightimage::default",
-        "rightimage::rebundle"
+        "rightimage::do_create_mci"
       ],
-      "display_name": "Rebundle Git Revision",
-      "description": "Git repository revision to checkout from when building a rebundle image"
-    },
-    "rightimage/image_source_bucket": {
+      "recommended": true,
       "required": "optional",
-      "calculated": false,
-      "choice": [
-
-      ],
-      "default": "rightscale-us-west-2",
-      "type": "string",
-      "recipes": [
-        "rightimage::default",
-        "rightimage::ec2_download_bundle"
-      ],
-      "display_name": "Image Source Bucket",
-      "description": "When migrating an image, where to download the image from."
-    },
-    "rightimage/google/project_id": {
-      "required": "optional",
-      "calculated": false,
-      "choice": [
-
-      ],
-      "type": "string",
-      "recipes": [
-        "rightimage::cloud_upload"
-      ],
-      "display_name": "Google Project ID",
-      "description": "GCE Project ID to register this image for"
-    },
-    "rightimage/azure/storage_account": {
-      "required": "recommended",
-      "calculated": false,
-      "choice": [
-
-      ],
-      "type": "string",
-      "recipes": [
-        "rightimage::cloud_upload"
-      ],
-      "display_name": "Azure Storage Account",
-      "description": "Storage account to upload the image to. Required when supplying a Shared Key"
-    },
-    "rightimage/rackspace/api_token": {
-      "required": "required",
-      "calculated": false,
-      "choice": [
-
-      ],
-      "type": "string",
-      "recipes": [
-        "rightimage::rebundle",
-        "rightimage::default"
-      ],
-      "display_name": "Rackspace API Token",
-      "description": "Rackspace API Token"
-    },
-    "rightimage/cloudstack/cdc_url": {
-      "required": "required",
-      "calculated": false,
-      "choice": [
-
-      ],
-      "type": "string",
-      "recipes": [
-        "rightimage::cloud_upload"
-      ],
-      "display_name": "CloudStack API URL",
-      "description": "URL to your CloudStack Cloud Controller. (Ex. http://<server_ip>:8080/client/api)"
-    },
-    "rightimage/euca/euca_url": {
-      "required": "required",
-      "calculated": false,
-      "choice": [
-
-      ],
-      "type": "string",
-      "recipes": [
-        "rightimage::cloud_upload"
-      ],
-      "display_name": "Eucalyptus URL",
-      "description": "Base URL to your Eucalyptus Cloud Controller. Don't include port. (Ex. http://<server_ip>)"
-    },
-    "rightimage/aws_access_key_id": {
-      "required": "required",
-      "calculated": false,
-      "choice": [
-
-      ],
-      "type": "string",
-      "recipes": [
-        "rightimage::cloud_upload",
-        "rightimage::rebundle",
-        "rightimage::default",
-        "rightimage::ec2_download_bundle",
-        "rightimage::build_base",
-        "rightimage::build_image",
-        "rightimage::upload_image_s3",
-        "rightimage::base_upload",
-        "rightimage::image_tests",
-        "rightimage::report_upload",
-        "rightimage::s3index_update"
-      ],
-      "display_name": "aws_access_key_id",
-      "description": "aws_access_key_id"
+      "type": "string"
     },
     "rightscale/api_user": {
-      "required": "optional",
       "calculated": false,
       "choice": [
 
       ],
-      "type": "string",
-      "recommended": true,
+      "description": "RightScale API username. Ex. you@rightscale.com",
+      "display_name": "API User",
       "recipes": [
         "rightimage::do_create_mci"
       ],
-      "display_name": "API User",
-      "description": "RightScale API username. Ex. you@rightscale.com"
-    },
-    "rightimage/build_id": {
-      "required": "recommended",
-      "calculated": false,
-      "choice": [
-
-      ],
-      "default": "0",
-      "type": "string",
-      "recipes": [
-
-      ],
-      "display_name": "Build ID",
-      "description": "Unique identifier for the a image. When building a full image, this build_id must match the build_id of the base image you wish to use. The ID can't include underscores.  This value is usually the RightImage version, such as 13.2.1, or a combination of the version and the developers name or git sha used to build the code, such as 13.2.1-aef01c2d"
-    },
-    "rightimage/mirror_freeze_date": {
-      "required": "recommended",
-      "calculated": false,
-      "choice": [
-
-      ],
-      "type": "string",
-      "recipes": [
-
-      ],
-      "display_name": "Mirror freeze date",
-      "description": "Day from which to pull OS, rightscale, and rubygem packages. Expected format is YYYYMMDD. If not supplied, will use latest available date."
-    },
-    "rightimage/rebundle_git_repository": {
+      "recommended": true,
       "required": "optional",
-      "calculated": false,
-      "choice": [
-
-      ],
-      "default": "",
-      "type": "string",
-      "recipes": [
-        "rightimage::default",
-        "rightimage::rebundle"
-      ],
-      "display_name": "Rebundle Git Repository",
-      "description": "Git repository to checkout from when building a rebundle image"
-    },
-    "rightimage/arch": {
-      "required": "optional",
-      "calculated": false,
-      "choice": [
-        "x86_64",
-        "i386"
-      ],
-      "type": "string",
-      "recipes": [
-
-      ],
-      "display_name": "Guest OS Architecture",
-      "description": "The architecture for the virtual image."
-    },
-    "rightimage/openstack/hostname": {
-      "required": "optional",
-      "calculated": false,
-      "choice": [
-
-      ],
-      "default": "",
-      "type": "string",
-      "recipes": [
-        "rightimage::cloud_upload"
-      ],
-      "display_name": "Openstack Hostname",
-      "description": "Hostname of Openstack Cloud Controller."
-    },
-    "rightimage/ec2/image_type": {
-      "required": "recommended",
-      "calculated": false,
-      "choice": [
-        "InstanceStore",
-        "EBS"
-      ],
-      "default": "InstanceStore",
-      "type": "string",
-      "recipes": [
-        "rightimage::build_image",
-        "rightimage::default",
-        "rightimage::cloud_upload"
-      ],
-      "display_name": "EC2 Image Type",
-      "description": "Type of EC2 Image cloud_upload recipe will create"
-    },
-    "rightimage/image_upload_bucket": {
-      "required": "required",
-      "calculated": false,
-      "choice": [
-
-      ],
-      "type": "string",
-      "recipes": [
-        "rightimage::base_upload",
-        "rightimage::build_base",
-        "rightimage::default",
-        "rightimage::build_image",
-        "rightimage::upload_image_s3",
-        "rightimage::ec2_download_bundle",
-        "rightimage::cloud_upload",
-        "rightimage::upload_image_s3"
-      ],
-      "display_name": "Image Upload Bucket",
-      "description": "The bucket to upload the image to."
-    },
-    "rightimage/platform": {
-      "required": "optional",
-      "calculated": false,
-      "choice": [
-        "centos",
-        "ubuntu",
-        "suse",
-        "rhel"
-      ],
-      "type": "string",
-      "recipes": [
-
-      ],
-      "display_name": "Guest OS Platform",
-      "description": "The operating system for the virtual image."
-    },
-    "rightimage/google/client_secret": {
-      "required": "optional",
-      "calculated": false,
-      "choice": [
-
-      ],
-      "type": "string",
-      "recipes": [
-        "rightimage::cloud_upload"
-      ],
-      "display_name": "Google client secret",
-      "description": "OAuth2 credentials client secret for GCE. Pulled from gcutil conf"
-    },
-    "rightimage/openstack/password": {
-      "required": "optional",
-      "calculated": false,
-      "choice": [
-
-      ],
-      "default": "",
-      "type": "string",
-      "recipes": [
-        "rightimage::cloud_upload"
-      ],
-      "display_name": "Openstack Password",
-      "description": "Password for user to access API of Openstack Cloud Controller."
-    },
-    "rightimage/euca/user_id": {
-      "required": "required",
-      "calculated": false,
-      "choice": [
-
-      ],
-      "type": "string",
-      "recipes": [
-        "rightimage::cloud_upload"
-      ],
-      "display_name": "Eucalyptus User ID",
-      "description": "The EC2_USER_ID value defined in your eucarc credentials file. User must have admin privileges."
+      "type": "string"
     },
     "rightscale/cloud_id": {
-      "required": "optional",
       "calculated": false,
       "choice": [
 
       ],
-      "type": "string",
-      "recommended": true,
+      "description": "The numeric ID in RightScale for the cloud which we will create this image for. For example, 6 = AWS Oregon, 232 = Rackspace",
+      "display_name": "RightScale Cloud ID (integer)",
       "recipes": [
         "rightimage::do_create_mci"
       ],
-      "display_name": "RightScale Cloud ID (integer)",
-      "description": "The numeric ID in RightScale for the cloud which we will create this image for. For example, 6 = AWS Oregon, 232 = Rackspace"
-    },
-    "rightimage/region": {
-      "required": "required",
-      "calculated": false,
-      "choice": [
-        "us-east",
-        "us-west",
-        "us-west-2",
-        "eu-west",
-        "ap-southeast",
-        "ap-southeast-2",
-        "ap-northeast",
-        "sa-east"
-      ],
-      "type": "string",
-      "recipes": [
-
-      ],
-      "display_name": "EC2 Region",
-      "description": "The EC2 region in which the image will reside"
-    },
-    "rightimage/platform_version": {
+      "recommended": true,
       "required": "optional",
+      "type": "string"
+    },
+    "rightscale/mci_name": {
       "calculated": false,
       "choice": [
-        "5.4",
-        "5.6",
-        "5.8",
-        "6.2",
-        "6.3",
-        "6.4",
-        "10.04",
-        "10.10",
-        "12.04"
-      ],
-      "type": "string",
-      "recipes": [
 
       ],
-      "display_name": "Guest OS Version",
-      "description": "The OS version to build into the virtual image."
+      "default": "",
+      "description": "MCI to add this image to. If an integer is specified, will be assumed to be RightScale ID.  If a string is specified, MCI name will be matched and created if not found. If empty, use image_name attribute",
+      "display_name": "MCI Name or ID",
+      "recipes": [
+        "rightimage::do_create_mci"
+      ],
+      "required": "optional",
+      "type": "string"
     }
-  },
-  "license": "Apache v2.0",
-  "suggestions": {
-  },
-  "platforms": {
-  },
-  "maintainer": "RightScale, Inc.",
-  "long_description": "",
-  "version": "1.0.0",
-  "recommendations": {
-  },
-  "recipes": {
-    "rightimage::rightscale_install": "installs rightscale",
-    "rightimage::rebundle": "coordinate a rebundled image build (redhat on on ec2 or rackspace)",
-    "rightimage::cloud_upload": "upload and register image with cloud",
-    "rightimage::build_base": "build base image based on host platform",
-    "rightimage::report_upload": "Checksums compressed images, adds info to reports, and uploads reports alongside images",
-    "rightimage::loopback_resize": "resizes loopback file system",
-    "rightimage::block_device_restore": "creates a new EBS volume by restoring from an EBS snapshot",
-    "rightimage::block_device_create": "creates, formats, and mounts a brand new EBS volume",
-    "rightimage::enable_debug": "enables a root login on image for debugging purposes",
-    "rightimage::default": "starts builds image automatically at boot. See 'manual_mode' input to enable.",
-    "rightimage::upload_image_s3": "bundle and upload private cloud image to s3 bucket for distribution/download",
-    "rightimage::loopback_unmount": "unmounts loopback file system",
-    "rightimage::block_device_destroy": "unmounts, and deletes an attached EBS volume",
-    "rightimage::cloud_add": "configures base os image for a specific cloud",
-    "rightimage::image_report": "Compiles information into a json report by parsing system calls and optional hint files",
-    "rightimage::do_create_mci": "creates RightScale MultiCloudImage (MCI) for image (only ec2 currently supported)",
-    "rightimage::loopback_mount": "mounts loopback file system",
-    "rightimage::ec2_download_bundle": "Downloads bundled image from EC2 S3.",
-    "rightimage::build_image": "build image based on host platform",
-    "rightimage::cloud_package": "packages RightImage for a specific cloud",
-    "rightimage::loopback_create": "creates and mounts loopback file system",
-    "rightimage::block_device_backup": "creates an EBS snapshot from attached EBS volume",
-    "rightimage::base_upload": "upload raw image to s3",
-    "rightimage::s3index_update": "Updates the index.html of the upload bucket",
-    "rightimage::loopback_copy": "creates non-partitioned loopback fs image from a partitioned one",
-    "rightimage::image_tests": "run some basic tests on mounted image such as grepping for credentials",
-    "rightimage::base_os": "build a base image",
-    "rightimage::clean": "cleans everything"
-  },
-  "groupings": {
   },
   "conflicting": {
   },
-  "replacing": {
+  "dependencies": {
+    "block_device": ">= 0.0.0",
+    "loopback_fs": ">= 0.0.0",
+    "rightimage_cloud_vagrant": ">= 0.0.0",
+    "rightimage_tester": ">= 0.0.0",
+    "rightscale": ">= 0.0.0"
   },
   "description": "A cookbook for building RightImages",
+  "groupings": {
+  },
+  "license": "Apache v2.0",
+  "long_description": "",
+  "maintainer": "RightScale, Inc.",
+  "maintainer_email": "support@rightscale.com",
+  "name": "rightimage",
+  "platforms": {
+  },
   "providing": {
-  }
+  },
+  "recipes": {
+    "rightimage::base_os": "build a base image",
+    "rightimage::base_upload": "upload raw image to s3",
+    "rightimage::block_device_backup": "creates an EBS snapshot from attached EBS volume",
+    "rightimage::block_device_create": "creates, formats, and mounts a brand new EBS volume",
+    "rightimage::block_device_destroy": "unmounts, and deletes an attached EBS volume",
+    "rightimage::block_device_restore": "creates a new EBS volume by restoring from an EBS snapshot",
+    "rightimage::build_base": "build base image based on host platform",
+    "rightimage::build_image": "build image based on host platform",
+    "rightimage::clean": "cleans everything",
+    "rightimage::cloud_add": "configures base os image for a specific cloud",
+    "rightimage::cloud_package": "packages RightImage for a specific cloud",
+    "rightimage::cloud_upload": "upload and register image with cloud",
+    "rightimage::default": "starts builds image automatically at boot. See 'manual_mode' input to enable.",
+    "rightimage::do_create_mci": "creates RightScale MultiCloudImage (MCI) for image (only ec2 currently supported)",
+    "rightimage::ec2_download_bundle": "Downloads bundled image from EC2 S3.",
+    "rightimage::enable_debug": "enables a root login on image for debugging purposes",
+    "rightimage::image_report": "Compiles information into a json report by parsing system calls and optional hint files",
+    "rightimage::image_tests": "run some basic tests on mounted image such as grepping for credentials",
+    "rightimage::loopback_copy": "creates non-partitioned loopback fs image from a partitioned one",
+    "rightimage::loopback_create": "creates and mounts loopback file system",
+    "rightimage::loopback_mount": "mounts loopback file system",
+    "rightimage::loopback_resize": "resizes loopback file system",
+    "rightimage::loopback_unmount": "unmounts loopback file system",
+    "rightimage::rebundle": "coordinate a rebundled image build (redhat on on ec2 or rackspace)",
+    "rightimage::report_upload": "Checksums compressed images, adds info to reports, and uploads reports alongside images",
+    "rightimage::rightscale_install": "installs rightscale",
+    "rightimage::s3index_update": "Updates the index.html of the upload bucket",
+    "rightimage::upload_image_s3": "bundle and upload private cloud image to s3 bucket for distribution/download"
+  },
+  "recommendations": {
+  },
+  "replacing": {
+  },
+  "suggestions": {
+  },
+  "version": "1.0.0"
 }

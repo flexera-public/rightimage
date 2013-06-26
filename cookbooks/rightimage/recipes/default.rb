@@ -30,53 +30,21 @@ class Chef::Recipe
 end
 
 
-# Requirement for nokogiri and rightimage_tools now
+# Requirement for nokogiri, which is a requirement for fog and rightimage_tools
 packages = value_for_platform(
   "ubuntu" => {"default" => %w(libxml2-dev libxslt1-dev)},
   "default" => %w(libxml2-devel libxslt-devel)
 )
 
 packages.each do |p| 
-  r = package p do 
-    action :nothing 
-  end
-  r.run_action(:install)
+  package p
 end
 
-SANDBOX_BIN_DIR = "/opt/rightscale/sandbox/bin"
-# These are needed until rest_connection pins it's activesupport dependency version
-r = gem_package "activesupport" do
-  gem_binary "#{SANDBOX_BIN_DIR}/gem"
-  version "2.3.10"
-  action :nothing
+gem_package "fog" do
+  gem_binary "/usr/bin/gem"
+  version "1.5.0"
+  action :install
 end
-r.run_action(:install)
-
-r = gem_package "nokogiri" do 
-  gem_binary "#{SANDBOX_BIN_DIR}/gem"
-  version "1.5.4"
-  action :nothing
-end
-r.run_action(:install)
-
-r = gem_package "net-ssh" do 
-  gem_binary "#{SANDBOX_BIN_DIR}/gem"
-  version "2.1.4"
-  action :nothing
-end
-r.run_action(:install)
-
-RI_TOOL_GEM = ::Dir.glob(::File.dirname(__FILE__)+"/../files/default/rightimage_tools*.gem").first
-RI_TOOL_VERSION = /-([\d\.]+)\.gem$/.match(RI_TOOL_GEM)[1]
-
-r = gem_package RI_TOOL_GEM do
-  gem_binary "#{SANDBOX_BIN_DIR}/gem"
-  version RI_TOOL_VERSION
-  action :nothing
-end
-r.run_action(:install)
-
-Gem.clear_paths
 
 unless node[:rightimage][:manual_mode] == "true"
   case node[:rightimage][:build_mode] 

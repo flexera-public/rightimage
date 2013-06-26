@@ -34,7 +34,7 @@ template "#{guest_root}/etc/ssh/sshd_config" do
 end
 
 bash "install_rubygems" do 
-  not_if  "chroot #{guest_root} which gem"
+  not_if  { system("chroot #{guest_root} which gem") || node[:rightimage][:bare_image] == "true" }
   flags "-ex"
   code <<-EOC
 ROOT=#{guest_root}
@@ -134,7 +134,7 @@ template "#{guest_root}/etc/ntp.conf" do
   source "ntp.conf.erb"
   backup false
   variables({
-    :driftfile => node[:rightimage][:platform] == "ubunutu" ? "/var/lib/ntp/ntp.drift" : "/var/lib/ntp/drift"
+    :driftfile => node[:rightimage][:platform] == "ubuntu" ? "/var/lib/ntp/ntp.drift" : "/var/lib/ntp/drift"
   })
 end
 

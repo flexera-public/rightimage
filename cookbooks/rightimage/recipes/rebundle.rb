@@ -133,9 +133,9 @@ bash "upload code to the remote instance" do
     freeze_date_opt = "--freeze-date #{mirror_freeze_date[0..3]}-#{mirror_freeze_date[4..5]}-#{mirror_freeze_date[6..7]}"
   end
   debug_opt = node[:rightimage][:debug] == "true" ? "--debug" : ""
-
+  staging_opt = node[:rightimage][:rightscale_staging_mirror] == "true" ? "--staging-mirror" : ""
   code <<-EOH
-  #{ruby_bin_dir}/ruby bin/upload --rightlink #{node[:rightimage][:rightlink_version]} #{freeze_date_opt} #{debug_opt} --no-configure
+  #{ruby_bin_dir}/ruby bin/upload --rightlink #{node[:rightimage][:rightlink_version]} #{freeze_date_opt} #{debug_opt} #{staging_opt} --no-configure
   EOH
 end
 

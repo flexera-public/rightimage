@@ -8,15 +8,8 @@ class Chef::Resource::RubyBlock
   include RightScale::RightImage::Helper
 end
 
-# Current rightimage_tools gem filename.
-RI_TOOL_GEM = Dir.entries(File.dirname(__FILE__)+"/../files/default/").grep(/rightimage_tools.*.gem/).first
 
-# Stage rightimge_tools gem in image.
-cookbook_file "#{guest_root}/tmp/#{RI_TOOL_GEM}" do
-  source RI_TOOL_GEM
-  mode "0644"
-  backup false
-end
+
 
 # This folder does not exist yet, so create it.
 # Store hint files in here.
@@ -56,31 +49,32 @@ directory temp_root do
   recursive true
 end
 
-bash "run_report_tool" do
-  code <<-EOH
-  /usr/sbin/chroot #{guest_root} gem install --no-rdoc --no-ri /tmp/#{RI_TOOL_GEM}
+ri_tools_dir = "/tmp/rightimage_tools"
 
-  # Extra path for Ubuntu.
-  PATH=$PATH:/usr/local/bin
-  
-  # Prints report to log.
-  /usr/sbin/chroot #{guest_root} report_tool print
+# Stage rightimge_tools gem in image.
+directory "#{guest_root}#{ri_tools_dir}"
 
-  # Move JSON file out of image to receive MD5 checksum.
-  mv #{guest_root}/tmp/report.js #{temp_root}/#{loopback_rootname}.js
-  
-  # Uninstall rightimage tools and some related gems.  Note that cloud providers
-  # may install their own rubygems, so don't remove everything
-  for gem in rest_connection right_api_client right_aws right_http_connection rightimage_tools; do 
-    /usr/sbin/chroot #{guest_root} gem uninstall -aIx $gem || true
-  done
-  EOH
-end
-
-# Clean up report tool.
-file "#{guest_root}/tmp/#{RI_TOOL_GEM}" do
+cookbook_file "#{guest_root}#{ri_tools_dir}/rightimage_tools.tar.gz" do
+  source "rightimage_tools.tar.gz"
+  mode "0644"
   backup false
-  action :delete 
 end
+
+cookbook_file "#{guest_root}#{ri_tools_dir}/setup_rightimage_tools.sh" do
+  source "setup_rightimage_tools.sh"
+  mode "0755"
+  backup false
+end
+
+execute "chroot #{guest_root} #{ri_tools_dir}/setup_rightimage_tools.sh" do
+  environment(node[:rightimage][:script_env])
+end
+
+execute "chroot /mnt/image bash -c 'cd /tmp/rightimage_tools && bundle exec bin/report_tool print'" do
+  environment(node[:rightimage][:script_env])
+end
+
+execute "mv -f #{guest_root}/tmp/report.js #{temp_root}/#{loopback_rootname}.js"
+
 
 rightscale_marker :end

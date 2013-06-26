@@ -29,4 +29,5 @@ include_recipe "rightimage_tester::gemrc"
 include_recipe "rightimage_tester::bad_files"
 include_recipe "rightimage_tester::special_strings"
 
+
 rightscale_marker :end

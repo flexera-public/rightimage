@@ -30,12 +30,32 @@ action :configure do
 
   execute "link_getsshkey" do 
     command  node[:rightimage][:getsshkey_cmd]
-    environment ({'GUEST_ROOT' => guest_root }) 
+    environment({'GUEST_ROOT' => guest_root }) 
+  end
+
+  # EC2 Tools are Java based
+  bash "install openjdk" do
+    flags "-ex"
+    code <<-EOH
+      case "#{new_resource.platform}" in
+      "ubuntu")
+        chroot #{guest_root} apt-get install -y openjdk-6-jre-headless
+        echo "export JAVA_HOME=/usr/lib/jvm/java-6-openjdk-amd64/jre" > #{guest_root}/etc/profile.d/java.sh
+        chmod a+x #{guest_root}/etc/profile.d/java.sh
+        ;;
+      "centos"|"rhel")
+        chroot #{guest_root} yum install -y java-1.6.0-openjdk
+        echo "export JAVA_HOME=/etc/alternatives/jre" > #{guest_root}/etc/profile.d/java.sh
+        chmod a+x #{guest_root}/etc/profile.d/java.sh
+        ;;
+      esac
+    EOH
   end
 
   #  - add cloud tools
   bash "install_ec2_tools" do 
     creates "#{guest_root}/home/ec2/bin"
+    not_if { node[:rightimage][:bare_image] == "true" }
     flags "-ex"
     code <<-EOH
       ROOT=#{guest_root}
@@ -212,7 +232,9 @@ def upload_ebs
       local_device=#{local_device}
 
       # Partition volume
-      sfdisk $local_device << EOF
+      # Use --no-reread option to avoid intermittent failures when re-reading
+      # the partition table at the end. (w-5644)
+      sfdisk --no-reread $local_device << EOF
 0,,L,*
 EOF
 

@@ -64,6 +64,13 @@ attribute "rightimage/manual_mode",
   :default => "true",
   :recipes => [ "rightimage::default" ]
 
+attribute "rightimage/bare_image",
+  :display_name => "Create Bare Image",
+  :description => "If true, image will not contain any additional packages beyond a stock os install, other than rightlink.  Used for debug/testing",
+  :choice => [ "true", "false" ],
+  :default => "false",
+  :required => "optional"
+
 attribute "rightimage/build_mode",
   :display_name => "Build Mode",
   :description => "Build base image, full image, or migrate existing image.",
@@ -91,7 +98,7 @@ attribute "rightimage/arch",
 attribute "rightimage/cloud",
   :display_name => "Target Cloud",
   :description => "The supported cloud for the virtual image. If unset, build a generic base image.",
-  :choice => [ "ec2", "cloudstack", "eucalyptus", "openstack", "rackspace", "rackspace-open-cloud", "azure", "google"],
+  :choice => [ "ec2", "cloudstack", "eucalyptus", "openstack", "rackspace", "rackspace-open-cloud", "azure", "google", "vagrant"],
   :required => "recommended"
   
 attribute "rightimage/region",
@@ -100,9 +107,21 @@ attribute "rightimage/region",
   :choice => [ "us-east", "us-west", "us-west-2", "eu-west", "ap-southeast", "ap-southeast-2", "ap-northeast", "sa-east" ],
   :required => true
   
+attribute "rightimage/rightlink_repo",
+  :display_name => "RightLink Repository",
+  :description => "Rightlink repository to use. For adhoc repos, supply the value 'adhoc-NAME', such as adhoc-pete.",
+  :recipes => [ "rightimage::default", "rightimage::build_image", "rightimage::rightscale_rightlink", "rightimage::rebundle", "rightimage::rightscale_install"],
+  :choice => [
+    "rightlink-staging",
+    "rightlink-nightly",
+    "rightlink-production"
+    ],
+  :default => "rightlink-staging",
+  :required => "optional"
+  
 attribute "rightimage/rightlink_version",
   :display_name => "RightLink Version",
-  :description => "The RightLink version we are building into our image",
+  :description => "RightLink version to install.",
   :recipes => [ "rightimage::default", "rightimage::build_image", "rightimage::rightscale_rightlink", "rightimage::rebundle", "rightimage::rightscale_install", "rightimage::do_create_mci"],
   :required => true
   
@@ -157,6 +176,14 @@ attribute "rightimage/mirror_freeze_date",
   :description => "Day from which to pull OS, rightscale, and rubygem packages. Expected format is YYYYMMDD. If not supplied, will use latest available date.",
   :required => "recommended"
 
+
+attribute "rightimage/rightscale_staging_mirror",
+  :display_name => "Use RightScale staging mirror",
+  :description => "Use the staging repo for RightScale Software repo. Used for development and testing",
+  :default => "false",
+  :choice => ["true", "false"],
+  :required => "optional"
+
 attribute "rightimage/build_id",
   :display_name => "Build ID",
   :description => "Unique identifier for the a image. When building a full image, this build_id must match the build_id of the base image you wish to use. The ID can't include underscores.  This value is usually the RightImage version, such as 13.2.1, or a combination of the version and the developers name or git sha used to build the code, such as 13.2.1-aef01c2d",
@@ -209,8 +236,8 @@ attribute "rightscale/cloud_id",
   :recommended => true
 
 attribute "rightscale/mci_name",
-   :display_name => "MCI Name",
-   :description => "MCI to add this image to. If empty, use image_name attribute",
+   :display_name => "MCI Name or ID",
+   :description => "MCI to add this image to. If an integer is specified, will be assumed to be RightScale ID.  If a string is specified, MCI name will be matched and created if not found. If empty, use image_name attribute",
    :default => "",
    :recipes => [ "rightimage::do_create_mci" ],
    :required => "optional"
@@ -339,13 +366,6 @@ attribute "rightimage/cloudstack/cdc_secret_key",
   :display_name => "CloudStack Secret Key",
   :description => "CloudStack secret key.",
   :required => "required",
-  :recipes => [ "rightimage::cloud_upload" ]
-
-attribute "rightimage/cloudstack/version",
-  :display_name => "CloudStack Version",
-  :description => "CloudStack version.",
-  :required => "required",
-  :choice => [ "2", "3" ],
   :recipes => [ "rightimage::cloud_upload" ]
 
 # RackSpace
