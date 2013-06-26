@@ -1,8 +1,8 @@
 #
 # Cookbook Name:: rightimage_tester
-# Recipe:: java
+# Recipe:: apparmor
 #
-# Copyright 2011, RightScale, Inc.
+# Copyright 2013, RightScale, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,10 +19,9 @@
 
 rightscale_marker :begin
 
-rightimage_tester "Verify JAVA_HOME environment variable is set" do
-  only_if { node[:cloud][:provider] == "ec2" }
-  command ". /etc/profile && [ ! -z \"$JAVA_HOME\" ] && test -e $JAVA_HOME/bin/java"
+rightimage_tester "Ensure apparmor is not installed" do
+  only_if "which aa-status" 
+  command "aa-status | grep 'apparmor filesystem is not mounted'"
   action :test
 end
-
 rightscale_marker :end

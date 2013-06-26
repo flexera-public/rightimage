@@ -15,6 +15,40 @@ class Chef::Recipe
   include RightScale::RightImage::Helper
 end
 
+require 'chef/log'
+require 'chef/mixin/shell_out'
+class Chef::Provider
+  include Chef::Mixin::ShellOut
+end
+
+
+# Ubuntu packages may call triggers which autostart services after install.  
+# These services will open log files preventing the loopback filesystem from 
+# unmounting.  Do the same thing debootstrap does and stub out initctl and
+# such with dummy scripts temporarily
+def loopback_package_install(packages)
+  init_scripts = ['/sbin/start-stop-daemon', '/sbin/initctl']
+  begin
+    init_scripts.each do |script|
+      shell_out!("chroot #{guest_root} dpkg-divert --add --rename --local #{script}")
+      ::File.open("#{guest_root}/#{script}","w") do |f|
+        f.puts('#!/bin/sh')
+        f.puts('echo')
+        f.puts("echo 'Warning: Fake #{script} called, doing nothing'")
+      end
+      shell_out!("chmod 755 #{guest_root}/#{script}")
+    end
+    package_list = Array(packages).join(" ")
+    Chef::Log.info("Installing #{package_list} into #{guest_root}")
+    shell_out!("chroot #{guest_root} apt-get install -y #{package_list}")
+  ensure
+    init_scripts.each do |script|
+      shell_out!("rm #{guest_root}/#{script}")
+      shell_out!("chroot #{guest_root} dpkg-divert --remove --rename #{script}")
+    end
+  end
+end
+
 action :install do
   platform_codename = platform_codename(new_resource.platform_version)
   #create bootstrap command
@@ -57,8 +91,6 @@ action :install do
   else
     bootstrap_cmd << " --arch amd64"
   end
-  node[:rightimage][:guest_packages].each { |p| bootstrap_cmd << " --addpkg #{p.split}"}
-  
 
   Chef::Log.info "vmbuilder bootstrap command is: " + bootstrap_cmd
 
@@ -127,8 +159,8 @@ EOS
         image_temp=`cat /mnt/vmbuilder/xen.conf  | grep xvda1 | grep -v root  | cut -c 25- | cut -c -9`
       fi
 
-      loop_name="loop1"
-      loop_dev="/dev/$loop_name"
+
+      loop_dev="/dev/loop1"
 
       base_raw_path="/mnt/vmbuilder/root.img"
 
@@ -136,11 +168,14 @@ EOS
       umount -lf $loop_dev || true
       # Cleanup loopback stuff
       set +e
-      losetup -a | grep $loop_name
+      losetup -a | grep $loop_dev
       [ "$?" == "0" ] && losetup -d $loop_dev
       set -e
 
       qemu-img convert -O raw /mnt/vmbuilder/$image_temp $base_raw_path
+
+
+
       losetup $loop_dev $base_raw_path
 
       guest_root=#{guest_root}
@@ -148,17 +183,19 @@ EOS
       random_dir=/tmp/rightimage-$RANDOM
       mkdir $random_dir
       mount -o loop $loop_dev  $random_dir
-      umount $guest_root/proc || true
-      rm -rf $guest_root/*
-      rsync -a $random_dir/ $guest_root/
+      rsync -a --delete $random_dir/ $guest_root/ --exclude '/proc' --exclude '/dev' --exclude '/sys'
       umount $random_dir
       sync
       losetup -d $loop_dev
       rm -rf $random_dir
+
       mkdir -p $guest_root/var/man
       chroot $guest_root chown -R man:root /var/man
+
+
   EOH
   end
+
 
   # disable loading pata_acpi module - currently breaks acpid from discovering volumes attached to CDC KVM hypervisor, from bootstrap_centos, should be applicable to ubuntu though
   bash "blacklist pata_acpi" do
@@ -168,10 +205,23 @@ EOS
     EOF
   end
 
+
+  cookbook_file "#{guest_root}/tmp/GPG-KEY-RightScale" do
+    source "GPG-KEY-RightScale"
+    backup false
+  end
+
+  log "Adding rightscale gpg key to keyring"
+  bash "install rightscale gpg key" do
+    flags "-ex"
+    code "chroot #{guest_root} apt-key add /tmp/GPG-KEY-RightScale"
+  end
+
   #  - configure mirrors
   rightimage_os new_resource.platform do
     action :repo_unfreeze
   end
+
 
   bash "Restore original ext4 in /etc/mke2fs.conf" do
     flags "-ex"
@@ -180,48 +230,6 @@ EOS
     EOH
   end
 
-  if node[:rightimage][:bare_image] != "true"
-    java_temp = "/tmp/java"
-
-    directory java_temp do
-      action :delete
-      recursive true
-    end
-
-    directory java_temp do
-      action :create
-    end
-
-    bash "install sun java" do
-      cwd java_temp
-      flags "-ex"
-      code <<-EOH
-        guest_root=#{guest_root}
-        java_home="/usr/lib/jvm/java-6-sun"
-        java_ver="31"
-
-        if [ "#{node[:rightimage][:arch]}" == x86_64 ] ; then
-          java_arch="x64"
-        else
-          java_arch="i586"
-        fi
-
-        java_file=jdk-6u$java_ver-linux-$java_arch.bin
-
-        wget http://s3.amazonaws.com/rightscale_software/java/$java_file
-        chmod +x /tmp/java/$java_file
-        echo "\\n" | /tmp/java/$java_file
-        rm -rf $guest_root${java_home}
-        mkdir -p $guest_root${java_home}
-        mv /tmp/java/jdk1.6.0_$java_ver/* $guest_root${java_home}
-
-        echo "JAVA_HOME=$java_home" > $guest_root/etc/profile.d/java.sh
-        echo "export JAVA_HOME" >> $guest_root/etc/profile.d/java.sh
-
-        chmod 775 $guest_root/etc/profile.d/java.sh
-      EOH
-    end
-  end
   
   # Set DHCP timeout
   bash "dhcp timeout" do
@@ -235,6 +243,19 @@ EOS
       sed -i "s/#timeout.*/timeout 300;/" #{guest_root}/etc/dhcp$dhcp_ver/dhclient.conf
       rm -f #{guest_root}/var/lib/dhcp$dhcp_ver/*
     EOH
+  end
+
+  # dhclient on precise by default doesn't set the hostname on boot
+  # while dhcpd on ubuntu 10.04 does. Ubuntu 13.04 has a script in contrib
+  # called sethostname.sh that does the same thing that you can place your enter
+  # hooks.  You may have to manually install it though, so revisit the issue at 
+  # that point (w-5618)
+  if new_resource.platform_version.to_f.between?(12.04,12.10); then
+    cookbook_file "#{guest_root}/etc/dhcp/dhclient-enter-hooks.d/hostname" do
+      source "dhclient-hostname.sh"
+      backup false
+      mode "0644"
+    end
   end
 
   # Don't let SysV init start until more than lo0 is ready
@@ -261,6 +282,7 @@ EOS
       echo "Acquire::http::Pipeline-Depth \"0\";" > #{guest_root}/etc/apt/apt.conf.d/99-no-pipelining
     EOH
   end
+
 
   # - add in custom built libc packages, fixes "illegal instruction" core dump (w-12310)
   directory "#{guest_root}/tmp/packages"
@@ -305,16 +327,12 @@ EOS
   end
 
 
-  cookbook_file "#{guest_root}/tmp/GPG-KEY-RightScale" do
-    source "GPG-KEY-RightScale"
-    backup false
+  ruby_block "install guest packages" do 
+    block do
+      loopback_package_install node[:rightimage][:guest_packages]
+    end
   end
 
-  log "Adding rightscale gpg key to keyring"
-  bash "install rightscale gpg key" do
-    flags "-ex"
-    code "chroot #{guest_root} apt-key add /tmp/GPG-KEY-RightScale"
-  end
 
   # Remove grub2 files
   bash "remove_grub2" do
@@ -338,38 +356,46 @@ EOS
       touch $guest_root/etc/resolvconf/resolv.conf.d/tail
 
       chroot #{guest_root} rm -rf /etc/init/plymouth*
-      chroot #{guest_root} apt-get update
+      chroot #{guest_root} apt-get update > /dev/null
       chroot #{guest_root} apt-get clean
     EOH
   end
 end
 
 action :repo_freeze do
+  mirror_date = "#{mirror_freeze_date[0..3]}/#{mirror_freeze_date[4..5]}/#{mirror_freeze_date[6..7]}"
+
   template "#{guest_root}/etc/apt/sources.list" do
     source "sources.list.erb"
     variables(
+      :mirror_url => node[:rightimage][:mirror],
+      :use_staging_mirror => node[:rightimage][:rightscale_staging_mirror],
+      :mirror_date => mirror_date,
       :bootstrap => true,
-      :mirror_date => "#{mirror_freeze_date[0..3]}/#{mirror_freeze_date[4..5]}/#{mirror_freeze_date[6..7]}",
       :platform_codename => platform_codename
     )
     backup false
   end
 
   # Need to apt-get update whenever the repo file is changed.
-  execute "chroot #{guest_root} apt-get -y update"
+  execute "chroot #{guest_root} apt-get -y update > /dev/null"
 end
 
 action :repo_unfreeze do
+  mirror_date = "latest"
+
   template "#{guest_root}/etc/apt/sources.list" do
     source "sources.list.erb"
     variables(
+      :mirror_url => node[:rightimage][:mirror],
+      :use_staging_mirror => node[:rightimage][:rightscale_staging_mirror],
+      :mirror_date => mirror_date,
       :bootstrap => false,
-      :mirror_date => "latest",
       :platform_codename => platform_codename
     )
     backup false
   end
 
   # Need to apt-get update whenever the repo file is changed.
-  execute "chroot #{guest_root} apt-get -y update"
+  execute "chroot #{guest_root} apt-get -y update > /dev/null"
 end

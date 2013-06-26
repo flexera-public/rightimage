@@ -20,37 +20,26 @@
 rightscale_marker :begin
 
 bash "rackconnect" do
-  log = value_for_platform(
-    "ubuntu" => { "default" => '/var/log/syslog' },
-    "default" => '/var/log/messages'
-  )
   only_if { node[:cloud][:provider] == "rackspace-ng" }
   code <<-EOH
-    log=#{log}
-    echo "---------------"
-    echo "WORD COUNT FOR WAITING FOR AUTOMATION STATUS KEY:"
-    echo `grep 'vm-data/user-metadata/rackconnect_automation_status' $log | wc`
-    echo "WORD COUNT FOR WAITING FOR DEPLOYED:"
-    echo `grep 'Waiting for rack_connect status to say deployed' $log | wc`
-    echo "---------------"
-    
-    grep "Timed out after" $log
-    status=$?
-    echo "Status from timed out grep: $status"
-    if [ $status -eq 0 ]; then
-      echo "Found timed out message in logs, rackspace automation didn't complete in time!!!!"
-      exit 1
+    # Check if RackConnect is enabled on the account.
+    xenstore-read vm-data/provider_data/roles | grep "rack_connect"
+
+    if [ $? -eq 0 ]; then
+      # RackConnect is enabled, so the rackconnect user should exist.
+      id rackconnect
+
+      if [ $? -eq 0 ]; then
+        echo "Rackspace automation appears to have SUCCEEDED"
+        exit 0
+      else
+        echo "Rackspace automation appears to have FAILED (rackconnect user does not exist)"
+        exit 1
+      fi
+    else
+      echo "RackConnect is not enabled on this account"
+      exit 0
     fi
-    
-    grep 'Instance reported failure in status' $log
-    status=$?
-    if [ $status -eq 0 ]; then
-      echo "Found rackconnect failure status message in logs"
-      exit 1
-    fi
-    
-    echo "Rackspace automation appears to have SUCCEEDED"
-    exit 0
   EOH
 end
 

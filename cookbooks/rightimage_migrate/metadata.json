@@ -1,109 +1,71 @@
 {
-  "dependencies": {
-  },
-  "name": "rightimage_migrate",
-  "maintainer_email": "support@rightscale.com",
   "attributes": {
-    "rightimage_migrate/source_region": {
-      "required": "required",
+    "rightimage_migrate/aws_509_cert": {
       "calculated": false,
       "choice": [
-        "us-east-1",
-        "us-west-1",
-        "us-west-2",
-        "eu-west-1",
-        "ap-southeast-1",
-        "ap-southeast-2",
-        "ap-northeast-1",
-        "sa-east-1"
+
       ],
-      "type": "string",
+      "description": "AWS x509 Cert, for instance store based images only",
+      "display_name": "AWS x509 Cert",
       "recipes": [
 
       ],
-      "display_name": "Source Region",
-      "description": "Region to migrate from"
-    },
-    "rightimage_migrate/destination_bucket": {
       "required": "optional",
-      "calculated": false,
-      "choice": [
-
-      ],
-      "type": "string",
-      "recipes": [
-
-      ],
-      "display_name": "AWS S3 Destination Bucket",
-      "description": "AWS S3 Destination Bucket, for instance store based images only"
-    },
-    "rightimage_migrate/aws_secret_access_key": {
-      "required": "required",
-      "calculated": false,
-      "choice": [
-
-      ],
-      "type": "string",
-      "recipes": [
-
-      ],
-      "display_name": "AWS Secret Access Key",
-      "description": "AWS Secret Access Key"
+      "type": "string"
     },
     "rightimage_migrate/aws_509_key": {
-      "required": "optional",
       "calculated": false,
       "choice": [
 
       ],
-      "type": "string",
-      "recipes": [
-
-      ],
+      "description": "AWS x509 Key, for instance store based images only",
       "display_name": "AWS x509 Key",
-      "description": "AWS x509 Key, for instance store based images only"
-    },
-    "rightimage_migrate/aws_509_cert": {
+      "recipes": [
+
+      ],
       "required": "optional",
-      "calculated": false,
-      "choice": [
-
-      ],
-      "type": "string",
-      "recipes": [
-
-      ],
-      "display_name": "AWS x509 Cert",
-      "description": "AWS x509 Cert, for instance store based images only"
-    },
-    "rightimage_migrate/image_id": {
-      "required": "required",
-      "calculated": false,
-      "choice": [
-
-      ],
-      "type": "string",
-      "recipes": [
-
-      ],
-      "display_name": "Image ID",
-      "description": "Image ID to migrate"
+      "type": "string"
     },
     "rightimage_migrate/aws_access_key_id": {
-      "required": "required",
       "calculated": false,
       "choice": [
 
       ],
-      "type": "string",
+      "description": "AWS Access Key ID",
+      "display_name": "AWS Access Key ID",
       "recipes": [
 
       ],
-      "display_name": "AWS Access Key ID",
-      "description": "AWS Access Key ID"
+      "required": "required",
+      "type": "string"
+    },
+    "rightimage_migrate/aws_secret_access_key": {
+      "calculated": false,
+      "choice": [
+
+      ],
+      "description": "AWS Secret Access Key",
+      "display_name": "AWS Secret Access Key",
+      "recipes": [
+
+      ],
+      "required": "required",
+      "type": "string"
+    },
+    "rightimage_migrate/destination_bucket": {
+      "calculated": false,
+      "choice": [
+
+      ],
+      "description": "AWS S3 Destination Bucket, for instance store based images only",
+      "display_name": "AWS S3 Destination Bucket",
+      "recipes": [
+
+      ],
+      "required": "optional",
+      "type": "string"
     },
     "rightimage_migrate/destination_region": {
-      "required": "required",
       "calculated": false,
       "choice": [
         "us-east-1",
@@ -115,34 +77,72 @@
         "ap-northeast-1",
         "sa-east-1"
       ],
-      "type": "string",
+      "description": "Region to migrate to",
+      "display_name": "Destination Region",
       "recipes": [
 
       ],
-      "display_name": "Destination Region",
-      "description": "Region to migrate to"
+      "required": "required",
+      "type": "string"
+    },
+    "rightimage_migrate/image_id": {
+      "calculated": false,
+      "choice": [
+
+      ],
+      "description": "Image ID to migrate",
+      "display_name": "Image ID",
+      "recipes": [
+
+      ],
+      "required": "required",
+      "type": "string"
+    },
+    "rightimage_migrate/source_region": {
+      "calculated": false,
+      "choice": [
+        "us-east-1",
+        "us-west-1",
+        "us-west-2",
+        "eu-west-1",
+        "ap-southeast-1",
+        "ap-southeast-2",
+        "ap-northeast-1",
+        "sa-east-1"
+      ],
+      "description": "Region to migrate from",
+      "display_name": "Source Region",
+      "recipes": [
+
+      ],
+      "required": "required",
+      "type": "string"
     }
   },
-  "license": "Apache v2.0",
-  "suggestions": {
+  "conflicting": {
   },
+  "dependencies": {
+  },
+  "description": "A cookbook for migrating RightImages",
+  "groupings": {
+  },
+  "license": "Apache v2.0",
+  "long_description": "",
+  "maintainer": "RightScale, Inc.",
+  "maintainer_email": "support@rightscale.com",
+  "name": "rightimage_migrate",
   "platforms": {
   },
-  "maintainer": "RightScale, Inc.",
-  "long_description": "",
-  "version": "1.0.0",
-  "recommendations": {
+  "providing": {
   },
   "recipes": {
     "rightimage_migrate::default": "Migrate image"
   },
-  "groupings": {
-  },
-  "conflicting": {
+  "recommendations": {
   },
   "replacing": {
   },
-  "description": "A cookbook for migrating RightImages",
-  "providing": {
-  }
+  "suggestions": {
+  },
+  "version": "1.0.0"
 }

@@ -31,4 +31,15 @@ ruby_block "Verify hostname set" do
   end
 end
 
+ruby_block "Verify hostname is not localhost" do
+  block do
+    hostname = `hostname -f`.chomp
+    if hostname.include? "localhost"
+      Chef::Log.info "Hostname is set to localhost."
+      exit 1
+    end
+  end
+end
+
+
 rightscale_marker :end

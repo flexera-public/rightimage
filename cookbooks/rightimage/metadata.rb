@@ -176,6 +176,14 @@ attribute "rightimage/mirror_freeze_date",
   :description => "Day from which to pull OS, rightscale, and rubygem packages. Expected format is YYYYMMDD. If not supplied, will use latest available date.",
   :required => "recommended"
 
+
+attribute "rightimage/rightscale_staging_mirror",
+  :display_name => "Use RightScale staging mirror",
+  :description => "Use the staging repo for RightScale Software repo. Used for development and testing",
+  :default => "false",
+  :choice => ["true", "false"],
+  :required => "optional"
+
 attribute "rightimage/build_id",
   :display_name => "Build ID",
   :description => "Unique identifier for the a image. When building a full image, this build_id must match the build_id of the base image you wish to use. The ID can't include underscores.  This value is usually the RightImage version, such as 13.2.1, or a combination of the version and the developers name or git sha used to build the code, such as 13.2.1-aef01c2d",
@@ -190,7 +198,7 @@ attribute "rightimage/hypervisor",
 
 attribute "rightimage/datacenter",
   :display_name => "Datacenter ID",
-  :description => "Datacenter/Zone ID.  Defaults to 1.  Use US/UK for Rackspace Legacy. Use DFW/ORD/LON for Rackspace Open Cloud.",
+  :description => "Datacenter/Zone ID.  Defaults to 1.  Use US/UK for Rackspace Legacy. Use DFW/ORD/LON/SYD for Rackspace Open Cloud.",
   :default => "1",
   :required => "recommended"
 
@@ -228,8 +236,8 @@ attribute "rightscale/cloud_id",
   :recommended => true
 
 attribute "rightscale/mci_name",
-   :display_name => "MCI Name",
-   :description => "MCI to add this image to. If empty, use image_name attribute",
+   :display_name => "MCI Name or ID",
+   :description => "MCI to add this image to. If an integer is specified, will be assumed to be RightScale ID.  If a string is specified, MCI name will be matched and created if not found. If empty, use image_name attribute",
    :default => "",
    :recipes => [ "rightimage::do_create_mci" ],
    :required => "optional"

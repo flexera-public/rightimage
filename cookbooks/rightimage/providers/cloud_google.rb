@@ -146,8 +146,8 @@ action :upload do
   # requirement for gsutil
   bash "install boto" do
     flags "-ex"
+    environment(node[:rightimage][:script_env])
     code <<-EOF
-      export PATH=$PATH:/usr/local/bin
       easy_install -U distribute
       easy_install pip
       pip install boto
