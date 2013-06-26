@@ -21,17 +21,17 @@ attribute "rightimage_migrate/aws_secret_access_key",
 attribute "rightimage_migrate/aws_509_cert",
   :display_name => "AWS x509 Cert",
   :description => "AWS x509 Cert, for instance store based images only",
-  :required => "optional"
+  :required => "recommended"
 
 attribute "rightimage_migrate/aws_509_key",
   :display_name => "AWS x509 Key",
   :description => "AWS x509 Key, for instance store based images only",
-  :required => "optional"
+  :required => "recommended"
 
 attribute "rightimage_migrate/destination_bucket",
   :display_name => "AWS S3 Destination Bucket",
   :description => "AWS S3 Destination Bucket, for instance store based images only",
-  :required => "optional"
+  :required => "recommended"
 
 attribute "rightimage_migrate/destination_region",
   :display_name => "Destination Region",
@@ -39,9 +39,9 @@ attribute "rightimage_migrate/destination_region",
   :choice => ec2_regions,
   :required => "required"
   
-attribute "rightimage_migrate/image_id",
-  :display_name => "Image ID",
-  :description => "Image ID to migrate",
+attribute "rightimage_migrate/source_image",
+  :display_name => "Source image name or ID",
+  :description => "You may specify either an ami-id or an ec2 image name to migrate.",
   :required => "required"
   
 attribute "rightimage_migrate/source_region",

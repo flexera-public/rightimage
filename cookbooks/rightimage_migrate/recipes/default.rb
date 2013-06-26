@@ -45,20 +45,24 @@ ruby_block "Migrate image" do
   block do
     ENV['EC2_HOME'] = '/home/ec2'
 
-    def describe_images_by_id(akid, sak, region, image_id)
-      output = `. /etc/profile && ec2-describe-images --aws-access-key "#{akid}" --aws-secret-key "#{sak}" --region "#{region}" --verbose "#{image_id}"`
-      image_name = /<name>(.*)<\/name>/.match(output)[1]
-      imageLocation = /<imageLocation>(.*)\/(.*)<\/imageLocation>/.match(output)
-      bucket = imageLocation[1]
-      manifest = imageLocation[2]
-      image_type = /<rootDeviceType>(.*)<\/rootDeviceType>/.match(output)[1]
-      status = /<imageState>(.*)<\/imageState>/.match(output)[1]
-      
-      { "image_name" => image_name, "image_type" => image_type, "manifest" => manifest, "bucket" => bucket, "status" => status }
+    def get_ami_metadata(akid, sak, region, image_id)
+      output = `. /etc/profile && ec2-describe-images --aws-access-key "#{akid}" --aws-secret-key "#{sak}" --region "#{region}" --verbose "#{image_id}" 2>&1`
+      if $?.success?
+        image_name = /<name>(.*)<\/name>/.match(output)[1]
+        imageLocation = /<imageLocation>(.*)\/(.*)<\/imageLocation>/.match(output)
+        bucket = imageLocation[1]
+        manifest = imageLocation[2]
+        image_type = /<rootDeviceType>(.*)<\/rootDeviceType>/.match(output)[1]
+        status = /<imageState>(.*)<\/imageState>/.match(output)[1]
+        
+        { "image_name" => image_name, "image_type" => image_type, "manifest" => manifest, "bucket" => bucket, "status" => status }
+      else
+        nil
+      end
     end
 
-    def describe_images_by_name(akid, sak, region, image_name)
-      output = `. /etc/profile && ec2-describe-images --aws-access-key "#{akid}" --aws-secret-key "#{sak}" --region "#{region}" --owner self --filter "name=#{image_name}" --verbose`
+    def get_ami_id(akid, sak, region, image_name)
+      output = `. /etc/profile && ec2-describe-images --aws-access-key "#{akid}" --aws-secret-key "#{sak}" --region "#{region}" --owner self --filter "name=#{image_name}" --verbose  2>&1`
       dupe_id = /<imageId>(.*)<\/imageId>/.match(output)
     
       if dupe_id
@@ -67,36 +71,46 @@ ruby_block "Migrate image" do
         nil
       end
     end
-	
-    image_id = node[:rightimage_migrate][:image_id]
+
     akid = node[:rightimage_migrate][:aws_access_key_id]
     sak = node[:rightimage_migrate][:aws_secret_access_key]
     source_region = node[:rightimage_migrate][:source_region]
     destination_bucket = node[:rightimage_migrate][:destination_bucket]
     destination_region = node[:rightimage_migrate][:destination_region]
+    	
+    if node[:rightimage_migrate][:source_image] =~ /^ami-/
+      image_id = node[:rightimage_migrate][:source_image]
+    else
+      image_id = get_ami_id(akid, sak, source_region, node[:rightimage_migrate][:source_image])
+      raise "Could not find image #{node[:rightimage_migrate][:source_image]} for region #{source_region}" unless image_id
+    end
+
+    Chef::Log.info("Getting image metadata")
+    source_image = get_ami_metadata(akid, sak, source_region, image_id)
+
+    raise "Could not find AMI #{image_id} for region #{source_region}" unless source_image
     
-    Chef::Log.info("Getting image data")
-    source_image = describe_images_by_id(akid, sak, source_region, image_id)
-    
-    raise "Destination bucket must be specified for instance store based images" if source_image['image_type'] == "instance-store" && !destination_bucket
-    raise "AWS x509 Certificate must be supplied for instance store based images" if source_image['image_type'] == "instance-store" && !node[:rightimage_migrate][:aws_509_cert]
-    raise "AWS x509 Key must be supplied for instance store based images" if source_image['image_type'] == "instance-store" && !node[:rightimage_migrate][:aws_509_key]
-	
+    if source_image['image_type'] == "instance-store" 
+      raise "Destination bucket must be specified for instance store based images" unless destination_bucket
+      raise "AWS x509 Certificate must be supplied for instance store based images" unless node[:rightimage_migrate][:aws_509_cert]
+      raise "AWS x509 Key must be supplied for instance store based images" unless node[:rightimage_migrate][:aws_509_key]
+    end
+
     Chef::Log.info("Checking destination region for duplicate image")
-    image_check = describe_images_by_name(akid, sak, destination_region, source_image['image_name'])
-    raise "Found existing image #{image_check} in destination region #{destination_region}" if image_check
+    image_check = get_ami_id(akid, sak, destination_region, source_image['image_name'])
+    raise "Found existing image #{image_check.inspect} in destination region #{destination_region}" if image_check
     
     Chef::Log.info("Migrating #{image_id} from #{source_region} to #{destination_region}")
     case source_image['image_type']
     when "ebs"
-      output = `. /etc/profile && ec2-copy-image --aws-access-key "#{akid}" --aws-secret-key "#{sak}" --source-region "#{source_region}" --source-ami-id "#{image_id}" --region "#{destination_region}"`
+      output = `. /etc/profile && ec2-copy-image --aws-access-key "#{akid}" --aws-secret-key "#{sak}" --source-region "#{source_region}" --source-ami-id "#{image_id}" --region "#{destination_region}"  2>&1`
     when "instance-store"
-      output = `. /etc/profile && ec2-migrate-image --private-key "#{key}" --cert "#{cert}" --owner-akid "#{akid}" --owner-sak "#{sak}" --bucket "#{source_image['bucket']}" --destination-bucket "#{destination_bucket}" --manifest "#{source_image['manifest']}" --acl "aws-exec-read" --region "#{destination_region}"`
+      output = `. /etc/profile && ec2-migrate-image --private-key "#{key}" --cert "#{cert}" --owner-akid "#{akid}" --owner-sak "#{sak}" --bucket "#{source_image['bucket']}" --destination-bucket "#{destination_bucket}" --manifest "#{source_image['manifest']}" --acl "aws-exec-read" --region "#{destination_region}"  2>&1`
       Chef::Log.info(output)
       raise "ec2-migrate-image failed" unless $?.success?
     
       Chef::Log.info("Registering image")
-      output = `. /etc/profile && ec2-register "#{destination_bucket}/#{source_image['manifest']}" --aws-access-key "#{akid}" --aws-secret-key "#{sak}" --name "#{source_image['image_name']}" --region "#{destination_region}"`
+      output = `. /etc/profile && ec2-register "#{destination_bucket}/#{source_image['manifest']}" --aws-access-key "#{akid}" --aws-secret-key "#{sak}" --name "#{source_image['image_name']}" --region "#{destination_region}"  2>&1`
     else
       raise "Root device type #{source_image['image_type']} not supported"
     end
@@ -115,21 +129,27 @@ ruby_block "Migrate image" do
       $retries=60
       $wait=30
       
+      status = "unknown"
+
       until $i > $retries do
         # Check status of new image.
-        destination_image = describe_images_by_id(akid, sak, destination_region, new_image_id)
-        
-        if destination_image['status'] == "available"
-          Chef::Log.info("Image is available")
+        destination_image = get_ami_metadata(akid, sak, destination_region, new_image_id)
+        status = "unknown"
+        if destination_image
+          status = destination_image['status']
+        end
+
+        if status == "available"
+          Chef::Log.info("Image #{new_image_id} is available")
           break
         else
           $i += 1;
-          Chef::Log.info("[#$i/#$retries] Image NOT ready! Status: #{destination_image['status']} Sleeping #$wait seconds...")
+          Chef::Log.info("[#$i/#$retries] Image NOT ready! Status: #{status} Sleeping #$wait seconds...")
           sleep $wait unless $i > $retries
         end
       end
   
-      raise "Image still not available! Giving up! Status: #{destination_image['status']}" unless destination_image['status'] == "available"
+      raise "Image still not available! Giving up! Status: #{status}" unless status == "available"
     end
 
     image_type = source_image['image_type'] == "ebs" ? "EBS" : nil

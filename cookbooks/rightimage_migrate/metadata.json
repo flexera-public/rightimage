@@ -10,7 +10,7 @@
       "recipes": [
 
       ],
-      "required": "optional",
+      "required": "recommended",
       "type": "string"
     },
     "rightimage_migrate/aws_509_key": {
@@ -23,7 +23,7 @@
       "recipes": [
 
       ],
-      "required": "optional",
+      "required": "recommended",
       "type": "string"
     },
     "rightimage_migrate/aws_access_key_id": {
@@ -62,7 +62,7 @@
       "recipes": [
 
       ],
-      "required": "optional",
+      "required": "recommended",
       "type": "string"
     },
     "rightimage_migrate/destination_region": {
@@ -85,13 +85,13 @@
       "required": "required",
       "type": "string"
     },
-    "rightimage_migrate/image_id": {
+    "rightimage_migrate/source_image": {
       "calculated": false,
       "choice": [
 
       ],
-      "description": "Image ID to migrate",
-      "display_name": "Image ID",
+      "description": "You may specify either an ami-id or an ec2 image name to migrate.",
+      "display_name": "Source image name or ID",
       "recipes": [
 
       ],
