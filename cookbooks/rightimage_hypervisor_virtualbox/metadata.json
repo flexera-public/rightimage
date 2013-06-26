@@ -1,29 +1,29 @@
 {
-  "dependencies": {
-  },
-  "name": "rightimage_hypervisor_virtualbox",
-  "maintainer_email": "support@rightscale.com",
   "attributes": {
-  },
-  "license": "none",
-  "suggestions": {
-  },
-  "platforms": {
-  },
-  "maintainer": "RightScale, Inc.",
-  "long_description": "",
-  "version": "1.0.0",
-  "recommendations": {
-  },
-  "recipes": {
-  },
-  "groupings": {
   },
   "conflicting": {
   },
-  "replacing": {
+  "dependencies": {
   },
   "description": "Hypervisor provider cookbook for building RightImage vagrant boxes",
+  "groupings": {
+  },
+  "license": "Apache v2.0",
+  "long_description": "",
+  "maintainer": "RightScale, Inc.",
+  "maintainer_email": "support@rightscale.com",
+  "name": "rightimage_hypervisor_virtualbox",
+  "platforms": {
+  },
   "providing": {
-  }
+  },
+  "recipes": {
+  },
+  "recommendations": {
+  },
+  "replacing": {
+  },
+  "suggestions": {
+  },
+  "version": "1.0.0"
 }
