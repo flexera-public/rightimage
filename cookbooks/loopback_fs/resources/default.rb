@@ -5,3 +5,4 @@ attribute :size_gb, :kind_of => Integer, :default => 10
 attribute :mount_point, :kind_of => String, :default => "/mnt/image"
 attribute :label, :kind_of => String, :default => "ROOT"
 attribute :device_number, :kind_of => Integer, :default => 0
+attribute :bind_devices, :kind_of => [ TrueClass, FalseClass ], :default => true
