@@ -98,58 +98,61 @@ ruby_block "Migrate image" do
 
     Chef::Log.info("Checking destination region for duplicate image")
     image_check = get_ami_id(akid, sak, destination_region, source_image['image_name'])
-    raise "Found existing image #{image_check.inspect} in destination region #{destination_region}" if image_check
-    
-    Chef::Log.info("Migrating #{image_id} from #{source_region} to #{destination_region}")
-    case source_image['image_type']
-    when "ebs"
-      output = `. /etc/profile && ec2-copy-image --aws-access-key "#{akid}" --aws-secret-key "#{sak}" --source-region "#{source_region}" --source-ami-id "#{image_id}" --region "#{destination_region}"  2>&1`
-    when "instance-store"
-      output = `. /etc/profile && ec2-migrate-image --private-key "#{key}" --cert "#{cert}" --owner-akid "#{akid}" --owner-sak "#{sak}" --bucket "#{source_image['bucket']}" --destination-bucket "#{destination_bucket}" --manifest "#{source_image['manifest']}" --acl "aws-exec-read" --region "#{destination_region}"  2>&1`
-      Chef::Log.info(output)
-      raise "ec2-migrate-image failed" unless $?.success?
-    
-      Chef::Log.info("Registering image")
-      output = `. /etc/profile && ec2-register "#{destination_bucket}/#{source_image['manifest']}" --aws-access-key "#{akid}" --aws-secret-key "#{sak}" --name "#{source_image['image_name']}" --region "#{destination_region}"  2>&1`
+    if image_check 
+      Chef::Log.warn("Image has already been migrated as #{image_check}, proceeding as normal")
+      new_image_id = image_check
     else
-      raise "Root device type #{source_image['image_type']} not supported"
-    end
-    Chef::Log.info(output)
-    	
-    raise "Migration failed" unless $?.success?
-	
-    new_image_id = output.split[1]
-    
-    if source_image['image_type'] == "ebs"
-      Chef::Log.info("Waiting for image #{new_image_id} to appear available")
-      # It will take at least 5 minutes for the new image to be ready.
-      sleep 300
+      Chef::Log.info("Migrating #{image_id} from #{source_region} to #{destination_region}")
+      case source_image['image_type']
+      when "ebs"
+        output = `. /etc/profile && ec2-copy-image --aws-access-key "#{akid}" --aws-secret-key "#{sak}" --source-region "#{source_region}" --source-ami-id "#{image_id}" --region "#{destination_region}"  2>&1`
+      when "instance-store"
+        output = `. /etc/profile && ec2-migrate-image --private-key "#{key}" --cert "#{cert}" --owner-akid "#{akid}" --owner-sak "#{sak}" --bucket "#{source_image['bucket']}" --destination-bucket "#{destination_bucket}" --manifest "#{source_image['manifest']}" --acl "aws-exec-read" --region "#{destination_region}"  2>&1`
+        Chef::Log.info(output)
+        raise "ec2-migrate-image failed" unless $?.success?
       
-      $i=0
-      $retries=60
-      $wait=30
-      
-      status = "unknown"
-
-      until $i > $retries do
-        # Check status of new image.
-        destination_image = get_ami_metadata(akid, sak, destination_region, new_image_id)
-        status = "unknown"
-        if destination_image
-          status = destination_image['status']
-        end
-
-        if status == "available"
-          Chef::Log.info("Image #{new_image_id} is available")
-          break
-        else
-          $i += 1;
-          Chef::Log.info("[#$i/#$retries] Image NOT ready! Status: #{status} Sleeping #$wait seconds...")
-          sleep $wait unless $i > $retries
-        end
+        Chef::Log.info("Registering image")
+        output = `. /etc/profile && ec2-register "#{destination_bucket}/#{source_image['manifest']}" --aws-access-key "#{akid}" --aws-secret-key "#{sak}" --name "#{source_image['image_name']}" --region "#{destination_region}"  2>&1`
+      else
+        raise "Root device type #{source_image['image_type']} not supported"
       end
-  
-      raise "Image still not available! Giving up! Status: #{status}" unless status == "available"
+      Chef::Log.info(output)
+      	
+      raise "Migration failed" unless $?.success?
+  	
+      new_image_id = output.split[1]
+
+      if source_image['image_type'] == "ebs"
+        Chef::Log.info("Waiting for image #{new_image_id} to appear available")
+        # It will take at least 5 minutes for the new image to be ready.
+        sleep 300
+        
+        $i=0
+        $retries=60
+        $wait=30
+        
+        status = "unknown"
+
+        until $i > $retries do
+          # Check status of new image.
+          destination_image = get_ami_metadata(akid, sak, destination_region, new_image_id)
+          status = "unknown"
+          if destination_image
+            status = destination_image['status']
+          end
+
+          if status == "available"
+            Chef::Log.info("Image #{new_image_id} is available")
+            break
+          else
+            $i += 1;
+            Chef::Log.info("[#$i/#$retries] Image NOT ready! Status: #{status} Sleeping #$wait seconds...")
+            sleep $wait unless $i > $retries
+          end
+        end
+    
+        raise "Image still not available! Giving up! Status: #{status}" unless status == "available"
+      end
     end
 
     image_type = source_image['image_type'] == "ebs" ? "EBS" : nil
