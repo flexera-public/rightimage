@@ -122,7 +122,7 @@ gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL<%= epel_key_name %>
 
 [rightscale-epel]
 name = none
-<% if @use_staging_mirror.to_s == "true" -%>
+<% if @use_staging_mirror.to_s == "true" && @bootstrap -%>
 baseurl = http://rightscale-software-staging.s3.amazonaws.com/centos/<%= node[:rightimage][:platform_version].to_i %>/<%= node[:rightimage][:arch] %>
 <% else -%>
 baseurl = http://<%= @mirror %>/rightscale_software/epel/<%= node[:rightimage][:platform_version].to_i %>/<%= node[:rightimage][:arch] %>/archive/<%= @mirror_date %>/

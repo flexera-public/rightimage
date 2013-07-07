@@ -26,7 +26,7 @@ deb http://ec2-us-west-mirror.rightscale.com/ubuntu_daily/<%= @mirror_date %>/ <
 #deb-src http://archive.ubuntu.com/ubuntu/ <%= @platform_codename %>-backports main restricted universe multiverse
 
 ## RIGHTSCALE REPOSITORY
-<% if @use_staging_mirror.to_s == "true" %>
+<% if @use_staging_mirror.to_s == "true" && @bootstrap -%>
 deb http://rightscale-software-staging.s3.amazonaws.com/ubuntu <%= @platform_codename %> main
 <% else %>
 deb http://<%= @mirror_url %>/rightscale_software_ubuntu/<%=@mirror_date%>/ <%= @platform_codename %> main
