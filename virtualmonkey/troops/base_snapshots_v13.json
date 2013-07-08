@@ -1,7 +1,7 @@
 {
   "feature":"base_snapshots.rb",
   "cloud_variables":"aws_us_oregon.json",
-  "common_inputs":"rightimage_base_snapshots.json",
+  "common_inputs":"base_snapshots.json",
   "prefix":"RI_BASE_V13",
   "server_template_ids":[
     "280897001"
