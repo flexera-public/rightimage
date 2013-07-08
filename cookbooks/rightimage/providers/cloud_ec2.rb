@@ -184,6 +184,7 @@ end
 def upload_ebs
   loopback_fs loopback_file do
     mount_point guest_root
+    bind_devices false
     action :mount
   end
 
@@ -314,7 +315,6 @@ EOF
 
   ## recreate the /proc mountpoint
       mkdir -p $ebs_mount/proc
-  #    mount --bind /proc $ebs_mount/proc
       umount $ebs_mount
 
   ## snapshot the ebs volume and save the snapshot id

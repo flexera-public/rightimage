@@ -142,19 +142,23 @@ action :upload do
       # Ignore errors during install, for re-runability.  If you're missing something, it will fail anyway during npm install.
       case "#{new_resource.platform}" in
       "ubuntu")
+        # azure-cli 0.7.x now seems to require node 0.10
+        azure_ver="0.7.10"
         apt-get -y install python-software-properties
-        add-apt-repository -y ppa:chris-lea/node.js-legacy
+        add-apt-repository -y ppa:chris-lea/node.js
         apt-get update
-        apt-get -y install nodejs npm
+        # nodejs package includes nodejs-dev and npm
+        apt-get -y install nodejs
         ;;
       "centos"|"rhel")
+        azure_ver="0.6.8"
         rpm -Uvh http://rightscale-rightimage.s3-website-us-east-1.amazonaws.com/packages/el6/nodejs-0.8.16-1.x86_64.rpm
         ;;
       esac
       npm -g ls | grep azure
       if [ "$?" == "1" ]; then
         set -e
-        npm install azure-cli@0.6.8 -g
+        npm install azure-cli@$azure_ver -g
       fi
     EOH
   end
@@ -165,6 +169,7 @@ action :upload do
   end
 
   bash "import settings" do
+    flags "-e"
     code <<-EOH
       settings=/root/azure.publishsettings
       azure account import $settings
