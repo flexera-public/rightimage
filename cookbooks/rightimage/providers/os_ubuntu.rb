@@ -284,8 +284,32 @@ EOS
   end
 
 
-  # - add in custom built libc packages, fixes "illegal instruction" core dump (w-12310)
+  # w-5970 - liblockfile has a bug resulting in ntp restart to fail on instances
+  # where the hostname is too long (>36 chars) which might occur somewhat commonly
+  # on openstack and rackspace instances. This is a patch from their staging repos
+  # TBD can be removed when patched version merged to master
+  # https://bugs.launchpad.net/ubuntu/+source/liblockfile/+bug/941968/comments/30
   directory "#{guest_root}/tmp/packages"
+  bash "custom liblockfile" do
+    cwd "#{guest_root}/tmp/packages"
+    flags "-ex"
+    only_if { new_resource.platform_version.to_f == 12.04 && node[:rightimage][:arch] == "x86_64" }
+    packages = %w(
+      liblockfile-bin_1.09-3ubuntu0.1_amd64.deb
+      liblockfile-dev_1.09-3ubuntu0.1_amd64.deb
+      liblockfile1_1.09-3ubuntu0.1_amd64.deb
+      ).join(" ")
+    code <<-EOF
+      baseurl=http://rightscale-rightimage.s3.amazonaws.com/patches/ubuntu/12.04/w-5970/
+      for p in #{packages}
+      do
+        curl -s -S -f -L --retry 7 -O $baseurl$p
+      done
+      echo 'cd /tmp/packages && dpkg -i #{packages}' | chroot /mnt/image
+    EOF
+  end
+
+  # - add in custom built libc packages, fixes "illegal instruction" core dump (w-12310)
   bash "install custom libc" do 
     only_if { new_resource.platform_version.to_f == 10.04 && node[:rightimage][:arch] == "x86_64" }
     packages = %w(
@@ -311,10 +335,10 @@ EOS
       done
 
       cat <<EOF>#{guest_root}/tmp/packages/install_debs.sh
-  #!/bin/bash -ex
-  cd /tmp/packages
-  dpkg -i #{packages}
-  EOF
+#!/bin/bash -ex
+cd /tmp/packages
+dpkg -i #{packages}
+EOF
       chmod a+x #{guest_root}/tmp/packages/install_debs.sh
       chroot #{guest_root} /tmp/packages/install_debs.sh
       # nscd deb starts up second version, will prevent loopback fs from dismounting
