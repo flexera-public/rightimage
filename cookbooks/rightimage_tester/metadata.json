@@ -110,7 +110,7 @@
     "rightimage_tester::java": "Check java installation.",
     "rightimage_tester::ldconfig": "Ensure ldconfig runs.",
     "rightimage_tester::modprobe": "Ensure modprobe runs.",
-    "rightimage_tester::ntp": "Ensure ntp service exists adn can restart.",
+    "rightimage_tester::ntp": "Ensure ntp service exists and can restart.",
     "rightimage_tester::packages": "Ensure packages can be installed.",
     "rightimage_tester::rackconnect": "Check for Rackspace Rackconnect automation failures.",
     "rightimage_tester::reboot": "Ensure instance reboots.",
