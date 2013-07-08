@@ -24,11 +24,26 @@ rightscale_marker :begin
 # on openstack and rackspace instances.  We use a patched version. 
 # Also ntp service should exist and be running, rightlink is dependent.
 # https://bugs.launchpad.net/ubuntu/+source/liblockfile/+bug/941968/comments/30
-rightimage_tester 'Restart ntp service' do
-  ntp_service = value_for_platform(
-    'ubuntu' => { 'default' => 'ntp' },
-    'default' => 'ntpd'
-  )
-  command "service #{ntp_service} restart"
-  action :test
+ruby_block 'Restart ntp service' do
+  block do
+ 
+    ntp_service = value_for_platform(
+      'ubuntu' => { 'default' => 'ntp' },
+      'default' => 'ntpd'
+    )
+
+    begin
+      old_hostname = `hostname`
+      output = `hostname this-is-a-very-long-hostname-to-break-ntp && service #{ntp_service} restart 2>&1`
+      unless $?.success?
+        raise "NTP service failed to start or restart"
+      end
+      if output.include?('Segmentation fault')
+        raise "Segfault detected during ntp restart"
+      end
+      Chef::Log.info("NTP service restart successfully")
+    ensure
+      `hostname #{old_hostname}`
+    end
+  end
 end
