@@ -44,10 +44,7 @@ end
 include_recipe "rightimage::loopback_unmount"
 include_recipe "rightimage::cloud_package"
 include_recipe "rightimage::upload_image_s3"
-# Only create reports for public cloud images if they are uploaded.
 unless node[:rightimage][:bare_image] == "true"
-  if not node[:rightimage][:cloud] =~ /ec2|google|azure/
-    include_recipe "rightimage::report_upload"
-  end
+  include_recipe "rightimage::report_upload"
 end
 rightscale_marker :end
