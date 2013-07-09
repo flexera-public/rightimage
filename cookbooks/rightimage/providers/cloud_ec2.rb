@@ -277,7 +277,7 @@ EOF
 
   ## partition volume (HVM only)
       if [ "$hvm" == "true" ]; then
-        echo "1,,L,*" | sfdisk #{local_device}
+        echo "1,,L,*" | sfdisk --no-reread #{local_device}
         device="#{local_device}1"
       else
         device="#{local_device}"
