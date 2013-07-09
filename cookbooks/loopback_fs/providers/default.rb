@@ -52,10 +52,12 @@ action :create do
       dd if=/dev/zero of=$source bs=1M count=$calc_mb
       losetup $loop_dev $source
 
-      sfdisk $loop_dev << EOF
+      sfdisk --no-reread $loop_dev << EOF
 0,,L,*
 EOF
-      kpartx -a $loop_dev
+
+      # use synchonous flag to avoid any later race conditions
+      kpartx -s -a $loop_dev
       loop_map="/dev/mapper/loop#{new_resource.device_number}p1"
       mke2fs -F -j $loop_map
       tune2fs -L $root_label $loop_map
@@ -87,7 +89,8 @@ action :unmount do
       umount -lf $mount_point || true
 
 
-      [ -e "$loop_map" ] && kpartx -d $loop_dev
+      # use synchonous flag to avoid any later race conditions
+      [ -e "$loop_map" ] && kpartx -s -d $loop_dev
       set +e
       losetup -a | grep $loop_dev
       if [ "$?" == "0" ]; then
@@ -110,7 +113,8 @@ action :mount do
 
       losetup $loop_dev $source
 
-      kpartx -a $loop_dev
+      # use synchonous flag to avoid any later race conditions
+      kpartx -s -a $loop_dev
       loop_map="/dev/mapper/loop#{new_resource.device_number}p1"
 
       mkdir -p $mount_point
