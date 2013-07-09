@@ -49,17 +49,21 @@ directory migrate_temp_unbundled do
   action :create
 end 
 
+# HACK.  We want to be able to use this to upload EBS images based off the migrated
+# S3 image, so do a little manipulation here.
+source_image_name = node[:rightimage][:image_name].sub("_EBS","")
+
 bash "download bundle" do
   flags "-ex"
-  environment ({'EC2_HOME' => "/home/ec2" })
+  environment({'EC2_HOME' => "/home/ec2" })
   code <<-EOH
-#create keyfiles for bundle
+    #create keyfiles for bundle
     echo "#{node[:rightimage][:aws_509_key]}" > /tmp/AWS_X509_KEY.pem
     echo "#{node[:rightimage][:aws_509_cert]}" > /tmp/AWS_X509_CERT.pem
 
-    /home/ec2/bin/ec2-download-bundle -b #{node[:rightimage][:image_source_bucket]} -a #{node[:rightimage][:aws_access_key_id]} -s #{node[:rightimage][:aws_secret_access_key]} -p #{node[:rightimage][:image_name]} -k /tmp/AWS_X509_CERT.pem --debug --retry -d #{migrate_temp_bundled}
-    /home/ec2/bin/ec2-unbundle -m #{migrate_temp_bundled}/#{node[:rightimage][:image_name]}.manifest.xml -k /tmp/AWS_X509_KEY.pem -d #{migrate_temp_unbundled} -s #{migrate_temp_bundled}
-    ln -s #{migrate_temp_unbundled}/#{node[:rightimage][:image_name]} #{loopback_file}
+    /home/ec2/bin/ec2-download-bundle -b #{node[:rightimage][:image_source_bucket]} -a #{node[:rightimage][:aws_access_key_id]} -s #{node[:rightimage][:aws_secret_access_key]} -p #{source_image_name} -k /tmp/AWS_X509_CERT.pem --debug --retry -d #{migrate_temp_bundled}
+    /home/ec2/bin/ec2-unbundle -m #{migrate_temp_bundled}/#{source_image_name}.manifest.xml -k /tmp/AWS_X509_KEY.pem -d #{migrate_temp_unbundled} -s #{migrate_temp_bundled}
+    ln -s #{migrate_temp_unbundled}/#{source_image_name} #{loopback_file}
 
     #remove keys
     rm -f /tmp/AWS_X509_KEY.pem
