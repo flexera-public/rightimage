@@ -142,8 +142,7 @@ action :upload do
       # Ignore errors during install, for re-runability.  If you're missing something, it will fail anyway during npm install.
       case "#{new_resource.platform}" in
       "ubuntu")
-        # azure-cli 0.7.x now seems to require node 0.10
-        azure_ver="0.7.10"
+        azure_ver="0.6.17"
         apt-get -y install python-software-properties
         add-apt-repository -y ppa:chris-lea/node.js
         apt-get update
