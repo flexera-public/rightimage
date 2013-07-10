@@ -34,7 +34,6 @@ Inputs:
   Build mode::
     base: Creates a new base OS image.
     full: Creates a full image with cloud-specific modifications and RightLink.
-    migrate: Downloads an already bundled image from EC2 S3 in order to replicate it across other EC2 regions.
   Build number::
     Starts at 0.  Creates a lineage of base snapshots derived from the same day.
   Build timestamp and mirror freeze date::
@@ -97,19 +96,6 @@ Manual mode is useful when developing of the rightimage cookbooks
   5. run "rightimage::do_create_mci" to add image to MCI
   6. launch image_tester template with newly created image
   7. launch rightlink_tester template with newly created image
-
-== Migrating a RightImage (Build mode: migrate)
-
-Migrate mode is used to replicate an existing image to other EC2 regions.
-
-NOTE: Migrations are currently limited from us-west-2 (Oregon) region only.
-Any RightLink-enabled image with EC2 AMI and API tools may be used to launch the instance.
-An instance size of at least m1.small is required.
-
-  1. Set ‘build mode’ to migrate
-  2. Set image_name input to the name of the image to migrate
-  3. Launch server in the region you wish to migrate to
-  4. Once operational, start the migration using "rightimage::upload_ec2_s3" and/or "rightimage::upload_ec2_ebs" recipe
 
 = FUTURE IMPROVEMENTS
 
