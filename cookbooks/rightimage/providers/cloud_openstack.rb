@@ -146,6 +146,12 @@ action :upload do
   ruby_block "upload to cloud" do
     block do
       require 'json'
+
+      # Fetches a glance property from the command output
+      def get_property(output, property_name)
+        Array(output.scan(/#{property_name}\s*[:|]\s+([^ |]+)/i)).flatten.first
+      end
+
       filename = "#{image_name}.qcow2"
 
       aws_url  = "rightscale-openstack-dev.s3.amazonaws.com"
@@ -158,21 +164,47 @@ action :upload do
       openstack_api_port = node[:rightimage][:openstack][:hostname].split(":")[1] || "5000"
 
       # Don't use location=file://path/to/file like you might think, thats the name of the location to store the file on the server that hosts the images, not this machine
-      cmd = %Q(env PATH=$PATH:/usr/local/bin glance --os-username '#{openstack_user}' --os-password '#{openstack_password}' --os-auth-url http://#{openstack_host}:#{openstack_api_port}/v2.0 --os-tenant-name #{openstack_user} image-create --name #{image_name} --is-public True --disk-format qcow2 --container-format bare --copy-from #{image_url})
+      auth_property = "--os-username '#{openstack_user}' --os-password '#{openstack_password}' --os-auth-url http://#{openstack_host}:#{openstack_api_port}/v2.0 --os-tenant-name #{openstack_user}"
+      cmd = %Q(env PATH=$PATH:/usr/local/bin glance #{auth_property} image-create --name #{image_name} --is-public True --disk-format qcow2 --container-format bare --copy-from #{image_url})
       Chef::Log.info "Executing command: "
       Chef::Log.info cmd
       upload_resp = `#{cmd}`
       Chef::Log.info("got response for upload req: #{upload_resp} to cloud.")
 
-      if upload_resp =~ /active/i
-        image_id = Array(upload_resp.scan(/ID\s*[:|]\s+([0-9a-f-]+)/i)).flatten.first
-        Chef::Log.info("Successfully uploaded image #{image_id} to cloud.")
-        
+      image_id = get_property(upload_resp, "id")
+
+      if image_id
+        Chef::Log.info "Uploaded image with id #{image_id}"
+      else
+        raise "ERROR! Could not parse image_id from glance response"
+      end
+
+
+      require 'timeout'
+      wait_timer = 3600
+      Chef::Log.info "Waiting up to #{wait_timer} seconds for image to become active"
+      Timeout::timeout(wait_timer) do 
+        while true
+          cmd = "env PATH=$PATH:/usr/local/bin glance #{auth_property} image-show #{image_id}"
+          output = `#{cmd}`
+          status = get_property(output, "status")
+          img_checksum = get_property(output, "checksum")
+          Chef::Log.info "Waiting for image to be active, current status: #{status}"
+
+          if status =~ /active/i
+            Chef::Log.info "SUCCESS!, image successfully uploaded with checksum #{img_checksum}"
+            break
+          elsif status =~ /error|kill|fail/i
+            Chef::Log.error "FAILURE!, uploaded image #{image_id} is in error state"
+            Chef::Log.error "LAST OUTPUT:"
+            raise output
+          end
+          sleep 30
+        end
+
         # add to global id store for use by other recipes
         id_list = RightImage::IdList.new(Chef::Log)
         id_list.add(image_id)
-      else
-        raise "ERROR: could not upload image to cloud at #{node[:rightimage][:openstack][:hostname]} due to #{upload_resp.inspect}"
       end
     end
   end

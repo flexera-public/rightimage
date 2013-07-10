@@ -32,18 +32,6 @@ end
 
 package "grub"
 
-bash "mount proc & dev" do
-  flags "-ex"
-  code <<-EOH
-    guest_root=#{guest_root}
-    umount -lf $guest_root/proc || true
-    umount -lf $guest_root/sys || true
-    mount -t proc none $guest_root/proc
-    mount --bind /dev $guest_root/dev
-    mount --bind /sys $guest_root/sys
-  EOH
-end
-
 # add fstab
 template "#{guest_root}/etc/fstab" do
   source "fstab.erb"

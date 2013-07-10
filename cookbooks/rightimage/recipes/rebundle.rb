@@ -95,7 +95,7 @@ end
 
 bash "install bundled gems" do
   flags "-ex"
-  code "#{ruby_bin_dir}/bundle install"
+  code "#{ruby_bin_dir}/bundle install --deployment"
   cwd Rebundle::REBUNDLE_SOURCE_PATH
 end
 
