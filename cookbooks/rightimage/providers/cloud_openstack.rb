@@ -116,12 +116,12 @@ action :upload do
   packages = case node[:platform]
              when "centos", "redhat" then
                if node[:platform_version].to_f >= 6.0
-                 %w(python-setuptools python-devel python-libs openssl-devel)
+                 %w(python-devel python-libs openssl-devel)
                else
-                 %w(python26-distribute python26-devel python26-libs openssl-devel)
+                 %w(python26-devel python26-libs openssl-devel)
                end
              when "ubuntu" then
-               %w(python-dev python-setuptools libssl-dev)
+               %w(python-dev libssl-dev)
              end
 
   packages.each { |p| package p }
@@ -137,8 +137,10 @@ action :upload do
     end
     environment(node[:rightimage][:script_env])
     code <<-EOH
+      # Install setuptools 0.8
+      wget http://rightscale-rightimage.s3.amazonaws.com/files/python/ez_setup.py -O - | python
+
       easy_install#{cmd_append} pip
-      easy_install#{cmd_append} -U distribute
       pip#{cmd_append} install -I python-glanceclient==0.9.0
     EOH
   end

@@ -148,7 +148,6 @@ action :upload do
     flags "-ex"
     environment(node[:rightimage][:script_env])
     code <<-EOF
-      easy_install -U distribute
       easy_install pip
       pip install boto
     EOF
