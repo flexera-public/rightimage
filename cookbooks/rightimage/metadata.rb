@@ -73,9 +73,9 @@ attribute "rightimage/bare_image",
 
 attribute "rightimage/build_mode",
   :display_name => "Build Mode",
-  :description => "Build base image, full image, or migrate existing image.",
+  :description => "Build base image or full image.",
   :required => "required",
-  :choice => [ "base", "migrate", "full" ]
+  :choice => [ "base", "full" ]
 
 attribute "rightimage/platform",
   :display_name => "Guest OS Platform",

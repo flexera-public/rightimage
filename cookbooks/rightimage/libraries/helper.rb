@@ -4,7 +4,7 @@ module RightScale
       def image_name
         raise "ERROR: you must specify an image_name!" unless node[:rightimage][:image_name] =~ /./
         name = node[:rightimage][:image_name].dup
-        name << "_#{generate_persisted_passwd}" if node[:rightimage][:debug] == "true" && node[:rightimage][:build_mode] != "migrate" && node[:rightimage][:cloud] !~ /rackspace/
+        name << "_#{generate_persisted_passwd}" if node[:rightimage][:debug] == "true" && node[:rightimage][:cloud] !~ /rackspace/
         name << "_EBS" if node[:rightimage][:ec2][:image_type] =~ /ebs/i and name !~ /_EBS/
         name.gsub!("_","-") if node[:rightimage][:cloud] =~ /rackspace|google|azure/
         name.gsub!(".","-") if node[:rightimage][:cloud] =~ /google/
@@ -279,8 +279,6 @@ module RightScale
           ts = Time.now - (3600*24)
           @@mirror_freeze_date = "%04d%02d%02d" % [ts.year,ts.month,ts.day]
           Chef::Log::info("Using latest available mirror date (#{@@mirror_freeze_date}) as mirror_freeze_date input")
-        elsif node[:rightimage][:build_mode] == "migrate"
-          @@mirror_freeze_date = nil
         elsif rebundle?
           Chef::Log::info("Using latest available mirror date for rebundle")
           @@mirror_freeze_date = nil
@@ -288,7 +286,7 @@ module RightScale
           set_mirror_freeze_date_from_snapshot
           @@mirror_freeze_date = node[:rightimage][:mirror_freeze_date]
         else
-          raise "Undefined build_mode #{node[:rightimage][:build_mode]}, must be base, migrate, or full"
+          raise "Undefined build_mode #{node[:rightimage][:build_mode]}, must be base or full"
         end
         return @@mirror_freeze_date
       end

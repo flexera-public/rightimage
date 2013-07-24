@@ -218,10 +218,9 @@
       "calculated": false,
       "choice": [
         "base",
-        "migrate",
         "full"
       ],
-      "description": "Build base image, full image, or migrate existing image.",
+      "description": "Build base image or full image.",
       "display_name": "Build Mode",
       "recipes": [
 
