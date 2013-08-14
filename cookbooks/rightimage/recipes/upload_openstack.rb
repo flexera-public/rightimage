@@ -29,9 +29,12 @@ bash "install python modules" do
   pip_cmd = (node[:platform] =~ /centos|redhat/) ? 'pip-2.6' : 'pip'
   code <<-EOH
     export PATH=$PATH:/usr/local/bin
-    easy_install-2.6 pip
-    easy_install-2.6 -U distribute
-    #{pip_cmd} install glance
+    easy_install-2.6 pip==1.1
+    # For some reason the dependencies aren't getting installed if you don't list them specifically, but at least this will help us lock down versions.
+    #{pip_cmd} install glance==2011.3.1 webob==1.0.8 httplib2==0.8 routes==1.13 eventlet==0.13.0 sqlalchemy==0.8.2 paste==1.7.5.1 PasteDeploy==1.5.0 xattr==0.6.4 kombu==2.5.12
+
+    # Since pip doesn't always list what version is installed, print them out.
+    #{pip_cmd} freeze
   EOH
 end
 
@@ -41,26 +44,23 @@ ruby_block "upload to cloud" do
     filename = "#{image_name}.qcow2"
     local_file = "#{target_temp_root}/#{filename}"
 
-    openstack_user = node[:rightimage][:openstack][:user]
-    openstack_password = node[:rightimage][:openstack][:password]
+    ENV['OS_AUTH_USER'] = node[:rightimage][:openstack][:user]
+    ENV['OS_AUTH_KEY'] = node[:rightimage][:openstack][:password]
+    ENV['OS_AUTH_TENANT'] = ENV['OS_AUTH_USER']
     openstack_host = node[:rightimage][:openstack][:hostname].split(":")[0]
     openstack_api_port = node[:rightimage][:openstack][:hostname].split(":")[1] || "5000"
-    openstack_glance_port = "9292"
+    ENV['OS_AUTH_URL'] = "http://#{openstack_host}:#{openstack_api_port}/v2.0"
+    ENV['OS_AUTH_STRATEGY'] = "keystone"
 
-    Chef::Log.info("Getting openstack api token for user #{openstack_user}@#{openstack_host}:#{openstack_api_port}")
-    auth_resp = `curl -d '{"auth":{"passwordCredentials":{"username": "#{openstack_user}", "password": "#{openstack_password}"}}}' -H "Content-type: application/json" http://#{openstack_host}:#{openstack_api_port}/v2.0/tokens` 
-    Chef::Log.info("got response for auth req: #{auth_resp}")
-    auth_hash = JSON.parse(auth_resp)
-    access_token = auth_hash["access"]["token"]["id"]
-
+    Chef::Log.info("Uploading #{local_file} to #{openstack_host}")
     # Don't use location=file://path/to/file like you might think, thats the name of the location to store the file on the server that hosts the images, not this machine
-    cmd = %Q(env PATH=$PATH:/usr/local/bin glance add --auth_token=#{access_token} --url=http://#{openstack_host}:#{openstack_glance_port}/v2.0 name=#{image_name} is_public=true disk_format=qcow2 container_format=ovf < #{local_file})
+    cmd = %Q(env PATH=$PATH:/usr/local/bin glance add name=#{image_name} is_public=true disk_format=qcow2 container_format=ovf < #{local_file})
     Chef::Log.debug(cmd)
     upload_resp = `#{cmd}`
     Chef::Log.info("got response for upload req: #{upload_resp} to cloud.")
 
     if upload_resp =~ /added/i 
-      image_id = upload_resp.scan(/ID:\s(\d+)/i).first
+      image_id = upload_resp.scan(/ID:\s(.+)/i).first
       Chef::Log.info("Successfully uploaded image #{image_id} to cloud.")
       
       # add to global id store for use by other recipes

@@ -37,7 +37,7 @@ module RightScale
         when "xen"
           (node[:rightimage][:cloud] == "euca" ? "tar.gz":"vhd.bz2")
         when "kvm"
-          "qcow2.bz2"
+          node[:rightimage][:cloud] == "openstack" ? "qcow2" : "qcow2.bz2"
         when "esxi"
           "vmdk.ova"
         end
