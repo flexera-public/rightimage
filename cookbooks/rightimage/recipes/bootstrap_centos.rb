@@ -83,12 +83,6 @@ yum -c /tmp/yum.conf -y makecache
 # install guest packages on CentOS 5.2 i386 host to work around yum problem
 yum -c /tmp/yum.conf --disablerepo=ruby_custom -y install #{node[:rightimage][:guest_packages]}
 # Install ruby 1.8.7 and base separately
-# Make sure to install postfix before guest_packages.  guest packages needs 
-# an MTA to satisfy dependencies and will use sendmail, which causes issues
-# for templates as sendmail gets configured incorrectly.  
-# Install postfix separately, don't want to use centosplus version which bundles mysql
-yum -c /tmp/yum.conf --installroot=#{node[:rightimage][:mount_dir]} -y install postfix --disablerepo=centosplus
-yum -c /tmp/yum.conf --installroot=#{node[:rightimage][:mount_dir]} -y remove sendmail
 # install the guest packages in the chroot
 yum -c /tmp/yum.conf --installroot=#{node[:rightimage][:mount_dir]} --exclude='*.i386' -y install #{node[:rightimage][:ruby_packages]}
 yum -c /tmp/yum.conf --installroot=#{node[:rightimage][:mount_dir]} -y install  #{node[:rightimage][:guest_packages]}
