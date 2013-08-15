@@ -29,4 +29,7 @@ remote_file "#{guest_root}/etc/sysconfig/kernel" do
   backup false
 end
 
+# Make sure that sendmail is set to run on startup.
+execute "chroot #{guest_root} chkconfig --add sendmail"
+
 rs_utils_marker :end
