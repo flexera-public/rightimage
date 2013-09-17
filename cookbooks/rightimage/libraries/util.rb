@@ -6,9 +6,9 @@ module RightImage
     # Truncate contents of all files in these directories.
     DIRS_truncate_logs = [ "/var/log", "/var/mail", "/var/spool/postfix" ]
     # Delete these files and directories
-    FILES_delete = [ "/root/.gemrc", "/root/.gem" ]
+    FILES_delete = [ "/root/.gemrc", "/root/.gem", "/root/.gnupg" ]
     # Delete contents of these directories, including deleting subdirectories, but not the directory itself.
-    DIRS_clean = ["/mnt", "/tmp", "/var/cache/apt/archives", "/var/cache/yum" ]
+    DIRS_clean = ["/mnt", "/tmp", "/var/cache/apt/archives", "/var/cache/yum", "/root/.ssh" ]
     
     # Utility Class
     #
