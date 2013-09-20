@@ -14,7 +14,7 @@ fi
 
 set +e
 grep /mnt /etc/mtab
-if [ $? == 1 ]; then
+if [ "$?" -ne 0 ]; then
   mount -o loop /tmp/VBoxGuestAdditions.iso /mnt
 fi
 set -e
