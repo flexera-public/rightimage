@@ -18,7 +18,7 @@ def repo_url_generator
     else
       url = "http://rightlink-#{repo_type}.s3.amazonaws.com/"
     end
-  elsif repo_url_base =~ /^adhoc-(\w+)$/
+  elsif repo_url_base =~ /^adhoc-(.+)$/
     repo_name = $1
     url = "http://rightlink-integration.s3.amazonaws.com/adhoc/#{repo_name}/"
   else 
