@@ -23,7 +23,7 @@ ruby_block "Verify fstab has a newline" do
   block do
     fstab = `tail -n 1 /etc/fstab`
     
-    unless fstab[-1] == 10
+    unless fstab[-1] == 10 || fstab[-1] == "\n"
       Chef::Log.info "************************************************"
       Chef::Log.info "*** ERROR: /etc/fstab does not end in a newline!!!"
       Chef::Log.info "************************************************"

@@ -24,13 +24,7 @@ raise "ERROR: your build_mode input is set to #{node[:rightimage][:build_mode]}.
 include_recipe "rightimage::block_device_create"
 include_recipe "rightimage::loopback_create"
 include_recipe "rightimage::base_os"
-unless node[:rightimage][:bare_image] == "true"
-  include_recipe "rightimage::image_report"
-end
 include_recipe "rightimage::loopback_unmount"
 include_recipe "rightimage::block_device_backup"
 include_recipe "rightimage::base_upload"
-unless node[:rightimage][:bare_image] == "true"
-  include_recipe "rightimage::report_upload"
-end
 rightscale_marker :end
