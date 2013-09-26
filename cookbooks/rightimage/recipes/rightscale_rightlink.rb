@@ -22,7 +22,7 @@ def repo_url_generator
     repo_name = $1
     url = "http://rightlink-integration.s3.amazonaws.com/adhoc/#{repo_name}/"
   else 
-    raise "Unknown rightlink_repo passed in (#{rightlink_repo})."
+    raise "Unknown rightlink_repo passed in (#{repo_url_base})."
   end
   if node[:rightimage][:platform] =~ /ubuntu/     
    url << "apt/"
