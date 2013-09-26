@@ -77,21 +77,11 @@ action :install do
   yum -c /tmp/yum.conf -y clean all
   yum -c /tmp/yum.conf -y makecache
 
-  if [ "#{node[:rightimage][:bare_image]}" != "true" ]; then 
-    # Install postfix separately, don't want to use centosplus version which bundles mysql
-    yum -c /tmp/yum.conf --installroot=#{guest_root} -y install postfix --disablerepo=centosplus --disablerepo=rightscale-epel
-    yum -c /tmp/yum.conf --installroot=#{guest_root} -y remove sendmail
-
-    # install the guest packages in the chroot
-    if [ "5" == "#{node[:rightimage][:platform_version].to_i}" ]; then
-      yum -c /tmp/yum.conf --installroot=#{guest_root} --exclude='*.i386' -y install --enablerepo=ruby_custom #{node[:rightimage][:ruby_packages]}
-    fi
-    # Install these one by one... yum install doesn't fail unless every package
-    # fails, so grouping them on one lines hides errors
-    for p in #{node[:rightimage][:guest_packages].join(" ")}; do
-      yum -c /tmp/yum.conf --installroot=#{guest_root} --exclude gcc-java -y install $p
-    done
-  fi
+  # Install these one by one... yum install doesn't fail unless every package
+  # fails, so grouping them on one lines hides errors
+  for p in #{node[:rightimage][:guest_packages].join(" ")}; do
+    yum -c /tmp/yum.conf --installroot=#{guest_root} --exclude gcc-java -y install $p
+  done
   yum -c /tmp/yum.conf --installroot=#{guest_root} -y remove bluez* gnome-bluetooth*
   yum -c /tmp/yum.conf --installroot=#{guest_root} -y clean all
 
@@ -123,11 +113,6 @@ action :install do
 
   ## fix logrotate
   touch #{guest_root}/var/log/boot.log
-
-  if [ "#{node[:rightimage][:bare_image]}" != "true" ]; then
-    ## enable name server caching daemon on boot
-    chroot #{guest_root} chkconfig --level 2345 nscd on
-  fi
 
   echo "Disabling TTYs"
   perl -p -i -e 's/(.*tty2)/#\1/' #{guest_root}/etc/inittab

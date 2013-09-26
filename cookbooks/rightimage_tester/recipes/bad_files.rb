@@ -42,6 +42,7 @@ bad_files_skip_dirs="\
 -path #{node[:rightimage_tester][:root]}/usr/lib/node_modules -or \
 -path #{node[:rightimage_tester][:root]}/var/cache/rightscale -or \
 -path #{node[:rightimage_tester][:root]}/usr/share/doc -or \
+-path #{node[:rightimage_tester][:root]}/opt/rightscale/sandbox/lib/ruby/gems -or \
 -path #{node[:rightimage_tester][:root]}/root/.rightscale\
 "
 

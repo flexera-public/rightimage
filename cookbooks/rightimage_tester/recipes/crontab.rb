@@ -23,7 +23,7 @@ ruby_block "Verify crontab has a newline" do
   block do
     crontab = `tail -n 1 /etc/crontab`
     
-    unless crontab[-1] == 10
+    unless crontab[-1] == 10 || crontab[-1] == "\n"
       Chef::Log.info "************************************************"
       Chef::Log.info "*** ERROR: /etc/crontab does not end in a newline!!!"
       Chef::Log.info "************************************************"

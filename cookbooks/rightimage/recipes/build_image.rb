@@ -37,14 +37,8 @@ include_recipe "rightimage::loopback_mount"
 include_recipe "rightimage::clean"
 include_recipe "rightimage::cloud_add"
 include_recipe "rightimage::rightscale_install"
-unless node[:rightimage][:bare_image] == "true"
-  include_recipe "rightimage::image_tests"
-  include_recipe "rightimage::image_report"
-end
+include_recipe "rightimage::image_tests"
 include_recipe "rightimage::loopback_unmount"
 include_recipe "rightimage::cloud_package"
 include_recipe "rightimage::upload_image_s3"
-unless node[:rightimage][:bare_image] == "true"
-  include_recipe "rightimage::report_upload"
-end
 rightscale_marker :end

@@ -33,7 +33,6 @@ set_unless[:rightimage][:base_image_bucket] = "rightscale-rightimage-base-dev"
 set_unless[:rightimage][:platform] = guest_platform
 set_unless[:rightimage][:platform_version] = guest_platform_version
 set_unless[:rightimage][:arch] = guest_arch
-set_unless[:rightimage][:bare_image] = "false"
 
 case node[:rightimage][:hypervisor]
 when "xen" then set[:rightimage][:image_type] = "vhd"
@@ -89,23 +88,12 @@ when "suse"
   rightimage[:host_packages] << " kiwi"
 end
 
-if rightimage[:bare_image] == "true"
-  # set base os packages
-  guest_packages =
-  case rightimage[:platform]
-  when "ubuntu" then %w(acpid openssh-clients openssh-server language-selector-common ubuntu-standard)
-  when "centos", "rhel" then %w(acpid openssh-server openssl dhclient)
-  end
-else
-  # set base os packages
-  guest_packages =
-  case rightimage[:platform]
-  when "ubuntu" then %w(rightimage-extras)
-  when "centos" then %w(rightimage-extras xfsprogs)
-  when "rhel" then %w(rightimage-extras)
-  end
+# set base os packages
+guest_packages =
+case rightimage[:platform]
+when "ubuntu" then %w(acpid openssh-client openssh-server language-selector-common ntp ubuntu-standard)
+when "centos", "rhel" then %w(acpid ntp openssh-server openssl dhclient)
 end
-
 set[:rightimage][:guest_packages] = guest_packages
 
 # set cloud stuff

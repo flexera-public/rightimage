@@ -24,6 +24,8 @@ bash "XFS crash bug detect" do
   flags "-ex"
   code <<-EOH
 
+yum -y install xfsprogs
+
 device=/dev/loop0
 loopback_file=/root/loopfile
 test_dir=/mnt/xfs_test

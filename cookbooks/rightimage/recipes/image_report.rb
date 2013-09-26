@@ -8,8 +8,27 @@ class Chef::Resource::RubyBlock
   include RightScale::RightImage::Helper
 end
 
+# Freeze repo again since we will be installing packages here.
+rightimage_os node[:rightimage][:platform] do
+  action :repo_freeze
+end
 
+# Install ruby and rubygems.
+bash "install rubygems" do
+  flags "-ex"
+  code <<-EOF
+    guest_root=#{guest_root}
 
+    case "#{node[:rightimage][:platform]}" in
+    "centos"|"rhel")
+      yum -c /tmp/yum.conf --installroot=$guest_root --disablerepo=rightscale-epel -y install ruby ruby-devel rubygems
+      ;;
+    "ubuntu")
+      chroot $guest_root apt-get -y install ruby ruby-dev rubygems
+      ;;
+    esac
+  EOF
+end
 
 # This folder does not exist yet, so create it.
 # Store hint files in here.
@@ -75,6 +94,27 @@ execute "chroot /mnt/image bash -c 'cd /tmp/rightimage_tools && bundle exec bin/
 end
 
 execute "mv -f #{guest_root}/tmp/report.js #{temp_root}/#{loopback_rootname}.js"
+
+# Uninstall ruby and rubygems.
+bash "uninstall rubygems" do
+  flags "-ex"
+  code <<-EOF
+    guest_root=#{guest_root}
+
+    case "#{node[:rightimage][:platform]}" in
+    "centos"|"rhel")
+      yum -c /tmp/yum.conf --installroot=$guest_root -y remove "ruby*"
+      ;;
+    "ubuntu")
+      chroot $guest_root apt-get -y purge "ruby*"
+      ;;
+    esac
+  EOF
+end
+
+rightimage_os node[:rightimage][:platform] do
+  action :repo_unfreeze
+end
 
 
 rightscale_marker :end
