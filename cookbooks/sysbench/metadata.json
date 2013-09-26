@@ -1,0 +1,84 @@
+{
+  "attributes": {
+    "sysbench/mysql_db": {
+      "calculated": false,
+      "choice": [
+
+      ],
+      "description": "Sample database name for OLTP test",
+      "display_name": "OLTP Test MySQL DB Name",
+      "recipes": [
+
+      ],
+      "required": "recommended",
+      "type": "string"
+    },
+    "sysbench/mysql_password": {
+      "calculated": false,
+      "choice": [
+
+      ],
+      "description": "Sample database password for OLTP test",
+      "display_name": "OLTP Test MySQL Password Name",
+      "recipes": [
+
+      ],
+      "required": "recommended",
+      "type": "string"
+    },
+    "sysbench/mysql_user": {
+      "calculated": false,
+      "choice": [
+
+      ],
+      "description": "Sample database user for OLTP test",
+      "display_name": "OLTP Test MySQL User Name",
+      "recipes": [
+
+      ],
+      "required": "recommended",
+      "type": "string"
+    },
+    "sysbench/result_file": {
+      "calculated": false,
+      "choice": [
+
+      ],
+      "default": "/tmp/result.json",
+      "description": "Where to output results of sysbench run. In json format.",
+      "display_name": "Report Output Location",
+      "recipes": [
+
+      ],
+      "required": "required",
+      "type": "string"
+    }
+  },
+  "conflicting": {
+  },
+  "dependencies": {
+  },
+  "description": "Installs and configures the sysbench",
+  "groupings": {
+  },
+  "license": "Apache v2.0",
+  "long_description": "Description\n===========\n\nRequirements\n============\n\nAttributes\n==========\n\nUsage\n=====\n\n",
+  "maintainer": "RightScale, Inc",
+  "maintainer_email": "support@rightscale.com",
+  "name": "sysbench",
+  "platforms": {
+  },
+  "providing": {
+  },
+  "recipes": {
+    "sysbench::default": "Install sysbench",
+    "sysbench::run": "Run sysbench"
+  },
+  "recommendations": {
+  },
+  "replacing": {
+  },
+  "suggestions": {
+  },
+  "version": "0.0.1"
+}
