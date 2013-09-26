@@ -11,7 +11,7 @@ recipe "sysbench::run", "Run sysbench"
 # depends "db_msyql"
 
 attribute "sysbench/result_file",
-  :required => "required",
+  :required => "recommended",
   :display_name => "Report Output Location",
   :description => "Where to output results of sysbench run. In json format.",
   :default => "/tmp/result.json"
