@@ -8,7 +8,8 @@
       "description": "AWS Access Key ID",
       "display_name": "AWS Access Key ID",
       "recipes": [
-        "rightimage_tester::special_strings"
+        "rightimage_tester::special_strings",
+        "rightimage_tester::benchmark"
       ],
       "required": "required",
       "type": "string"
@@ -21,7 +22,8 @@
       "description": "AWS Secret Access Key",
       "display_name": "AWS Secret Access Key",
       "recipes": [
-        "rightimage_tester::special_strings"
+        "rightimage_tester::special_strings",
+        "rightimage_tester::benchmark"
       ],
       "required": "required",
       "type": "string"
@@ -94,9 +96,10 @@
     "rightimage_tester::bad_files": "Check for bad files.",
     "rightimage_tester::banned_packages": "Ensure no banned packages installed.",
     "rightimage_tester::bashrc": "Ensure bashrc is sourced.",
+    "rightimage_tester::benchmark": "Run image benchmarks and upload to s3.",
     "rightimage_tester::blank_passwords": "Ensure no blank passwords.",
     "rightimage_tester::crontab": "Check crontab configuration.",
-    "rightimage_tester::default": "",
+    "rightimage_tester::default": "Default recipe. Does nothing currently.",
     "rightimage_tester::dependencies": "Ensure dependencies are installed.",
     "rightimage_tester::dupe_mounts": "Check for duplicate mounts.",
     "rightimage_tester::ephemeral": "Ensure ephemeral drive mounted.",

@@ -6,12 +6,13 @@ version          "0.1.0"
 
 depends "rightscale"
 
-recipe "rightimage_tester::default", ""
+recipe "rightimage_tester::default", "Default recipe. Does nothing currently."
 recipe "rightimage_tester::apparmor", "Ensure apparmor is not installed."
 recipe "rightimage_tester::apt_config", "Check apt configuration."
 recipe "rightimage_tester::bad_files", "Check for bad files."
 recipe "rightimage_tester::banned_packages", "Ensure no banned packages installed."
 recipe "rightimage_tester::bashrc", "Ensure bashrc is sourced."
+recipe "rightimage_tester::benchmark", "Run image benchmarks and upload to s3."
 recipe "rightimage_tester::blank_passwords", "Ensure no blank passwords."
 recipe "rightimage_tester::crontab", "Check crontab configuration."
 recipe "rightimage_tester::dependencies", "Ensure dependencies are installed."
@@ -46,13 +47,13 @@ attribute "rightimage_tester/aws_access_key_id",
   :display_name => "AWS Access Key ID",
   :description => "AWS Access Key ID",
   :required => "required",
-  :recipes => [ "rightimage_tester::special_strings" ]
+  :recipes => [ "rightimage_tester::special_strings", "rightimage_tester::benchmark" ]
 
 attribute "rightimage_tester/aws_secret_access_key",
   :display_name => "AWS Secret Access Key",
   :description => "AWS Secret Access Key",
   :required => "required",
-  :recipes => [ "rightimage_tester::special_strings" ]
+  :recipes => [ "rightimage_tester::special_strings", "rightimage_tester::benchmark" ]
 
 attribute "rightimage_tester/root_size",
   :display_name => "Root Filesystem Size",
