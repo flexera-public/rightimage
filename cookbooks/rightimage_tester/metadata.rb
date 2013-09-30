@@ -5,6 +5,7 @@ license          "Apache v2.0"
 version          "14.0.0"
 
 depends "rightscale"
+depends "sysbench"
 
 recipe "rightimage_tester::default", "Default recipe. Does nothing currently."
 recipe "rightimage_tester::apparmor", "Ensure apparmor is not installed."

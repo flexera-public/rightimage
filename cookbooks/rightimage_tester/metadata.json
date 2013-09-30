@@ -76,7 +76,8 @@
   "conflicting": {
   },
   "dependencies": {
-    "rightscale": ">= 0.0.0"
+    "rightscale": ">= 0.0.0",
+    "sysbench": ">= 0.0.0"
   },
   "description": "A cookbook for testing RightImages",
   "groupings": {
