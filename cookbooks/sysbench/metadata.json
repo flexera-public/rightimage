@@ -19,7 +19,8 @@
   },
   "dependencies": {
     "db": ">= 0.0.0",
-    "db_mysql": ">= 0.0.0"
+    "db_mysql": ">= 0.0.0",
+    "rightscale": ">= 0.0.0"
   },
   "description": "Installs and configures the sysbench",
   "groupings": {
