@@ -185,21 +185,6 @@
       "required": "recommended",
       "type": "string"
     },
-    "rightimage/bare_image": {
-      "calculated": false,
-      "choice": [
-        "true",
-        "false"
-      ],
-      "default": "false",
-      "description": "If true, image will not contain any additional packages beyond a stock os install, other than rightlink.  Used for debug/testing",
-      "display_name": "Create Bare Image",
-      "recipes": [
-
-      ],
-      "required": "optional",
-      "type": "string"
-    },
     "rightimage/build_id": {
       "calculated": false,
       "choice": [

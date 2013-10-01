@@ -50,20 +50,33 @@ def loopback_package_install(packages)
 end
 
 action :install do
+  mirror_date = "#{mirror_freeze_date[0..3]}/#{mirror_freeze_date[4..5]}/#{mirror_freeze_date[6..7]}"
+  mirror_url = "http://#{node[:rightimage][:mirror]}/ubuntu_daily/#{mirror_date}"
   platform_codename = platform_codename(new_resource.platform_version)
-  #create bootstrap command
-  if node[:platform_version].to_f >= 10.04
-    package "python-boto"
-    # install vmbuilder from deb files
-    cookbook_file "/tmp/python-vm-builder.deb" do
-      source "python-vm-builder_0.12.4+bzr477-0ubuntu1_all.deb"
-    end
-    ruby_block "install python-vm-builder debs with dependencies" do
-      block do
-        Chef::Log.info(`dpkg -i /tmp/python-vm-builder.deb`)
-        Chef::Log.info(`apt-get -fy install`)
-      end
-    end
+
+  package "python-boto"
+  package "python-vm-builder"
+
+  # Overwrite the provided sources.list template or the kernel will be
+  # installed from the upstream Ubuntu mirror. (w-6136)
+  directory "/root/.vmbuilder/ubuntu" do
+    owner "root"
+    group "root"
+    mode "0700"
+    recursive true
+    action :create
+  end
+
+  template "/root/.vmbuilder/ubuntu/sources.list.tmpl" do
+    source "sources.list.erb"
+    variables(
+      :mirror_url => node[:rightimage][:mirror],
+      :use_staging_mirror => node[:rightimage][:rightscale_staging_mirror],
+      :mirror_date => mirror_date,
+      :bootstrap => true,
+      :platform_codename => platform_codename
+    )
+    backup false
   end
 
   bash "cleanup" do
@@ -74,9 +87,7 @@ action :install do
     EOH
   end
 
-  mirror_date = "#{mirror_freeze_date[0..3]}/#{mirror_freeze_date[4..5]}/#{mirror_freeze_date[6..7]}"
-  mirror_url = "http://#{node[:rightimage][:mirror]}/ubuntu_daily/#{mirror_date}"
-
+  #create bootstrap command
   bootstrap_cmd = "/usr/bin/vmbuilder xen ubuntu -o \
       --suite=#{platform_codename} \
       -d #{node[:rightimage][:build_dir]} \

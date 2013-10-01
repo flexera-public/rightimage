@@ -18,11 +18,11 @@ def repo_url_generator
     else
       url = "http://rightlink-#{repo_type}.s3.amazonaws.com/"
     end
-  elsif repo_url_base =~ /^adhoc-(\w+)$/
+  elsif repo_url_base =~ /^adhoc-(.+)$/
     repo_name = $1
     url = "http://rightlink-integration.s3.amazonaws.com/adhoc/#{repo_name}/"
   else 
-    raise "Unknown rightlink_repo passed in (#{rightlink_repo})."
+    raise "Unknown rightlink_repo passed in (#{repo_url_base})."
   end
   if node[:rightimage][:platform] =~ /ubuntu/     
    url << "apt/"
@@ -130,6 +130,12 @@ def install_rightlink()
   # Setup repos
   repo_url = repo_url_generator
   gpg_check = gpg_check_generator
+
+  # Since dependencies can be installed from the repo, need to freeze them here.
+  rightimage_os node[:rightimage][:platform] do
+    action :repo_freeze
+  end
+
   if node[:rightimage][:platform] == "centos"
     template "#{guest_root}/etc/yum.repos.d/rightlink.repo" do
       source "rightlink.repo.erb"
@@ -182,6 +188,10 @@ def install_rightlink()
       backup false
     end
     execute "chroot #{guest_root} #{update_repo_cmd}"
+
+    rightimage_os node[:rightimage][:platform] do
+      action :repo_unfreeze
+    end
   end
 
 end
