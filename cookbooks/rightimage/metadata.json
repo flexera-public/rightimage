@@ -985,7 +985,8 @@
     "rightimage::loopback_unmount": "unmounts loopback file system",
     "rightimage::rebundle": "coordinate a rebundled image build (redhat on on ec2 or rackspace)",
     "rightimage::report_upload": "Checksums compressed images, adds info to reports, and uploads reports alongside images",
-    "rightimage::rightscale_install": "installs rightscale",
+    "rightimage::rightscale_install": "sets up rightscale specific customizations, then installs rightlink",
+    "rightimage::rightscale_rightlink": "installs rightlink",
     "rightimage::s3index_update": "Updates the index.html of the upload bucket",
     "rightimage::upload_image_s3": "bundle and upload private cloud image to s3 bucket for distribution/download"
   },
