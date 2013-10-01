@@ -17,6 +17,19 @@
 # limitations under the License.
 #
 
+node.set[:sysbench][:result_file] = "/tmp/results.json"
+
 include_recipe "sysbench"
 include_recipe "sysbench::run"
 
+report_name = node[:rightimage_tester][:report_name].dup
+report_name << ".json" unless report_name.include?('.json')
+
+ros_upload full_image_path do
+  provider "ros_upload_s3"
+  user node[:rightimage_tester][:aws_access_key_id]
+  password node[:rightimage_tester][:aws_secret_access_key]
+  container "rightimage-benchmarks"
+  remote_path report_name
+  action :upload
+end

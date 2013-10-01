@@ -57,6 +57,12 @@ attribute "rightimage_tester/aws_secret_access_key",
   :required => "required",
   :recipes => [ "rightimage_tester::special_strings", "rightimage_tester::benchmark" ]
 
+attribute "rightimage_tester/report_name",
+  :display_name => "Report Name",
+  :description => "Upload a json file to s3 detailing benchmark, image tester, and image report results with specified name. This is generally a mix of the image id or name and cloud tested on.  For example: us-west-1/RightImage_CentOS_6.4_x64_v13.5.0.1",
+  :required => "required",
+  :recipes => [ "rightimage_tester::benchmark" ]
+
 attribute "rightimage_tester/root_size",
   :display_name => "Root Filesystem Size",
   :description => "If set, verifies root filesystem size.  Specify size in GB.  Most RightImages are 10GB.",
