@@ -24,7 +24,6 @@ ros_upload loopback_file_gz do
   provider "ros_upload_s3"
   user node[:rightimage][:aws_access_key_id]
   password node[:rightimage][:aws_secret_access_key]
-  endpoint 's3-us-west-2.amazonaws.com'
   container image_upload_bucket
   remote_path  image_s3_path
   action :upload

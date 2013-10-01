@@ -109,26 +109,20 @@ ruby_block "full_image_report_additions" do
 end
 
 # Upload JSON files.
-  # Base and Full cases. 
+# Base and Full cases. 
 
-# Upload vars.
 if (node[:rightimage][:build_mode] == "base")
-  image_s3_path = "#{guest_platform}/#{guest_platform_version}/#{guest_arch}/#{mirror_freeze_date[0..3]}"
+  image_s3_path = "#{guest_platform}/#{guest_platform_version}/#{guest_arch}/#{mirror_freeze_date[0..3]}/"
   image_upload_bucket = node[:rightimage][:base_image_bucket]
+  image_file = "#{temp_root}/#{loopback_rootname}.js"
 elsif (node[:rightimage][:build_mode] == "full")
-  image_s3_path = node[:rightimage][:hypervisor]+"/#{guest_platform}/#{guest_platform_version}"
+  image_s3_path = node[:rightimage][:hypervisor]+"/#{guest_platform}/#{guest_platform_version}/"
   image_upload_bucket = "rightscale-"+node[:rightimage][:cloud]+"-dev"
+  image_file = "#{temp_root}/#{image_name}.js"
 end
 
-# Base image case:
-
-# Upload partitioned JSON file.
-json_partitioned = "#{temp_root}/#{loopback_rootname}.js"
-
-ros_upload json_partitioned do
+ros_upload image_file do
   provider "ros_upload_s3"
-  only_if { node[:rightimage][:build_mode] == "base" }
-  endpoint 's3-us-west-2.amazonaws.com'
   user node[:rightimage][:aws_access_key_id]
   password node[:rightimage][:aws_secret_access_key]
   container image_upload_bucket
@@ -136,19 +130,6 @@ ros_upload json_partitioned do
   action :upload
 end
 
-# Full image case:
 
-json_full_image ="#{temp_root}/#{image_name}.js"
-
-ros_upload json_full_image do
-  provider "ros_upload_s3"
-  only_if { node[:rightimage][:build_mode] == "full" }
-  endpoint 's3-us-west-1.amazonaws.com'
-  user node[:rightimage][:aws_access_key_id]
-  password node[:rightimage][:aws_secret_access_key]
-  container image_upload_bucket
-  remote_path  image_s3_path
-  action :upload
-end
 
 rightscale_marker :end

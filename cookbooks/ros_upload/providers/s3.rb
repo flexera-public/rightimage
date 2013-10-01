@@ -1,45 +1,51 @@
 action :upload do
   file = new_resource.file
-  path_bits = new_resource.remote_path.split("/",2)
-  bucket_name = path_bits.shift
-  s3_path = path_bits.shift || ""
-  s3_file = s3_path.dup
-  endpoint = new_resource.endpoint || 's3-us-west-1.amazonaws.com'
+  bucket_name = new_resource.container
+  s3_file = new_resource.remote_path.dup
   user = new_resource.user
   password = new_resource.password
 
-  if s3_path =~ /./ && s3_path !~ /\/$/
-    s3_file << "/"
+  if s3_file =~ /\/$/
+    s3_file << ::File.basename(file)
   end
-  s3_file << ::File.basename(file)
+
 
   Chef::Log.info("bucket: #{bucket_name}")
-  Chef::Log.info("upload path: #{s3_path}")
+  Chef::Log.info("remote_path: #{s3_file}")
   Chef::Log.info("file to upload: #{file}")
-  Chef::Log.info("endpoint: #{endpoint}")
 
   ruby "Upload image to s3" do
+    environment(
+      'AWS_ACCESS_KEY_ID'=>user,
+      'AWS_SECRET_ACCESS_KEY'=>password
+    )
     code <<-EOF
       require 'rubygems'
       require 'fog'
 
+      def connect_storage(region)
+        Fog::Storage.new(
+          :provider               => 'AWS',
+          :region                 => region,
+          :aws_access_key_id      => ENV['AWS_ACCESS_KEY_ID'],
+          :aws_secret_access_key  => ENV['AWS_SECRET_ACCESS_KEY']
+        )
+      end
+
       s3_file = '#{s3_file}'
       bucket_name = '#{bucket_name}'
       file     = '#{file}'
-      endpoint = '#{endpoint}'
-      user     = '#{user}'
-      password = '#{password}'
+      default_region = 'us-east-1' # must be us-east-1 else fog can't get bucket location for other regions
 
-      storage =
-        Fog::Storage.new(
-          :provider               => 'AWS',
-          :host                   => endpoint,
-          :aws_access_key_id      => user,
-          :aws_secret_access_key  => password,
-          :persistent => false
-      )
-
+      storage = connect_storage(default_region)
       b = storage.directories.get(bucket_name)
+
+      # Reconnect to the endpoint if its in a different region
+      if b.location != default_region
+        storage = connect_storage(b.location)
+        b = storage.directories.get(bucket_name)
+      end
+
       raise "ERROR: Bucket not found: \#{bucket_name} -- please verify your image_upload_bucket and creds" unless b
       b.files.each { |f| puts "WARNING: image already exists -- OVERWRITING!!" if f.key == s3_file }
 
