@@ -2,6 +2,8 @@ actions :upload
 
 # pathname/bucket to upload the remote file to
 attribute :remote_path, :kind_of => String
+attribute :container,   :kind_of => String
+
 
 attribute :endpoint, :kind_of => String
 attribute :user, :kind_of => String

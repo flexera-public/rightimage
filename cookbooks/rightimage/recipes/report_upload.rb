@@ -125,13 +125,14 @@ end
 # Upload partitioned JSON file.
 json_partitioned = "#{temp_root}/#{loopback_rootname}.js"
 
-rightimage_upload json_partitioned do
-  provider "rightimage_upload_s3"
+ros_upload json_partitioned do
+  provider "ros_upload_s3"
   only_if { node[:rightimage][:build_mode] == "base" }
   endpoint 's3-us-west-2.amazonaws.com'
   user node[:rightimage][:aws_access_key_id]
   password node[:rightimage][:aws_secret_access_key]
-  remote_path  "#{image_upload_bucket}/#{image_s3_path}"
+  container image_upload_bucket
+  remote_path  image_s3_path
   action :upload
 end
 
@@ -139,13 +140,14 @@ end
 
 json_full_image ="#{temp_root}/#{image_name}.js"
 
-rightimage_upload json_full_image do
-  provider "rightimage_upload_s3"
+ros_upload json_full_image do
+  provider "ros_upload_s3"
   only_if { node[:rightimage][:build_mode] == "full" }
   endpoint 's3-us-west-1.amazonaws.com'
   user node[:rightimage][:aws_access_key_id]
   password node[:rightimage][:aws_secret_access_key]
-  remote_path  "#{image_upload_bucket}/#{image_s3_path}"
+  container image_upload_bucket
+  remote_path  image_s3_path
   action :upload
 end
 

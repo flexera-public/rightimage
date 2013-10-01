@@ -4,6 +4,7 @@ description      "A cookbook for testing RightImages"
 license          "Apache v2.0"
 version          "14.0.0"
 
+depends "ros_upload"
 depends "rightscale"
 depends "sysbench"
 

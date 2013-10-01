@@ -4,6 +4,7 @@ description      "A cookbook for building RightImages"
 version          "1.0.0"
 license          "Apache v2.0"
 
+depends "ros_upload"
 depends "rightimage_tester"
 depends "loopback_fs"
 depends "rightscale"

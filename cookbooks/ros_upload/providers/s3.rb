@@ -1,7 +1,3 @@
-class Chef::Resource::RubyBlock
-   include RightScale::RightImage::Helper
-end
-
 action :upload do
   file = new_resource.file
   path_bits = new_resource.remote_path.split("/",2)

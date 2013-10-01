@@ -944,7 +944,8 @@
     "loopback_fs": ">= 0.0.0",
     "rightimage_cloud_vagrant": ">= 0.0.0",
     "rightimage_tester": ">= 0.0.0",
-    "rightscale": ">= 0.0.0"
+    "rightscale": ">= 0.0.0",
+    "ros_upload": ">= 0.0.0"
   },
   "description": "A cookbook for building RightImages",
   "groupings": {
