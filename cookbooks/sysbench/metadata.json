@@ -1,5 +1,19 @@
 {
   "attributes": {
+    "sysbench/instance_type": {
+      "calculated": false,
+      "choice": [
+
+      ],
+      "default": "/tmp/result.json",
+      "description": "Instance (or computer) type, for annotating the report. I.E. for an ec2 instance, m1.small.",
+      "display_name": "Instance Type",
+      "recipes": [
+
+      ],
+      "required": "required",
+      "type": "string"
+    },
     "sysbench/result_file": {
       "calculated": false,
       "choice": [

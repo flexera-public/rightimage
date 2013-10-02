@@ -62,6 +62,12 @@ attribute "rightimage_tester/report_name",
   :display_name => "Report Name",
   :description => "Upload a json file to s3 detailing benchmark, image tester, and image report results with specified name. This is generally a mix of the image id or name and cloud tested on.  For example: us-west-1/RightImage_CentOS_6.4_x64_v13.5.0.1",
   :required => "required",
+  :recipes => [ "rightimage_tester::report" ]
+
+attribute "rightimage_tester/instance_type",
+  :display_name => "Instance Type",
+  :description => "The instance type, such as m1.small. Inserted into the benchmark results.",
+  :required => "recommended",
   :recipes => [ "rightimage_tester::benchmark" ]
 
 attribute "rightimage_tester/root_size",

@@ -28,6 +28,19 @@
       "required": "required",
       "type": "string"
     },
+    "rightimage_tester/instance_type": {
+      "calculated": false,
+      "choice": [
+
+      ],
+      "description": "The instance type, such as m1.small. Inserted into the benchmark results.",
+      "display_name": "Instance Type",
+      "recipes": [
+        "rightimage_tester::benchmark"
+      ],
+      "required": "recommended",
+      "type": "string"
+    },
     "rightimage_tester/report_name": {
       "calculated": false,
       "choice": [
@@ -36,7 +49,7 @@
       "description": "Upload a json file to s3 detailing benchmark, image tester, and image report results with specified name. This is generally a mix of the image id or name and cloud tested on.  For example: us-west-1/RightImage_CentOS_6.4_x64_v13.5.0.1",
       "display_name": "Report Name",
       "recipes": [
-        "rightimage_tester::benchmark"
+        "rightimage_tester::report"
       ],
       "required": "required",
       "type": "string"

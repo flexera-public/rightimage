@@ -8,3 +8,4 @@
 default[:rightimage_tester][:run_static_tests] = false
 default[:rightimage_tester][:root] = ""
 default[:rightimage_tester][:benchmark_results_file] = "/tmp/result.json"
+default[:rightimage_tester][:instance_type] = ""

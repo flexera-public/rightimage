@@ -43,7 +43,7 @@ action :run do
     # Clean out in-memory caches
     shell_out!("echo 3 > /proc/sys/vm/drop_caches")
 
-    collected_results = {}
+    collected_results = {"instance_type" => r.instance_type}
 
     parse_cmd(collected_results, "disk", "sysbench --test=fileio --file-test-mode=rndrw run") do |cmd_out, result_hash|
       result_hash["total time"] = parse_key(cmd_out, "total time")

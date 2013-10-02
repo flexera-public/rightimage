@@ -17,3 +17,9 @@ attribute "sysbench/result_file",
   :display_name => "Report Output Location",
   :description => "Where to output results of sysbench run. In json format.",
   :default => "/tmp/result.json"
+
+attribute "sysbench/instance_type",
+  :required => "required",
+  :display_name => "Instance Type",
+  :description => "Instance (or computer) type, for annotating the report. I.E. for an ec2 instance, m1.small.",
+  :default => "/tmp/result.json"
