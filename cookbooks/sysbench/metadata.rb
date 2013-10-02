@@ -21,5 +21,4 @@ attribute "sysbench/result_file",
 attribute "sysbench/instance_type",
   :required => "required",
   :display_name => "Instance Type",
-  :description => "Instance (or computer) type, for annotating the report. I.E. for an ec2 instance, m1.small.",
-  :default => "/tmp/result.json"
+  :description => "Instance (or computer) type, for annotating the report. I.E. for an ec2 instance, m1.small."
