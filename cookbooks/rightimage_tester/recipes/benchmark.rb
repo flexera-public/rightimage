@@ -17,6 +17,8 @@
 # limitations under the License.
 #
 
+rightscale_marker :begin
+
 node.set[:sysbench][:result_file]   = node[:rightimage_tester][:benchmark_results_file]
 node.set[:sysbench][:instance_type] = node[:rightimage_tester][:instance_type]
 
@@ -24,5 +26,6 @@ node.set[:sysbench][:instance_type] = node[:rightimage_tester][:instance_type]
 include_recipe "sysbench"
 include_recipe "sysbench::run"
 
+rightscale_marker :end
 
 

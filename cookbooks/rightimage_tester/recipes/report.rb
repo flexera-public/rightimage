@@ -18,6 +18,8 @@
 #
 
 
+rightscale_marker :begin
+
 include_recipe "ros_upload"
 
 report_file = "/tmp/report.js"
@@ -72,3 +74,6 @@ ros_upload report_file do
   remote_path report_name
   action :upload
 end
+
+rightscale_marker :end
+
