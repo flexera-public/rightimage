@@ -22,32 +22,36 @@ include_recipe "ros_upload"
 
 report_file = "/tmp/report.js"
 
-remote_file "/tmp/rightimage_tools/rightimage_tools.tar.gz" do
-  source "http://rightscale-rightimage.s3.amazonaws.com/files/rightimage_tools_0.6.2.tar.gz"
-  action :create_if_missing
-end
-
+package "wget"
 package "ruby"
 package "rubygems"
 
 bash "generate_rightimage_report" do
+  flags "-e"
+  # /usr/local/bin stripped from path for RightLink v5.8
+  environment('PATH'=>'/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin')
   code <<-EOF
+    mkdir -p /tmp/rightimage_tools
     cd /tmp/rightimage_tools 
-    tar zxf rightimage_tools.tar.gz
+
+    # Don't use remote file, broken for 10.10 (CHEF-3140)
+    wget --quiet http://rightscale-rightimage.s3.amazonaws.com/files/rightimage_tools_0.6.2.tar.gz
+    tar zxf rightimage_tools_*.tar.gz
+
     gem install bundler --no-rdoc --no-ri
-    # Use --deployment flag so no gems are installed to system, we want to keep
-    # this isolated. Private is github gems, don't install those.
+    # Use --deployment flag so no gems are installed to system
+    # Private is github gems, don't install those.
     (bundle check || bundle install --deployment --without private development)
     bundle exec bin/report_tool print
   EOF
 end
 
 # Insert in benchmark results if the benchmark recipe was run
-ruby_block do
+ruby_block "insert benchmark results" do
   block do
     image_report = JSON.parse(::File.read(report_file))
 
-    if ::File.exists? node[:rightimage_tester][:benchmark_results_file]
+    if ::File.exists?(node[:rightimage_tester][:benchmark_results_file])
       benchmark_contents = JSON.parse(::File.read(node[:rightimage_tester][:benchmark_results_file]))
       image_report['benchmark'] = benchmark_contents
     end
@@ -60,7 +64,7 @@ end
 
 report_name = node[:rightimage_tester][:report_name].dup
 report_name << ".json" unless report_name.include?('.json')
-ros_upload benchmark_results_file do
+ros_upload report_file do
   provider "ros_upload_s3"
   user node[:rightimage_tester][:aws_access_key_id]
   password node[:rightimage_tester][:aws_secret_access_key]
