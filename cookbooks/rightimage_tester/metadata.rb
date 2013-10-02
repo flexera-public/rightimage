@@ -14,7 +14,7 @@ recipe "rightimage_tester::apt_config", "Check apt configuration."
 recipe "rightimage_tester::bad_files", "Check for bad files."
 recipe "rightimage_tester::banned_packages", "Ensure no banned packages installed."
 recipe "rightimage_tester::bashrc", "Ensure bashrc is sourced."
-recipe "rightimage_tester::benchmark", "Run image benchmarks and upload to s3."
+recipe "rightimage_tester::benchmark", "Run image benchmarks. Call report recipe after this one to upload to S3"
 recipe "rightimage_tester::blank_passwords", "Ensure no blank passwords."
 recipe "rightimage_tester::crontab", "Check crontab configuration."
 recipe "rightimage_tester::dependencies", "Ensure dependencies are installed."
@@ -34,6 +34,7 @@ recipe "rightimage_tester::ntp", "Ensure ntp service exists and can restart."
 recipe "rightimage_tester::packages", "Ensure packages can be installed."
 recipe "rightimage_tester::rackconnect", "Check for Rackspace Rackconnect automation failures."
 recipe "rightimage_tester::reboot", "Ensure instance reboots."
+recipe "rightimage_tester::report", "Generate and upload an image report"
 recipe "rightimage_tester::resolvconf", "Verify resolvconf tail empty."
 recipe "rightimage_tester::rightlink_core", "Ensure no RightLink core files."
 recipe "rightimage_tester::rubygems", "Check rubygems installation."
@@ -47,15 +48,15 @@ recipe "rightimage_tester::xfs_crash", "Ensure instance does not crash when usin
 
 attribute "rightimage_tester/aws_access_key_id",
   :display_name => "AWS Access Key ID",
-  :description => "AWS Access Key ID",
+  :description => "AWS Access Key ID. Used to upload image report/benchmarks/",
   :required => "required",
-  :recipes => [ "rightimage_tester::special_strings", "rightimage_tester::benchmark" ]
+  :recipes => [ "rightimage_tester::special_strings", "rightimage_tester::report" ]
 
 attribute "rightimage_tester/aws_secret_access_key",
   :display_name => "AWS Secret Access Key",
-  :description => "AWS Secret Access Key",
+  :description => "AWS Secret Access Key. used to upload image report/benchmarks",
   :required => "required",
-  :recipes => [ "rightimage_tester::special_strings", "rightimage_tester::benchmark" ]
+  :recipes => [ "rightimage_tester::special_strings", "rightimage_tester::report" ]
 
 attribute "rightimage_tester/report_name",
   :display_name => "Report Name",
