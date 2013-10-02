@@ -17,7 +17,9 @@
 # limitations under the License.
 #
 
-node.set[:sysbench][:result_file] = node[:rightimage_tester][:benchmark_results_file]
+node.set[:sysbench][:result_file]   = node[:rightimage_tester][:benchmark_results_file]
+node.set[:sysbench][:instance_type] = node[:rightimage_tester][:instance_type]
+
 
 include_recipe "sysbench"
 include_recipe "sysbench::run"
