@@ -23,7 +23,6 @@ recipe "rightimage::rightscale_rightlink", "installs rightlink"
 recipe "rightimage::rightscale_install", "sets up rightscale specific customizations, then installs rightlink"
 recipe "rightimage::cloud_add", "configures base os image for a specific cloud"
 recipe "rightimage::cloud_package", "packages RightImage for a specific cloud"
-recipe "rightimage::do_create_mci", "creates RightScale MultiCloudImage (MCI) for image (only ec2 currently supported)"
 recipe "rightimage::cloud_upload", "upload and register image with cloud"
 recipe "rightimage::upload_image_s3", "bundle and upload private cloud image to s3 bucket for distribution/download"
 recipe "rightimage::base_upload", "upload raw image to s3"
@@ -42,13 +41,6 @@ recipe "rightimage::loopback_copy", "creates non-partitioned loopback fs image f
 recipe "rightimage::loopback_unmount", "unmounts loopback file system"
 recipe "rightimage::loopback_mount", "mounts loopback file system"
 recipe "rightimage::loopback_resize", "resizes loopback file system"
-
-# Report tool recipes
-recipe "rightimage::image_report", "Compiles information into a json report by parsing system calls and optional hint files"
-recipe "rightimage::report_upload", "Checksums compressed images, adds info to reports, and uploads reports alongside images"
-
-# s3index update recipe
-recipe "rightimage::s3index_update", "Updates the index.html of the upload bucket"
 
 #
 # required
@@ -117,7 +109,7 @@ attribute "rightimage/rightlink_repo",
 attribute "rightimage/rightlink_version",
   :display_name => "RightLink Version",
   :description => "RightLink version to install.",
-  :recipes => [ "rightimage::default", "rightimage::build_image", "rightimage::rightscale_rightlink", "rightimage::rebundle", "rightimage::rightscale_install", "rightimage::do_create_mci"],
+  :recipes => [ "rightimage::default", "rightimage::build_image", "rightimage::rightscale_rightlink", "rightimage::rebundle", "rightimage::rightscale_install"],
   :required => true
   
 attribute "rightimage/image_upload_bucket",
@@ -205,41 +197,9 @@ attribute "rightimage/cloud_options",
   :required => "recommended",
   :recipes => [ "rightimage::rebundle", "rightimage::default" ]
 
-# Optional, parameters for auto creation of mci
-attribute "rightscale/api_user",
-  :display_name => "API User",
-  :description => "RightScale API username. Ex. you@rightscale.com",
-  :recipes => [ "rightimage::do_create_mci" ],
-  :recommended => true
-
-attribute "rightscale/api_password",
-  :display_name => "API Password",
-  :description => "Rightscale API password.",
-  :recipes => [ "rightimage::do_create_mci" ],
-  :recommended => true
- 
-attribute "rightscale/api_url",
-  :display_name => "API URL",
-  :description => "The rightscale account specific api url to use.  Ex. https://my.rightscale.com/api/acct/1234 (where 1234 is your account id)",
-  :recipes => [ "rightimage::do_create_mci" ],
-  :recommended => true
-
-attribute "rightscale/cloud_id",
-  :display_name => "RightScale Cloud ID (integer)",
-  :description => "The numeric ID in RightScale for the cloud which we will create this image for. For example, 6 = AWS Oregon, 232 = Rackspace",
-  :recipes => [ "rightimage::do_create_mci" ],
-  :recommended => true
-
-attribute "rightscale/mci_name",
-   :display_name => "MCI Name or ID",
-   :description => "MCI to add this image to. If an integer is specified, will be assumed to be RightScale ID.  If a string is specified, MCI name will be matched and created if not found. If empty, use image_name attribute",
-   :default => "",
-   :recipes => [ "rightimage::do_create_mci" ],
-   :required => "optional"
-
 # AWS
 aws_x509_recipes = ["rightimage::cloud_upload", "rightimage::rebundle", "rightimage::default", "rightimage::ec2_download_bundle"]
-aws_api_recipes = aws_x509_recipes + ["rightimage::build_base", "rightimage::build_image", "rightimage::upload_image_s3", "rightimage::base_upload", "rightimage::image_tests", "rightimage::report_upload", "rightimage::s3index_update" ]
+aws_api_recipes = aws_x509_recipes + ["rightimage::build_base", "rightimage::build_image", "rightimage::upload_image_s3", "rightimage::base_upload", "rightimage::image_tests" ]
 
 attribute "rightimage/ec2/image_type",
   :display_name => "EC2 Image Type",

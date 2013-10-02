@@ -27,7 +27,7 @@ Image:
 
 Select an image that matches the target guest platform and architecture
   * Centos 5.6 x64 builds x64 guest
-  * Ubuntu x64 i386 builds i386 guest, etc
+  * Ubuntu x64 12.04 i386 builds i386 guest, etc
 
 Inputs:
 
@@ -81,9 +81,8 @@ Automatic mode is useful when building an image on boot
   1. Set ‘build mode’ to full and ‘manual mode’ to false
   2. launch server
   3. once operational run "rightimage::upload_cloud_<cloud>" recipe
-  4. run "rightimage::do_create_mci" to add image to MCI
-  5. launch image_tester template with newly created image
-  6. launch rightlink_tester template with newly created image
+  4. launch image_tester template with newly created image
+  5. launch rightlink_tester template with newly created image
 
 == Building a RightImage (Build mode: full, Manual mode: true):
 
@@ -93,14 +92,9 @@ Manual mode is useful when developing of the rightimage cookbooks
   2. launch server
   3. once operational start the build using "rightimage::build_image" recipe
   4. After the build is complete run "rightimage::upload_cloud_<cloud>" recipe
-  5. run "rightimage::do_create_mci" to add image to MCI
-  6. launch image_tester template with newly created image
-  7. launch rightlink_tester template with newly created image
+  5. launch image_tester template with newly created image
+  6. launch rightlink_tester template with newly created image
 
-= FUTURE IMPROVEMENTS
-
-Remove dependence on cookbooks_premium when time comes
-  
 == Maintainer
 
 email: cary@rightscale.com
