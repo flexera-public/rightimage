@@ -5,11 +5,11 @@
       "choice": [
 
       ],
-      "description": "AWS Access Key ID",
+      "description": "AWS Access Key ID. Used to upload image report/benchmarks/",
       "display_name": "AWS Access Key ID",
       "recipes": [
         "rightimage_tester::special_strings",
-        "rightimage_tester::benchmark"
+        "rightimage_tester::report"
       ],
       "required": "required",
       "type": "string"
@@ -19,11 +19,11 @@
       "choice": [
 
       ],
-      "description": "AWS Secret Access Key",
+      "description": "AWS Secret Access Key. used to upload image report/benchmarks",
       "display_name": "AWS Secret Access Key",
       "recipes": [
         "rightimage_tester::special_strings",
-        "rightimage_tester::benchmark"
+        "rightimage_tester::report"
       ],
       "required": "required",
       "type": "string"
@@ -111,7 +111,7 @@
     "rightimage_tester::bad_files": "Check for bad files.",
     "rightimage_tester::banned_packages": "Ensure no banned packages installed.",
     "rightimage_tester::bashrc": "Ensure bashrc is sourced.",
-    "rightimage_tester::benchmark": "Run image benchmarks and upload to s3.",
+    "rightimage_tester::benchmark": "Run image benchmarks. Call report recipe after this one to upload to S3",
     "rightimage_tester::blank_passwords": "Ensure no blank passwords.",
     "rightimage_tester::crontab": "Check crontab configuration.",
     "rightimage_tester::default": "Default recipe. Does nothing currently.",
@@ -132,6 +132,7 @@
     "rightimage_tester::packages": "Ensure packages can be installed.",
     "rightimage_tester::rackconnect": "Check for Rackspace Rackconnect automation failures.",
     "rightimage_tester::reboot": "Ensure instance reboots.",
+    "rightimage_tester::report": "Generate and upload an image report",
     "rightimage_tester::resolvconf": "Verify resolvconf tail empty.",
     "rightimage_tester::rightlink_core": "Ensure no RightLink core files.",
     "rightimage_tester::rubygems": "Check rubygems installation.",
