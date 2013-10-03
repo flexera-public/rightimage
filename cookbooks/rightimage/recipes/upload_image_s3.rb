@@ -19,7 +19,6 @@ image_upload_bucket = "rightscale-#{node[:rightimage][:cloud]}-dev"
 ros_upload full_image_path do
   provider "ros_upload_s3"
   not_if { node[:rightimage][:cloud] =~ /ec2|google|azure/ }
-  endpoint 's3-us-west-1.amazonaws.com'
   user node[:rightimage][:aws_access_key_id]
   password node[:rightimage][:aws_secret_access_key]
   container image_upload_bucket
