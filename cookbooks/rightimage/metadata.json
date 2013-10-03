@@ -797,8 +797,7 @@
         "rightimage::build_image",
         "rightimage::rightscale_rightlink",
         "rightimage::rebundle",
-        "rightimage::rightscale_install",
-        "rightimage::do_create_mci"
+        "rightimage::rightscale_install"
       ],
       "required": "required",
       "type": "string"
@@ -844,76 +843,6 @@
       ],
       "required": "optional",
       "type": "string"
-    },
-    "rightscale/api_password": {
-      "calculated": false,
-      "choice": [
-
-      ],
-      "description": "Rightscale API password.",
-      "display_name": "API Password",
-      "recipes": [
-        "rightimage::do_create_mci"
-      ],
-      "recommended": true,
-      "required": "optional",
-      "type": "string"
-    },
-    "rightscale/api_url": {
-      "calculated": false,
-      "choice": [
-
-      ],
-      "description": "The rightscale account specific api url to use.  Ex. https://my.rightscale.com/api/acct/1234 (where 1234 is your account id)",
-      "display_name": "API URL",
-      "recipes": [
-        "rightimage::do_create_mci"
-      ],
-      "recommended": true,
-      "required": "optional",
-      "type": "string"
-    },
-    "rightscale/api_user": {
-      "calculated": false,
-      "choice": [
-
-      ],
-      "description": "RightScale API username. Ex. you@rightscale.com",
-      "display_name": "API User",
-      "recipes": [
-        "rightimage::do_create_mci"
-      ],
-      "recommended": true,
-      "required": "optional",
-      "type": "string"
-    },
-    "rightscale/cloud_id": {
-      "calculated": false,
-      "choice": [
-
-      ],
-      "description": "The numeric ID in RightScale for the cloud which we will create this image for. For example, 6 = AWS Oregon, 232 = Rackspace",
-      "display_name": "RightScale Cloud ID (integer)",
-      "recipes": [
-        "rightimage::do_create_mci"
-      ],
-      "recommended": true,
-      "required": "optional",
-      "type": "string"
-    },
-    "rightscale/mci_name": {
-      "calculated": false,
-      "choice": [
-
-      ],
-      "default": "",
-      "description": "MCI to add this image to. If an integer is specified, will be assumed to be RightScale ID.  If a string is specified, MCI name will be matched and created if not found. If empty, use image_name attribute",
-      "display_name": "MCI Name or ID",
-      "recipes": [
-        "rightimage::do_create_mci"
-      ],
-      "required": "optional",
-      "type": "string"
     }
   },
   "conflicting": {
@@ -952,7 +881,6 @@
     "rightimage::cloud_package": "packages RightImage for a specific cloud",
     "rightimage::cloud_upload": "upload and register image with cloud",
     "rightimage::default": "starts builds image automatically at boot. See 'manual_mode' input to enable.",
-    "rightimage::do_create_mci": "creates RightScale MultiCloudImage (MCI) for image (only ec2 currently supported)",
     "rightimage::ec2_download_bundle": "Downloads bundled image from EC2 S3.",
     "rightimage::enable_debug": "enables a root login on image for debugging purposes",
     "rightimage::image_tests": "run some basic tests on mounted image such as grepping for credentials",

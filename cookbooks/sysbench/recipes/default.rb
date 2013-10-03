@@ -6,20 +6,20 @@
 
 package "sysbench"
 
-node.set[:db][:admin][:user]     = "admin"
-node.set[:db][:admin][:password] = node[:sysbench][:mysql_password]
-
-node.set[:db][:application][:user]     = node[:sysbench][:mysql_user]
-node.set[:db][:applicaiton][:password] = node[:sysbench][:mysql_password]
-
 node.set[:db][:dns][:master][:fqdn] = "localhost"
 
-include_recipe "rightscale::install_tools"
+# Deploy MySQL database
 
-# Required by db_mysql but not explicitly required.  Normally installed
-# as part of rightscale::install_tools at compile time so make sure this
-# comes after
-require 'system_timer'
+# Setup password required by the mysql cookbook
+node.set['mysql']['server_root_password']   = node[:sysbench][:mysql_password]
+node.set['mysql']['server_repl_password']   = node[:sysbench][:mysql_password]
+node.set['mysql']['server_debian_password'] = node[:sysbench][:mysql_password]
 
-include_recipe "db_mysql::setup_server_5_5"
-include_recipe "db::install_server"
+# User the root user
+node.set['mysql']['allow_remote_root'] = false
+node.set['mysql']['remove_anonymous_users'] = true
+
+# Use the test database
+node.set['mysql']['remove_test_database'] = false
+
+include_recipe 'mysql::server'

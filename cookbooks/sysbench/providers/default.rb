@@ -68,15 +68,15 @@ action :run do
     end
 
     # password currently ignored, not needed for localhost users
-    mysql_db=r.mysql_db
-    mysql_user=r.mysql_user
-    mysql_pass=r.mysql_password
-    shell_out("echo 'CREATE DATABASE IF NOT EXISTS #{mysql_db}' | mysql -u sysbenchuser")
-    shell_out("sysbench --test=oltp --oltp-table-size=1000000 --db-driver=mysql --mysql-db=#{mysql_db} --mysql-user=#{mysql_user} prepare")
+    mysql_db   = "--mysql-db=test"
+    mysql_user = "--mysql-user=root"
+    mysql_password = r.mysql_password ? "--mysql-password=#{r.mysql_password}" : ""
+    #shell_out("echo 'CREATE DATABASE IF NOT EXISTS #{mysql_db}'")
+    shell_out("sysbench --test=oltp --oltp-table-size=1000000 --db-driver=mysql #{mysql_db} #{mysql_user} #{mysql_password} prepare")
     shell_out!("sync")
     # Clean out in-memory caches
     shell_out!("echo 3 > /proc/sys/vm/drop_caches")
-    parse_cmd(collected_results, "oltp", "sysbench --num-threads=4  --test=oltp --oltp-table-size=1000000 --db-driver=mysql --mysql-db=#{mysql_db} --mysql-user=#{mysql_user} run") do |cmd_out, result_hash|
+    parse_cmd(collected_results, "oltp", "sysbench --num-threads=4  --test=oltp --oltp-table-size=1000000 --db-driver=mysql #{mysql_db} #{mysql_user} #{mysql_password} run") do |cmd_out, result_hash|
       result_hash["total time"] = parse_key(cmd_out, "total time")
       result_hash["throughput"] = parse_throughput(cmd_out, "read/write requests")
     end

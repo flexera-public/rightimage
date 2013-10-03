@@ -31,11 +31,9 @@
   "conflicting": {
   },
   "dependencies": {
-    "db": ">= 0.0.0",
-    "db_mysql": ">= 0.0.0",
-    "rightscale": ">= 0.0.0"
+    "mysql": "~> 3.0"
   },
-  "description": "Installs and configures the sysbench",
+  "description": "Installs and runs sysbench",
   "groupings": {
   },
   "license": "Apache v2.0",
@@ -57,5 +55,5 @@
   },
   "suggestions": {
   },
-  "version": "0.0.1"
+  "version": "0.1.0"
 }
