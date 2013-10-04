@@ -20,13 +20,15 @@
 
 rightscale_marker :begin
 
-include_recipe "ros_upload"
 
 report_file = "/tmp/report.js"
 
 package "wget"
 package "ruby"
 package "rubygems"
+
+# Include after package calls, else fog disappears (centos only)
+include_recipe "ros_upload"
 
 bash "generate_rightimage_report" do
   flags "-e"
@@ -63,6 +65,7 @@ ruby_block "insert benchmark results" do
     end
   end
 end
+
 
 report_name = node[:rightimage_tester][:report_name].dup
 report_name << ".json" unless report_name.include?('.json')
