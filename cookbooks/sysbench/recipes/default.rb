@@ -6,8 +6,6 @@
 
 package "sysbench"
 
-node.set[:db][:dns][:master][:fqdn] = "localhost"
-
 # Deploy MySQL database
 
 # Setup password required by the mysql cookbook
