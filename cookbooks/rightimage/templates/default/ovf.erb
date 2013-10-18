@@ -69,11 +69,19 @@
         <rasd:AddressOnParent>7</rasd:AddressOnParent>
         <rasd:AutomaticAllocation>true</rasd:AutomaticAllocation>
         <rasd:Connection>VM Network</rasd:Connection>
-        <rasd:Description>E1000 ethernet adapter on "VM Network"</rasd:Description>
+        <rasd:Description>Ethernet adapter on "VM Network"</rasd:Description>
         <rasd:ElementName>Network adapter 1</rasd:ElementName>
         <rasd:InstanceID>8</rasd:InstanceID>
-        <rasd:ResourceSubType>E1000</rasd:ResourceSubType>
+        <rasd:ResourceSubType><% if node[:rightimage][:cloud] == "vscale" %>VMXNET3<% else -%>E1000<% end -%></rasd:ResourceSubType>
         <rasd:ResourceType>10</rasd:ResourceType>
+      </Item>
+      <Item>
+        <rasd:AddressOnParent>0</rasd:AddressOnParent>
+        <rasd:AutomaticAllocation>true</rasd:AutomaticAllocation>
+        <rasd:Description>Floppy Drive</rasd:Description>
+        <rasd:ElementName>Floppy Drive 1</rasd:ElementName>
+        <rasd:InstanceID>8000</rasd:InstanceID>
+        <rasd:ResourceType>14</rasd:ResourceType>
       </Item>
     </VirtualHardwareSection>
   </VirtualSystem>
