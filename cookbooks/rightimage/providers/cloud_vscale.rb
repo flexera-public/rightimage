@@ -17,7 +17,7 @@ action :configure do
   end
 
 
-  # insert grub conf, and link menu.lst to grub.conf
+  # Create metadata mount directory. 
   directory "#{guest_root}/mnt/metadata" do
     owner "root"
     group "root"
