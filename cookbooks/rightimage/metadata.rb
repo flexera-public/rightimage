@@ -64,13 +64,6 @@ attribute "rightimage/manual_mode",
   :default => "true",
   :recipes => [ "rightimage::default" ]
 
-attribute "rightimage/bare_image",
-  :display_name => "Create Bare Image",
-  :description => "If true, image will not contain any additional packages beyond a stock os install, other than rightlink.  Used for debug/testing",
-  :choice => [ "true", "false" ],
-  :default => "false",
-  :required => "optional"
-
 attribute "rightimage/build_mode",
   :display_name => "Build Mode",
   :description => "Build base image or full image.",

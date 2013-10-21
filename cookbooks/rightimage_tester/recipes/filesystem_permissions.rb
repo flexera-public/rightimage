@@ -20,6 +20,7 @@
 rightscale_marker :begin
 
 rightimage_tester "Verify postfix permissions" do
+  only_if "test -d /var/spool/postfix"
   cmd = value_for_platform(
     /suse/i => { "default" => 'find /var/spool/postfix -group maildrop' },
     "default" => 'find /var/spool/postfix -group postdrop'
