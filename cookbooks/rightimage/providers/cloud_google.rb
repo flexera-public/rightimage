@@ -228,7 +228,7 @@ EOF
     end
   end
 
-  # Needed for do_create_mci, the primary key is the image_name
+  # Needed to create the MCI, pulled by right_image_builder
   ruby_block "store id" do
     block do
       id_list = RightImage::IdList.new(Chef::Log)

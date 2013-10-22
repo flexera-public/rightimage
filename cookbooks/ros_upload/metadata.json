@@ -1,0 +1,29 @@
+{
+  "attributes": {
+  },
+  "conflicting": {
+  },
+  "dependencies": {
+  },
+  "description": "Uploads files on disk to a remote object store. Only s3 currently supported.",
+  "groupings": {
+  },
+  "license": "All rights reserved",
+  "long_description": "# DESCRIPTION:\n\nThis is a utility cookbook to help upload files to a remote object store (s3 supported)\n\n# REQUIREMENTS:\n\nRuby 1.8+ and rubygems.  This cookbook relies on fog and will install the version\nit needs.\n\n# ATTRIBUTES:\n\nNo attributes. Currently not usable as a standalone cookbook, meant to be called\nfrom other cookbooks only. Note that a trailing slash on remote_path makes a difference.\nIf there is a trailing slash, the filename will be appended to the remote path.\nIf there is not a trailing slash, the file will be renamed.\n\n# USAGE:\n  \n    include_recipe \"ros_upload\" # installs fog\n\n    ros_upload \"/path/to/file\" do\n      provider  \"ros_upload_s3\"\n      user      node[:cookbook][:aws_access_key_id]\n      password  node[:cookbook][:aws_secret_access_key]\n      container node[:cookbook][:s3_bucket]\n      remote_path \"subdir/\"\n      action :upload\n    end\n",
+  "maintainer": "RightScale, Inc.",
+  "maintainer_email": "images@rightscale.com",
+  "name": "ros_upload",
+  "platforms": {
+  },
+  "providing": {
+  },
+  "recipes": {
+  },
+  "recommendations": {
+  },
+  "replacing": {
+  },
+  "suggestions": {
+  },
+  "version": "0.1.0"
+}
