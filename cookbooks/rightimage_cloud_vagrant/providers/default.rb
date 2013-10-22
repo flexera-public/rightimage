@@ -111,6 +111,8 @@ end
 
 action :package do
   rightimage_image "virtualbox" do
+    platform new_resource.platform
+    platform_version new_resource.platform_version
     action :package
   end
 end

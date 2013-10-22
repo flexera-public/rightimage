@@ -16,7 +16,7 @@
   <VirtualSystem ovf:id="vm">
     <Info>A virtual machine</Info>
   <Name><%= @ovf_image_name %></Name>
-    <OperatingSystemSection ovf:id="100" ovf:version="5" vmw:osType="<%= @ovf_ostype %>">
+    <OperatingSystemSection ovf:id="<%= @ovf_ostype_id %>" ovf:version="5">
       <Info>The kind of installed guest operating system</Info>
     </OperatingSystemSection>
     <VirtualHardwareSection>
@@ -92,7 +92,7 @@
         <rasd:ResourceType>17</rasd:ResourceType>
       </Item>
     </VirtualHardwareSection>
-    <vbox:Machine ovf:required="false" version="1.12-macosx" uuid="{2d6be5b6-57cd-4131-b44d-a8eb67ea6002}" name="Ubuntu Server 12.04 amd64" OSType="Linux" snapshotFolder="Snapshots" lastStateChange="2012-10-16T11:18:52Z">
+    <vbox:Machine ovf:required="false" version="1.12-macosx" uuid="{2d6be5b6-57cd-4131-b44d-a8eb67ea6002}" name="<%=@ovf_image_name%>" OSType="<%=@vbox_ostype%>" snapshotFolder="Snapshots" lastStateChange="2012-10-16T11:18:52Z">
       <ovf:Info>Complete VirtualBox machine configuration in VirtualBox format</ovf:Info>
       <ExtraData>
         <ExtraDataItem name="GUI/LastCloseAction" value="powerOff"/>
