@@ -12,6 +12,6 @@ none       /dev/shm  tmpfs   defaults        0 0
 none       /proc     proc    defaults        0 0
 none       /sys      sysfs   defaults        0 0
 <% if node[:rightimage][:cloud] == "vscale" %>
-<%= node[:rightimage][:fstab][:metadata][:device] %>   <%= node[:rightimage][:fstab][:metadata][:mount_dir] %>      auto   gid=0,mode=750        0 0
+<%= node[:rightimage][:fstab][:metadata][:device] %>   <%= node[:rightimage][:fstab][:metadata][:mount_dir] %>      auto   ro,noexec,nosuid,nodev,umask=337,uid=0,gid=0        0 0
 <% end -%>
 
