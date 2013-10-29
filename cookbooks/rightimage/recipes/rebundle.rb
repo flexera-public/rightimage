@@ -135,7 +135,7 @@ bash "upload code to the remote instance" do
   debug_opt = node[:rightimage][:debug] == "true" ? "--debug" : ""
   staging_opt = node[:rightimage][:rightscale_staging_mirror] == "true" ? "--staging-mirror" : ""
   code <<-EOH
-  #{ruby_bin_dir}/ruby bin/upload --rightlink #{node[:rightimage][:rightlink_version]} #{freeze_date_opt} #{debug_opt} #{staging_opt} --no-configure
+  #{ruby_bin_dir}/ruby bin/upload #{freeze_date_opt} #{debug_opt} #{staging_opt} --no-configure
   EOH
 end
 
@@ -144,7 +144,7 @@ bash "configure the remote instance" do
   cwd Rebundle::REBUNDLE_SOURCE_PATH
   debug_opt = node[:rightimage][:debug] == "true" ? "--debug" : ""
   code <<-EOH
-  #{ruby_bin_dir}/ruby bin/configure --rightlink #{node[:rightimage][:rightlink_version]} #{debug_opt}
+  #{ruby_bin_dir}/ruby bin/configure --rightlink-repo #{node[:rightimage][:rightlink_repo]} --rightlink-version #{node[:rightimage][:rightlink_version]} #{debug_opt}
   EOH
 end
 
