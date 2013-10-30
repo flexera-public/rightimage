@@ -218,7 +218,8 @@
         "rackspace-open-cloud",
         "azure",
         "google",
-        "vagrant"
+        "vagrant",
+        "vscale"
       ],
       "description": "The supported cloud for the virtual image. If unset, build a generic base image.",
       "display_name": "Target Cloud",
