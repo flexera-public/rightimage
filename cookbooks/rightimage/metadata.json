@@ -904,6 +904,7 @@
     "rightimage::image_tests": "run some basic tests on mounted image such as grepping for credentials",
     "rightimage::loopback_copy": "creates non-partitioned loopback fs image from a partitioned one",
     "rightimage::loopback_create": "creates and mounts loopback file system",
+    "rightimage::loopback_download": "downloads base loopback image",
     "rightimage::loopback_mount": "mounts loopback file system",
     "rightimage::loopback_resize": "resizes loopback file system",
     "rightimage::loopback_unmount": "unmounts loopback file system",
