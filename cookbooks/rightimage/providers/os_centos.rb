@@ -199,20 +199,10 @@ action :install do
     backup false
   end
 
-  # Grubby requires a symlink to /etc/grub.conf.
-  execute "grub symlink" do
-    command "chroot #{guest_root} ln -s /boot/grub/menu.lst /etc/grub.conf"
-    creates "#{guest_root}/etc/grub.conf"
-  end
+  install_grub_package
+  install_grub_config { cloud "none" }
+  install_bootloader { cloud "none" }
 
-  # Setup /etc/sysconfig/kernel to allow grub to auto-update grub.conf when updating kernel.
-  template "#{guest_root}/etc/sysconfig/kernel" do
-    source "sysconfig-kernel.erb"
-    backup false
-    variables({
-      :kernel => (el6?)?"kernel" : "kernel-xen"
-    })
-  end
 
   cookbook_file "#{guest_root}/root/.bash_profile" do 
     source "bash_profile" 

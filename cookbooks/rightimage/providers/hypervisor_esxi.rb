@@ -20,10 +20,8 @@ action :install_kernel do
           chroot $guest_root mkinitrd --with=mptbase --with=mptscsih --with=mptspi --with=scsi_transport_spi --with=ata_piix \
              --with=ext3 -v initrd-$kernel_version $kernel_version
           mv $guest_root/initrd-$kernel_version  $guest_root/boot/.
-          yum -c /tmp/yum.conf --installroot=$guest_root -y install grub
         ;;
         "ubuntu" )
-          chroot $guest_root apt-get -y install grub
         ;;
       esac
     EOH

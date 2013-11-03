@@ -118,7 +118,7 @@ module RightScale
         end
       end
 
-     def do_loopback_resize
+      def do_loopback_resize
         source_size_gb = (::File.size(loopback_file)/1024/1024/1024).to_f.round
         node[:rightimage][:root_size_gb].to_i != source_size_gb
       end
@@ -250,17 +250,6 @@ module RightScale
         "--source http://#{node[:rightimage][:mirror]}/rubygems/archive/#{mirror_freeze_date}/"
       end
 
-      def grub_initrd
-        ::File.basename(Dir.glob("#{guest_root}/boot/initr*").sort_by { |f| File.mtime(f) }.last)
-      end
-
-      def grub_kernel
-        ::File.basename(Dir.glob("#{guest_root}/boot/vmlinuz*").sort_by { |f| File.mtime(f) }.last)
-      end
-
-      def grub_root
-        "(hd0,0)"
-      end
 
       # Mirror freeze date is used to name the snapshots that base images are stored to and restored from
       # For base images, we'll use the specified freezedate or default to the latest date

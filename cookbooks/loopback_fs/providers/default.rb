@@ -42,28 +42,39 @@ action :create do
 # and use all the space
 #    size_bytes = new_resource.size_gb*1024*1024*1024
 #    cylinders = size_bytes/(255*63*512)
+
+
+
     code <<-EOH
       calc_mb="#{new_resource.size_gb*1024}"
       loop_dev="/dev/loop#{new_resource.device_number}"
+      loop_map="/dev/mapper/loop#{new_resource.device_number}p1"
+      fake_dev="/dev/mapper/sda#{new_resource.device_number}"
+      fake_map="/dev/mapper/sda#{new_resource.device_number}p1"
       root_label="#{new_resource.label}"
       mount_point="#{new_resource.mount_point}"
       source="#{new_resource.source}"
 
       dd if=/dev/zero of=$source bs=1M count=$calc_mb
       losetup $loop_dev $source
+      parted -s ${loop_dev} mklabel msdos
+      parted -s ${loop_dev} mkpart primary ext2 1024k 100% -a minimal
+      parted -s ${loop_dev} set 1 boot on
 
-      sfdisk --no-reread $loop_dev << EOF
-0,,L,*
-EOF
+      echo "0 $[#{new_resource.size_gb}*2097152] linear $loop_dev 0" | dmsetup create `basename $fake_dev`
+      kpartx -a $fake_dev
 
       # use synchonous flag to avoid any later race conditions
-      kpartx -s -a $loop_dev
-      loop_map="/dev/mapper/loop#{new_resource.device_number}p1"
-      mke2fs -F -j $loop_map
-      tune2fs -L $root_label $loop_map
+      #kpartx -s -a $loop_dev
+      # loop_map_link is needed to fool grub-install since its not aware
+      # of /dev/mapper/xxx and expects something to be in /dev
+      #cp -Rf $loop_map $loop_map_link
+
+      mke2fs -F -j $fake_map
+      tune2fs -L $root_label $fake_map
       rm -rf $mount_point
       mkdir -p $mount_point
-      mount $loop_map $mount_point
+      mount -t ext2 $fake_map $mount_point
 
       # Handle binding of special files
       #{bind_devices_script}
@@ -77,6 +88,9 @@ action :unmount do
     code <<-EOH
       loop_dev="/dev/loop#{new_resource.device_number}"
       loop_map="/dev/mapper/loop#{new_resource.device_number}p1"
+      fake_dev="/dev/mapper/sda#{new_resource.device_number}"
+      fake_map="/dev/mapper/sda#{new_resource.device_number}p1"
+
       mount_point="#{new_resource.mount_point}"
 
       sync
@@ -89,8 +103,8 @@ action :unmount do
       umount -lf $mount_point || true
 
 
-      # use synchonous flag to avoid any later race conditions
-      [ -e "$loop_map" ] && kpartx -s -d $loop_dev
+      [ -e "$fake_map" ] && kpartx -d $fake_dev
+      [ -e "$fake_dev" ] && dmsetup remove $fake_dev
       set +e
       losetup -a | grep $loop_dev
       if [ "$?" == "0" ]; then
@@ -108,17 +122,22 @@ action :mount do
     flags "-ex"
     code <<-EOH
       loop_dev="/dev/loop#{new_resource.device_number}"
+      loop_map="/dev/mapper/loop#{new_resource.device_number}p1"
+      loop_map_link=${loop_dev}p1
+      fake_dev="/dev/mapper/sda#{new_resource.device_number}"
+      fake_map="/dev/mapper/sda#{new_resource.device_number}p1"
+
       mount_point="#{new_resource.mount_point}"
       source="#{new_resource.source}"
 
       losetup $loop_dev $source
 
       # use synchonous flag to avoid any later race conditions
-      kpartx -s -a $loop_dev
-      loop_map="/dev/mapper/loop#{new_resource.device_number}p1"
+      echo "0 $[#{new_resource.size_gb}*2097152] linear $loop_dev 0" | dmsetup create `basename $fake_dev`
+      kpartx -a $fake_dev
 
       mkdir -p $mount_point
-      mount $loop_map $mount_point
+      mount $fake_map $mount_point
 
       # Handle binding of special files
       if [ "#{new_resource.bind_devices}" == "true" ]; then
