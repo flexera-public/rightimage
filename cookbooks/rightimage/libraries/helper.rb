@@ -251,6 +251,22 @@ module RightScale
       end
 
 
+      def chroot_install
+        if node[:rightimage][:platform] == "ubuntu" 
+          "chroot #{guest_root} apt-get -y install"
+        else
+          "yum -c /tmp/yum.conf --installroot=#{guest_root} -y install"
+        end
+      end
+
+      def chroot_remove
+        if node[:rightimage][:platform] == "ubuntu"
+          "chroot #{guest_root} apt-get -y purge"
+        else
+          "yum -c /tmp/yum.conf --installroot=#{guest_root} -y uninstall"
+        end
+      end
+
       # Mirror freeze date is used to name the snapshots that base images are stored to and restored from
       # For base images, we'll use the specified freezedate or default to the latest date
       # For full images, we'll restored from the specified freezedate, or else poll the API for

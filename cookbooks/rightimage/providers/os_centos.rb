@@ -1,13 +1,3 @@
-class Chef::Resource
-  include RightScale::RightImage::Helper
-end
-class Chef::Recipe
-  include RightScale::RightImage::Helper
-end
-class Erubis::Context
-  include RightScale::RightImage::Helper
-end
-
 
 action :install do 
   rightimage_os new_resource.platform do

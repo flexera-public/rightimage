@@ -1,12 +1,5 @@
 rightscale_marker :begin
 
-class Chef::Resource
-  include RightScale::RightImage::Helper
-end
-class Chef::Recipe
-  include RightScale::RightImage::Helper
-end
-
 # Install any dependencies
 node[:rightimage][:host_packages].each { |p| package p.strip }
 

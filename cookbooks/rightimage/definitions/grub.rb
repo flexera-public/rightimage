@@ -56,16 +56,8 @@ define :install_bootloader, :cloud => :default do
 end
 
 define :install_grub_package do
-  pkg_install = (node[:rightimage][:platform] == "ubuntu") ? 
-    "apt-get -y install" :
-    "yum -y install"
-
-  pkg_remove = (node[:rightimage][:platform] == "ubuntu") ? 
-    "" :
-    "yum -y uninstall"
-
   package grub_package
-  execute "chroot #{guest_root} #{pkg_install} #{grub_package}"
+  execute "#{chroot_install} #{grub_package}"
 end
   
 
@@ -111,10 +103,7 @@ define :install_grub_config, :cloud => :default do
   # it sort of gets bypassed by pv-grub.  grub-legacy-ec2 is a shim that maintains 
   # the menu.lst in parallel - technically ec2 doesn't even need a bootloader installed
   if cloud == "ec2" && grub_package == "grub2"
-    pkg_install = (node[:rightimage][:platform] == "ubuntu") ? 
-      "apt-get -y install" :
-      "yum -y install"
-    execute "chroot #{guest_root} #{pkg_install} grub-legacy-ec2"
+    execute "#{chroot_install} grub-legacy-ec2"
     template "/boot/grub/menu.lst" do
       source "menu.lst.erb"
       backup false

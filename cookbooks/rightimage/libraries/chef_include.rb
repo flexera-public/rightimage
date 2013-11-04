@@ -12,6 +12,13 @@ end
 module RightImage
 end
 
+
+class Erubis::Context
+  include RightScale::RightImage::Grub
+  include RightScale::RightImage::Helper
+  include RightImage
+end
+
 class Chef::Resource
   include RightScale::RightImage::Grub
   include RightScale::RightImage::Helper

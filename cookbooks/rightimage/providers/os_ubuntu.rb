@@ -1,19 +1,8 @@
-# bootstrap_ubuntu.rb
-# 
 # Use vmbuilder to generate a base virtual image.  We will use the image generated here for other recipes to add
 # Cloud and Hypervisor specific details.
 #
 # When this is finished running, you should have a basic image ready in /mnt
 #
-class Erubis::Context
-  include RightScale::RightImage::Helper
-end
-class Chef::Resource
-  include RightScale::RightImage::Helper
-end
-class Chef::Recipe
-  include RightScale::RightImage::Helper
-end
 
 require 'chef/log'
 require 'chef/mixin/shell_out'
