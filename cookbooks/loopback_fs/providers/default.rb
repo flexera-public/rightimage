@@ -51,14 +51,13 @@ action :create do
       parted -s ${loop_dev} mkpart primary ext2 1024k 100% -a minimal
       parted -s ${loop_dev} set 1 boot on
 
+      # So this bit of indirection helps the grub2 install to work - grub2 
+      # normally freaks out if the partition is in /dev/mapper and the loopback
+      # device itself is mounted in /dev, so keep them both in the same place
+      # so that grub2-install can link them together properly
       echo "0 $[#{new_resource.size_gb}*2097152] linear $loop_dev 0" | dmsetup create `basename $fake_dev`
-      kpartx -a $fake_dev
-
       # use synchonous flag to avoid any later race conditions
-      #kpartx -s -a $loop_dev
-      # loop_map_link is needed to fool grub-install since its not aware
-      # of /dev/mapper/xxx and expects something to be in /dev
-      #cp -Rf $loop_map $loop_map_link
+      kpartx -s -a $fake_dev
 
       mke2fs -F -j $fake_map
       tune2fs -L $root_label $fake_map
@@ -122,9 +121,9 @@ action :mount do
 
       losetup $loop_dev $source
 
-      # use synchonous flag to avoid any later race conditions
       echo "0 $[#{new_resource.size_gb}*2097152] linear $loop_dev 0" | dmsetup create `basename $fake_dev`
-      kpartx -a $fake_dev
+      # use synchonous flag to avoid any later race conditions
+      kpartx -s -a $fake_dev
 
       mkdir -p $mount_point
       mount $fake_map $mount_point
