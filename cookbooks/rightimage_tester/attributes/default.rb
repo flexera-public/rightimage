@@ -5,5 +5,7 @@
 # So run them before when image is mounted as loopback file
 # When set to true tests will error out of problems.  When set to false
 # tests will still run but issues will be downgraded to warnings
-set_unless[:rightimage_tester][:run_static_tests] = false
-set_unless[:rightimage_tester][:root] = ""
+default[:rightimage_tester][:run_static_tests] = false
+default[:rightimage_tester][:root] = ""
+default[:rightimage_tester][:benchmark_results_file] = "/tmp/result.json"
+default[:rightimage_tester][:instance_type] = ""

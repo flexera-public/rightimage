@@ -12,20 +12,10 @@ def bind_devices_script
   mount --bind /sys $mount_point/sys
 
   umount $mount_point/dev || true
-  umount $mount_point/dev/pts || true
 
-  if [ "#{node[:platform]}" = "ubuntu" ]; then
-    mkdir -p $mount_point/dev
-    mount -t devtmpfs none $mount_point/dev
-  else
-    /sbin/MAKEDEV -d $mount_point/dev -x console
-    /sbin/MAKEDEV -d $mount_point/dev -x null
-    /sbin/MAKEDEV -d $mount_point/dev -x zero
-    /sbin/MAKEDEV -d $mount_point/dev ptmx
-    /sbin/MAKEDEV -d $mount_point/dev urandom
-    mkdir -p $mount_point/dev/pts
-    mkdir -p $mount_point/sys/block
-  fi
+  mkdir -p $mount_point/dev
+  mount -t devtmpfs none $mount_point/dev
+
   EOF
 end
 

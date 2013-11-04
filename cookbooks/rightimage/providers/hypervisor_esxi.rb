@@ -58,8 +58,8 @@ EOF
 
     "ubuntu" )
       # https://help.ubuntu.com/community/VMware/Tools#Installing VMware tools on an Ubuntu guest
-     #  chroot $guest_root apt-get install -y --no-install-recommends open-vm-dkms
-     #  chroot $guest_root apt-get install -y --no-install-recommends open-vm-tools 
+      chroot $guest_root apt-get install -y --no-install-recommends open-vm-dkms
+      chroot $guest_root apt-get install -y --no-install-recommends open-vm-tools
       ;;
 
    esac

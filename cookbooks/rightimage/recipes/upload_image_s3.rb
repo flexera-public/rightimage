@@ -16,13 +16,13 @@ image_s3_path = hypervisor+"/"+guest_platform+"/"+guest_platform_version+"/"
 
 image_upload_bucket = "rightscale-#{node[:rightimage][:cloud]}-dev"
 
-rightimage_upload full_image_path do
-  provider "rightimage_upload_s3"
+ros_upload full_image_path do
+  provider "ros_upload_s3"
   not_if { node[:rightimage][:cloud] =~ /ec2|google|azure/ }
-  endpoint 's3-us-west-1.amazonaws.com'
   user node[:rightimage][:aws_access_key_id]
   password node[:rightimage][:aws_secret_access_key]
-  remote_path  "#{image_upload_bucket}/#{image_s3_path}"
+  container image_upload_bucket
+  remote_path image_s3_path
   action :upload
 end
 rightscale_marker :end

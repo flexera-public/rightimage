@@ -1,0 +1,59 @@
+{
+  "attributes": {
+    "sysbench/instance_type": {
+      "calculated": false,
+      "choice": [
+
+      ],
+      "description": "Instance (or computer) type, for annotating the report. I.E. for an ec2 instance, m1.small.",
+      "display_name": "Instance Type",
+      "recipes": [
+
+      ],
+      "required": "required",
+      "type": "string"
+    },
+    "sysbench/result_file": {
+      "calculated": false,
+      "choice": [
+
+      ],
+      "default": "/tmp/result.json",
+      "description": "Where to output results of sysbench run. In json format.",
+      "display_name": "Report Output Location",
+      "recipes": [
+
+      ],
+      "required": "recommended",
+      "type": "string"
+    }
+  },
+  "conflicting": {
+  },
+  "dependencies": {
+    "mysql": "~> 3.0"
+  },
+  "description": "Installs and runs sysbench",
+  "groupings": {
+  },
+  "license": "Apache v2.0",
+  "long_description": "Description\n===========\n\nRequirements\n============\n\nAttributes\n==========\n\nUsage\n=====\n\n",
+  "maintainer": "RightScale, Inc",
+  "maintainer_email": "support@rightscale.com",
+  "name": "sysbench",
+  "platforms": {
+  },
+  "providing": {
+  },
+  "recipes": {
+    "sysbench::default": "Install sysbench",
+    "sysbench::run": "Run sysbench"
+  },
+  "recommendations": {
+  },
+  "replacing": {
+  },
+  "suggestions": {
+  },
+  "version": "0.1.0"
+}

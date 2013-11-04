@@ -40,7 +40,15 @@ action :package do
   ovf_filename = bundled_image
   ovf_image_name = bundled_image
   ovf_capacity = node[:rightimage][:root_size_gb] 
-  ovf_ostype = "other26xLinux64Guest"
+  if new_resource.platform == "ubuntu"
+    # table of these values at http://docs.opennodecloud.com/wiki/doku.php?id=devdoc:os:ovf
+    # virtualbox uses the same ostype as vmware but in a different section it seems
+    vbox_ostype = "Ubuntu_64"
+    ovf_ostype_id = "94"
+  else
+    vbox_ostype = "RedHat_64"
+    ovf_ostype_id = "80"
+  end
 
   template "#{target_raw_root}/temp.ovf" do
     # Need this cookbook line so templates get looked for in the right place.  Even though this
@@ -52,7 +60,8 @@ action :package do
       :ovf_filename => ovf_filename,
       :ovf_image_name => ovf_image_name,
       :ovf_capacity => ovf_capacity,
-      :ovf_ostype => ovf_ostype
+      :ovf_ostype_id => ovf_ostype_id,
+      :vbox_ostype => vbox_ostype
     })
   end
 
