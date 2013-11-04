@@ -32,3 +32,6 @@ GRUB_DISABLE_RECOVERY="true"
 
 # Uncomment to get a beep at grub start
 #GRUB_INIT_TUNE="480 440 1"
+
+# Same timeout, don't halt at boot on forced shutdowns
+GRUB_RECORDFAIL_TIMEOUT=<%= @timeout %>
