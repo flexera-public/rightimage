@@ -1,0 +1,99 @@
+diff --git a/lib/clouds/clouds/vscale.rb b/lib/clouds/clouds/vscale.rb
+index 8fcc305..6867c18 100644
+--- a/lib/clouds/clouds/vscale.rb
++++ b/lib/clouds/clouds/vscale.rb
+@@ -20,6 +20,9 @@
+ # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ 
++USER_SSH_DIR = "/root/.ssh"
++AUTH_KEYS_FILE = "#{USER_SSH_DIR}/authorized_keys"
++
+ # dependencies.
+ metadata_source 'metadata_sources/file_metadata_source'
+ metadata_writers 'metadata_writers/dictionary_metadata_writer',
+@@ -66,3 +69,70 @@ def is_current_cloud?
+   return true
+ end
+ 
++# Updates the given node with cloud metadata details.
++#
++# === Return
++# always true
++def update_details
++
++  if platform.windows?
++    # administrator password setting not yet supported
++  else
++    # update authorized_keys file from metadata
++    public_key = get_public_ssh_key_from_metadata()
++    update_authorized_keys(public_key)
++  end
++end
++
++# Gets public key string from cloud metadata file
++#
++# === Return
++# public_key(String):: A public SSH key
++def get_public_ssh_key_from_metadata
++    public_key = nil
++    begin
++      # load metadata from file
++      meta_data_file = ::File.join(AgentConfig.cloud_state_dir, 'meta-data.rb')
++      load(meta_data_file)
++      public_key = ENV['VS_SSH_PUBLIC_KEY']
++
++      # was there a key found?
++      if public_key || public_key.empty?
++        logger.warn("No public SSH key found in metadata")
++        return
++      end
++    rescue Exception => e
++      logger.warn("Failed to load metadata!", e)
++    end
++    public_key
++  end
++end
++
++# Add public key to ssh authorized_keys file
++#
++# If the file does not exist, it will be created.
++# If the key already exists, it will not be added again.
++#
++# === Parameters
++# public_key(String):: public ssh key
++#
++# === Return
++# result(Hash):: Hash-like leaf value
++def update_authorized_keys(public_key)
++  if public_key || public_key.empty?
++    logger.warn("No public SSH key specified -- no modifications to #{AUTH_KEYS_FILE} made.")
++    return
++  end
++
++  FileUtils.mkdir_p(USER_SSH_DIR) # make sure the directory exists
++
++  existing_keys = ""
++  File.open(AUTH_KEYS_FILE, "r") { |f| existing_keys = f.read() } if File.exists?(AUTH_KEYS_FILE)
++  if existing_keys.include?(public_key)
++    logger.info "Public ssh key for root already exists in #{AUTH_KEYS_FILE}."
++  else
++    logger.info "Appending public ssh key to #{AUTH_KEYS_FILE}."
++    File.open(AUTH_KEYS_FILE, "a") { |f| f.puts(public_key) }
++  end
++  true
++end
+\ No newline at end of file
+diff --git a/scripts/cloud_controller.rb b/scripts/cloud_controller.rb
+index 3d6423e..4c8bade 100644
+--- a/scripts/cloud_controller.rb
++++ b/scripts/cloud_controller.rb
+@@ -83,7 +83,7 @@ module RightScale
+           case action
+             when :bootstrap
+               # bootstrap is shorthand for all standard actions performed on boot
+-              result += [:clear_state, :wait_for_instance_ready, :write_cloud_metadata, :write_user_metadata, :wait_for_eip]
++              result += [:clear_state, :wait_for_instance_ready, :write_cloud_metadata, :update_details, :write_user_metadata, :wait_for_eip]
+               only_if = true
+             else
+               result << action

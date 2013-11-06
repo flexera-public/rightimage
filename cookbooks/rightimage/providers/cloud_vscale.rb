@@ -25,8 +25,15 @@ action :configure do
     recursive true
   end 
 
+  # Patch for RightLink support on VScale.
   cookbook_file "#{guest_root}/root/.rightscale/vscale.patch" do
     source "vscale.patch"
+    backup false
+  end
+
+  # Patch for retreiving SSH keys from metadata.
+  cookbook_file "#{guest_root}/root/.rightscale/vscale-ssh.patch" do
+    source "vscale-ssh.patch"
     backup false
   end
 
@@ -53,6 +60,7 @@ action :configure do
       esac
 
       chroot $guest_root patch --directory=/opt/rightscale/right_link --forward -p1 --input=/root/.rightscale/vscale.patch
+      chroot $guest_root patch --directory=/opt/rightscale/right_link --forward -p1 --input=/root/.rightscale/vscale-ssh.patch
     EOH
   end
 
