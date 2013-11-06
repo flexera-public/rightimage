@@ -3,9 +3,7 @@ class Chef::Resource
 end
 
 
-action :configure do
-  package "grub"
-  
+action :configure do  
   ruby_block "check hypervisor" do
     block do
       raise "ERROR: you must set your hypervisor to VirtualBox!" unless new_resource.hypervisor == "virtualbox"
@@ -25,10 +23,6 @@ action :configure do
       esac
     EOH
   end
-
-  install_grub_package
-  install_grub_config
-  install_bootloader  
   
   # ensure there is a hostname file
   execute "chroot #{guest_root} touch /etc/hostname"

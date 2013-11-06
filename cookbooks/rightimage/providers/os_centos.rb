@@ -189,11 +189,6 @@ action :install do
     backup false
   end
 
-  install_grub_package
-  install_grub_config { cloud "none" }
-  install_bootloader { cloud "none" }
-
-
   cookbook_file "#{guest_root}/root/.bash_profile" do 
     source "bash_profile" 
     backup false

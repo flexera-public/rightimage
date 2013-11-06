@@ -223,11 +223,6 @@ EOS
     code "chroot #{guest_root} apt-key add /tmp/GPG-KEY-RightScale"
   end
 
-  #  - configure mirrors
-  rightimage_os new_resource.platform do
-    action :repo_unfreeze
-  end
-
 
   bash "Restore original ext4 in /etc/mke2fs.conf" do
     flags "-ex"
@@ -362,10 +357,6 @@ EOF
       loopback_package_install node[:rightimage][:guest_packages]
     end
   end
-
-  install_grub_package
-  install_grub_config { cloud "none" }
-  install_bootloader { cloud "none" }
 
   # TODO: Add cleanup
   bash "cleanup" do

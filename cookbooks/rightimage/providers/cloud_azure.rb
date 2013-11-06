@@ -15,9 +15,6 @@ action :configure do
     command "chroot #{guest_root} yum -y install iscsi-initiator-utils"
   end
 
-  install_grub_package
-  install_grub_config
-  install_bootloader
 
   # Install Openlogic supplied kernel to support Azure (w-5335)
   template "#{guest_root}/etc/yum.repos.d/Openlogic.repo" do

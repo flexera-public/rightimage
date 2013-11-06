@@ -66,6 +66,15 @@ rightimage_cloud node[:rightimage][:cloud] do
   action :configure
 end
 
+
+rightimage_bootloader "grub" do
+  hypervisor node[:rightimage][:hypervisor]
+  platform node[:rightimage][:platform]
+  platform_version node[:rightimage][:platform_version].to_f
+  cloud node[:rightimage][:cloud]
+  action :install
+end
+
 # END cloud specific additions
 
 rightimage_os node[:rightimage][:platform] do

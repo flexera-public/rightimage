@@ -13,9 +13,6 @@ action :configure do
     command "chroot #{guest_root} yum -y install iscsi-initiator-utils"
   end
   
-  install_grub_package
-  install_grub_config
-  install_bootloade
 
   bash "install euca tools for ubuntu" do
     only_if { node[:rightimage][:platform] == "ubuntu" }

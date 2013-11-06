@@ -10,6 +10,19 @@ rightimage_os node[:rightimage][:platform] do
   action :install
 end
 
+rightimage_os node[:rightimage][:platform] do
+  action :repo_freeze
+end
+
+rightimage_bootloader "grub" do
+  hypervisor node[:rightimage][:hypervisor]
+  platform node[:rightimage][:platform]
+  platform_version node[:rightimage][:platform_version].to_f
+  cloud "none"
+  action :install
+end
+
+
 # Common base image configurations 
 bash "resolv.conf" do
   code <<-EOH
@@ -81,9 +94,15 @@ template "#{guest_root}/etc/ntp.conf" do
   })
 end
 
+rightimage_os node[:rightimage][:platform] do
+  action :repo_unfreeze
+end
+
 # Clean up GUEST_ROOT image
 rightimage guest_root do
   action :sanitize
 end
+
+
 
 rightscale_marker :end
