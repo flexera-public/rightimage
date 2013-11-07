@@ -253,7 +253,7 @@ module RightScale
         if node[:rightimage][:platform] == "ubuntu"
           "chroot #{guest_root} apt-get -y purge"
         else
-          "yum -c /tmp/yum.conf --installroot=#{guest_root} -y uninstall"
+          "yum -c /tmp/yum.conf --installroot=#{guest_root} -y erase"
         end
       end
 
