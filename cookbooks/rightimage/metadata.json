@@ -531,21 +531,6 @@
       "required": "required",
       "type": "string"
     },
-    "rightimage/image_source_bucket": {
-      "calculated": false,
-      "choice": [
-
-      ],
-      "default": "rightscale-us-west-2",
-      "description": "When migrating an image, where to download the image from.",
-      "display_name": "Image Source Bucket",
-      "recipes": [
-        "rightimage::default",
-        "rightimage::ec2_download_bundle"
-      ],
-      "required": "optional",
-      "type": "string"
-    },
     "rightimage/image_upload_bucket": {
       "calculated": false,
       "choice": [

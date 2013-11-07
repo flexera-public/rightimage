@@ -147,18 +147,8 @@ module RightScale
         "/mnt/ephemeral/rightimage-temp"
       end
 
-      def image_source_bucket
-        bucket = "rightscale-#{image_source_cloud}"
-        bucket << "-dev" if node[:rightimage][:debug] == "true"
-        bucket
-      end
-
       def loopback_file_gz
         "#{temp_root}/#{loopback_filename}.gz"
-      end
-
-      def image_source_cloud
-        "us-west-2"
       end
 
       def mounted?
