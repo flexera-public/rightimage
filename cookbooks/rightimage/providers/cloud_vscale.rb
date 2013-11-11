@@ -45,19 +45,19 @@ action :configure do
     code <<-EOH
       guest_root="#{guest_root}"
 
-      # No need for seed script since the package is being preinstalled.
-      rm -f $guest_root/etc/init.d/rightimage
-
       case "#{new_resource.platform}" in
       "ubuntu")
         dpkg --root $guest_root -i $guest_root/root/.rightscale/rightscale*.deb
-        chroot $guest_root update-rc.d rightimage remove
+        chroot $guest_root update-rc.d -f rightimage remove
         ;;
       "centos"|"rhel")
         rpm --root $guest_root -Uvh $guest_root/root/.rightscale/rightscale*.rpm
         chroot $guest_root chkconfig --del rightimage
         ;;
       esac
+
+      # No need for seed script since the package is being preinstalled.
+      rm -f $guest_root/etc/init.d/rightimage
 
       chroot $guest_root patch --directory=/opt/rightscale/right_link --forward -p1 --input=/root/.rightscale/vscale.patch
     EOH
