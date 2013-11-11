@@ -31,12 +31,6 @@ action :configure do
     backup false
   end
 
-  # Patch for retreiving SSH keys from metadata.
-  cookbook_file "#{guest_root}/root/.rightscale/vscale-ssh.patch" do
-    source "vscale-ssh.patch"
-    backup false
-  end
-
   # HACK: Preinstall RightLink so we can apply a patch to add support.
   # Remove when proper RightLink support is added in to the package.
   bash "install rightlink for vscale" do
@@ -60,7 +54,6 @@ action :configure do
       esac
 
       chroot $guest_root patch --directory=/opt/rightscale/right_link --forward -p1 --input=/root/.rightscale/vscale.patch
-      chroot $guest_root patch --directory=/opt/rightscale/right_link --forward -p1 --input=/root/.rightscale/vscale-ssh.patch
     EOH
   end
 
