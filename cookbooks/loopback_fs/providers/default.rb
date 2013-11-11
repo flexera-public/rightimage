@@ -92,7 +92,7 @@ action :unmount do
       umount -lf $mount_point || true
 
 
-      [ -e "$fake_map" ] && kpartx -d $fake_dev
+      [ -e "$fake_map" ] && kpartx -s -d $fake_dev
       [ -e "$fake_dev" ] && dmsetup remove $fake_dev
       set +e
       losetup -a | grep $loop_dev
