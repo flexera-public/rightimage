@@ -25,15 +25,15 @@ action :configure do
     recursive true
   end 
 
+  # Fix discovery of floppy device on CentOS
+  # https://bugzilla.redhat.com/show_bug.cgi?id=503308
+  execute "echo 'alias acpi:PNP0700: floppy' > #{guest_root}/etc/modprobe.d/floppy-pnp.conf" do
+    only_if { el6? }
+  end
+
   # Patch for RightLink support on VScale.
   cookbook_file "#{guest_root}/root/.rightscale/vscale.patch" do
     source "vscale.patch"
-    backup false
-  end
-
-  # Patch for retreiving SSH keys from metadata.
-  cookbook_file "#{guest_root}/root/.rightscale/vscale-ssh.patch" do
-    source "vscale-ssh.patch"
     backup false
   end
 
@@ -45,13 +45,10 @@ action :configure do
     code <<-EOH
       guest_root="#{guest_root}"
 
-      # No need for seed script since the package is being preinstalled.
-      rm -f $guest_root/etc/init.d/rightimage
-
       case "#{new_resource.platform}" in
       "ubuntu")
         dpkg --root $guest_root -i $guest_root/root/.rightscale/rightscale*.deb
-        chroot $guest_root update-rc.d rightimage remove
+        chroot $guest_root update-rc.d -f rightimage remove
         ;;
       "centos"|"rhel")
         rpm --root $guest_root -Uvh $guest_root/root/.rightscale/rightscale*.rpm
@@ -59,8 +56,10 @@ action :configure do
         ;;
       esac
 
+      # No need for seed script since the package is being preinstalled.
+      rm -f $guest_root/etc/init.d/rightimage
+
       chroot $guest_root patch --directory=/opt/rightscale/right_link --forward -p1 --input=/root/.rightscale/vscale.patch
-      chroot $guest_root patch --directory=/opt/rightscale/right_link --forward -p1 --input=/root/.rightscale/vscale-ssh.patch
     EOH
   end
 
