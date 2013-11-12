@@ -279,11 +279,6 @@ EOF
 
   ruby_block "register image" do
     block do
-      require 'json'
-      kernels = JSON.parse(`/usr/local/gcutil/gcutil listkernels --project=google --format=json`)
-      kernels_sorted = kernels["items"].sort_by {|k| k["creationTimestamp"]}
-      gce_kernel = kernels_sorted.reverse.first["name"]
-
       command = "/usr/local/gcutil/gcutil addimage \"#{new_resource.image_name}\" " +
         "\"http://commondatastorage.googleapis.com/#{node[:rightimage][:image_upload_bucket]}/#{new_resource.image_name}.tar.gz\" " +
         "--preferred_kernel='' " +
