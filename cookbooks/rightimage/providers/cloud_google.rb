@@ -138,7 +138,7 @@ EOH
         # Need to install backported kernel from 12.10
         # NOTE: this image should not be used in production!!
         # See wookie page
-        chroot $guest_root apt-get -y install linux-image-3.5.0-42-generic
+        chroot $guest_root apt-get -y install linux-generic-lts-quantal
 
         # Disable all ttys except for tty1 (console)
         for i in `ls $guest_root/etc/init/tty[2-9].conf`; do
