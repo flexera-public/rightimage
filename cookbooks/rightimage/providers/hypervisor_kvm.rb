@@ -8,7 +8,6 @@ action :install_kernel do
   # maybe move to cloud providers later
   bash "add acpi module" do
     flags "-x"
-    not_if { node[:rightimage][:cloud] == "google" }
     code <<-EOH
     guest_root=#{guest_root}
     set +e
