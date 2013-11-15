@@ -3,7 +3,7 @@ helpers do
     clouds = ::VirtualMonkey::Toolbox::get_available_clouds
     servers.each do |s|
       cloud_name = clouds.find { |c| c["cloud_id"].to_i == s.cloud_id.to_i }["name"]
-      if cloud_name =~ /rackspace/i
+      if cloud_name =~ /rackspace|softlayer/i
         ipv6 = "false"
         root_login_disabled = "false"
       else
