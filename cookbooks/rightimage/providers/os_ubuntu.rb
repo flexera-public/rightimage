@@ -311,7 +311,7 @@ EOS
       liblockfile1_1.09-3ubuntu0.1_amd64.deb
       ).join(" ")
     code <<-EOF
-      baseurl=http://rightscale-rightimage.s3.amazonaws.com/patches/ubuntu/12.04/w-5970/
+      baseurl=#{node[:rightimage][:s3_base_url]}/patches/ubuntu/12.04/w-5970/
       for p in #{packages}
       do
         curl -s -S -f -L --retry 7 -O $baseurl$p
@@ -339,7 +339,7 @@ EOS
       mount -t proc none #{guest_root}/proc
       mount --bind /dev #{guest_root}/dev
       mount --bind /sys #{guest_root}/sys
-      base_url=http://rightscale-rightimage-misc.s3.amazonaws.com/ubuntu/10.04/
+      base_url=#{node[:rightimage][:s3_base_url]}/packages/ubuntu/10.04/
       for p in #{packages}
       do
         curl -s -S -f -L --retry 7 -O $base_url$p 

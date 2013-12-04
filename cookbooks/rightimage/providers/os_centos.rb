@@ -183,7 +183,7 @@ action :install do
       cwd "/tmp/packages"
       flags "-ex"
       code <<-EOH
-      base_url=http://rightscale-rightimage.s3.amazonaws.com/patches/centos/6.2/w-4923/RPMS/x86_64/
+      base_url=#{node[:rightimage][:s3_base_url]}/patches/centos/6.2/w-4923/RPMS/x86_64/
       for p in #{packages}
       do
         curl -s -S -f -L --retry 7 -O $base_url$p 
