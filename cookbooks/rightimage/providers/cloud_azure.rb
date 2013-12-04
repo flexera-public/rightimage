@@ -103,30 +103,16 @@ EOH
     EOH
   end
 
-  bash "install tools" do
-    flags "-x"
-    code <<-EOH
-      guest_root=#{guest_root}
-
-      # Ignore errors during install, for re-runability.  If you're missing something, it will fail anyway during npm install.
-      case "#{new_resource.platform}" in
-      "ubuntu")
-        chroot $guest_root apt-get -y install python-software-properties
-        chroot $guest_root add-apt-repository -y ppa:chris-lea/node.js-legacy
-        chroot $guest_root apt-get update
-        chroot $guest_root apt-get -y install nodejs npm
-        ;;
-      "centos"|"rhel")
-        chroot $guest_root rpm -Uvh http://rightscale-rightimage.s3-website-us-east-1.amazonaws.com/packages/el6/nodejs-0.8.16-1.x86_64.rpm
-        ;;
-      esac
-      set -e
-      chroot $guest_root npm install azure-cli@0.6.8 -g
-
-      # Remove .swp files
-      find $guest_root/root/.npm $guest_root/usr/lib/node* $guest_root/usr/lib/node_modules -name *.swp -exec rm -rf {} \\;
-    EOH
+  cookbook_file "#{guest_root}/tmp/install_azure_tools.sh" do
+    source "install_azure_tools.sh"
+    action :create_if_missing
+    backup false
   end
+
+  execute "chroot #{guest_root} /tmp/install_azure_tools.sh" do
+    environment(node[:rightimage][:execute_env])
+  end
+
 end
 
 action :package do
@@ -136,30 +122,14 @@ action :package do
 end
 
 action :upload do
-  bash "install tools on host" do
-    flags "-x"
-    code <<-EOH
-      azure_ver="0.7.3"
+  cookbook_file "/tmp/install_azure_tools.sh" do
+    source "install_azure_tools.sh"
+    action :create_if_missing
+    backup false
+  end
 
-      # Ignore errors during install, for re-runability.  If you're missing something, it will fail anyway during npm install.
-      case "#{new_resource.platform}" in
-      "ubuntu")
-        apt-get -y install python-software-properties
-        add-apt-repository -y ppa:chris-lea/node.js
-        apt-get update
-        # nodejs package includes nodejs-dev and npm
-        apt-get -y install nodejs
-        ;;
-      "centos"|"rhel")
-        rpm -Uvh http://rightscale-rightimage.s3-website-us-east-1.amazonaws.com/packages/el6/nodejs-0.8.16-1.x86_64.rpm
-        ;;
-      esac
-      npm -g ls | grep azure
-      if [ "$?" == "1" ]; then
-        set -e
-        npm install azure-cli@$azure_ver -g
-      fi
-    EOH
+  execute "/tmp/install_azure_tools.sh" do
+    environment(node[:rightimage][:script_env])
   end
 
   template "/root/azure.publishsettings" do
