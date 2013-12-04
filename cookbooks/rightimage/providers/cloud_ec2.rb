@@ -52,24 +52,17 @@ action :configure do
     EOH
   end
 
-  #  - add cloud tools
-  bash "install_ec2_tools" do 
-    creates "#{guest_root}/home/ec2/bin"
-    flags "-ex"
-    code <<-EOH
-      ROOT=#{guest_root}
-      rm -rf $ROOT/home/ec2 || true
-      mkdir -p $ROOT/home/ec2
-      curl -o $ROOT/tmp/ec2-api-tools.zip http://s3.amazonaws.com/ec2-downloads/ec2-api-tools.zip
-      curl -o $ROOT/tmp/ec2-ami-tools.zip http://s3.amazonaws.com/ec2-downloads/ec2-ami-tools.zip
-      unzip $ROOT/tmp/ec2-api-tools.zip -d $ROOT/tmp/
-      unzip $ROOT/tmp/ec2-ami-tools.zip -d $ROOT/tmp/
-      cp -r $ROOT/tmp/ec2-api-tools-*/* $ROOT/home/ec2/.
-      rsync -av $ROOT/tmp/ec2-ami-tools-*/ $ROOT/home/ec2
-      rm -r $ROOT/tmp/ec2-a*
-      echo 'export PATH=/home/ec2/bin:${PATH}' >> $ROOT/etc/profile.d/ec2.sh
-      echo 'export EC2_HOME=/home/ec2' >> $ROOT/etc/profile.d/ec2.sh
-    EOH
+  #  Add cloud tools to host and image
+  cookbook_file "#{guest_root}/tmp/install_ec2_tools.sh" do
+    source "install_ec2_tools.sh"
+    mode "0755"
+    backup false
+  end
+  execute "#{guest_root}/tmp/install_ec2_tools.sh" do
+    environment(node[:rightimage][:script_env])
+  end
+  execute "chroot #{guest_root} /tmp/install_ec2_tools.sh" do
+    environment(node[:rightimage][:script_env])
   end
    
   bash "do_depmod" do 
