@@ -49,7 +49,7 @@ action :install_tools do
         cat > $guest_root/etc/yum.repos.d/vmware-tools.repo <<EOF
 [vmware-tools]
 name=VMware Tools
-baseurl=http://packages.vmware.com/tools/esx/5.0/rhel5/x86_64
+baseurl=http://packages.vmware.com/tools/esx/5.5/rhel#{node[:rightimage][:platform_version].to_i}/x86_64
 enabled=1
 gpgcheck=1
 EOF
