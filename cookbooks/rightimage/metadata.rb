@@ -118,13 +118,6 @@ attribute "rightimage/image_upload_bucket",
   :required => "required",
   :recipes => [ "rightimage::base_upload", "rightimage::build_base", "rightimage::default", "rightimage::build_image" , "rightimage::upload_image_s3", "rightimage::ec2_download_bundle", "rightimage::cloud_upload", "rightimage::upload_image_s3" ]
 
-attribute "rightimage/image_source_bucket",
-  :display_name => "Image Source Bucket",
-  :description => "When migrating an image, where to download the image from.",
-  :required => "optional",
-  :default => "rightscale-us-west-2",
-  :recipes => [ "rightimage::default", "rightimage::ec2_download_bundle" ] 
-
 attribute "rightimage/image_name",
    :display_name => "Image Name",
    :description => "The name you want to give this new image.",

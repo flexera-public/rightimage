@@ -45,11 +45,8 @@ action :install_kernel do
       rm -f $guest_root/boot/initrd* $guest_root/initrd*
       chroot $guest_root mkinitrd --with=ata_piix --with=virtio_ring --with=virtio_net --with=virtio_balloon --with=virtio --with=virtio_blk --with=ext3 --with=virtio_pci --with=dm_mirror --with=dm_snapshot --with=dm_zero -v initrd-$kernel_version $kernel_version
       mv $guest_root/initrd-$kernel_version $guest_root/boot/.
-
-      yum -c /tmp/yum.conf --installroot=$guest_root -y install grub
       ;;
     "ubuntu" )
-      chroot $guest_root apt-get -y install grub
       ;;
     esac  
   EOH

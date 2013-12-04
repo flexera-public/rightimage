@@ -118,7 +118,7 @@ module RightScale
         end
       end
 
-     def do_loopback_resize
+      def do_loopback_resize
         source_size_gb = (::File.size(loopback_file)/1024/1024/1024).to_f.round
         node[:rightimage][:root_size_gb].to_i != source_size_gb
       end
@@ -147,18 +147,8 @@ module RightScale
         "/mnt/ephemeral/rightimage-temp"
       end
 
-      def image_source_bucket
-        bucket = "rightscale-#{image_source_cloud}"
-        bucket << "-dev" if node[:rightimage][:debug] == "true"
-        bucket
-      end
-
       def loopback_file_gz
         "#{temp_root}/#{loopback_filename}.gz"
-      end
-
-      def image_source_cloud
-        "us-west-2"
       end
 
       def mounted?
@@ -250,16 +240,21 @@ module RightScale
         "--source http://#{node[:rightimage][:mirror]}/rubygems/archive/#{mirror_freeze_date}/"
       end
 
-      def grub_initrd
-        ::File.basename(Dir.glob("#{guest_root}/boot/initr*").sort_by { |f| File.mtime(f) }.last)
+
+      def chroot_install
+        if node[:rightimage][:platform] == "ubuntu" 
+          "chroot #{guest_root} apt-get -y install"
+        else
+          "yum -c /tmp/yum.conf --installroot=#{guest_root} -y install"
+        end
       end
 
-      def grub_kernel
-        ::File.basename(Dir.glob("#{guest_root}/boot/vmlinuz*").sort_by { |f| File.mtime(f) }.last)
-      end
-
-      def grub_root
-        "(hd0,0)"
+      def chroot_remove
+        if node[:rightimage][:platform] == "ubuntu"
+          "chroot #{guest_root} apt-get -y purge"
+        else
+          "yum -c /tmp/yum.conf --installroot=#{guest_root} -y erase"
+        end
       end
 
       # Mirror freeze date is used to name the snapshots that base images are stored to and restored from

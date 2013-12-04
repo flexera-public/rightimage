@@ -1,5 +1,5 @@
 default         0
-timeout         <%= node[:rightimage][:grub][:timeout] %>
+timeout         <%= @timeout %>
 hiddenmenu
 
 ### BEGIN AUTOMAGIC KERNELS LIST
@@ -20,7 +20,7 @@ hiddenmenu
 
 ## default grub root device
 ## e.g. groot=(hd0)
-# groot=<%= grub_root %>
+# groot=<%= @grub_root %>
 
 ## should update-grub create alternative automagic boot options
 ## e.g. alternative=true
@@ -35,7 +35,7 @@ hiddenmenu
 ## additional options to use with the default boot option, but not with the
 ## alternatives
 ## e.g. defoptions=vga=791 resume=/dev/hda5
-# defoptions=<%= node[:rightimage][:grub][:kernel][:options] %>
+# defoptions=<%= @grub_kernel_options %>
 
 ## should update-grub lock old automagic boot options
 ## e.g. lockold=false
@@ -66,7 +66,7 @@ hiddenmenu
 ## e.g. indomU=detect
 ##      indomU=true
 ##      indomU=false
-# indomU=<%= node[:rightimage][:grub][:indomU] %>
+# indomU=<%= @indomu %>
 
 ## should update-grub create memtest86 boot option
 ## e.g. memtest86=true
@@ -83,9 +83,9 @@ hiddenmenu
 
 ## ## End Default Options ##
 
-title		<%= `chroot #{guest_root} lsb_release -ds`.strip %>, kernel <%= grub_kernel.split("-",2)[1] %>
-root		<%= grub_root %>
-kernel		/boot/<%= grub_kernel %> root=<%= node[:rightimage][:root_mount][:dev] %> ro <%= node[:rightimage][:grub][:kernel][:options] %> 
-initrd		/boot/<%= grub_initrd %>
+title		<%= `chroot #{guest_root} lsb_release -ds`.strip %>, kernel <%= @grub_kernel.split("-",2)[1] %>
+root		<%= @grub_root %>
+kernel		/boot/<%= @grub_kernel %> root=<%= node[:rightimage][:root_mount][:dev] %> ro <%= @grub_kernel_options %> 
+initrd		/boot/<%= @grub_initrd %>
 
 ### END DEBIAN AUTOMAGIC KERNELS LIST

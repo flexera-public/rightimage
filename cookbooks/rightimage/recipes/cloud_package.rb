@@ -27,8 +27,6 @@ class Chef::Recipe
   include RightScale::RightImage::Helper
 end
 
-package "grub"
-
 rightimage_cloud node[:rightimage][:cloud] do
   image_name  helper_image_name
 
