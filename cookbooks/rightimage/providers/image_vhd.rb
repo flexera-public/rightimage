@@ -8,10 +8,10 @@ action :package do
 
   case node[:platform]
     when "centos", /redhat/i
-      vhd_util_deps=%w{mercurial git ncurses-devel dev86 iasl SDL python-devel libgcrypt-devel uuid-devel openssl-devel}
+      vhd_util_deps=%w{git ncurses-devel dev86 iasl SDL python-devel libgcrypt-devel uuid-devel openssl-devel}
       vhd_util_deps << (el6? ? "libuuid-devel" : "e2fsprogs-devel")
     when "ubuntu"
-      vhd_util_deps=%w{mercurial libncurses5-dev bin86 bcc iasl libsdl1.2-dev python-dev libgcrypt11-dev uuid-dev libssl-dev gettext libc6-dev libc6-dev:i386}
+      vhd_util_deps=%w{libncurses5-dev bin86 bcc iasl libsdl1.2-dev python-dev libgcrypt11-dev uuid-dev libssl-dev gettext libc6-dev libc6-dev:i386}
       vhd_util_deps << (node[:rightimage][:platform_version].to_f < 12.04 ? "libsdl1.2debian-all" : "libsdl1.2debian")
     else
       raise "ERROR: platform #{node[:platform]} not supported. Please feel free to add support ;) "
@@ -28,7 +28,9 @@ action :package do
     flags "-ex"
     code <<-EOF
       rm -rf /mnt/vhd && mkdir /mnt/vhd && cd /mnt/vhd
-      hg clone --rev 21560 http://xenbits.xensource.com/xen-4.0-testing.hg
+      # Mercurial repo generated with command 'hg clone --rev 21560 http://xenbits.xensource.com/xen-4.0-testing.hg'
+      wget -q #{node[:rightimage][:s3_base_url]}/files/vhd-util-rev21560.tar.gz 
+      tar zxvf vhd-util-rev21560.tar.gz 
       cd xen-4.0-testing.hg
       patch --forward -p1 < /tmp/vhd-util-patch
       make install-tools
