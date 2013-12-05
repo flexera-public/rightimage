@@ -188,8 +188,12 @@ bash "bundle instance" do
   flags "-ex"
   cwd Rebundle::REBUNDLE_SOURCE_PATH
   environment(cloud_credentials)
+
+  bucket  = node[:rightimage][:cloud] == "google" ? "--bucket #{node[:rightimage][:image_upload_bucket]}" : ""
+  project = node[:rightimage][:cloud] == "google" ? "--project #{node[:rightimage][:google][:project_id]}" : ""
+
   code <<-EOH
-  #{ruby_bin_dir}/ruby bin/bundle --name #{node[:rightimage][:image_name]}
+  #{ruby_bin_dir}/ruby bin/bundle --name #{node[:rightimage][:image_name]} #{bucket} #{project}
   EOH
 end
 #

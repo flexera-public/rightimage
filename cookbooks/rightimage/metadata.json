@@ -628,7 +628,8 @@
         "rightimage::upload_image_s3",
         "rightimage::ec2_download_bundle",
         "rightimage::cloud_upload",
-        "rightimage::upload_image_s3"
+        "rightimage::upload_image_s3",
+        "rightimage::rebundle"
       ],
       "required": "required",
       "type": "string"

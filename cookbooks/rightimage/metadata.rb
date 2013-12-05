@@ -129,7 +129,7 @@ attribute "rightimage/image_upload_bucket",
   :display_name => "Image Upload Bucket",
   :description => "The bucket to upload the image to.",
   :required => "required",
-  :recipes => [ "rightimage::base_upload", "rightimage::build_base", "rightimage::default", "rightimage::build_image" , "rightimage::upload_image_s3", "rightimage::ec2_download_bundle", "rightimage::cloud_upload", "rightimage::upload_image_s3" ]
+  :recipes => [ "rightimage::base_upload", "rightimage::build_base", "rightimage::default", "rightimage::build_image" , "rightimage::upload_image_s3", "rightimage::ec2_download_bundle", "rightimage::cloud_upload", "rightimage::upload_image_s3", "rightimage::rebundle" ]
 
 attribute "rightimage/image_source_bucket",
   :display_name => "Image Source Bucket",
