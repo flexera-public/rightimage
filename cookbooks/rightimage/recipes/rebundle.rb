@@ -75,10 +75,15 @@ bash "setup keyfiles" do
   EOH
 end
 
+package "openssl" do
+  only_if { node[:rightimage][:cloud] == "google" }
+end
+
 bash "setup google auth" do
   only_if { node[:rightimage][:cloud] == "google" }
   code <<-EOH
-    echo "#{node[:rightimage][:google][:key]}" > #{google_p12_path}
+    openssl pkcs12 -export -out #{google_p12_path} -inkey #{node[:rightimage][:google][:service_key]} -in #{node[:rightimage][:google][:service_cert]} -passout pass:notasecret
+    chmod 0400 #{google_p12_path}
   EOH
 end
 

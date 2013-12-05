@@ -514,19 +514,6 @@
       "required": "optional",
       "type": "string"
     },
-    "rightimage/google/key": {
-      "calculated": false,
-      "choice": [
-
-      ],
-      "description": "OAuth2 credentials (PKCS 12 key) for GCE. Pulled from gcutil conf",
-      "display_name": "Google PKCS 12 file",
-      "recipes": [
-        "rightimage::rebundle"
-      ],
-      "required": "optional",
-      "type": "string"
-    },
     "rightimage/google/project_id": {
       "calculated": false,
       "choice": [
@@ -550,6 +537,32 @@
       "display_name": "Google OAuth2 credentials refresh token",
       "recipes": [
         "rightimage::cloud_upload",
+        "rightimage::rebundle"
+      ],
+      "required": "optional",
+      "type": "string"
+    },
+    "rightimage/google/service_cert": {
+      "calculated": false,
+      "choice": [
+
+      ],
+      "description": "OAuth2 credentials service account certificate for GCE. Pulled from gcutil conf",
+      "display_name": "Google certificate",
+      "recipes": [
+        "rightimage::rebundle"
+      ],
+      "required": "optional",
+      "type": "string"
+    },
+    "rightimage/google/service_key": {
+      "calculated": false,
+      "choice": [
+
+      ],
+      "description": "OAuth2 credentials service account private key for GCE. Pulled from gcutil conf",
+      "display_name": "Google private key",
+      "recipes": [
         "rightimage::rebundle"
       ],
       "required": "optional",
