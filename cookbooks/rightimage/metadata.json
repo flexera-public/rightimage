@@ -514,6 +514,19 @@
       "required": "optional",
       "type": "string"
     },
+    "rightimage/google/key": {
+      "calculated": false,
+      "choice": [
+
+      ],
+      "description": "OAuth2 credentials (PKCS 12 key) for GCE. Pulled from gcutil conf",
+      "display_name": "Google PKCS 12 file",
+      "recipes": [
+        "rightimage::rebundle"
+      ],
+      "required": "optional",
+      "type": "string"
+    },
     "rightimage/google/project_id": {
       "calculated": false,
       "choice": [

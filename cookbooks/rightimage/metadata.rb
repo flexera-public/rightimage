@@ -451,6 +451,12 @@ attribute "rightimage/google/client_id",
   :required => "optional",
   :recipes => [ "rightimage::cloud_upload", "rightimage::rebundle" ]
 
+attribute "rightimage/google/key",
+  :display_name => "Google PKCS 12 file",
+  :description => "OAuth2 credentials (PKCS 12 key) for GCE. Pulled from gcutil conf",
+  :required => "optional",
+  :recipes => [ "rightimage::rebundle" ]
+
 attribute "rightimage/google/refresh_token",
   :display_name => "Google OAuth2 credentials refresh token",
   :description => "Refresh token value for GCE. Pulled form gcutil conf",
