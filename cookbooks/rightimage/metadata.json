@@ -445,6 +445,19 @@
       "required": "required",
       "type": "string"
     },
+    "rightimage/google/client_email": {
+      "calculated": false,
+      "choice": [
+
+      ],
+      "description": "OAuth2 credentials client email for GCE. Pulled from gcutil conf",
+      "display_name": "Google client email",
+      "recipes": [
+        "rightimage::rebundle"
+      ],
+      "required": "optional",
+      "type": "string"
+    },
     "rightimage/google/client_id": {
       "calculated": false,
       "choice": [
@@ -453,7 +466,8 @@
       "description": "OAuth2 credentials client id for GCE. Pulled from gcutil conf",
       "display_name": "Google client id",
       "recipes": [
-        "rightimage::cloud_upload"
+        "rightimage::cloud_upload",
+        "rightimage::rebundle"
       ],
       "required": "optional",
       "type": "string"
@@ -466,7 +480,8 @@
       "description": "OAuth2 credentials client secret for GCE. Pulled from gcutil conf",
       "display_name": "Google client secret",
       "recipes": [
-        "rightimage::cloud_upload"
+        "rightimage::cloud_upload",
+        "rightimage::rebundle"
       ],
       "required": "optional",
       "type": "string"
@@ -479,7 +494,8 @@
       "description": "Google storage (interoperable) access key id",
       "display_name": "Google access_key_id",
       "recipes": [
-        "rightimage::cloud_upload"
+        "rightimage::cloud_upload",
+        "rightimage::rebundle"
       ],
       "required": "optional",
       "type": "string"
@@ -492,7 +508,8 @@
       "description": "Google storage (interoperable) secret access key",
       "display_name": "Google secret_access_key",
       "recipes": [
-        "rightimage::cloud_upload"
+        "rightimage::cloud_upload",
+        "rightimage::rebundle"
       ],
       "required": "optional",
       "type": "string"
@@ -505,7 +522,8 @@
       "description": "GCE Project ID to register this image for",
       "display_name": "Google Project ID",
       "recipes": [
-        "rightimage::cloud_upload"
+        "rightimage::cloud_upload",
+        "rightimage::rebundle"
       ],
       "required": "optional",
       "type": "string"
@@ -518,7 +536,8 @@
       "description": "Refresh token value for GCE. Pulled form gcutil conf",
       "display_name": "Google OAuth2 credentials refresh token",
       "recipes": [
-        "rightimage::cloud_upload"
+        "rightimage::cloud_upload",
+        "rightimage::rebundle"
       ],
       "required": "optional",
       "type": "string"

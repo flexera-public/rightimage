@@ -19,6 +19,9 @@ rightscale_marker :begin
 class Chef::Resource::Bash
   include RightScale::RightImage::Helper
 end
+class Chef::Resource::File
+  include RightScale::RightImage::Helper
+end
 
 module Rebundle
   REBUNDLE_SOURCE_PATH  = "/tmp/rightscale/rightimage_rebundle"
@@ -72,6 +75,13 @@ bash "setup keyfiles" do
   EOH
 end
 
+bash "setup google auth" do
+  only_if { node[:rightimage][:cloud] == "google" }
+  code <<-EOH
+    echo "#{node[:rightimage][:google][:key]}" > #{google_p12_path}
+  EOH
+end
+
 bash "check that image doesn't exist" do
   only_if { node[:rightimage][:cloud] == "ec2" }
   flags "-e"
@@ -105,23 +115,29 @@ bash "launch the remote instance" do
   cwd Rebundle::REBUNDLE_SOURCE_PATH
   region_opt = case node[:rightimage][:cloud]
                when "ec2" then "#{node[:ec2][:placement][:availability_zone].chop}"
-               when /rackspace/i then "#{node[:rightimage][:datacenter]}"
+               when "google" || /rackspace/i then "#{node[:rightimage][:datacenter]}"
                else ""
                end
 
   region_opt = "--region #{region_opt}" if region_opt =~ /./
   resize_opt = node[:rightimage][:cloud] == "ec2" ? "--resize #{node[:rightimage][:root_size_gb]}" : ""
-  flavor_opt = node[:rightimage][:cloud] == "ec2" ? "--flavor-id c1.medium" : ""
+  flavor_opt = case node[:rightimage][:cloud]
+               when "ec2" then "--flavor-id c1.medium"
+               when "google" then "--flavor-id n1-standard-1"
+               else ""
+               end
   debug_opt = node[:rightimage][:debug] == "true" ? "--debug" : ""
   zone = node[:rightimage][:datacenter].to_s.empty? ? "US" : node[:rightimage][:datacenter]
-  name_opt   = node[:rightimage][:cloud] =~ /rackspace/i ? "--hostname ri-rebundle-#{node[:rightimage][:platform]}-#{zone.downcase}" : ""
+  name_opt   = node[:rightimage][:cloud] =~ "google" || /rackspace/i ? "--hostname ri-rebundle-#{node[:rightimage][:platform]}" : ""
+  name_opt << "-#{zone.downcase}" if node[:rightimage][:cloud] =~ /rackspace/i
   if node[:rightimage][:cloud] =~ /rackspace/i && !node[:rightimage][:cloud_options].to_s.empty?
     roles_opt = "--roles '#{node[:rightimage][:cloud_options]}'"
   else
     roles_opt = ""
   end
+  ssh_user = node[:rightimage][:cloud] == "google" ? "--ssh-user google" : ""
   code <<-EOH
-  #{ruby_bin_dir}/ruby bin/launch --provider #{node[:rightimage][:cloud]} --image-id #{node[:rightimage][:rebundle_base_image_id]} #{region_opt} #{flavor_opt} #{name_opt} #{resize_opt} #{debug_opt} #{roles_opt} --no-auto
+  #{ruby_bin_dir}/ruby bin/launch --provider #{node[:rightimage][:cloud]} --image-id #{node[:rightimage][:rebundle_base_image_id]} #{region_opt} #{flavor_opt} #{name_opt} #{resize_opt} #{debug_opt} #{roles_opt} #{ssh_user} --no-auto
   EOH
 end
 
@@ -137,6 +153,13 @@ bash "upload code to the remote instance" do
   code <<-EOH
   #{ruby_bin_dir}/ruby bin/upload --rightlink #{node[:rightimage][:rightlink_version]} #{freeze_date_opt} #{debug_opt} #{staging_opt} --no-configure
   EOH
+end
+
+file google_p12_path do
+  only_if { node[:rightimage][:cloud] == "google" }
+
+  backup false
+  action :delete
 end
 
 bash "configure the remote instance" do
