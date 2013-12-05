@@ -81,8 +81,14 @@ end
 
 bash "setup google auth" do
   only_if { node[:rightimage][:cloud] == "google" }
+  flags "-e"
   code <<-EOH
-    openssl pkcs12 -export -out #{google_p12_path} -inkey #{node[:rightimage][:google][:service_key]} -in #{node[:rightimage][:google][:service_cert]} -passout pass:notasecret
+    echo "#{node[:rightimage][:google][:service_key]}" > /tmp/google.pem
+    echo "#{node[:rightimage][:google][:service_cert]}" > /tmp/google.crt
+    chmod 0400 /tmp/google.pem /tmp/google.crt
+
+    openssl pkcs12 -export -out #{google_p12_path} -inkey /tmp/google.pem -in /tmp/google.crt -passout pass:notasecret
+    rm -f /tmp/google.pem /tmp/google.crt
     chmod 0400 #{google_p12_path}
   EOH
 end
@@ -133,8 +139,14 @@ bash "launch the remote instance" do
                end
   debug_opt = node[:rightimage][:debug] == "true" ? "--debug" : ""
   zone = node[:rightimage][:datacenter].to_s.empty? ? "US" : node[:rightimage][:datacenter]
-  name_opt   = node[:rightimage][:cloud] =~ "google" || /rackspace/i ? "--hostname ri-rebundle-#{node[:rightimage][:platform]}" : ""
+
+  if node[:rightimage][:cloud] == "google" || node[:rightimage][:cloud] =~ /rackspace/i
+    name_opt = "--hostname ri-rebundle-#{node[:rightimage][:platform]}"
+  else
+    name_opt = ""
+  end
   name_opt << "-#{zone.downcase}" if node[:rightimage][:cloud] =~ /rackspace/i
+
   if node[:rightimage][:cloud] =~ /rackspace/i && !node[:rightimage][:cloud_options].to_s.empty?
     roles_opt = "--roles '#{node[:rightimage][:cloud_options]}'"
   else
@@ -158,13 +170,6 @@ bash "upload code to the remote instance" do
   code <<-EOH
   #{ruby_bin_dir}/ruby bin/upload --rightlink #{node[:rightimage][:rightlink_version]} #{freeze_date_opt} #{debug_opt} #{staging_opt} --no-configure
   EOH
-end
-
-file google_p12_path do
-  only_if { node[:rightimage][:cloud] == "google" }
-
-  backup false
-  action :delete
 end
 
 bash "configure the remote instance" do
@@ -226,5 +231,12 @@ bash "destroy instance" do
   environment(cloud_credentials)
   code "#{ruby_bin_dir}/ruby bin/destroy"
 end  
+
+file google_p12_path do
+  only_if { node[:rightimage][:cloud] == "google" }
+
+  backup false
+  action :delete
+end
 
 rightscale_marker :end
