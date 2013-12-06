@@ -30,8 +30,6 @@ class Erubis::Context
   include RightScale::RightImage::Helper
 end
 
-package "grub"
-
 # add fstab
 template "#{guest_root}/etc/fstab" do
   source "fstab.erb"
@@ -68,11 +66,15 @@ rightimage_cloud node[:rightimage][:cloud] do
   action :configure
 end
 
-execute "grub symlink" do
-  only_if { ::File.exists?"#{guest_root}/boot/grub/menu.lst" }
-  command "chroot #{guest_root} ln -s /boot/grub/menu.lst /boot/grub/grub.conf"
-  creates "#{guest_root}/boot/grub/grub.conf"
+
+rightimage_bootloader "grub" do
+  hypervisor node[:rightimage][:hypervisor]
+  platform node[:rightimage][:platform]
+  platform_version node[:rightimage][:platform_version].to_f
+  cloud node[:rightimage][:cloud]
+  action :install
 end
+
 # END cloud specific additions
 
 rightimage_os node[:rightimage][:platform] do

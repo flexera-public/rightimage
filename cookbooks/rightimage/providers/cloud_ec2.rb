@@ -6,20 +6,6 @@ action :configure do
     end
   end
 
-  # insert grub conf, and link menu.lst to grub.conf
-  directory "#{guest_root}/boot/grub" do
-    owner "root"
-    group "root"
-    mode "0750"
-    action :create
-    recursive true
-  end 
-
-  # Setup grub Version 1, ec2
-  template "#{guest_root}/boot/grub/menu.lst" do
-    source "menu.lst.erb"
-    backup false 
-  end
 
   #  - add get_ssh_key script
   template "#{guest_root}/etc/init.d/getsshkey" do 

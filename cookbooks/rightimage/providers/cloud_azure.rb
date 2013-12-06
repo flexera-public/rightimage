@@ -4,74 +4,17 @@ end
 
 
 action :configure do
-  package "grub"
-  
   ruby_block "check hypervisor" do
     block do
       raise "ERROR: you must set your hypervisor to hyperv!" unless new_resource.hypervisor == "hyperv"
     end
   end
   
-  bash "install guest packages" do 
-    flags '-ex'
-    code <<-EOH
-      case "#{new_resource.platform}" in
-      "ubuntu")
-        chroot #{guest_root} apt-get -y purge grub-pc
-        chroot #{guest_root} apt-get -y install grub
-        ;;
-      "centos"|"rhel")
-        chroot #{guest_root} yum -y install grub iscsi-initiator-utils
-        ;;
-      esac
-    EOH
+  execute "install iscsi tools" do 
+    only_if { node[:rightimage][:platform] =~ /redhat|rhel|centos/ }
+    command "chroot #{guest_root} yum -y install iscsi-initiator-utils"
   end
 
-  # insert grub conf, and link menu.lst to grub.conf
-  directory "#{guest_root}/boot/grub" do
-    owner "root"
-    group "root"
-    mode "0750"
-    action :create
-    recursive true
-  end 
-
-  # insert grub conf, and symlink
-  template "#{guest_root}/boot/grub/menu.lst" do
-    source "menu.lst.erb"
-    backup false 
-  end
-
-  bash "setup grub" do
-    flags "-ex"
-    code <<-EOH
-      guest_root="#{guest_root}"
-      
-      case "#{new_resource.platform}" in
-        "ubuntu")
-          chroot $guest_root cp -p /usr/lib/grub/x86_64-pc/* /boot/grub
-          grub_command="/usr/sbin/grub"
-          ;;
-        "centos"|"rhel")
-          chroot $guest_root cp -p /usr/share/grub/x86_64-redhat/* /boot/grub
-          grub_command="/sbin/grub"
-          ;;
-      esac
-
-      echo "(hd0) #{node[:rightimage][:grub][:root_device]}" > $guest_root/boot/grub/device.map
-      echo "" >> $guest_root/boot/grub/device.map
-
-      cat > device.map <<EOF
-(hd0) #{loopback_file}
-EOF
-
-    ${grub_command} --batch --device-map=device.map <<EOF
-root (hd0,0)
-setup (hd0)
-quit
-EOF
-EOH
-  end
 
   # Install Openlogic supplied kernel to support Azure (w-5335)
   template "#{guest_root}/etc/yum.repos.d/Openlogic.repo" do

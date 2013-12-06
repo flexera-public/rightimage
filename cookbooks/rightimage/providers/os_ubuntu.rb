@@ -1,19 +1,8 @@
-# bootstrap_ubuntu.rb
-# 
 # Use vmbuilder to generate a base virtual image.  We will use the image generated here for other recipes to add
 # Cloud and Hypervisor specific details.
 #
 # When this is finished running, you should have a basic image ready in /mnt
 #
-class Erubis::Context
-  include RightScale::RightImage::Helper
-end
-class Chef::Resource
-  include RightScale::RightImage::Helper
-end
-class Chef::Recipe
-  include RightScale::RightImage::Helper
-end
 
 require 'chef/log'
 require 'chef/mixin/shell_out'
@@ -26,7 +15,7 @@ end
 # These services will open log files preventing the loopback filesystem from 
 # unmounting.  Do the same thing debootstrap does and stub out initctl and
 # such with dummy scripts temporarily
-def loopback_package_install(packages)
+def loopback_package_install(packages = nil)
   init_scripts = ['/sbin/start-stop-daemon', '/sbin/initctl']
   begin
     init_scripts.each do |script|
@@ -38,9 +27,12 @@ def loopback_package_install(packages)
       end
       shell_out!("chmod 755 #{guest_root}/#{script}")
     end
-    package_list = Array(packages).join(" ")
-    Chef::Log.info("Installing #{package_list} into #{guest_root}")
-    shell_out!("chroot #{guest_root} apt-get install -y #{package_list}")
+    if packages
+      package_list = Array(packages).join(" ")
+      Chef::Log.info("Installing #{package_list} into #{guest_root}")
+      shell_out!("chroot #{guest_root} apt-get install -y #{package_list}")
+    end
+    yield if block_given?
   ensure
     init_scripts.each do |script|
       shell_out!("rm #{guest_root}/#{script}")
@@ -53,6 +45,9 @@ action :install do
   mirror_date = "#{mirror_freeze_date[0..3]}/#{mirror_freeze_date[4..5]}/#{mirror_freeze_date[6..7]}"
   mirror_url = "http://#{node[:rightimage][:mirror]}/ubuntu_daily/#{mirror_date}"
   platform_codename = platform_codename(new_resource.platform_version)
+
+  # Needed if constituent packages updated since image creation
+  execute 'apt-get update -y > /dev/null'
 
   package "python-boto"
   package "python-vm-builder"
@@ -228,11 +223,6 @@ EOS
     code "chroot #{guest_root} apt-key add /tmp/GPG-KEY-RightScale"
   end
 
-  #  - configure mirrors
-  rightimage_os new_resource.platform do
-    action :repo_unfreeze
-  end
-
 
   bash "Restore original ext4 in /etc/mke2fs.conf" do
     flags "-ex"
@@ -366,18 +356,6 @@ EOF
     block do
       loopback_package_install node[:rightimage][:guest_packages]
     end
-  end
-
-
-  # Remove grub2 files
-  bash "remove_grub2" do
-    flags "-ex"
-    only_if { new_resource.platform_version.to_f > 10.04 }
-    code <<-EOH
-      guest_root=#{guest_root}
-      dpkg --root $guest_root --purge grub2-common grub-pc grub-pc-bin grub-gfxpayload-lists
-      rm -rf $guest_root/boot/grub/menu.lst*
-    EOH
   end
 
   # TODO: Add cleanup

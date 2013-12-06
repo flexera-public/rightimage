@@ -18,6 +18,7 @@
   "providing": {
   },
   "recipes": {
+    "ros_upload::default": "Default recipe. Installs prerequisites."
   },
   "recommendations": {
   },

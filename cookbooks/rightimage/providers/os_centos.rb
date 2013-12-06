@@ -1,13 +1,3 @@
-class Chef::Resource
-  include RightScale::RightImage::Helper
-end
-class Chef::Recipe
-  include RightScale::RightImage::Helper
-end
-class Erubis::Context
-  include RightScale::RightImage::Helper
-end
-
 
 action :install do 
   rightimage_os new_resource.platform do
@@ -197,21 +187,6 @@ action :install do
   cookbook_file "#{guest_root}/etc/pki/rpm-gpg/RPM-GPG-KEY-RightScale" do
     source "GPG-KEY-RightScale"
     backup false
-  end
-
-  # Grubby requires a symlink to /etc/grub.conf.
-  execute "grub symlink" do
-    command "chroot #{guest_root} ln -s /boot/grub/menu.lst /etc/grub.conf"
-    creates "#{guest_root}/etc/grub.conf"
-  end
-
-  # Setup /etc/sysconfig/kernel to allow grub to auto-update grub.conf when updating kernel.
-  template "#{guest_root}/etc/sysconfig/kernel" do
-    source "sysconfig-kernel.erb"
-    backup false
-    variables({
-      :kernel => (el6?)?"kernel" : "kernel-xen"
-    })
   end
 
   cookbook_file "#{guest_root}/root/.bash_profile" do 
