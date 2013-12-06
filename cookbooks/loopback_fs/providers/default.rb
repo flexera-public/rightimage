@@ -56,9 +56,13 @@ action :create do
 0,,L,*
 EOF
 
-      # use synchonous flag to avoid any later race conditions
-      kpartx -s -a $loop_dev
-      loop_map="/dev/mapper/loop#{new_resource.device_number}p1"
+      if [ "#{new_resource.partitioned}" == "true" ]; then
+        # use synchonous flag to avoid any later race conditions
+        kpartx -s -a $loop_dev
+        loop_map="/dev/mapper/loop#{new_resource.device_number}p1"
+      else
+        loop_map=$loop_dev
+      fi
       mke2fs -F -j $loop_map
       tune2fs -L $root_label $loop_map
       rm -rf $mount_point
@@ -113,9 +117,13 @@ action :mount do
 
       losetup $loop_dev $source
 
-      # use synchonous flag to avoid any later race conditions
-      kpartx -s -a $loop_dev
-      loop_map="/dev/mapper/loop#{new_resource.device_number}p1"
+      if [ "#{new_resource.partitioned}" == "true" ]; then
+        # use synchonous flag to avoid any later race conditions
+        kpartx -s -a $loop_dev
+        loop_map="/dev/mapper/loop#{new_resource.device_number}p1"
+      else
+        loop_map=$loop_dev
+      fi
 
       mkdir -p $mount_point
       mount $loop_map $mount_point
