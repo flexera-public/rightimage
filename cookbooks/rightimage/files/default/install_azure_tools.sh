@@ -17,7 +17,8 @@ ubuntu*)
   dpkg -i $packages
   ;;
 rhel*|redhat*|centos*)
-  rpm -Uvh ${BASE_URL}/packages/el6/nodejs-0.8.16-1.x86_64.rpm
+  # Replacepkgs ensures we don't error on rerun
+  rpm -Uvh --replacepkgs ${BASE_URL}/packages/el6/nodejs-0.8.16-1.x86_64.rpm
   ;;
 *)
   echo "ERROR: PLATFORM not set!"
@@ -25,7 +26,13 @@ rhel*|redhat*|centos*)
   ;;
 esac
 
-npm install -g azure-cli@0.7.4
+# Use precompiled node_modules
+# To generate the tarball cd to / then something like
+# tar zcf azurecli-0.7.4.tar.gz /usr/lib/node_modules /usr/bin/azure
+cd /tmp
+wget -q ${BASE_URL}/files/azurecli-0.7.4.tar.gz
+cd /
+tar zxf /tmp/azurecli-0.7.4.tar.gz
 
 # Remove .swp files
 find /root/.npm /usr/lib/node* /usr/lib/node_modules -name *.swp -exec rm -rf {} \;
