@@ -267,6 +267,7 @@ module RightScale
       end
 
       def partitioned?
+        # Don't partition EC2 images because it's not easy to rebundle them later without manual changes.
         node[:rightimage][:build_mode] == "base" ||  (node[:rightimage][:mode] == "full" && node[:rightimage][:cloud] != "ec2")
       end
 
