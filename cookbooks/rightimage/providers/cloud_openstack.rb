@@ -71,7 +71,7 @@ action :upload do
 
   # Create bundle using pip bundle command on instance
   remote_file "/tmp/glance.pybundle" do
-    source "#{node[:rightimage][:s3_base_url]}/files/glance-#{node[:rightimage][:glance_version]}.pybundle"
+    source "#{node[:rightimage][:s3_base_url]}/files/glance-0.12.0.pybundle"
     action :create_if_missing
   end
 

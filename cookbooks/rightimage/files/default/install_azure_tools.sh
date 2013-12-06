@@ -1,6 +1,5 @@
 #!/bin/bash -ex 
 
-
 if [ -z "$BASE_URL" ]; then
   echo "BASE_URL not set!"
   exit 1

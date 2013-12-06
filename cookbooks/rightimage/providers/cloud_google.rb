@@ -47,12 +47,13 @@ action :configure do
     backup false
   end
   bash "untar google helper and startup scripts" do
-    code "tar zxvf #{temp_root}/google.tgz -C #{guest_root}/usr/share"
+    code "tar zxf #{temp_root}/google.tgz -C #{guest_root}/usr/share"
   end
 
   cookbook_file "#{guest_root}/tmp/install_google_tools.sh" do
     source "install_google_tools.sh"
-    action :create_if_missing
+    mode "0755"
+    action :create
     backup false
   end
 
@@ -127,7 +128,8 @@ end
 action :upload do
   cookbook_file "/tmp/install_google_tools.sh" do
     source "install_google_tools.sh"
-    action :create_if_missing
+    mode "0755"
+    action :create
     backup false
   end
 

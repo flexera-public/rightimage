@@ -30,7 +30,7 @@ action :package do
       rm -rf /mnt/vhd && mkdir /mnt/vhd && cd /mnt/vhd
       # Mercurial repo generated with command 'hg clone --rev 21560 http://xenbits.xensource.com/xen-4.0-testing.hg'
       wget -q #{node[:rightimage][:s3_base_url]}/files/vhd-util-rev21560.tar.gz 
-      tar zxvf vhd-util-rev21560.tar.gz 
+      tar zxf vhd-util-rev21560.tar.gz 
       cd xen-4.0-testing.hg
       patch --forward -p1 < /tmp/vhd-util-patch
       make install-tools

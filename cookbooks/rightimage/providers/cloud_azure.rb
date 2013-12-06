@@ -16,13 +16,6 @@ action :configure do
   end
 
 
-  # Install Openlogic supplied kernel to support Azure (w-5335)
-  template "#{guest_root}/etc/yum.repos.d/Openlogic.repo" do
-     only_if { node[:rightimage][:platform] == "centos" }
-    source "openlogic.repo.erb"
-    backup false
-  end
-
   bash "configure for azure" do
     flags "-ex"
     code <<-EOH
@@ -38,8 +31,6 @@ action :configure do
       "centos"|"rhel")
         sed -i "s/ACTIVE_CONSOLES=.*/ACTIVE_CONSOLES=\\/dev\\/tty1/" $guest_root/etc/sysconfig/init
 
-        # Install Openlogic supplied kernel to support Azure (w-5335)
-        # Need to be able to give Openlogic repo priority over base kernels.
         chroot $guest_root yum -y install yum-plugin-priorities
         ;;
       esac
@@ -48,12 +39,13 @@ action :configure do
 
   cookbook_file "#{guest_root}/tmp/install_azure_tools.sh" do
     source "install_azure_tools.sh"
-    action :create_if_missing
+    mode "0755"
+    action :create
     backup false
   end
 
   execute "chroot #{guest_root} /tmp/install_azure_tools.sh" do
-    environment(node[:rightimage][:execute_env])
+    environment(node[:rightimage][:script_env])
   end
 
 end
@@ -67,9 +59,11 @@ end
 action :upload do
   cookbook_file "/tmp/install_azure_tools.sh" do
     source "install_azure_tools.sh"
-    action :create_if_missing
+    mode "0755"
+    action :create
     backup false
   end
+
 
   execute "/tmp/install_azure_tools.sh" do
     environment(node[:rightimage][:script_env])
