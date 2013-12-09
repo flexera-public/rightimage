@@ -445,6 +445,20 @@
       "required": "required",
       "type": "string"
     },
+    "rightimage/google/client_email": {
+      "calculated": false,
+      "choice": [
+
+      ],
+      "description": "OAuth2 credentials client email for GCE. Pulled from gcutil conf",
+      "display_name": "Google client email",
+      "recipes": [
+        "rightimage::default",
+        "rightimage::rebundle"
+      ],
+      "required": "optional",
+      "type": "string"
+    },
     "rightimage/google/client_id": {
       "calculated": false,
       "choice": [
@@ -505,7 +519,9 @@
       "description": "GCE Project ID to register this image for",
       "display_name": "Google Project ID",
       "recipes": [
-        "rightimage::cloud_upload"
+        "rightimage::cloud_upload",
+        "rightimage::default",
+        "rightimage::rebundle"
       ],
       "required": "optional",
       "type": "string"
@@ -519,6 +535,34 @@
       "display_name": "Google OAuth2 credentials refresh token",
       "recipes": [
         "rightimage::cloud_upload"
+      ],
+      "required": "optional",
+      "type": "string"
+    },
+    "rightimage/google/service_cert": {
+      "calculated": false,
+      "choice": [
+
+      ],
+      "description": "OAuth2 credentials service account certificate for GCE. Pulled from gcutil conf",
+      "display_name": "Google certificate",
+      "recipes": [
+        "rightimage::default",
+        "rightimage::rebundle"
+      ],
+      "required": "optional",
+      "type": "string"
+    },
+    "rightimage/google/service_key": {
+      "calculated": false,
+      "choice": [
+
+      ],
+      "description": "OAuth2 credentials service account private key for GCE. Pulled from gcutil conf",
+      "display_name": "Google private key",
+      "recipes": [
+        "rightimage::default",
+        "rightimage::rebundle"
       ],
       "required": "optional",
       "type": "string"
@@ -583,7 +627,8 @@
         "rightimage::upload_image_s3",
         "rightimage::ec2_download_bundle",
         "rightimage::cloud_upload",
-        "rightimage::upload_image_s3"
+        "rightimage::upload_image_s3",
+        "rightimage::rebundle"
       ],
       "required": "required",
       "type": "string"

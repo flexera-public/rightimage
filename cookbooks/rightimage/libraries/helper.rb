@@ -180,12 +180,20 @@ module RightScale
           return {'AWS_CALLING_FORMAT' => 'SUBDOMAIN',
                   'AWS_ACCESS_KEY_ID'  => node[:rightimage][:aws_access_key_id],
                   'AWS_SECRET_ACCESS_KEY'=> node[:rightimage][:aws_secret_access_key]}
+        when "google"
+          return {'GOOGLE_KEY_LOCATION' => google_p12_path,
+                  'GOOGLE_PROJECT' => node[:rightimage][:google][:project_id],
+                  'GOOGLE_SERVICE_EMAIL' => node[:rightimage][:google][:client_email]}
         when /rackspace/i
           return {'RACKSPACE_ACCOUNT' => node[:rightimage][:rackspace][:account],
                   'RACKSPACE_API_TOKEN' => node[:rightimage][:rackspace][:api_token]}
         else
           raise "Cloud #{cloud_type} passed to cloud_credentials, which it doesn't know how to handle"
         end
+      end
+
+      def google_p12_path
+        "/tmp/google.p12"
       end
 
       def calc_md5sum(file)
@@ -201,7 +209,7 @@ module RightScale
       end
 
       def rebundle?
-        if node[:rightimage][:cloud] == "ec2" and node[:rightimage][:platform] == "rhel"
+        if (node[:rightimage][:cloud] == "ec2" || node[:rightimage][:cloud] == "google") and node[:rightimage][:platform] == "rhel"
           return true
         elsif node[:rightimage][:cloud] =~ /rackspace/i
           return true
