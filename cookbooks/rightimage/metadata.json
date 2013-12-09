@@ -467,9 +467,7 @@
       "description": "OAuth2 credentials client id for GCE. Pulled from gcutil conf",
       "display_name": "Google client id",
       "recipes": [
-        "rightimage::cloud_upload",
-        "rightimage::default",
-        "rightimage::rebundle"
+        "rightimage::cloud_upload"
       ],
       "required": "optional",
       "type": "string"
@@ -482,9 +480,7 @@
       "description": "OAuth2 credentials client secret for GCE. Pulled from gcutil conf",
       "display_name": "Google client secret",
       "recipes": [
-        "rightimage::cloud_upload",
-        "rightimage::default",
-        "rightimage::rebundle"
+        "rightimage::cloud_upload"
       ],
       "required": "optional",
       "type": "string"
@@ -497,9 +493,7 @@
       "description": "Google storage (interoperable) access key id",
       "display_name": "Google access_key_id",
       "recipes": [
-        "rightimage::cloud_upload",
-        "rightimage::default",
-        "rightimage::rebundle"
+        "rightimage::cloud_upload"
       ],
       "required": "optional",
       "type": "string"
@@ -512,9 +506,7 @@
       "description": "Google storage (interoperable) secret access key",
       "display_name": "Google secret_access_key",
       "recipes": [
-        "rightimage::cloud_upload",
-        "rightimage::default",
-        "rightimage::rebundle"
+        "rightimage::cloud_upload"
       ],
       "required": "optional",
       "type": "string"
@@ -542,9 +534,7 @@
       "description": "Refresh token value for GCE. Pulled form gcutil conf",
       "display_name": "Google OAuth2 credentials refresh token",
       "recipes": [
-        "rightimage::cloud_upload",
-        "rightimage::default",
-        "rightimage::rebundle"
+        "rightimage::cloud_upload"
       ],
       "required": "optional",
       "type": "string"

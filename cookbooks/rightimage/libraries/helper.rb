@@ -183,12 +183,7 @@ module RightScale
         when "google"
           return {'GOOGLE_KEY_LOCATION' => google_p12_path,
                   'GOOGLE_PROJECT' => node[:rightimage][:google][:project_id],
-                  'GOOGLE_SERVICE_EMAIL' => node[:rightimage][:google][:client_email],
-                  'GOOGLE_CLIENT_ID' => node[:rightimage][:google][:client_id],
-                  'GOOGLE_CLIENT_SECRET' => node[:rightimage][:google][:client_secret],
-                  'GOOGLE_REFRESH_TOKEN' => node[:rightimage][:google][:refresh_token],
-                  'GOOGLE_ACCESS_KEY_ID' => node[:rightimage][:google][:gc_access_key_id],
-                  'GOOGLE_SECRET_ACCESS_KEY' => node[:rightimage][:google][:gc_secret_access_key]}
+                  'GOOGLE_SERVICE_EMAIL' => node[:rightimage][:google][:client_email]}
         when /rackspace/i
           return {'RACKSPACE_ACCOUNT' => node[:rightimage][:rackspace][:account],
                   'RACKSPACE_API_TOKEN' => node[:rightimage][:rackspace][:api_token]}

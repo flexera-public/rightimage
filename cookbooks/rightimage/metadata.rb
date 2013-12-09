@@ -419,13 +419,13 @@ attribute "rightimage/google/gc_access_key_id",
   :display_name => "Google access_key_id",
   :description => "Google storage (interoperable) access key id",
   :required => "optional",
-  :recipes => [ "rightimage::cloud_upload", "rightimage::default", "rightimage::rebundle" ]
+  :recipes => [ "rightimage::cloud_upload" ]
 
 attribute "rightimage/google/gc_secret_access_key",
   :display_name => "Google secret_access_key",
   :description => "Google storage (interoperable) secret access key",
   :required => "optional",
-  :recipes => [ "rightimage::cloud_upload", "rightimage::default", "rightimage::rebundle" ]
+  :recipes => [ "rightimage::cloud_upload" ]
 
 attribute "rightimage/google/project_id",
   :display_name => "Google Project ID",
@@ -443,13 +443,13 @@ attribute "rightimage/google/client_secret",
   :display_name => "Google client secret",
   :description => "OAuth2 credentials client secret for GCE. Pulled from gcutil conf",
   :required => "optional",
-  :recipes => [ "rightimage::cloud_upload", "rightimage::default", "rightimage::rebundle" ]
+  :recipes => [ "rightimage::cloud_upload" ]
 
 attribute "rightimage/google/client_id",
   :display_name => "Google client id",
   :description => "OAuth2 credentials client id for GCE. Pulled from gcutil conf",
   :required => "optional",
-  :recipes => [ "rightimage::cloud_upload", "rightimage::default", "rightimage::rebundle" ]
+  :recipes => [ "rightimage::cloud_upload" ]
 
 attribute "rightimage/google/service_cert",
   :display_name => "Google certificate",
@@ -467,4 +467,4 @@ attribute "rightimage/google/refresh_token",
   :display_name => "Google OAuth2 credentials refresh token",
   :description => "Refresh token value for GCE. Pulled form gcutil conf",
   :required => "optional",
-  :recipes => [ "rightimage::cloud_upload", "rightimage::default", "rightimage::rebundle" ]
+  :recipes => [ "rightimage::cloud_upload" ]
