@@ -393,27 +393,6 @@ def upload_s3()
       rm -rf "#{temp_root}/bundled"
       mkdir -p "#{temp_root}/bundled"
 
-      loop_dev=/dev/loop1
-      loopback_new="#{temp_root}/#{ri_lineage}_hd0.raw"
-      root_label="#{node[:rightimage][:root_mount][:label_dev]}"
-      mount_point="#{guest_root_nonpart}"
-
-      dd if=/dev/zero of=$loopback_new bs=1M count=10240
-      losetup $loop_dev $loopback_new
-
-      sfdisk $loop_dev << EOF
-0,,L,*
-EOF
-
-      mke2fs -F -j $loop_dev
-      tune2fs -L $root_label $loop_dev
-      rm -rf $mount_point
-      mkdir -p $mount_point
-      mount $loop_dev $mount_point
-      rsync -a #{guest_root}/ ${mount_point}/
-      umount $mount_point
-      losetup -d $loop_dev
-
       echo "Bundling..."
       /home/ec2/bin/ec2-bundle-image --privatekey /tmp/AWS_X509_KEY.pem --cert /tmp/AWS_X509_CERT.pem --user #{node[:rightimage][:aws_account_number]} --image #{loopback_nonpart} --prefix #{image_name} --destination "#{temp_root}/bundled" --arch #{new_resource.arch} $kernel_opt $ramdisk_opt -B "ami=sda,root=/dev/sda1,ephemeral0=sdb,swap=sda3"
 
