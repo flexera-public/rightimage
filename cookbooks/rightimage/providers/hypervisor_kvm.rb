@@ -8,11 +8,10 @@ action :install_kernel do
   # maybe move to cloud providers later
   bash "add acpi module" do
     flags "-x"
-    not_if { node[:rightimage][:cloud] == "google" }
     code <<-EOH
     guest_root=#{guest_root}
     set +e
-    case "#{node[:rightimage][:platform]}" in 
+    case "#{node[:rightimage][:platform]}" in
     "centos" )
       grep "acpiphp" $guest_root/etc/rc.local
       [ "$?" == "1" ] && echo "/sbin/modprobe acpiphp" >> $guest_root/etc/rc.local
@@ -32,11 +31,10 @@ action :install_kernel do
 
  bash "install kvm kernel" do
   flags "-ex"
-  not_if { node[:rightimage][:cloud] == "google" }
   code <<-EOH
     guest_root=#{guest_root}
 
-    case "#{new_resource.platform}" in 
+    case "#{new_resource.platform}" in
     "centos"|"rhel" )
       [ "#{new_resource.platform_version.to_i < 6}" == "true" ] && chroot $guest_root yum -y install kmod-kvm
 
@@ -51,7 +49,7 @@ action :install_kernel do
     "ubuntu" )
       chroot $guest_root apt-get -y install grub
       ;;
-    esac  
+    esac
   EOH
  end
 end
