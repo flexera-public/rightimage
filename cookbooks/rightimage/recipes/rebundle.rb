@@ -19,6 +19,9 @@ rightscale_marker :begin
 class Chef::Resource::Bash
   include RightScale::RightImage::Helper
 end
+class Chef::Resource::File
+  include RightScale::RightImage::Helper
+end
 
 module Rebundle
   REBUNDLE_SOURCE_PATH  = "/tmp/rightscale/rightimage_rebundle"
@@ -72,6 +75,24 @@ bash "setup keyfiles" do
   EOH
 end
 
+package "openssl" do
+  only_if { node[:rightimage][:cloud] == "google" }
+end
+
+bash "setup google auth" do
+  only_if { node[:rightimage][:cloud] == "google" }
+  flags "-e"
+  code <<-EOH
+    echo "#{node[:rightimage][:google][:service_key]}" > /tmp/google.pem
+    echo "#{node[:rightimage][:google][:service_cert]}" > /tmp/google.crt
+    chmod 0400 /tmp/google.pem /tmp/google.crt
+
+    openssl pkcs12 -export -out #{google_p12_path} -inkey /tmp/google.pem -in /tmp/google.crt -passout pass:notasecret
+    rm -f /tmp/google.pem /tmp/google.crt
+    chmod 0400 #{google_p12_path}
+  EOH
+end
+
 bash "check that image doesn't exist" do
   only_if { node[:rightimage][:cloud] == "ec2" }
   flags "-e"
@@ -105,23 +126,35 @@ bash "launch the remote instance" do
   cwd Rebundle::REBUNDLE_SOURCE_PATH
   region_opt = case node[:rightimage][:cloud]
                when "ec2" then "#{node[:ec2][:placement][:availability_zone].chop}"
-               when /rackspace/i then "#{node[:rightimage][:datacenter]}"
+               when "google" || /rackspace/i then "#{node[:rightimage][:datacenter]}"
                else ""
                end
 
   region_opt = "--region #{region_opt}" if region_opt =~ /./
   resize_opt = node[:rightimage][:cloud] == "ec2" ? "--resize #{node[:rightimage][:root_size_gb]}" : ""
-  flavor_opt = node[:rightimage][:cloud] == "ec2" ? "--flavor-id c1.medium" : ""
+  flavor_opt = case node[:rightimage][:cloud]
+               when "ec2" then "--flavor-id c1.medium"
+               when "google" then "--flavor-id n1-standard-1"
+               else ""
+               end
   debug_opt = node[:rightimage][:debug] == "true" ? "--debug" : ""
   zone = node[:rightimage][:datacenter].to_s.empty? ? "US" : node[:rightimage][:datacenter]
-  name_opt   = node[:rightimage][:cloud] =~ /rackspace/i ? "--hostname ri-rebundle-#{node[:rightimage][:platform]}-#{zone.downcase}" : ""
+
+  if node[:rightimage][:cloud] == "google" || node[:rightimage][:cloud] =~ /rackspace/i
+    name_opt = "--hostname ri-rebundle-#{node[:rightimage][:platform]}"
+  else
+    name_opt = ""
+  end
+  name_opt << "-#{zone.downcase}" if node[:rightimage][:cloud] =~ /rackspace/i
+
   if node[:rightimage][:cloud] =~ /rackspace/i && !node[:rightimage][:cloud_options].to_s.empty?
     roles_opt = "--roles '#{node[:rightimage][:cloud_options]}'"
   else
     roles_opt = ""
   end
+  ssh_user = node[:rightimage][:cloud] == "google" ? "--ssh-user google" : ""
   code <<-EOH
-  #{ruby_bin_dir}/ruby bin/launch --provider #{node[:rightimage][:cloud]} --image-id #{node[:rightimage][:rebundle_base_image_id]} #{region_opt} #{flavor_opt} #{name_opt} #{resize_opt} #{debug_opt} #{roles_opt} --no-auto
+  #{ruby_bin_dir}/ruby bin/launch --provider #{node[:rightimage][:cloud]} --image-id #{node[:rightimage][:rebundle_base_image_id]} #{region_opt} #{flavor_opt} #{name_opt} #{resize_opt} #{debug_opt} #{roles_opt} #{ssh_user} --no-auto
   EOH
 end
 
@@ -160,8 +193,12 @@ bash "bundle instance" do
   flags "-ex"
   cwd Rebundle::REBUNDLE_SOURCE_PATH
   environment(cloud_credentials)
+
+  bucket  = node[:rightimage][:cloud] == "google" ? "--bucket #{node[:rightimage][:image_upload_bucket]}" : ""
+  project = node[:rightimage][:cloud] == "google" ? "--project #{node[:rightimage][:google][:project_id]}" : ""
+
   code <<-EOH
-  #{ruby_bin_dir}/ruby bin/bundle --name #{node[:rightimage][:image_name]}
+  #{ruby_bin_dir}/ruby bin/bundle --name #{node[:rightimage][:image_name]} #{bucket} #{project}
   EOH
 end
 #
@@ -194,5 +231,12 @@ bash "destroy instance" do
   environment(cloud_credentials)
   code "#{ruby_bin_dir}/ruby bin/destroy"
 end  
+
+file google_p12_path do
+  only_if { node[:rightimage][:cloud] == "google" }
+
+  backup false
+  action :delete
+end
 
 rightscale_marker :end

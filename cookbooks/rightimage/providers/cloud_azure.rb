@@ -139,10 +139,11 @@ action :upload do
   bash "install tools on host" do
     flags "-x"
     code <<-EOH
+      azure_ver="0.7.3"
+
       # Ignore errors during install, for re-runability.  If you're missing something, it will fail anyway during npm install.
       case "#{new_resource.platform}" in
       "ubuntu")
-        azure_ver="0.6.17"
         apt-get -y install python-software-properties
         add-apt-repository -y ppa:chris-lea/node.js
         apt-get update
@@ -150,7 +151,6 @@ action :upload do
         apt-get -y install nodejs
         ;;
       "centos"|"rhel")
-        azure_ver="0.6.8"
         rpm -Uvh http://rightscale-rightimage.s3-website-us-east-1.amazonaws.com/packages/el6/nodejs-0.8.16-1.x86_64.rpm
         ;;
       esac

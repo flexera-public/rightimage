@@ -8,9 +8,9 @@ rightscale_marker :begin
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #     http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -35,8 +35,8 @@ include_recipe "rightimage::block_device_restore"
 include_recipe "rightimage::loopback_resize"
 include_recipe "rightimage::loopback_mount"
 include_recipe "rightimage::clean"
-include_recipe "rightimage::cloud_add"
 include_recipe "rightimage::rightscale_install"
+include_recipe "rightimage::cloud_add"
 unless node[:rightimage][:bare_image] == "true"
   include_recipe "rightimage::image_tests"
   include_recipe "rightimage::image_report"

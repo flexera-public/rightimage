@@ -150,10 +150,21 @@ action :upload do
     EOH
   end
 
+  loopback_fs loopback_file do
+    mount_point guest_root
+    bind_devices false
+    action :mount
+  end
+
   if is_ebs
     upload_ebs()
   else
     upload_s3()
+  end
+
+  loopback_fs loopback_file do
+    mount_point guest_root
+    action :unmount
   end
 
   bash "remove keys" do
@@ -182,13 +193,6 @@ action :upload do
 end
 
 def upload_ebs
-  loopback_fs loopback_file do
-    mount_point guest_root
-    bind_devices false
-    action :mount
-  end
-
-
   bash "create ebs volume" do 
     flags "-e"
     creates "/var/tmp/ebs_volume_id"
@@ -268,26 +272,11 @@ def upload_ebs
       image_mount=#{guest_root}
       local_device=#{local_device}
 
-      # Partition volume
-      # Use --no-reread option to avoid intermittent failures when re-reading
-      # the partition table at the end. (w-5644)
-      sfdisk --no-reread $local_device << EOF
-0,,L,*
-EOF
-
-  ## partition volume (HVM only)
-      if [ "$hvm" == "true" ]; then
-        echo "1,,L,*" | sfdisk --no-reread #{local_device}
-        device="#{local_device}1"
-      else
-        device="#{local_device}"
-      fi
-
   ## format and mount volume
-      mkfs.ext3 -F ${local_device}1
+      mkfs.ext3 -F ${local_device}
       root_label="#{node[:rightimage][:root_mount][:label_dev]}"
-      tune2fs -L $root_label ${local_device}1
-      mount ${local_device}1 $ebs_mount
+      tune2fs -L $root_label ${local_device}
+      mount ${local_device} $ebs_mount
 
   ## mount EBS volume, rsync, and unmount ebs volume
       rsync -a $image_mount/ $ebs_mount/ --exclude '/proc'
@@ -366,15 +355,28 @@ EOF
         ec2_path=/tmp/ec2-api-nda
         virt_type_opt="--virtualization-type hvm"
         export EC2_HOME=$ec2_path
-        root_device="/dev/sda1"
       else
         ec2_path=/home/ec2
         virt_type_opt=""
-        root_device="/dev/sda"
       fi
 
   ## calculate ec2 region
       region=#{node[:ec2][:placement][:availability_zone].chop}
+
+  ## register image
+      # EBS images don't support the maximum number of ephemeral devices
+      # provided by the instance type unless you register them on the image or
+      # when running the instance. (w-5974)
+      set +x
+      block_device_mapping="";
+      i=0;
+
+      # Register /dev/sdb -> ephemeral0 .. /dev/sdy -> ephemeral23 to support 24 ephemeral drives total.
+      for letter in {b..y}; do
+        block_device_mapping="$block_device_mapping --block-device-mapping \\"/dev/sd${letter}=ephemeral${i}\\" ";
+        ((i = i + 1))
+      done
+      set -x
 
       image_out_ebs=`${ec2_path}/bin/ec2-register \
         --private-key /tmp/AWS_X509_KEY.pem \
@@ -382,14 +384,14 @@ EOF
         --region $region \
         --url #{node[:rightimage][:ec2_endpoint]}\
         --architecture #{new_resource.arch} \
-        --block-device-mapping "/dev/sdb=ephemeral0" \
+        $block_device_mapping \
         --description "#{image_name}" \
         --name "#{image_name}" \
         --snapshot $snap_id \
         $kernel_opt \
         $ramdisk_opt \
         $virt_type_opt \
-        --root-device-name $root_device `
+        --root-device-name /dev/sda1 `
 
   ## parse out image id
       image_id_ebs=`echo -n $image_out_ebs | awk '{ print $2 }'`
@@ -415,16 +417,31 @@ EOF
       rm -f /var/tmp/ebs_volume_id
     EOH
   end
-
-  loopback_fs loopback_file do
-    mount_point guest_root
-    action :unmount
-  end
-
 end
 
 
 def upload_s3()
+  guest_root_nonpart=guest_root+"2"
+  loopback_nonpart="#{temp_root}/#{ri_lineage}_hd0.raw"
+
+  loopback_fs loopback_nonpart do
+    device_number 1
+    mount_point guest_root_nonpart
+    partitioned false
+    size_gb node[:rightimage][:root_size_gb].to_i
+    action :create
+  end
+
+  bash "copy loopback fs" do
+    flags "-e"
+    code "rsync -a #{guest_root}/ #{guest_root_nonpart}/"
+  end
+
+  loopback_fs loopback_nonpart do
+    device_number 1
+    action :unmount
+  end
+
   # bundle and upload
   bash "bundle_upload_s3_image" do 
     flags "-e"
@@ -448,8 +465,8 @@ def upload_s3()
       mkdir -p "#{temp_root}/bundled"
 
       echo "Bundling..."
-      /home/ec2/bin/ec2-bundle-image --privatekey /tmp/AWS_X509_KEY.pem --cert /tmp/AWS_X509_CERT.pem --user #{node[:rightimage][:aws_account_number]} --image #{loopback_file} --prefix #{image_name} --destination "#{temp_root}/bundled" --arch #{new_resource.arch} $kernel_opt $ramdisk_opt -B "ami=sda,root=/dev/sda,ephemeral0=sdb,swap=sda3"
-     
+      /home/ec2/bin/ec2-bundle-image --privatekey /tmp/AWS_X509_KEY.pem --cert /tmp/AWS_X509_CERT.pem --user #{node[:rightimage][:aws_account_number]} --image #{loopback_nonpart} --prefix #{image_name} --destination "#{temp_root}/bundled" --arch #{new_resource.arch} $kernel_opt $ramdisk_opt -B "ami=sda,root=/dev/sda1,ephemeral0=sdb,swap=sda3"
+
       echo "Uploading..." 
       echo y | /home/ec2/bin/ec2-upload-bundle -b #{node[:rightimage][:image_upload_bucket]} -m "#{temp_root}/bundled/#{image_name}.manifest.xml" -a #{node[:rightimage][:aws_access_key_id]} -s #{node[:rightimage][:aws_secret_access_key]} --retry --batch
       
