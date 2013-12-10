@@ -116,7 +116,7 @@ attribute "rightimage/image_upload_bucket",
   :display_name => "Image Upload Bucket",
   :description => "The bucket to upload the image to.",
   :required => "required",
-  :recipes => [ "rightimage::base_upload", "rightimage::build_base", "rightimage::default", "rightimage::build_image" , "rightimage::upload_image_s3", "rightimage::ec2_download_bundle", "rightimage::cloud_upload", "rightimage::upload_image_s3" ]
+  :recipes => [ "rightimage::base_upload", "rightimage::build_base", "rightimage::default", "rightimage::build_image" , "rightimage::upload_image_s3", "rightimage::ec2_download_bundle", "rightimage::cloud_upload", "rightimage::upload_image_s3", "rightimage::rebundle" ]
 
 attribute "rightimage/image_name",
    :display_name => "Image Name",
@@ -379,7 +379,13 @@ attribute "rightimage/google/project_id",
   :display_name => "Google Project ID",
   :description => "GCE Project ID to register this image for",
   :required => "optional",
-  :recipes => [ "rightimage::cloud_upload" ]
+  :recipes => [ "rightimage::cloud_upload", "rightimage::default", "rightimage::rebundle" ]
+
+attribute "rightimage/google/client_email",
+  :display_name => "Google client email",
+  :description => "OAuth2 credentials client email for GCE. Pulled from gcutil conf",
+  :required => "optional",
+  :recipes => [ "rightimage::default", "rightimage::rebundle" ]
 
 attribute "rightimage/google/client_secret",
   :display_name => "Google client secret",
@@ -392,6 +398,18 @@ attribute "rightimage/google/client_id",
   :description => "OAuth2 credentials client id for GCE. Pulled from gcutil conf",
   :required => "optional",
   :recipes => [ "rightimage::cloud_upload" ]
+
+attribute "rightimage/google/service_cert",
+  :display_name => "Google certificate",
+  :description => "OAuth2 credentials service account certificate for GCE. Pulled from gcutil conf",
+  :required => "optional",
+  :recipes => [ "rightimage::default", "rightimage::rebundle" ]
+
+attribute "rightimage/google/service_key",
+  :display_name => "Google private key",
+  :description => "OAuth2 credentials service account private key for GCE. Pulled from gcutil conf",
+  :required => "optional",
+  :recipes => [ "rightimage::default", "rightimage::rebundle" ]
 
 attribute "rightimage/google/refresh_token",
   :display_name => "Google OAuth2 credentials refresh token",

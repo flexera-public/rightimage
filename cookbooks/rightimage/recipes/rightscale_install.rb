@@ -74,8 +74,4 @@ end
 
 include_recipe "rightimage::rightscale_rightlink"
 
-rightimage guest_root do
-  action :sanitize
-end
-
 rightscale_marker :end

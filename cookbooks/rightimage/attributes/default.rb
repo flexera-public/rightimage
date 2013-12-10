@@ -18,7 +18,9 @@ set_unless[:rightimage][:root_size_gb] = "10"
 set[:rightimage][:build_dir] = "/mnt/vmbuilder"
 set[:rightimage][:guest_root] = "/mnt/image"
 set_unless[:rightimage][:hypervisor] = "xen"
-set[:rightimage][:mirror] = "cf-mirror.rightscale.com"
+# Don't use cf-mirror because it causes hash sum mismatch errors on Ubuntu
+# during an apt-get update using /latest. (w-6201)
+set[:rightimage][:mirror] = "mirror.rightscale.com"
 set_unless[:rightimage][:rightscale_staging_mirror] = "false"
 set_unless[:rightimage][:cloud] = "ec2"
 set[:rightimage][:fstab][:ephemeral][:mount] = "/mnt/ephemeral"
