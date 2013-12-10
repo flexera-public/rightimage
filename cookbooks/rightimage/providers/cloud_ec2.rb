@@ -70,6 +70,8 @@ action :configure do
       rm -r $ROOT/tmp/ec2-a*
       echo 'export PATH=/home/ec2/bin:${PATH}' >> $ROOT/etc/profile.d/ec2.sh
       echo 'export EC2_HOME=/home/ec2' >> $ROOT/etc/profile.d/ec2.sh
+      # Lock down nokogiri to v1.5 for Ruby 1.8 compat (w-6202)
+      chroot $ROOT gem install #{gem_install_source} nokogiri -v "~> 1.5.0" --no-ri --no-rdoc
       chroot $ROOT gem install #{gem_install_source} s3sync --no-ri --no-rdoc
     EOH
   end
