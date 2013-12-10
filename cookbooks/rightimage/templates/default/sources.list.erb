@@ -1,26 +1,22 @@
 deb http://<%= @mirror_url %>/ubuntu_daily/<%= @mirror_date %>/ <%= @platform_codename %> main restricted universe multiverse
-deb http://mirror.rightscale.com/ubuntu_daily/<%= @mirror_date %>/ <%= @platform_codename %> main restricted universe multiverse
 deb http://ec2-us-east-mirror.rightscale.com/ubuntu_daily/<%= @mirror_date %>/ <%= @platform_codename %> main restricted universe multiverse
 deb http://ec2-us-west-mirror.rightscale.com/ubuntu_daily/<%= @mirror_date %>/ <%= @platform_codename %> main restricted universe multiverse
 #deb-src http://archive.ubuntu.com/ubuntu/ <%= @platform_codename %> main restricted universe multiverse
 
 ## MAJOR BUG FIX UPDATES produced after the final release
 deb http://<%= @mirror_url %>/ubuntu_daily/<%= @mirror_date %>/ <%= @platform_codename %>-updates main restricted universe multiverse
-deb http://mirror.rightscale.com/ubuntu_daily/<%= @mirror_date %>/ <%= @platform_codename %>-updates main restricted universe multiverse
 deb http://ec2-us-east-mirror.rightscale.com/ubuntu_daily/<%= @mirror_date %>/ <%= @platform_codename %>-updates main restricted universe multiverse
 deb http://ec2-us-west-mirror.rightscale.com/ubuntu_daily/<%= @mirror_date %>/ <%= @platform_codename %>-updates main restricted universe multiverse
 #deb-src http://archive.ubuntu.com/ubuntu/ <%= @platform_codename %>-updates main restricted universe multiverse
 
 ## UBUNTU SECURITY UPDATES
 deb http://<%= @mirror_url %>/ubuntu_daily/<%= @mirror_date %>/ <%= @platform_codename %>-security main restricted universe multiverse
-deb http://mirror.rightscale.com/ubuntu_daily/<%= @mirror_date %>/ <%= @platform_codename %>-security main restricted universe multiverse
 deb http://ec2-us-east-mirror.rightscale.com/ubuntu_daily/<%= @mirror_date %>/ <%= @platform_codename %>-security main restricted universe multiverse
 deb http://ec2-us-west-mirror.rightscale.com/ubuntu_daily/<%= @mirror_date %>/ <%= @platform_codename %>-security main restricted universe multiverse
 #deb-src http://archive.ubuntu.com/ubuntu/ <%= @platform_codename %>-security main restricted universe multiverse
 
 ## BACKPORTS REPOSITORY (Unsupported.  May contain illegal packages.  Use at own risk.)
 #deb http://<%= @mirror_url %>/ubuntu_daily/<%= @mirror_date %>/ <%= @platform_codename %>-backports main restricted universe multiverse
-#deb http://mirror.rightscale.com/ubuntu_daily/<%= @mirror_date %>/ <%= @platform_codename %>-backports main restricted universe multiverse
 #deb http://ec2-us-east-mirror.rightscale.com/ubuntu_daily/<%= @mirror_date %>/ <%= @platform_codename %>-backports main restricted universe multiverse
 #deb http://ec2-us-west-mirror.rightscale.com/ubuntu_daily/<%= @mirror_date %>/ <%= @platform_codename %>-backports main restricted universe multiverse
 #deb-src http://archive.ubuntu.com/ubuntu/ <%= @platform_codename %>-backports main restricted universe multiverse
@@ -30,7 +26,6 @@ deb http://ec2-us-west-mirror.rightscale.com/ubuntu_daily/<%= @mirror_date %>/ <
 deb http://rightscale-software-ubuntu-staging.s3.amazonaws.com/ <%= @platform_codename %> main
 <% else %>
 deb http://<%= @mirror_url %>/rightscale_software_ubuntu/<%=@mirror_date%>/ <%= @platform_codename %> main
-deb http://mirror.rightscale.com/rightscale_software_ubuntu/<%=@mirror_date%>/ <%= @platform_codename %> main
 deb http://ec2-us-east-mirror.rightscale.com/rightscale_software_ubuntu/<%=@mirror_date%>/ <%= @platform_codename %> main
 deb http://ec2-us-west-mirror.rightscale.com/rightscale_software_ubuntu/<%=@mirror_date%>/ <%= @platform_codename %> main
 <% end -%>
