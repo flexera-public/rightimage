@@ -2,7 +2,7 @@ default         0
 timeout         <%= @timeout %>
 hiddenmenu
 
-title		<%= @platform %> <%= @plaform_version %>, kernel <%= @grub_kernel.split("-",2)[1] %>
+title		<%= @platform %> <%= @platform_version %>, kernel <%= @grub_kernel.split("-",2)[1] %>
 root		<%= @grub_root %>
 kernel		/boot/<%= @grub_kernel %> root=<%= node[:rightimage][:root_mount][:dev]  %> ro <%= @grub_kernel_options %> 
 initrd		/boot/<%= @grub_initrd %>
