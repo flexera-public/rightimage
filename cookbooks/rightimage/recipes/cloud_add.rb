@@ -111,9 +111,5 @@ CHROOT_SCRIPT
   EOF
 end
 
-# Clean up guest image
-rightimage guest_root do
-  action :sanitize
-end
 
 rightscale_marker :end
