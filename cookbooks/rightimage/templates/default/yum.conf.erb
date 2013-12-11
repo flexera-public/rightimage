@@ -30,7 +30,6 @@ enabled=0
 [base]
 name = none
 baseurl = http://<%= @mirror %>/centos/<%= node[:rightimage][:platform_version].to_i %>/os/<%= node[:rightimage][:arch] %>/archive/<%= @mirror_date %>/
-  http://mirror.rightscale.com/centos/<%= node[:rightimage][:platform_version].to_i %>/os/<%= node[:rightimage][:arch] %>/archive/<%= @mirror_date %>/
   http://ec2-us-east-mirror.rightscale.com/centos/<%= node[:rightimage][:platform_version].to_i %>/os/<%= node[:rightimage][:arch] %>/archive/<%= @mirror_date %>/
   http://ec2-us-west-mirror.rightscale.com/centos/<%= node[:rightimage][:platform_version].to_i %>/os/<%= node[:rightimage][:arch] %>/archive/<%= @mirror_date %>/
 failovermethod=priority
@@ -42,7 +41,6 @@ gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-<%= node[:rightimage][:platfor
 [addons]
 name = none
 baseurl = http://<%= @mirror %>/centos/<%= node[:rightimage][:platform_version].to_i %>/addons/<%= node[:rightimage][:arch] %>/archive/<%= @mirror_date %>/
-  http://mirror.rightscale.com/centos/<%= node[:rightimage][:platform_version].to_i %>/addons/<%= node[:rightimage][:arch] %>/archive/<%= @mirror_date %>/
   http://ec2-us-east-mirror.rightscale.com/centos/<%= node[:rightimage][:platform_version].to_i %>/addons/<%= node[:rightimage][:arch] %>/archive/<%= @mirror_date %>/
   http://ec2-us-west-mirror.rightscale.com/centos/<%= node[:rightimage][:platform_version].to_i %>/addons/<%= node[:rightimage][:arch] %>/archive/<%= @mirror_date %>/
 failovermethod=priority
@@ -54,7 +52,6 @@ gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-<%= node[:rightimage][:platfor
 [centosplus]
 name = none
 baseurl = http://<%= @mirror %>/centos/<%= node[:rightimage][:platform_version].to_i %>/centosplus/<%= node[:rightimage][:arch] %>/archive/<%= @mirror_date %>/
-  http://mirror.rightscale.com/centos/<%= node[:rightimage][:platform_version].to_i %>/centosplus/<%= node[:rightimage][:arch] %>/archive/<%= @mirror_date %>/
   http://ec2-us-east-mirror.rightscale.com/centos/<%= node[:rightimage][:platform_version].to_i %>/centosplus/<%= node[:rightimage][:arch] %>/archive/<%= @mirror_date %>/
   http://ec2-us-west-mirror.rightscale.com/centos/<%= node[:rightimage][:platform_version].to_i %>/centosplus/<%= node[:rightimage][:arch] %>/archive/<%= @mirror_date %>/
 failovermethod=priority
@@ -65,7 +62,6 @@ gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-<%= node[:rightimage][:platfor
 [extras]
 name = none
 baseurl = http://<%= @mirror %>/centos/<%= node[:rightimage][:platform_version].to_i %>/extras/<%= node[:rightimage][:arch] %>/archive/<%= @mirror_date %>/
-  http://mirror.rightscale.com/centos/<%= node[:rightimage][:platform_version].to_i %>/extras/<%= node[:rightimage][:arch] %>/archive/<%= @mirror_date %>/
   http://ec2-us-east-mirror.rightscale.com/centos/<%= node[:rightimage][:platform_version].to_i %>/extras/<%= node[:rightimage][:arch] %>/archive/<%= @mirror_date %>/
   http://ec2-us-west-mirror.rightscale.com/centos/<%= node[:rightimage][:platform_version].to_i %>/extras/<%= node[:rightimage][:arch] %>/archive/<%= @mirror_date %>/
 failovermethod=priority
@@ -76,7 +72,6 @@ gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-<%= node[:rightimage][:platfor
 [updates]
 name = none
 baseurl = http://<%= @mirror %>/centos/<%= node[:rightimage][:platform_version].to_i %>/updates/<%= node[:rightimage][:arch] %>/archive/<%= @mirror_date %>/
-  http://mirror.rightscale.com/centos/<%= node[:rightimage][:platform_version].to_i %>/updates/<%= node[:rightimage][:arch] %>/archive/<%= @mirror_date %>/
   http://ec2-us-east-mirror.rightscale.com/centos/<%= node[:rightimage][:platform_version].to_i %>/updates/<%= node[:rightimage][:arch] %>/archive/<%= @mirror_date %>/
   http://ec2-us-west-mirror.rightscale.com/centos/<%= node[:rightimage][:platform_version].to_i %>/updates/<%= node[:rightimage][:arch] %>/archive/<%= @mirror_date %>/
 failovermethod=priority
@@ -112,7 +107,6 @@ sslcacert=/etc/pki/entitlement/cdn.redhat.com-chain.crt
 [epel]
 name = none
 baseurl = http://<%= @mirror %>/epel/<%= node[:rightimage][:platform_version].to_i %>/<%= node[:rightimage][:arch] %>/archive/<%= @mirror_date %>/
-  http://mirror.rightscale.com/epel/<%= node[:rightimage][:platform_version].to_i %>/<%= node[:rightimage][:arch] %>/archive/<%= @mirror_date %>/
   http://ec2-us-east-mirror.rightscale.com/epel/<%= node[:rightimage][:platform_version].to_i %>/<%= node[:rightimage][:arch] %>/archive/<%= @mirror_date %>/
   http://ec2-us-west-mirror.rightscale.com/epel/<%= node[:rightimage][:platform_version].to_i %>/<%= node[:rightimage][:arch] %>/archive/<%= @mirror_date %>/
 failovermethod=priority
@@ -126,7 +120,6 @@ name = none
 baseurl = http://rightscale-software-staging.s3.amazonaws.com/centos/<%= node[:rightimage][:platform_version].to_i %>/<%= node[:rightimage][:arch] %>
 <% else -%>
 baseurl = http://<%= @mirror %>/rightscale_software/epel/<%= node[:rightimage][:platform_version].to_i %>/<%= node[:rightimage][:arch] %>/archive/<%= @mirror_date %>/
-  http://mirror.rightscale.com/rightscale_software/epel/<%= node[:rightimage][:platform_version].to_i %>/<%= node[:rightimage][:arch] %>/archive/<%= @mirror_date %>/
   http://ec2-us-east-mirror.rightscale.com/rightscale_software/epel/<%= node[:rightimage][:platform_version].to_i %>/<%= node[:rightimage][:arch] %>/archive/<%= @mirror_date %>/
   http://ec2-us-west-mirror.rightscale.com/rightscale_software/epel/<%= node[:rightimage][:platform_version].to_i %>/<%= node[:rightimage][:arch] %>/archive/<%= @mirror_date %>/
 <% end -%>

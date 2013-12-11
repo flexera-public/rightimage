@@ -2,15 +2,81 @@ class Chef::Resource
   include RightScale::RightImage::Helper
 end
 
-
 action :configure do
+
+  node.override[:rightimage][:grub][:root_device] = "/dev/sda"
+  node.override[:rightimage][:grub][:kernel][:options] = "noquiet earlyprintk=ttyS0 loglevel=8"
+  node.override[:rightimage][:root_mount][:dump] = "1"
+  node.override[:rightimage][:root_mount][:fsck] = "1"
+
   ruby_block "check hypervisor" do
     block do
       raise "ERROR: you must set your hypervisor to kvm!" unless new_resource.hypervisor == "kvm"
     end
   end
 
+  bash "install guest packages" do
+    flags '-ex'
+    code <<-EOH
+      case "#{new_resource.platform}" in
+      "ubuntu")
+        chroot #{guest_root} apt-get -y purge grub-pc
+        chroot #{guest_root} apt-get -y install grub
+        ;;
+      "centos"|"rhel")
+        chroot #{guest_root} yum -y install grub iscsi-initiator-utils
+        ;;
+      esac
+    EOH
+  end
+
   directory temp_root { recursive true }
+
+  # insert grub conf, and link menu.lst to grub.conf
+  directory "#{guest_root}/boot/grub" do
+    owner "root"
+    group "root"
+    mode "0750"
+    action :create
+    recursive true
+  end
+
+  # insert grub conf, and symlink
+  template "#{guest_root}/boot/grub/menu.lst" do
+    source "menu.lst.erb"
+    backup false
+  end
+
+  bash "setup grub" do
+    flags "-ex"
+    code <<-EOH
+      guest_root="#{guest_root}"
+
+      case "#{new_resource.platform}" in
+        "ubuntu")
+          chroot $guest_root cp -p /usr/lib/grub/x86_64-pc/* /boot/grub
+          grub_command="/usr/sbin/grub"
+          ;;
+        "centos"|"rhel")
+          chroot $guest_root cp -p /usr/share/grub/x86_64-redhat/* /boot/grub
+          grub_command="/sbin/grub"
+          ;;
+      esac
+
+      echo "(hd0) #{node[:rightimage][:grub][:root_device]}" > $guest_root/boot/grub/device.map
+      echo "" >> $guest_root/boot/grub/device.map
+
+      cat > device.map <<EOF
+(hd0) #{loopback_file}
+EOF
+
+    ${grub_command} --batch --device-map=device.map <<EOF
+root (hd0,0)
+setup (hd0)
+quit
+EOF
+EOH
+  end
 
   if (new_resource.platform =~ /centos|rhel/ && new_resource.platform_version.to_f >= 6) || new_resource.platform == "ubuntu"
     # Add google init script for centos (6+ only) / ubuntu
@@ -75,11 +141,10 @@ action :configure do
       "ubuntu")
         chroot $guest_root apt-get -y install acpid dhcp3-client
 
-        # Uninstall grub (not needed)
-        chroot $guest_root apt-get -y purge grub-common
-
-        # Google disables loading of kernel modules
-        echo '' > /etc/modules
+        # Need to install backported kernel from 12.10
+        # NOTE: this image should not be used in production!!
+        # See wookie page
+        chroot $guest_root apt-get -y install linux-generic-lts-quantal
 
         # Disable all ttys except for tty1 (console)
         for i in `ls $guest_root/etc/init/tty[2-9].conf`; do
@@ -95,7 +160,7 @@ action :configure do
       echo 'initctl emit --no-wait google-rc-local-has-run' >> $guest_root/etc/rc.local
       chmod 755 $guest_root/etc/rc.local
 
-      set +e 
+      set +e
       # Add metadata alias
       grep -E 'metadata' /etc/hosts &> /dev/null
       if [ "$?" != "0" ]; then
@@ -137,13 +202,12 @@ action :upload do
     environment(node[:rightimage][:script_env])
   end
 
- 
-  # TBD, replace this block. We use the gsutil/gcutil tools to do this, but we 
+  # TBD, replace this block. We use the gsutil/gcutil tools to do this, but we
   # need to generate the refresh_token on another computer (see rightimage_tools/google_token)
   # We can skip this and use the api directly with the "service accounts" oauth method
   # but these tools don't support that control flow and need to look into doing
   # it with google-api-python or google-api-ruby separately. don't think those tools
-  # work yet either, revisit later 
+  # work yet either, revisit later
   template "/root/.gcutil_auth" do
     source "gcutil_auth.erb"
     variables(
@@ -154,7 +218,7 @@ action :upload do
     backup false
   end
 
-  template "/root/.boto" do 
+  template "/root/.boto" do
     source "google_boto.erb"
     variables(
       :gc_access_key_id     => node[:rightimage][:google][:gc_access_key_id],
@@ -176,14 +240,9 @@ action :upload do
 
   ruby_block "register image" do
     block do
-      require 'json'
-      kernels = JSON.parse(`/usr/local/gcutil/gcutil listkernels --project=google --format=json`)
-      kernels_sorted = kernels["items"].sort_by {|k| k["creationTimestamp"]}
-      gce_kernel = kernels_sorted.reverse.first["name"]
-      
-      command = "/usr/local/gcutil/gcutil addimage \"#{new_resource.image_name}\" " + 
+      command = "/usr/local/gcutil/gcutil addimage \"#{new_resource.image_name}\" " +
         "\"http://commondatastorage.googleapis.com/#{node[:rightimage][:image_upload_bucket]}/#{new_resource.image_name}.tar.gz\" " +
-        "--preferred_kernel=projects/google/global/kernels/#{gce_kernel} " +
+        "--preferred_kernel='' " +
         "--project=#{node[:rightimage][:google][:project_id]}"
       Chef::Log.info("Running command: #{command}")
       `#{command}`

@@ -56,8 +56,13 @@ action :create do
       # device itself is mounted in /dev, so keep them both in the same place
       # so that grub2-install can link them together properly
       echo "0 $[#{new_resource.size_gb}*2097152] linear $loop_dev 0" | dmsetup create `basename $fake_dev`
-      # use synchonous flag to avoid any later race conditions
-      kpartx -s -a $fake_dev
+      if [ "#{new_resource.partitioned}" == "true" ]; then
+        # use synchonous flag to avoid any later race conditions
+        kpartx -s -a $fake_dev
+        fake_map="/dev/mapper/loop#{new_resource.device_number}p1"
+      else
+        fake_map=$fake_dev
+      fi
 
       mke2fs -F -j $fake_map
       tune2fs -L $root_label $fake_map
@@ -123,7 +128,13 @@ action :mount do
 
       echo "0 $[#{new_resource.size_gb}*2097152] linear $loop_dev 0" | dmsetup create `basename $fake_dev`
       # use synchonous flag to avoid any later race conditions
-      kpartx -s -a $fake_dev
+      if [ "#{new_resource.partitioned}" == "true" ]; then
+        # use synchonous flag to avoid any later race conditions
+        kpartx -s -a $fake_dev
+        fake_map="/dev/mapper/sda#{new_resource.device_number}p1"
+      else
+        fake_map=$fake_dev
+      fi
 
       mkdir -p $mount_point
       mount $fake_map $mount_point
