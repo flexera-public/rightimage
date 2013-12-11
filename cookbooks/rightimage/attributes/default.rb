@@ -23,8 +23,6 @@ set_unless[:rightimage][:hypervisor] = "xen"
 set[:rightimage][:mirror] = "mirror.rightscale.com"
 set_unless[:rightimage][:rightscale_staging_mirror] = "false"
 set_unless[:rightimage][:cloud] = "ec2"
-set[:rightimage][:fstab][:ephemeral][:mount] = "/mnt/ephemeral"
-set[:rightimage][:fstab][:ephemeral][:options] = "defaults"
 set[:rightimage][:root_mount][:label_dev] = "ROOT"
 set[:rightimage][:root_mount][:dev] = "LABEL=#{rightimage[:root_mount][:label_dev]}"
 set[:rightimage][:root_mount][:options] = "defaults"
@@ -105,27 +103,21 @@ case rightimage[:cloud]
     set[:rightimage][:root_mount][:fsck] = "0" 
     # Might have to double check don't know if maverick should use kernel linux-image-ec2 or not
     set[:rightimage][:swap_mount] = "/dev/sda3" unless rightimage[:arch] == "x86_64"
-    set[:rightimage][:fstab][:ephemeral][:dev] = "/dev/sdb"
 
     case rightimage[:platform]
       when "ubuntu" 
-        set[:rightimage][:fstab][:ephemeral][:options] = "defaults,nobootwait"
         set[:rightimage][:fstab][:swap] = "defaults,nobootwait"
         if rightimage[:platform_version].to_f >= 10.10
-          set[:rightimage][:fstab][:ephemeral][:dev] = "/dev/xvdb"
           set[:rightimage][:swap_mount] = "/dev/xvda3" unless rightimage[:arch]  == "x86_64"
         end
       when "centos", "rhel"
-        set[:rightimage][:fstab][:ephemeral][:options] = "defaults"
         set[:rightimage][:fstab][:swap] = "defaults"
 
         # CentOS 6.1-6.2 start SCSI device naming from e
         if rightimage[:platform_version].to_i == 6
           if rightimage[:platform_version].to_f.between?(6.1,6.2)
-            set[:rightimage][:fstab][:ephemeral][:dev] = "/dev/xvdf"
             set[:rightimage][:swap_mount] = "/dev/xvde3"  unless rightimage[:arch]  == "x86_64"
           else
-            set[:rightimage][:fstab][:ephemeral][:dev] = "/dev/xvdb"
             set[:rightimage][:swap_mount] = "/dev/xvda3"  unless rightimage[:arch]  == "x86_64"
           end
         end
@@ -133,18 +125,12 @@ case rightimage[:cloud]
   else 
     case rightimage[:hypervisor]
     when "xen"
-      set[:rightimage][:fstab][:ephemeral][:dev] = nil
-      set[:rightimage][:fstab][:ephemeral][:options] = nil
       set[:rightimage][:root_mount][:dump] = "1" 
       set[:rightimage][:root_mount][:fsck] = "1" 
     when "kvm"
-      set[:rightimage][:fstab][:ephemeral][:dev] = nil
-      set[:rightimage][:fstab][:ephemeral][:options] = nil
       set[:rightimage][:root_mount][:dump] = "1" 
       set[:rightimage][:root_mount][:fsck] = "1" 
     when "esxi", "hyperv"
-      set[:rightimage][:fstab][:ephemeral][:dev] = nil
-      set[:rightimage][:fstab][:ephemeral][:options] = nil
       set[:rightimage][:root_mount][:dump] = "1" 
       set[:rightimage][:root_mount][:fsck] = "1" 
     else
