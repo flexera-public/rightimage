@@ -55,10 +55,6 @@ when "ubuntu"
     rightimage[:host_packages] << " devscripts"
   end
 
-  if rightimage[:platform_version].to_f == 10.04
-    rightimage[:host_packages] << " python-vm-builder-ec2"
-  end
-
   if rightimage[:platform_version].to_f == 12.04
     rightimage[:host_packages] << " liburi-perl"
   end
