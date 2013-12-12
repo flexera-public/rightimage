@@ -685,14 +685,9 @@
     "rightimage/platform_version": {
       "calculated": false,
       "choice": [
-        "5.4",
-        "5.6",
-        "5.8",
-        "6.2",
         "6.3",
         "6.4",
-        "10.04",
-        "10.10",
+        "6.5",
         "12.04"
       ],
       "description": "The OS version to build into the virtual image.",
