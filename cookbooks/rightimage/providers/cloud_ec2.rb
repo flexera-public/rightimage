@@ -14,8 +14,18 @@ action :configure do
     backup false
   end
 
+  # generate command to install getsshkey init script 
+  case rightimage[:platform]
+    when "ubuntu" 
+      getsshkey_cmd = "chroot $GUEST_ROOT update-rc.d getsshkey start 20 2 3 4 5 . stop 1 0 1 6 ."
+    when "centos", "rhel"
+      getsshkey_cmd = "chroot $GUEST_ROOT chkconfig --add getsshkey && \
+                 chroot $GUEST_ROOT chkconfig --level 4 getsshkey on"
+  end
+
+
   execute "link_getsshkey" do 
-    command  node[:rightimage][:getsshkey_cmd]
+    command getsshkey_cmd
     environment({'GUEST_ROOT' => guest_root }) 
   end
 

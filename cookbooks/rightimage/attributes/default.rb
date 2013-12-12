@@ -140,15 +140,6 @@ set_unless[:rightimage][:rightlink_version] = ""
 set_unless[:rightimage][:rightlink_repo] = "rightlink-staging"
 
 
-# generate command to install getsshkey init script 
-case rightimage[:platform]
-  when "ubuntu" 
-    set[:rightimage][:getsshkey_cmd] = "chroot $GUEST_ROOT update-rc.d getsshkey start 20 2 3 4 5 . stop 1 0 1 6 ."
-  when "centos", "rhel"
-    set[:rightimage][:getsshkey_cmd] = "chroot $GUEST_ROOT chkconfig --add getsshkey && \
-               chroot $GUEST_ROOT chkconfig --level 4 getsshkey on"
-end
-
 # http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=637234#40
 set[:rightimage][:root_mount][:options] = "errors=remount-ro,barrier=0" if rightimage[:platform] == "ubuntu" && rightimage[:platform_version].to_f >= 12.04 && rightimage[:hypervisor] == "xen"
 
