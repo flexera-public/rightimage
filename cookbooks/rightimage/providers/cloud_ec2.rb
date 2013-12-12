@@ -15,7 +15,7 @@ action :configure do
   end
 
   # generate command to install getsshkey init script 
-  case rightimage[:platform]
+  case node[:rightimage][:platform]
     when "ubuntu" 
       getsshkey_cmd = "chroot $GUEST_ROOT update-rc.d getsshkey start 20 2 3 4 5 . stop 1 0 1 6 ."
     when "centos", "rhel"
