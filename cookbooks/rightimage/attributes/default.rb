@@ -57,9 +57,6 @@ when "ubuntu"
     rightimage[:host_packages] << " liburi-perl"
   end
 when "centos","rhel"
-  # For Centos 5, install custom ruby (1.8.7). so keep these in a separate variable 
-  # These are the packages available on the rbel upstream mirror
-  set[:rightimage][:ruby_packages] = "ruby ruby-devel ruby-irb ruby-libs ruby-rdoc ruby-ri ruby-tcltk"
 
   rightimage[:host_packages] << " swig"
 
