@@ -59,7 +59,6 @@ action :create do
       if [ "#{new_resource.partitioned}" == "true" ]; then
         # use synchonous flag to avoid any later race conditions
         kpartx -s -a $fake_dev
-        fake_map="/dev/mapper/loop#{new_resource.device_number}p1"
       else
         fake_map=$fake_dev
       fi
@@ -131,7 +130,6 @@ action :mount do
       if [ "#{new_resource.partitioned}" == "true" ]; then
         # use synchonous flag to avoid any later race conditions
         kpartx -s -a $fake_dev
-        fake_map="/dev/mapper/sda#{new_resource.device_number}p1"
       else
         fake_map=$fake_dev
       fi
