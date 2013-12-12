@@ -126,7 +126,7 @@ bash "launch the remote instance" do
   cwd Rebundle::REBUNDLE_SOURCE_PATH
   region_opt = case node[:rightimage][:cloud]
                when "ec2" then "#{node[:ec2][:placement][:availability_zone].chop}"
-               when "google" || /rackspace/i then "#{node[:rightimage][:datacenter]}"
+               when "google", /rackspace/i then "#{node[:rightimage][:datacenter]}"
                else ""
                end
 
