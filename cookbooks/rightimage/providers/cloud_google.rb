@@ -116,13 +116,6 @@ EOH
     code "tar zxf #{temp_root}/google.tgz -C #{guest_root}/usr/share"
   end
 
-  cookbook_file "#{guest_root}/tmp/install_google_tools.sh" do
-    source "install_google_tools.sh"
-    mode "0755"
-    action :create
-    backup false
-  end
-
   bash "configure for google compute" do
     flags "-ex" 
     environment(node[:rightimage][:script_env])
@@ -167,9 +160,6 @@ EOH
         echo '169.254.169.254 metadata.google.internal metadata' >> $guest_root/etc/hosts
       fi
       set -e
-
-      # Install GCUtil + GSUtil
-      chroot /mnt/image /tmp/install_google_tools.sh
     EOH
   end
 end

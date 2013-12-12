@@ -36,18 +36,6 @@ action :configure do
       esac
     EOH
   end
-
-  cookbook_file "#{guest_root}/tmp/install_azure_tools.sh" do
-    source "install_azure_tools.sh"
-    mode "0755"
-    action :create
-    backup false
-  end
-
-  execute "chroot #{guest_root} /tmp/install_azure_tools.sh" do
-    environment(node[:rightimage][:script_env])
-  end
-
 end
 
 action :package do
