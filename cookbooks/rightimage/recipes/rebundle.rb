@@ -160,6 +160,7 @@ end
 
 bash "upload code to the remote instance" do
   flags "-ex"
+  environment(cloud_credentials)
   cwd Rebundle::REBUNDLE_SOURCE_PATH
   freeze_date_opt = ""
   if mirror_freeze_date
