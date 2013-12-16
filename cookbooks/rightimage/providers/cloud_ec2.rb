@@ -19,35 +19,13 @@ action :configure do
     environment({'GUEST_ROOT' => guest_root }) 
   end
 
-  # EC2 Tools are Java based
-  bash "install openjdk" do
-    flags "-ex"
-    code <<-EOH
-      case "#{new_resource.platform}" in
-      "ubuntu")
-        chroot #{guest_root} apt-get install -y openjdk-6-jre-headless
-        echo "export JAVA_HOME=/usr/lib/jvm/java-6-openjdk-amd64/jre" > #{guest_root}/etc/profile.d/java.sh
-        chmod a+x #{guest_root}/etc/profile.d/java.sh
-        ;;
-      "centos"|"rhel")
-        chroot #{guest_root} yum install -y java-1.6.0-openjdk
-        echo "export JAVA_HOME=/etc/alternatives/jre" > #{guest_root}/etc/profile.d/java.sh
-        chmod a+x #{guest_root}/etc/profile.d/java.sh
-        ;;
-      esac
-    EOH
-  end
-
-  #  Add cloud tools to host and image
+  #  Add cloud tools to host
   cookbook_file "#{guest_root}/tmp/install_ec2_tools.sh" do
     source "install_ec2_tools.sh"
     mode "0755"
     backup false
   end
   execute "#{guest_root}/tmp/install_ec2_tools.sh" do
-    environment(node[:rightimage][:script_env])
-  end
-  execute "chroot #{guest_root} /tmp/install_ec2_tools.sh" do
     environment(node[:rightimage][:script_env])
   end
    
