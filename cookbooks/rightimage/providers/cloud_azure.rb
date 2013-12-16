@@ -30,8 +30,6 @@ action :configure do
         ;;
       "centos"|"rhel")
         sed -i "s/ACTIVE_CONSOLES=.*/ACTIVE_CONSOLES=\\/dev\\/tty1/" $guest_root/etc/sysconfig/init
-
-        chroot $guest_root yum -y install yum-plugin-priorities
         ;;
       esac
     EOH
