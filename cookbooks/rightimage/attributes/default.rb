@@ -2,16 +2,6 @@ class Chef::Node
  include RightScale::RightImage::Helper
 end
 
-# Rightlink strips /usr/local/bin out of the default path for, which is where
-# Ubuntu installs python and ruby binstubs.  Setting JAVA_HOME to /usr here is
-# a bit of a hack, the ec2 tools really only want JAVA_HOME to be set to the grandparent
-# directory of the java executable.
-set[:rightimage][:script_env] = {
-  'PATH' => "/home/ec2/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
-  'JAVA_HOME' => "/usr",
-  'EC2_HOME' => "/home/ec2"
-}
-
 set_unless[:rightimage][:debug] = false
 set[:rightimage][:lang] = "en_US.UTF-8"
 set_unless[:rightimage][:root_size_gb] = "10"
@@ -32,6 +22,25 @@ set_unless[:rightimage][:base_image_bucket] = "rightscale-rightimage-base-dev"
 set_unless[:rightimage][:platform] = guest_platform
 set_unless[:rightimage][:platform_version] = guest_platform_version
 set_unless[:rightimage][:arch] = guest_arch
+
+default[:rightimage][:s3_base_url] =  "http://rightscale-rightimage.s3.amazonaws.com"
+
+
+# Rightlink strips /usr/local/bin out of the default path for, which is where
+# Ubuntu installs python and ruby binstubs.  Setting JAVA_HOME to /usr here is
+# a bit of a hack, the ec2 tools really only want JAVA_HOME to be set to the grandparent
+# directory of the java executable.
+set[:rightimage][:script_env] = {
+  'PATH' => "/home/ec2/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+  'JAVA_HOME' => "/usr",
+  'EC2_HOME' => "/home/ec2",
+  'PLATFORM' => node[:rightimage][:platform],
+  'PLATFORM_VERSION' => node[:rightimage][:platform_version],
+  'BASE_URL' => node[:rightimage][:s3_base_url]
+}
+
+
+
 
 case node[:rightimage][:hypervisor]
 when "xen" then set[:rightimage][:image_type] = "vhd"

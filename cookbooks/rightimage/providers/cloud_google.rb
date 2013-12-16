@@ -113,11 +113,20 @@ EOH
     backup false
   end
   bash "untar google helper and startup scripts" do
-    code "tar zxvf #{temp_root}/google.tgz -C #{guest_root}/usr/share"
+    code "tar zxf #{temp_root}/google.tgz -C #{guest_root}/usr/share"
+  end
+
+  cookbook_file "#{guest_root}/tmp/install_google_tools.sh" do
+    source "install_google_tools.sh"
+    mode "0755"
+    action :create
+    backup false
   end
 
   bash "configure for google compute" do
-    flags "-ex"
+    flags "-ex" 
+    environment(node[:rightimage][:script_env])
+
     code <<-EOH
       guest_root=#{guest_root}
 
@@ -126,13 +135,10 @@ EOH
 
       case "#{new_resource.platform}" in
       "centos"|"rhel")
-        chroot $guest_root yum -y install python-setuptools python-devel python-libs
-
         # enable console access
         sed -i "s/ACTIVE_CONSOLES=.*/ACTIVE_CONSOLES=\\/dev\\/tty1/" $guest_root/etc/sysconfig/init
         ;;
       "ubuntu")
-        chroot $guest_root apt-get -y install python-dev python-setuptools
         chroot $guest_root apt-get -y install acpid dhcp3-client
 
         # Need to install backported kernel from 12.10
@@ -162,21 +168,8 @@ EOH
       fi
       set -e
 
-      # Install Boto (for gsutil)
-      chroot $guest_root easy_install pip
-      chroot $guest_root source /etc/profile && pip install boto
-
-      gcutil=#{node[:rightimage][:google][:gcutil_name]}
-      wget #{node[:rightimage][:google][:gcutil_base_url]}/$gcutil.tar.gz
-      tar zxvf $gcutil.tar.gz -C $guest_root/usr/local
-      rm -rf $guest_root/usr/local/gcutil
-      mv $guest_root/usr/local/$gcutil $guest_root/usr/local/gcutil
-      echo 'export PATH=$PATH:/usr/local/gcutil' > $guest_root/etc/profile.d/gcutil.sh
-
-      # Install GSUtil
-      wget http://commondatastorage.googleapis.com/pub/gsutil.tar.gz
-      tar zxvf gsutil.tar.gz -C $guest_root/usr/local
-      echo 'export PATH=$PATH:/usr/local/gsutil' > $guest_root/etc/profile.d/gsutil.sh
+      # Install GCUtil + GSUtil
+      chroot /mnt/image /tmp/install_google_tools.sh
     EOH
   end
 end
@@ -198,47 +191,15 @@ action :package do
 end
 
 action :upload do
-  case node[:platform]
-  when "centos", "redhat" then
-    # Need to use yum_package instead of package or else setuptools will error out
-    # with "no candidate found" because its a noarch package which package doesn't
-    # understand
-    %w(python-setuptools python-devel python-libs).each { |p| yum_package p }
-  when "ubuntu" then
-    %w(python-dev python-setuptools).each {|p| package p}
+  cookbook_file "/tmp/install_google_tools.sh" do
+    source "install_google_tools.sh"
+    mode "0755"
+    action :create
+    backup false
   end
 
-  # requirement for gsutil
-  bash "install boto" do
-    flags "-ex"
+  execute "/tmp/install_google_tools.sh" do
     environment(node[:rightimage][:script_env])
-    code <<-EOF
-      easy_install pip
-      pip install boto
-    EOF
-  end
-
-  bash "install gcutil" do
-    creates "/usr/local/gcutil/gcutil"
-    code <<-EOF
-      gcutil=#{node[:rightimage][:google][:gcutil_name]}
-      wget #{node[:rightimage][:google][:gcutil_base_url]}/$gcutil.tar.gz
-      tar zxvf $gcutil.tar.gz -C /usr/local
-      rm -rf /usr/local/gcutil
-      mv /usr/local/$gcutil /usr/local/gcutil
-      echo 'export PATH=$PATH:/usr/local/gcutil' > /etc/profile.d/gcutil.sh
-      source /etc/profile.d/gcutil.sh
-EOF
-  end
-
-  bash "install gsutil" do
-    creates "/usr/local/gsutil/gsutil"
-    code <<-EOF
-  wget http://commondatastorage.googleapis.com/pub/gsutil.tar.gz
-  tar zxvf gsutil.tar.gz -C /usr/local
-  echo 'export PATH=$PATH:/usr/local/gsutil' > /etc/profile.d/gsutil.sh
-  source /etc/profile.d/gsutil.sh
-EOF
   end
 
   # TBD, replace this block. We use the gsutil/gcutil tools to do this, but we
