@@ -130,7 +130,6 @@
     "rightimage_tester::default": "Default recipe. Does nothing currently.",
     "rightimage_tester::dependencies": "Ensure dependencies are installed.",
     "rightimage_tester::dupe_mounts": "Check for duplicate mounts.",
-    "rightimage_tester::ephemeral": "Ensure ephemeral drive mounted.",
     "rightimage_tester::filesystem_permissions": "Check filesystem permissions.",
     "rightimage_tester::filesystem_size": "Check root filesystem size.",
     "rightimage_tester::fstab": "Check fstab.",
