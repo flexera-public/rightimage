@@ -111,14 +111,5 @@ CHROOT_SCRIPT
   EOF
 end
 
-# Clean up guest image
-rightimage guest_root do
-  action :sanitize
-end
-
-directory "#{guest_root}#{node[:rightimage][:fstab][:ephemeral][:mount]}" do
-  not_if { node[:rightimage][:fstab][:ephemeral][:dev] == nil }
-  action :create
-end
 
 rightscale_marker :end
