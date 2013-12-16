@@ -47,7 +47,7 @@ def install_grub_package
   execute "#{chroot_install} #{grub_package}"
 end
 
-def install_grub_config(new_resource)
+def install_grub_config
   cloud = new_resource.cloud
 
   timeout = 5
@@ -123,6 +123,11 @@ def install_grub_config(new_resource)
       creates "#{guest_root}/etc/grub.conf"
     end
 
+    execute "grub symlink2" do
+      command "chroot #{guest_root} ln -s /boot/grub/menu.lst /boot/grub/grub.conf"
+      creates "#{guest_root}/boot/grub/grub.conf"
+    end
+
     # Setup /etc/sysconfig/kernel to allow grub to auto-update grub.conf when updating kernel.
     if new_resource.platform =~ /centos|rhel|redhat/
       template "#{guest_root}/etc/sysconfig/kernel" do
@@ -146,7 +151,7 @@ action :install do
   cloud = new_resource.cloud
 
   install_grub_package
-  install_grub_config(new_resource)
+  install_grub_config
 
 
   root_device = 
