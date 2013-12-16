@@ -62,17 +62,10 @@ when "ubuntu"
     rightimage[:host_packages] << " devscripts"
   end
 
-  if rightimage[:platform_version].to_f == 10.04
-    rightimage[:host_packages] << " python-vm-builder-ec2"
-  end
-
   if rightimage[:platform_version].to_f == 12.04
     rightimage[:host_packages] << " liburi-perl"
   end
 when "centos","rhel"
-  # For Centos 5, install custom ruby (1.8.7). so keep these in a separate variable 
-  # These are the packages available on the rbel upstream mirror
-  set[:rightimage][:ruby_packages] = "ruby ruby-devel ruby-irb ruby-libs ruby-rdoc ruby-ri ruby-tcltk"
 
   rightimage[:host_packages] << " swig"
 
@@ -152,15 +145,6 @@ set_unless[:rightimage][:rightlink_version] = ""
 
 set_unless[:rightimage][:rightlink_repo] = "rightlink-staging"
 
-
-# generate command to install getsshkey init script 
-case rightimage[:platform]
-  when "ubuntu" 
-    set[:rightimage][:getsshkey_cmd] = "chroot $GUEST_ROOT update-rc.d getsshkey start 20 2 3 4 5 . stop 1 0 1 6 ."
-  when "centos", "rhel"
-    set[:rightimage][:getsshkey_cmd] = "chroot $GUEST_ROOT chkconfig --add getsshkey && \
-               chroot $GUEST_ROOT chkconfig --level 4 getsshkey on"
-end
 
 # http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=637234#40
 set[:rightimage][:root_mount][:options] = "errors=remount-ro,barrier=0" if rightimage[:platform] == "ubuntu" && rightimage[:platform_version].to_f >= 12.04 && rightimage[:hypervisor] == "xen"

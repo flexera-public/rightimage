@@ -259,15 +259,6 @@ EOS
     end
   end
 
-  # Don't let SysV init start until more than lo0 is ready
-  bash "sysv upstart fix" do
-    only_if { new_resource.platform_version.to_f == 10.04 }
-    flags "-ex"
-    code <<-EOH
-      sed -i "s/IFACE=/IFACE\!=/" #{guest_root}/etc/init/rc-sysinit.conf
-    EOH
-  end
-
   log "Setting APT::Install-Recommends to false"
   bash "apt config" do
     flags "-ex"
@@ -283,74 +274,6 @@ EOS
       echo "Acquire::http::Pipeline-Depth \"0\";" > #{guest_root}/etc/apt/apt.conf.d/99-no-pipelining
     EOH
   end
-
-
-  # w-5970 - liblockfile has a bug resulting in ntp restart to fail on instances
-  # where the hostname is too long (>36 chars) which might occur somewhat commonly
-  # on openstack and rackspace instances. This is a patch from their staging repos
-  # TBD can be removed when patched version merged to master
-  # https://bugs.launchpad.net/ubuntu/+source/liblockfile/+bug/941968/comments/30
-  directory "#{guest_root}/tmp/packages"
-  bash "custom liblockfile" do
-    cwd "#{guest_root}/tmp/packages"
-    flags "-ex"
-    only_if { new_resource.platform_version.to_f == 12.04 && node[:rightimage][:arch] == "x86_64" }
-    packages = %w(
-      liblockfile-bin_1.09-3ubuntu0.1_amd64.deb
-      liblockfile-dev_1.09-3ubuntu0.1_amd64.deb
-      liblockfile1_1.09-3ubuntu0.1_amd64.deb
-      ).join(" ")
-    code <<-EOF
-      baseurl=#{node[:rightimage][:s3_base_url]}/patches/ubuntu/12.04/w-5970/
-      for p in #{packages}
-      do
-        curl -s -S -f -L --retry 7 -O $baseurl$p
-      done
-      echo 'cd /tmp/packages && dpkg -i #{packages}' | chroot /mnt/image
-    EOF
-  end
-
-  # - add in custom built libc packages, fixes "illegal instruction" core dump (w-12310)
-  bash "install custom libc" do 
-    only_if { new_resource.platform_version.to_f == 10.04 && node[:rightimage][:arch] == "x86_64" }
-    packages = %w(
-      libc-bin_2.11.1-0ubuntu7.11_amd64.deb
-      libc-dev-bin_2.11.1-0ubuntu7.11_amd64.deb
-      libc6-dbg_2.11.1-0ubuntu7.11_amd64.deb
-      libc6-dev-i386_2.11.1-0ubuntu7.11_amd64.deb
-      libc6-dev_2.11.1-0ubuntu7.11_amd64.deb
-      libc6-i386_2.11.1-0ubuntu7.11_amd64.deb
-      libc6_2.11.1-0ubuntu7.11_amd64.deb
-      nscd_2.11.1-0ubuntu7.11_amd64.deb
-    ).join(" ")
-    cwd "#{guest_root}/tmp/packages"
-    flags "-ex"
-    code <<-EOH
-      mount -t proc none #{guest_root}/proc
-      mount --bind /dev #{guest_root}/dev
-      mount --bind /sys #{guest_root}/sys
-      base_url=#{node[:rightimage][:s3_base_url]}/packages/ubuntu/10.04/
-      for p in #{packages}
-      do
-        curl -s -S -f -L --retry 7 -O $base_url$p 
-      done
-
-      cat <<EOF>#{guest_root}/tmp/packages/install_debs.sh
-#!/bin/bash -ex
-cd /tmp/packages
-dpkg -i #{packages}
-EOF
-      chmod a+x #{guest_root}/tmp/packages/install_debs.sh
-      chroot #{guest_root} /tmp/packages/install_debs.sh
-      # nscd deb starts up second version, will prevent loopback fs from dismounting
-      killall nscd
-      umount -lf #{guest_root}/dev || true
-      umount -lf #{guest_root}/proc || true
-      umount -lf #{guest_root}/sys || true
-      service nscd start
-    EOH
-  end
-
 
   ruby_block "install guest packages" do 
     block do
