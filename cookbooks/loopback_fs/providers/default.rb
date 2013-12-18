@@ -39,7 +39,8 @@ action :create do
       source="#{new_resource.source}"
 
       qemu-img create -f qcow2 $source ${loop_size}G
-      modprobe nbd max_part=16
+      # Only run modprobe if not done already, otherwise will cause I/O errors.
+      [ ! -e /dev/nbd0 ] && modprobe nbd max_part=16
       qemu-nbd -n -c $loop_dev $source
       sleep 1
       parted -s ${loop_dev} mklabel msdos
@@ -65,7 +66,11 @@ action :create do
       mount -t ext2 $fake_map $mount_point
 
       # Handle binding of special files
-      #{bind_devices_script}
+      # No need to do this if doing a create as part of resize action, since we
+      # just want to copy what is already on the other loopback.
+      if [ "#{new_resource.bind_devices}" == "true" ]; then
+        #{bind_devices_script}
+      fi
     EOH
   end
 end
@@ -89,19 +94,10 @@ action :unmount do
 
       umount -lf $mount_point || true
 
-<<<<<<< HEAD
-
       [ -e "$fake_map" ] && kpartx -s -d $fake_dev
       [ -e "$fake_dev" ] && dmsetup remove $fake_dev
       qemu-nbd -d $loop_dev
 	    killall qemu-nbd || killall5 qemu-nbd || true
-=======
-      [ -e "$fake_map" ] && kpartx -s -d $fake_dev
-      [ -e "$fake_dev" ] && dmsetup remove $fake_dev
-
-      qemu-nbd -d $loop_dev
-      killall qemu-nbd || killall5 qemu-nbd || true
->>>>>>> ca619f6... [QCOW] Fix issues from last merge
     EOH
   end
 end
@@ -120,8 +116,9 @@ action :mount do
       mount_point="#{new_resource.mount_point}"
       source="#{new_resource.source}"
 
-      modprobe nbd max_part=16
-  	  # Turn off cache (-n) as it causes qemu-nbd to crash and throw I/O errors.
+      [ ! -e /dev/nbd0 ] && modprobe nbd max_part=16
+
+      # Turn off cache (-n) as it causes qemu-nbd to crash and throw I/O errors.
       qemu-nbd -n -c $loop_dev $source
   	  sleep 1
       partprobe $loop_dev
@@ -143,5 +140,11 @@ action :mount do
         #{bind_devices_script}
       fi
     EOH
+  end
+end
+
+action :clone do
+  execute "qemu-img create -f qcow2 -o backing_file=#{loopback_file_base} #{loopback_file_backup}" do
+    cwd target_raw_root
   end
 end

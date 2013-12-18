@@ -25,15 +25,17 @@ log "Resize skipped, desired file size (#{node[:rightimage][:root_size_gb]}) and
   not_if { do_loopback_resize }
 end
 
-loopback_fs loopback_file do
+loopback_fs loopback_file_base do
   only_if { do_loopback_resize }
+  bind_devices false
   mount_point guest_root
   device_number 0
   action :mount
 end
 
-loopback_fs loopback_file+".tmp" do
+loopback_fs loopback_file_base+".tmp" do
   only_if { do_loopback_resize }
+  bind_devices false
   mount_point guest_root+"2"
   device_number 1
   size_gb node[:rightimage][:root_size_gb].to_i
@@ -46,13 +48,13 @@ bash "copy loopback fs" do
   code "rsync -a #{guest_root}/ #{guest_root+'2'}"
 end
 
-loopback_fs loopback_file do
+loopback_fs loopback_file_base do
   only_if { do_loopback_resize }
   mount_point guest_root
   action :unmount
 end
 
-loopback_fs loopback_file+".tmp" do
+loopback_fs loopback_file_base+".tmp" do
   only_if { do_loopback_resize }
   mount_point guest_root+"2"
   action :unmount
@@ -61,7 +63,12 @@ end
 bash "replace old file" do
   only_if { do_loopback_resize }
   flags "-ex"
-  code "mv #{loopback_file}.tmp #{loopback_file}"
+  code "mv #{loopback_file_base}.tmp #{loopback_file_base}"
+end
+
+loopback_fs "clone resized #{loopback_file_base}" do
+  only_if { do_loopback_resize }
+  action :clone
 end
 
 rightscale_marker :end

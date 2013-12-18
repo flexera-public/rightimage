@@ -32,7 +32,7 @@ end
 node[:rightimage][:host_packages].each { |p| package p.strip }
 
 include_recipe "rightimage::loopback_download"
-#include_recipe "rightimage::loopback_resize"
+include_recipe "rightimage::loopback_resize"
 include_recipe "rightimage::loopback_mount"
 include_recipe "rightimage::clean"
 include_recipe "rightimage::cloud_add"

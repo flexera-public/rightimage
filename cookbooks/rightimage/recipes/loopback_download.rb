@@ -27,9 +27,9 @@ execute "bzip2 --decompress #{loopback_file_compressed}" do
   not_if { ::File.exists? loopback_file_base }
 end
 
-execute "qemu-img create -f qcow2 -o backing_file=#{loopback_file_base} #{loopback_file_backup}" do
-  cwd target_raw_root
-  not_if { ::File.exists? loopback_file_backup }
+loopback_fs "clone #{loopback_file_base}" do
+  not_if { ::File.exists?(loopback_file_backup) || do_loopback_resize }
+  action :clone
 end
 
 rightscale_marker :end

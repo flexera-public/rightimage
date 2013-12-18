@@ -119,8 +119,12 @@ module RightScale
       end
 
       def do_loopback_resize
-        source_size_gb = (::File.size(loopback_file)/1024/1024/1024).to_f.round
-        node[:rightimage][:root_size_gb].to_i != source_size_gb
+        node[:rightimage][:root_size_gb].to_i != loopback_size
+      end
+
+      def loopback_size
+        source_size = `qemu-img info #{loopback_file_base} | grep "virtual size" | cut -d '(' -f2 | cut -d ' ' -f1`.chomp.to_i
+        (source_size/1024/1024/1024).to_i
       end
 
       def guest_root
