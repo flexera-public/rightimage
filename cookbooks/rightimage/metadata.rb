@@ -8,6 +8,7 @@ depends "ros_upload"
 depends "rightimage_tester"
 depends "loopback_fs"
 depends "rightscale"
+depends "rightscale_volume"
 
 depends "rightimage_cloud_vagrant"
 
@@ -35,6 +36,9 @@ recipe "rightimage::loopback_download", "downloads base loopback image"
 recipe "rightimage::loopback_unmount", "unmounts loopback file system"
 recipe "rightimage::loopback_mount", "mounts loopback file system"
 recipe "rightimage::loopback_resize", "resizes loopback file system"
+
+recipe "rightimage::volume_create", "creates and attaches a volume"
+recipe "rightimage::volume_destroy", "detatches and deletes a volume"
 
 #
 # required
@@ -407,6 +411,18 @@ attribute "rightimage/google/service_key",
 
 attribute "rightimage/google/refresh_token",
   :display_name => "Google OAuth2 credentials refresh token",
-  :description => "Refresh token value for GCE. Pulled form gcutil conf",
+  :description => "Refresh token value for GCE. Pulled from gcutil conf",
   :required => "optional",
   :recipes => [ "rightimage::cloud_upload" ]
+
+attribute "rightimage/build_dir",
+  :display_name => "Build Directory",
+  :description => "Temporary directory to store build collateral",
+  :default => "/mnt/storage",
+  :required => "optional"
+
+attribute "rightimage/volume_size",
+  :display_name => "Volume Size",
+  :description => "If specified, creates a volume of specified size and mounts at rightimage/build_dir",
+  :required => "optional",
+  :recipes => [ "rightimage::volume_create" ]

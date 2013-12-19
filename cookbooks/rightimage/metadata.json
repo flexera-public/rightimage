@@ -179,6 +179,20 @@
       "required": "recommended",
       "type": "string"
     },
+    "rightimage/build_dir": {
+      "calculated": false,
+      "choice": [
+
+      ],
+      "default": "/mnt/storage",
+      "description": "Temporary directory to store build collateral",
+      "display_name": "Build Directory",
+      "recipes": [
+
+      ],
+      "required": "optional",
+      "type": "string"
+    },
     "rightimage/build_id": {
       "calculated": false,
       "choice": [
@@ -509,7 +523,7 @@
       "choice": [
 
       ],
-      "description": "Refresh token value for GCE. Pulled form gcutil conf",
+      "description": "Refresh token value for GCE. Pulled from gcutil conf",
       "display_name": "Google OAuth2 credentials refresh token",
       "recipes": [
         "rightimage::cloud_upload"
@@ -866,6 +880,19 @@
       ],
       "required": "optional",
       "type": "string"
+    },
+    "rightimage/volume_size": {
+      "calculated": false,
+      "choice": [
+
+      ],
+      "description": "If specified, creates a volume of specified size and mounts at rightimage/build_dir",
+      "display_name": "Volume Size",
+      "recipes": [
+        "rightimage::volume_create"
+      ],
+      "required": "optional",
+      "type": "string"
     }
   },
   "conflicting": {
@@ -875,6 +902,7 @@
     "rightimage_cloud_vagrant": ">= 0.0.0",
     "rightimage_tester": ">= 0.0.0",
     "rightscale": ">= 0.0.0",
+    "rightscale_volume": ">= 0.0.0",
     "ros_upload": ">= 0.0.0"
   },
   "description": "A cookbook for building RightImages",
@@ -911,7 +939,9 @@
     "rightimage::rebundle": "coordinate a rebundled image build (redhat on on ec2 or rackspace)",
     "rightimage::rightscale_install": "sets up rightscale specific customizations, then installs rightlink",
     "rightimage::rightscale_rightlink": "installs rightlink",
-    "rightimage::upload_image_s3": "bundle and upload private cloud image to s3 bucket for distribution/download"
+    "rightimage::upload_image_s3": "bundle and upload private cloud image to s3 bucket for distribution/download",
+    "rightimage::volume_create": "creates and attaches a volume",
+    "rightimage::volume_destroy": "detatches and deletes a volume"
   },
   "recommendations": {
   },

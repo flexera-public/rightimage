@@ -132,7 +132,7 @@ module RightScale
       end
 
       def target_raw_root
-        "/mnt/storage"
+        node[:rightimage][:build_dir]
       end
 
       def loopback_device
