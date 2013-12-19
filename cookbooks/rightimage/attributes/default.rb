@@ -5,7 +5,6 @@ end
 set_unless[:rightimage][:debug] = false
 set[:rightimage][:lang] = "en_US.UTF-8"
 set_unless[:rightimage][:root_size_gb] = "10"
-set[:rightimage][:build_dir] = "/mnt/vmbuilder"
 set[:rightimage][:guest_root] = "/mnt/image"
 set_unless[:rightimage][:hypervisor] = "xen"
 # Don't use cf-mirror because it causes hash sum mismatch errors on Ubuntu

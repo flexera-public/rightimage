@@ -82,10 +82,11 @@ action :install do
     EOH
   end
 
+  temp_build_dir = node[:rightimage][:build_dir] + "/vmbuilder"
   #create bootstrap command
   bootstrap_cmd = "/usr/bin/vmbuilder xen ubuntu -o \
       --suite=#{platform_codename} \
-      -d #{node[:rightimage][:build_dir]} \
+      -d #{temp_build_dir} \
       --rootsize=2048 \
       --install-mirror=#{mirror_url} \
       --install-security-mirror=#{mirror_url} \
@@ -162,13 +163,13 @@ EOS
       if [ "#{platform_codename}" == "hardy" ] ; then
         image_temp=$image_name
       else
-        image_temp=`cat /mnt/vmbuilder/xen.conf  | grep xvda1 | grep -v root  | cut -c 25- | cut -c -9`
+        image_temp=`cat #{temp_build_dir}/xen.conf  | grep xvda1 | grep -v root  | cut -c 25- | cut -c -9`
       fi
 
 
       loop_dev="/dev/loop1"
 
-      base_raw_path="/mnt/vmbuilder/root.img"
+      base_raw_path="#{temp_build_dir}/root.img"
 
       sync
       umount -lf $loop_dev || true
@@ -178,7 +179,7 @@ EOS
       [ "$?" == "0" ] && losetup -d $loop_dev
       set -e
 
-      qemu-img convert -O raw /mnt/vmbuilder/$image_temp $base_raw_path
+      qemu-img convert -O raw #{temp_build_dir}/$image_temp $base_raw_path
 
 
 

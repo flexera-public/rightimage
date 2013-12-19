@@ -43,7 +43,7 @@ end
 
 
 def install_grub_package
-  package grub_package
+  #package grub_package
   execute "#{chroot_install} #{grub_package}"
 end
 

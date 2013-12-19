@@ -26,8 +26,10 @@ class Chef::Recipe
   include RightScale::RightImage::Helper
 end
 
+include_recipe "rightimage::loopback_unmount"
+
 mount target_raw_root do
-  device node['rightscale_volume']['db_data_volume']['device']
+  device node['rightscale_volume']['volume']['device']
   action :umount
 end
 
