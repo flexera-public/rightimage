@@ -274,6 +274,15 @@ def upload_ebs
       image_mount=#{guest_root}
       local_device=#{local_device}
 
+      if [ "$hvm" == "true" ]; then
+        # Partition volume (Required for HVM)
+        # Use --no-reread option to avoid intermittent failures when re-reading
+        # the partition table at the end. (w-5644)
+        echo "1,,L,*" | sfdisk --no-reread $local_device
+
+        local_device=${local_device}1
+      fi
+
   ## format and mount volume
       mkfs.ext3 -F ${local_device}
       root_label="#{node[:rightimage][:root_mount][:label_dev]}"
