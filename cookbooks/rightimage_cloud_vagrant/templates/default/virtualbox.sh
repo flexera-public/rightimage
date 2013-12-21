@@ -12,12 +12,10 @@ if [ ! -f $file ]; then
   curl -o $file --fail --silent --location http://download.virtualbox.org/virtualbox/$VBOX_VERSION/VBoxGuestAdditions_$VBOX_VERSION.iso
 fi
 
-set +e
-grep /mnt /etc/mtab
-if [ $? == 1 ]; then
+if [ ! -f /mnt/VBoxLinuxAdditions.run ]; then
+  [ ! -e /dev/loop1 ] && MAKEDEV loop1
   mount -o loop /tmp/VBoxGuestAdditions.iso /mnt
 fi
-set -e
 
 # See ../../files/default/uname for explanation of uname thing. Need a fake uname
 # to fool the installer about which kernel headers to build against
