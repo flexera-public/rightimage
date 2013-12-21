@@ -35,6 +35,7 @@ action :configure do
     mode "0755"
     backup false
   end
+
   execute "#{guest_root}/tmp/install_ec2_tools.sh" do
     environment(node[:rightimage][:script_env])
   end
