@@ -300,10 +300,9 @@ module RightScale
         node[:rightimage][:build_mode] == "base" ||  (node[:rightimage][:build_mode] == "full" && node[:rightimage][:cloud] != "ec2")
       end
 
-      # Mirror freeze date is used to name the snapshots that base images are stored to and restored from
+      # Mirror freeze date is used to name the qcow volumes that base images are stored to and restored from
       # For base images, we'll use the specified freezedate or default to the latest date
-      # For full images, we'll restored from the specified freezedate, or else poll the API for
-      # the latest snapshot and use that.
+      # For full images, we'll restored from the specified freezedate or error out
       def mirror_freeze_date
         return @@mirror_freeze_date if defined?(@@mirror_freeze_date)
 
@@ -321,60 +320,11 @@ module RightScale
           Chef::Log::info("Using latest available mirror date for rebundle")
           @@mirror_freeze_date = nil
         elsif node[:rightimage][:build_mode] == "full"
-          set_mirror_freeze_date_from_snapshot
-          @@mirror_freeze_date = node[:rightimage][:mirror_freeze_date]
+          raise "A mirror freeze date must be supplied for full image builds. This must be the same date used to build the base image."
         else
           raise "Undefined build_mode #{node[:rightimage][:build_mode]}, must be base or full"
         end
         return @@mirror_freeze_date
-      end
-
-      def set_mirror_freeze_date_from_snapshot
-        require 'rest_client'
-        require 'json'
-        require '/var/spool/cloud/user-data'
-
-        os = node[:rightimage][:platform]
-        ver = node[:rightimage][:platform_version]
-        arch = node[:rightimage][:arch]
-
-        Chef::Log.info("A mirror_freeze_date was not supplied, attempting to restore from the latest snapshot")
-        Chef::Log.info("Searching for snapshots with the form base_image_#{os}_#{ver}_#{arch}")
-
-        url = ENV['RS_API_URL']
-        body = RestClient.get(url + '/find_ebs_snapshots.js?api_version=1.0')
-        snapshots = JSON.load(body)
-
-        filtered_snaps = snapshots.select do |s| 
-          s['nickname'] =~ /base_image_#{os}_#{ver}_#{arch}_(\d{8,12})_([^_]+)_(.+)/ &&
-          s['aws_status'] == "completed"
-        end
-        if filtered_snaps.length > 0
-          sorted_snaps = filtered_snaps.map do |s|
-            # $1=repo freezedate, $2=build_id, $3=aws snapshot timestamp
-            s['nickname'] =~ /_(\d{8,12})_([^_]+)_(.+)/
-            freezedate = $1
-            build_id = $2
-            timestamp = $3
-            if timestamp =~ /_(\d{8,})$/
-              timestamp = $1
-            end
-            [s,freezedate,build_id,timestamp]
-          end
-          sorted_snaps.sort! { |a,b| a[1..3] <=> b[1..3] }
-
-          snapshot = sorted_snaps.last[0]
-          if snapshot['nickname'] =~ /(base_image_#{os}_#{ver}_#{arch}_(\d{8,12})_([^_]+))_/
-            lineage = $1
-            Chef::Log.info("Found #{sorted_snaps.length} snapshots, using latest with lineage #{lineage}")
-            node[:rightimage][:mirror_freeze_date] = $2[0..7]
-            node[:rightimage][:build_id] = $3
-          else
-            raise "Unable to parse lineage out of snapshot name #{snap["nickname"]}"
-          end
-        else
-          raise "No snapshots found matching lineage base_image_#{os}_#{ver}_#{arch}_*. You have to first run a build with build_mode set to base to generate a base image snapshot"
-        end
       end
 
       def version_compare(str1, str2)
