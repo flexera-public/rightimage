@@ -28,17 +28,10 @@ action :create do
   bash "create loopback fs #{new_resource.source}" do
     not_if { ::File.exists? new_resource.source }
     flags "-ex"
-# Cylinders is the second param to sfdisk, however it doesn't
-# seem to be necessary, if its blank it'll just calculate it itself
-# and use all the space
-#    size_bytes = new_resource.size_gb*1024*1024*1024
-#    cylinders = size_bytes/(255*63*512)
-
-
 
     code <<-EOH
-      calc_mb="#{new_resource.size_gb*1024}"
       loop_dev="#{loopback_device}#{new_resource.device_number}"
+      loop_size="#{new_resource.size_gb}"
       fake_dev="/dev/mapper/sda#{new_resource.device_number}"
       fake_map="/dev/mapper/sda#{new_resource.device_number}p1"
       root_label="#{new_resource.label}"
@@ -96,11 +89,19 @@ action :unmount do
 
       umount -lf $mount_point || true
 
+<<<<<<< HEAD
 
       [ -e "$fake_map" ] && kpartx -s -d $fake_dev
       [ -e "$fake_dev" ] && dmsetup remove $fake_dev
       qemu-nbd -d $loop_dev
 	    killall qemu-nbd || killall5 qemu-nbd || true
+=======
+      [ -e "$fake_map" ] && kpartx -s -d $fake_dev
+      [ -e "$fake_dev" ] && dmsetup remove $fake_dev
+
+      qemu-nbd -d $loop_dev
+      killall qemu-nbd || killall5 qemu-nbd || true
+>>>>>>> ca619f6... [QCOW] Fix issues from last merge
     EOH
   end
 end

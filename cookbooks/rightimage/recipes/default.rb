@@ -46,7 +46,7 @@ package "rubygems"
 # Dependency of fog, v2 requires Ruby 1.9.2+
 gem_package "mime-types" do
   gem_binary "/usr/bin/gem"
-  version "1.25"
+  version "< 2.0"
   action :install
 end
 

@@ -198,8 +198,8 @@ action :install do
     bash "setup grub2" do
       flags "-ex"
       code <<-EOH
-        loop_device=`losetup -j #{loopback_file} | cut -d: -f1`
-        grub-install --boot-directory=#{guest_root}/boot/ --modules="ext2 part_msdos" $loop_device
+        mkdir -p /mnt/out/boot/grub
+        grub-install --boot-directory=#{guest_root}/boot/ --modules="ext2 part_msdos" #{loopback_device}0
       EOH
     end
   end
