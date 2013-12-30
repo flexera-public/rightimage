@@ -55,7 +55,8 @@ action :package do
       qemu-img convert -f qcow2 -O raw #{loopback_file} $raw_image
       vhd-util convert -s 0 -t 1 -i $raw_image -o $vhd_image
       vhd-util convert -s 1 -t 2 -i $vhd_image -o #{image_name}.vhd
-      bzip2 -k #{image_name}.vhd
+      rm -f ${vhd_image}.bak
+      bzip2 #{image_name}.vhd
     EOH
   end
 end

@@ -38,9 +38,12 @@ def grub_kernel
 end
 
 def grub_root
-  "(hd0,0)"
+  if partitioned?
+    "(hd0,0)"
+  else
+    "(hd0)"
+  end
 end
-
 
 def install_grub_package
   if node[:rightimage][:platform] == "ubuntu"
@@ -170,7 +173,7 @@ action :install do
     case new_resource.hypervisor
     when "xen" then "/dev/xvda"
     when "kvm" then  "/dev/vda"
-    when "esxi", "hyperv" then "/dev/sda"
+    when "esxi", "hyperv", "virtualbox" then "/dev/sda"
     else raise "Unknown hypervisor, can't install bootloader"
     end
 
@@ -198,7 +201,7 @@ action :install do
         echo "(hd0) #{root_device}" > $guest_root/boot/grub/device.map
         echo "" >> $guest_root/boot/grub/device.map
 
-        echo "(hd0) #{loopback_file}" > device.map 
+        echo "(hd0) /dev/mapper/sda0" > device.map
 
         echo "root #{grub_root}" > /tmp/grubsetup
         echo "setup (hd0)" >> /tmp/grubsetup

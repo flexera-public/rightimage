@@ -15,7 +15,6 @@ action :configure do
     end
   end
 
-
   directory temp_root do
     recursive true
   end
@@ -64,6 +63,11 @@ setup (hd0)
 quit
 EOF
 EOH
+  end
+
+  execute "install iscsi tools" do
+    only_if { node[:rightimage][:platform] =~ /redhat|rhel|centos/ }
+    command "chroot #{guest_root} yum -y install iscsi-initiator-utils"
   end
 
   if (new_resource.platform =~ /centos|rhel/ && new_resource.platform_version.to_f >= 6) || new_resource.platform == "ubuntu"

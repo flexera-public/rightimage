@@ -124,19 +124,8 @@ case rightimage[:cloud]
         end
     end
   else 
-    case rightimage[:hypervisor]
-    when "xen"
-      set[:rightimage][:root_mount][:dump] = "1" 
-      set[:rightimage][:root_mount][:fsck] = "1" 
-    when "kvm"
-      set[:rightimage][:root_mount][:dump] = "1" 
-      set[:rightimage][:root_mount][:fsck] = "1" 
-    when "esxi", "hyperv"
-      set[:rightimage][:root_mount][:dump] = "1" 
-      set[:rightimage][:root_mount][:fsck] = "1" 
-    else
-      raise "ERROR: unsupported hypervisor #{node[:rightimage][:hypervisor]} for cloudstack"
-    end
+    set[:rightimage][:root_mount][:dump] = "1"
+    set[:rightimage][:root_mount][:fsck] = "1"
 end
 
 # set rightscale stuff

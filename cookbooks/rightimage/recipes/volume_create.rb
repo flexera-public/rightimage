@@ -29,8 +29,6 @@ class Chef::Resource::RubyBlock
   include Chef::Mixin::ShellOut
 end
 
-include_recipe "rightscale_volume::default" if node[:rightimage][:volume_size]
-
 rightscale_volume "volume" do
   only_if { node[:rightimage][:volume_size] && !mounted? }
   size node[:rightimage][:volume_size].to_i

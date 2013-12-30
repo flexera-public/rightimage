@@ -1,5 +1,6 @@
 # Base install
 
+yum -y install sudo
 # Disable requiretty as documented in:
 # http://docs-v1.vagrantup.com/v1/docs/base_boxes.html
 sed -i "/^Defaults/ s/ requiretty/ \!requiretty/" /etc/sudoers

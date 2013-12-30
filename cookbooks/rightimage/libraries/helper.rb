@@ -295,17 +295,9 @@ module RightScale
         end
       end
 
-      def grub_root
-        if partitioned?
-          "(hd0,0)"
-        else
-          "(hd0)"
-        end
-      end
-
       def partitioned?
         # Don't partition EC2 images because it's not easy to rebundle them later without manual changes.
-        node[:rightimage][:build_mode] == "base" ||  (node[:rightimage][:mode] == "full" && node[:rightimage][:cloud] != "ec2")
+        node[:rightimage][:build_mode] == "base" ||  (node[:rightimage][:build_mode] == "full" && node[:rightimage][:cloud] != "ec2")
       end
 
       # Mirror freeze date is used to name the snapshots that base images are stored to and restored from
