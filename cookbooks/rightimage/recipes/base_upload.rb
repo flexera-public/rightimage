@@ -6,13 +6,18 @@ class Chef::Resource::Bash
   include RightScale::RightImage::Helper
 end
 
-directory(::File.dirname(loopback_file_gz)) { recursive true }
+#directory(::File.dirname(loopback_file_compressed)) { recursive true }
+
+#directory temp_root do
+#  recursive true
+#  action :create
+#end
 
 bash "compress partitioned base image" do
-  cwd temp_root
+  cwd target_raw_root
   flags "-ex"
-  not_if { ::File.exists?(loopback_file_gz) && (::File.mtime(loopback_file_gz) > ::File.mtime(loopback_file)) }
-  code "gzip -c #{loopback_file} > #{loopback_file_gz}"
+  not_if { ::File.exists?(loopback_file_compressed) && (::File.mtime(loopback_file_compressed) > ::File.mtime(loopback_file)) }
+  code "bzip2 --best --compress --force --keep #{loopback_file}"
 end
 
 
@@ -20,7 +25,7 @@ image_s3_path = guest_platform+"/"+guest_platform_version+"/"+guest_arch+"/"+mir
 image_upload_bucket = node[:rightimage][:base_image_bucket]
 
 # Upload partitioned image
-ros_upload loopback_file_gz do
+rightimage_upload loopback_file_compressed do
   provider "ros_upload_s3"
   user node[:rightimage][:aws_access_key_id]
   password node[:rightimage][:aws_secret_access_key]

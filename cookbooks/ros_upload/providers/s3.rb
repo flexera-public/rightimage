@@ -19,6 +19,7 @@ action :upload do
       'AWS_ACCESS_KEY_ID'=>user,
       'AWS_SECRET_ACCESS_KEY'=>password
     )
+    timeout 10800
     code <<-EOF
       require 'rubygems'
       require 'fog'

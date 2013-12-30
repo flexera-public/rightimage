@@ -131,7 +131,15 @@ module RightScale
         "/mnt/storage"
       end
 
-      def loopback_file
+      def loopback_device
+        "/dev/nbd"
+      end
+
+	  def loopback_file
+	    node[:rightimage][:mode] == "base" ? loopback_file_base : loopback_file_backup
+	  end
+	  
+      def loopback_file_base
         "#{target_raw_root}/#{loopback_filename}"
       end
 
@@ -140,15 +148,30 @@ module RightScale
       end
 
       def loopback_filename
-        loopback_rootname + ".raw"
+        loopback_rootname + ".qcow2"
       end
 
       def temp_root
         "/mnt/ephemeral/rightimage-temp"
       end
 
-      def loopback_file_gz
-        "#{temp_root}/#{loopback_filename}.gz"
+      def image_source_bucket
+        bucket = "rightscale-#{image_source_cloud}"
+        bucket << "-dev" if node[:rightimage][:debug] == "true"
+        bucket
+      end
+
+      def loopback_file_compressed
+        loopback_file_base + ".bz2"
+      end	  
+	  
+      def loopback_filename_compressed
+        loopback_filename + ".bz2"
+      end
+	  
+	    def loopback_file_backup
+	    #  "#{target_raw_root}/#{loopback_rootname}-full.qcow2"
+	      loopback_file_base
       end
 
       def mounted?

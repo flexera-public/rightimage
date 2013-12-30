@@ -4,6 +4,10 @@ class Chef::Resource
   include RightScale::RightImage::Helper
 end
 
+package "rsync"
+
+# TODO: Check for resize option on qemu. Will need to resize the actual disk too.
+
 # If the image is unpartitioned we use resize2fs, if its partitioned we 
 # create a new loopback file of the desired size, mount it, and copy over
 # then replace the old file since that works equally well for growing/shrinking

@@ -12,10 +12,11 @@ def bind_devices_script
   mount --bind /sys $mount_point/sys
 
   umount $mount_point/dev || true
+  umount $mount_point/dev/pts || true
 
   mkdir -p $mount_point/dev
   mount -t devtmpfs none $mount_point/dev
-
+  
   EOF
 end
 
@@ -37,16 +38,17 @@ action :create do
 
     code <<-EOH
       calc_mb="#{new_resource.size_gb*1024}"
-      loop_dev="/dev/loop#{new_resource.device_number}"
-      loop_map="/dev/mapper/loop#{new_resource.device_number}p1"
+      loop_dev="#{loopback_device}#{new_resource.device_number}"
       fake_dev="/dev/mapper/sda#{new_resource.device_number}"
       fake_map="/dev/mapper/sda#{new_resource.device_number}p1"
       root_label="#{new_resource.label}"
       mount_point="#{new_resource.mount_point}"
       source="#{new_resource.source}"
 
-      dd if=/dev/zero of=$source bs=1M count=$calc_mb
-      losetup $loop_dev $source
+      qemu-img create -f qcow2 $source ${loop_size}G
+      modprobe nbd max_part=16
+      qemu-nbd -n -c $loop_dev $source
+      sleep 1
       parted -s ${loop_dev} mklabel msdos
       parted -s ${loop_dev} mkpart primary ext2 1024k 100% -a minimal
       parted -s ${loop_dev} set 1 boot on
@@ -79,8 +81,7 @@ action :unmount do
   bash "unmount loopback fs #{new_resource.source}" do
     flags "-ex"
     code <<-EOH
-      loop_dev="/dev/loop#{new_resource.device_number}"
-      loop_map="/dev/mapper/loop#{new_resource.device_number}p1"
+      loop_dev="#{loopback_device}#{new_resource.device_number}"
       fake_dev="/dev/mapper/sda#{new_resource.device_number}"
       fake_map="/dev/mapper/sda#{new_resource.device_number}p1"
 
@@ -98,32 +99,31 @@ action :unmount do
 
       [ -e "$fake_map" ] && kpartx -s -d $fake_dev
       [ -e "$fake_dev" ] && dmsetup remove $fake_dev
-      set +e
-      losetup -a | grep $loop_dev
-      if [ "$?" == "0" ]; then
-        set -e
-        losetup -d $loop_dev
-      fi
-      set -e
+      qemu-nbd -d $loop_dev
+	    killall qemu-nbd || killall5 qemu-nbd || true
     EOH
   end
 end
 
 action :mount do
+  package "parted"
+  
   bash "mount loopback fs #{new_resource.source}" do
     not_if { `mount`.split("\n").any? {|line| line.include? new_resource.mount_point} }
     flags "-ex"
     code <<-EOH
-      loop_dev="/dev/loop#{new_resource.device_number}"
-      loop_map="/dev/mapper/loop#{new_resource.device_number}p1"
-      loop_map_link=${loop_dev}p1
+      loop_dev="#{loopback_device}#{new_resource.device_number}"
       fake_dev="/dev/mapper/sda#{new_resource.device_number}"
       fake_map="/dev/mapper/sda#{new_resource.device_number}p1"
 
       mount_point="#{new_resource.mount_point}"
       source="#{new_resource.source}"
 
-      losetup $loop_dev $source
+      modprobe nbd max_part=16
+  	  # Turn off cache (-n) as it causes qemu-nbd to crash and throw I/O errors.
+      qemu-nbd -n -c $loop_dev $source
+  	  sleep 1
+      partprobe $loop_dev
 
       echo "0 $[#{new_resource.size_gb}*2097152] linear $loop_dev 0" | dmsetup create `basename $fake_dev`
       # use synchonous flag to avoid any later race conditions

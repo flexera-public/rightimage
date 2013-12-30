@@ -105,21 +105,39 @@ action :upload do
   CDC_GEM = ::File.join(::File.dirname(__FILE__), "..", "files", "default", "right_cloud_api-#{CDC_GEM_VER}.gem")
   SANDBOX_BIN = "/opt/rightscale/sandbox/bin/gem"
 
-  r = gem_package "nokogiri" do
-    gem_binary SANDBOX_BIN
+  #r = gem_package "nokogiri" do
+    #gem_binary SANDBOX_BIN
+  #  version "1.4.3.1"
+  #  action :nothing
+  #end
+  #r.run_action(:install)
+
+  #r = gem_package CDC_GEM do
+    #gem_binary SANDBOX_BIN
+  #  version CDC_GEM_VER
+  #  action :nothing
+  #end
+  #r.run_action(:install)
+
+  # Dependency of right_cloud_api
+  #r = gem_package "right_http_connection" do
+  #  action :nothing
+  #end
+  #r.run_action(:install)
+  
+  #Gem.clear_paths
+  
+  chef_gem "nokogiri" do
     version "1.4.3.1"
-    action :nothing
+	action :install
   end
-  r.run_action(:install)
-
-  r = gem_package CDC_GEM do
-    gem_binary SANDBOX_BIN
+  
+  chef_gem CDC_GEM do
     version CDC_GEM_VER
-    action :nothing
+	action :install
   end
-  r.run_action(:install)
-
-  Gem.clear_paths
+  
+  chef_gem "right_http_connection"
 
   ruby_block "trigger download to test cloud" do
     block do

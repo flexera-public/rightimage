@@ -856,9 +856,6 @@
         "rightimage::build_base",
         "rightimage::build_image",
         "rightimage::loopback_copy",
-        "rightimage::block_device_backup",
-        "rightimage::block_device_create",
-        "rightimage::block_device_restore",
         "rightimage::loopback_resize",
         "rightimage::loopback_mount",
         "rightimage::loopback_create",
@@ -874,7 +871,6 @@
   "conflicting": {
   },
   "dependencies": {
-    "block_device": ">= 0.0.0",
     "loopback_fs": ">= 0.0.0",
     "rightimage_cloud_vagrant": ">= 0.0.0",
     "rightimage_tester": ">= 0.0.0",
@@ -896,10 +892,6 @@
   "recipes": {
     "rightimage::base_os": "build a base image",
     "rightimage::base_upload": "upload raw image to s3",
-    "rightimage::block_device_backup": "creates an EBS snapshot from attached EBS volume",
-    "rightimage::block_device_create": "creates, formats, and mounts a brand new EBS volume",
-    "rightimage::block_device_destroy": "unmounts, and deletes an attached EBS volume",
-    "rightimage::block_device_restore": "creates a new EBS volume by restoring from an EBS snapshot",
     "rightimage::build_base": "build base image based on host platform",
     "rightimage::build_image": "build image based on host platform",
     "rightimage::clean": "cleans everything",
