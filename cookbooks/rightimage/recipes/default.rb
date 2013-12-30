@@ -18,10 +18,6 @@
 #
 
 rightscale_marker :begin
-# Load up prerequisites first
-include_recipe "rightimage_tester"
-include_recipe "loopback_fs"
-include_recipe "ros_upload"
 
 class Chef::Recipe
   include RightScale::RightImage::Helper
@@ -41,6 +37,9 @@ end
 package "bzip2"
 package "gcc"
 #package "MAKEDEV" # only for Fedora?
+
+# Since we're using /usr/bin/gem below, we need to make sure it is installed
+# first, also before other include_recipes that are using /usr/bin/gem
 package "rubygems"
 
 # Dependency of fog, v2 requires Ruby 1.9.2+
@@ -56,7 +55,11 @@ gem_package "fog" do
   action :install
 end
 
->>>>>>> 5c5ade8... Initial commit (WIP)
+# Load up prerequisites first
+include_recipe "rightimage_tester"
+include_recipe "loopback_fs"
+include_recipe "ros_upload"
+
 unless node[:rightimage][:manual_mode] == "true"
   case node[:rightimage][:build_mode] 
   when "full"
