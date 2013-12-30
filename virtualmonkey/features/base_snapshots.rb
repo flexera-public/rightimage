@@ -49,7 +49,7 @@ test "default" do
 
   s_one.launch
   wait_for_server_state(s_one, "operational")
-  run_script_on_all('block_device_destroy')
+  run_script_on_all('volume_destroy')
   s_one.stop
 
   # tag repository for later reproducibilty, but not for one offs and hand builds
