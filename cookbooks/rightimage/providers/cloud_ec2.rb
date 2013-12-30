@@ -38,7 +38,10 @@ action :configure do
   execute "#{guest_root}/tmp/install_ec2_tools.sh" do
     environment(node[:rightimage][:script_env])
   end
-   
+  execute "chroot #{guest_root} /tmp/install_ec2_tools.sh" do
+    environment({'PLATFORM' => node[:rightimage][:platform]})
+  end
+
   bash "do_depmod" do 
     flags "-ex"
     only_if { node[:rightimage][:platform] == "centos" }
