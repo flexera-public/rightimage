@@ -50,11 +50,11 @@ action :package do
     cwd target_raw_root
     flags "-ex"
     code <<-EOH
-      raw_image=$(basename #{loopback_file})
+      raw_image="#{loopback_rootname}.raw"
       vhd_image=${raw_image}.vhd
+      qemu-img convert -f qcow2 -O raw #{loopback_file} $raw_image
       vhd-util convert -s 0 -t 1 -i $raw_image -o $vhd_image
       vhd-util convert -s 1 -t 2 -i $vhd_image -o #{image_name}.vhd
-      rm -f #{image_name}.vhd.bz2
       bzip2 -k #{image_name}.vhd
     EOH
   end

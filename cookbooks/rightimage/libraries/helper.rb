@@ -135,9 +135,9 @@ module RightScale
         "/dev/nbd"
       end
 
-	  def loopback_file
-	    node[:rightimage][:mode] == "base" ? loopback_file_base : loopback_file_backup
-	  end
+      def loopback_file
+        node[:rightimage][:build_mode] == "base" ? loopback_file_base : loopback_file_backup
+      end
 	  
       def loopback_file_base
         "#{target_raw_root}/#{loopback_filename}"
@@ -169,9 +169,12 @@ module RightScale
         loopback_filename + ".bz2"
       end
 	  
-	    def loopback_file_backup
-	    #  "#{target_raw_root}/#{loopback_rootname}-full.qcow2"
-	      loopback_file_base
+      def loopback_file_backup
+	      "#{target_raw_root}/#{loopback_rootname}-full.qcow2"
+      end
+
+      def image_source_cloud
+        "us-west-2"
       end
 
       def mounted?

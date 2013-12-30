@@ -16,11 +16,13 @@ action :package do
     cwd target_raw_root
     code <<-EOH
       image="#{image_name}.vhd"
+      raw_image="#{loopback_rootname}.raw"
 
       echo "Remove old image"
       rm -f $image
 
-      VBoxManage convertfromraw #{loopback_filename} $image --format VHD
+      qemu-img convert -f qcow2 -O raw #{loopback_file} $raw_image
+      VBoxManage convertfromraw $raw_image $image --format VHD
     EOH
   end
 end

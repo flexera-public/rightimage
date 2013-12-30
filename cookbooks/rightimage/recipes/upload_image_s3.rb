@@ -25,4 +25,10 @@ ros_upload full_image_path do
   remote_path image_s3_path
   action :upload
 end
+
+file loopback_file_backup do
+  backup false
+  action :delete
+end
+
 rightscale_marker :end

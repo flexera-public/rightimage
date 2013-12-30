@@ -27,10 +27,6 @@ action :configure do
   # ensure there is a hostname file
   execute "chroot #{guest_root} touch /etc/hostname"
   
-  # force cloud name to none
-  execute "echo -n none > #{guest_root}/etc/rightscale.d/cloud" 
-
-
   bash "save system uname" do
     not_if "test -f #{guest_root}/bin/realuname"
     code "cp #{guest_root}/bin/uname #{guest_root}/bin/realuname"

@@ -15,22 +15,10 @@ action :configure do
     end
   end
 
-  bash "install guest packages" do
-    flags '-ex'
-    code <<-EOH
-      case "#{new_resource.platform}" in
-      "ubuntu")
-        chroot #{guest_root} apt-get -y purge grub-pc
-        chroot #{guest_root} apt-get -y install grub
-        ;;
-      "centos"|"rhel")
-        chroot #{guest_root} yum -y install grub iscsi-initiator-utils
-        ;;
-      esac
-    EOH
-  end
 
-  directory temp_root { recursive true }
+  directory temp_root do
+    recursive true
+  end
 
   # insert grub conf, and link menu.lst to grub.conf
   directory "#{guest_root}/boot/grub" do
@@ -165,6 +153,11 @@ EOH
 end
 
 action :package do
+  loopback_raw="#{loopback_rootname}.raw"
+  execute "qemu-img convert -f qcow2 -O raw #{loopback_file} #{loopback_raw}" do
+    cwd target_raw_root
+  end
+
   file "#{target_raw_root}/disk.raw" do
     action :delete
     backup false
@@ -172,7 +165,7 @@ action :package do
   # Chef file resource doesn't do this correctly for some reason
   bash "hard link to disk.raw" do
     cwd target_raw_root
-    code "ln #{loopback_file} disk.raw"
+    code "ln #{loopback_raw} disk.raw"
   end
   bash "zipping raw file" do
     cwd target_raw_root
