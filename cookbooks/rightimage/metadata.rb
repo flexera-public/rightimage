@@ -9,7 +9,6 @@ depends "rightimage_tester"
 depends "loopback_fs"
 depends "rightscale"
 depends "rightscale_volume"
-depends 'delayed_evaluator'
 
 depends "rightimage_cloud_vagrant"
 

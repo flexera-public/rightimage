@@ -297,6 +297,13 @@ EOS
       chroot #{guest_root} apt-get clean
     EOH
   end
+
+  execute "umount -lf #{temp_build_dir}/proc || true"
+
+  directory temp_build_dir do
+    action :delete
+    recursive true
+  end
 end
 
 action :repo_freeze do

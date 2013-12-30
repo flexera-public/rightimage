@@ -898,7 +898,6 @@
   "conflicting": {
   },
   "dependencies": {
-    "delayed_evaluator": ">= 0.0.0",
     "loopback_fs": ">= 0.0.0",
     "rightimage_cloud_vagrant": ">= 0.0.0",
     "rightimage_tester": ">= 0.0.0",

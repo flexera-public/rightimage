@@ -26,7 +26,7 @@ class Chef::Recipe
   include RightScale::RightImage::Helper
 end
 
-include_recipe "rightimage::loopback_unmount"
+include_recipe "rightimage::loopback_unmount" if mounted?(guest_root)
 
 mount target_raw_root do
   device node['rightscale_volume']['volume']['device']

@@ -25,28 +25,41 @@ rightscale_marker :begin
 class Chef::Recipe
   include RightScale::RightImage::Helper
 end
-include_recipe "rightscale_volume"
-include_recipe 'delayed_evaluator'
+class Chef::Resource::RubyBlock
+  include Chef::Mixin::ShellOut
+end
+
+include_recipe "rightscale_volume::default" if node[:rightimage][:volume_size]
 
 rightscale_volume "volume" do
   only_if { node[:rightimage][:volume_size] && !mounted? }
   size node[:rightimage][:volume_size].to_i
-  action [ :create, :attach ]
+  action :create
 end
 
-execute "format volume as ext4" do
+rightscale_volume "volume" do
   only_if { node[:rightimage][:volume_size] && !mounted? }
-  command "mkfs.ext4 #{node['rightscale_volume']['volume']['device']}"
-  action :run
+  action :attach
+end
+
+ruby_block "format volume" do
+  only_if { node[:rightimage][:volume_size] && !mounted? }
+  block do
+    volume_device = node['rightscale_volume']['volume']['device']
+    shell_out!("mkfs.ext4 #{volume_device}")
+  end
 end
 
 directory target_raw_root do
   action :create
 end
 
-mount target_raw_root do
-  device node['rightscale_volume']['volume']['device']
-  fstype "ext4"
+ruby_block "mount volume" do
+  only_if { node[:rightimage][:volume_size] && !mounted? }
+  block do
+    volume_device = node['rightscale_volume']['volume']['device']
+    shell_out!("mount #{volume_device} #{target_raw_root}")
+  end
 end
 
 rightscale_marker :end

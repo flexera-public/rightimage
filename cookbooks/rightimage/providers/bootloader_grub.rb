@@ -43,7 +43,19 @@ end
 
 
 def install_grub_package
-  #package grub_package
+  if node[:rightimage][:platform] == "ubuntu"
+    # Avoid grub install from asking questions. This is needed for grub -> grub2
+    # update on host.
+    grub_install = "cat << ! | debconf-set-selections -v
+grub2   grub2/linux_cmdline                select   
+grub2   grub2/linux_cmdline_default        select   
+grub-pc grub-pc/install_devices_empty      select yes
+grub-pc grub-pc/install_devices            select   
+! && DEBIAN_FRONTEND=noninteractive apt-get -y install "
+  else
+    grub_install = "yum -y install "
+  end
+  execute "#{grub_install} #{grub_package}"
   execute "#{chroot_install} #{grub_package}"
 end
 

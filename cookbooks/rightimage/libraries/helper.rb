@@ -181,8 +181,8 @@ module RightScale
         "us-west-2"
       end
 
-      def mounted?
-        `mount`.grep(/#{target_raw_root}/).any?
+      def mounted?(dir = target_raw_root)
+        `mount`.grep(/#{dir}/).any?
       end
 
       def setup_ec2_tools_env
