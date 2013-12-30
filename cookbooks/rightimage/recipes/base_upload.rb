@@ -28,7 +28,7 @@ image_s3_path = guest_platform+"/"+guest_platform_version+"/"+guest_arch+"/"+mir
 image_upload_bucket = node[:rightimage][:base_image_bucket]
 
 # Upload partitioned image
-rightimage_upload loopback_file_compressed do
+ros_upload loopback_file_compressed do
   provider "ros_upload_s3"
   user node[:rightimage][:aws_access_key_id]
   password node[:rightimage][:aws_secret_access_key]

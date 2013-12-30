@@ -159,12 +159,6 @@ module RightScale
         "/mnt/ephemeral/rightimage-temp"
       end
 
-      def image_source_bucket
-        bucket = "rightscale-#{image_source_cloud}"
-        bucket << "-dev" if node[:rightimage][:debug] == "true"
-        bucket
-      end
-
       def loopback_file_compressed
         loopback_file_base + ".tbz"
       end	  
@@ -175,10 +169,6 @@ module RightScale
 	  
       def loopback_file_backup
 	      "#{target_raw_root}/#{loopback_rootname}-full.qcow2"
-      end
-
-      def image_source_cloud
-        "us-west-2"
       end
 
       def mounted?(dir = target_raw_root)
