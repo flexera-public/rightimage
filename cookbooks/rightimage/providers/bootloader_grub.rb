@@ -210,7 +210,6 @@ action :install do
     bash "setup grub2" do
       flags "-ex"
       code <<-EOH
-        mkdir -p /mnt/out/boot/grub
         grub-install --boot-directory=#{guest_root}/boot/ --modules="ext2 part_msdos" #{loopback_device}0
       EOH
     end

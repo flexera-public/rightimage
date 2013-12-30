@@ -319,7 +319,8 @@ end
 
 def upload_s3()
   guest_root_nonpart=guest_root+"2"
-  loopback_nonpart="#{temp_root}/#{ri_lineage}_hd0.raw"
+  loopback_nonpart="#{target_raw_root}/#{ri_lineage}_hd0.qcow2"
+  raw_image="#{target_raw_root}/#{loopback_rootname}.raw"
 
   loopback_fs loopback_nonpart do
     device_number 1
@@ -330,11 +331,13 @@ def upload_s3()
   end
 
   bash "copy loopback fs" do
+    not_if { ::File.exists? raw_image }
     flags "-e"
     code "rsync -a #{guest_root}/ #{guest_root_nonpart}/"
   end
 
   loopback_fs loopback_nonpart do
+    not_if { ::File.exists? raw_image }
     device_number 1
     action :unmount
   end
@@ -356,25 +359,27 @@ def upload_s3()
         ramdisk_opt="--ramdisk #{node[:rightimage][:ramdisk_id]}"
       fi
 
-      echo "Doing S3 bundle"
-    
-      rm -rf "#{temp_root}/bundled"
-      mkdir -p "#{temp_root}/bundled"
+      raw_image="#{raw_image}"
+      if [ ! -f "$raw_image" ]; then
+        rm -rf "#{target_raw_root}/bundled"
+        mkdir -p "#{target_raw_root}/bundled"
 
-      echo "Bundling..."
-      raw_image="#{loopback_rootname}.raw"
-      qemu-img convert -f qcow2 -O raw #{loopback_file} $raw_image
-      /home/ec2/bin/ec2-bundle-image --privatekey /tmp/AWS_X509_KEY.pem --cert /tmp/AWS_X509_CERT.pem --user #{node[:rightimage][:aws_account_number]} --image $raw_image --prefix #{image_name} --destination "#{temp_root}/bundled" --arch #{new_resource.arch} $kernel_opt $ramdisk_opt -B "ami=sda,root=/dev/sda,ephemeral0=sdb,swap=sda3"
+        qemu-img convert -f qcow2 -O raw #{loopback_nonpart} $raw_image
+      fi
+
+      /home/ec2/bin/ec2-bundle-image --privatekey /tmp/AWS_X509_KEY.pem --cert /tmp/AWS_X509_CERT.pem --user #{node[:rightimage][:aws_account_number]} --image $raw_image --prefix #{image_name} --destination "#{target_raw_root}/bundled" --arch #{new_resource.arch} $kernel_opt $ramdisk_opt -B "ami=sda,root=/dev/sda,ephemeral0=sdb,swap=sda3"
      
       echo "Uploading..." 
-      echo y | /home/ec2/bin/ec2-upload-bundle -b #{node[:rightimage][:image_upload_bucket]} -m "#{temp_root}/bundled/#{image_name}.manifest.xml" -a #{node[:rightimage][:aws_access_key_id]} -s #{node[:rightimage][:aws_secret_access_key]} --retry --batch
+      echo y | /home/ec2/bin/ec2-upload-bundle -b #{node[:rightimage][:image_upload_bucket]} -m "#{target_raw_root}/bundled/#{image_name}.manifest.xml" -a #{node[:rightimage][:aws_access_key_id]} -s #{node[:rightimage][:aws_secret_access_key]} --retry --batch
       
-      echo registering... 
+      echo "Registering..."
       image_out_s3=`/home/ec2/bin/ec2-register #{node[:rightimage][:image_upload_bucket]}/#{image_name}.manifest.xml -K  /tmp/AWS_X509_KEY.pem -C  /tmp/AWS_X509_CERT.pem -n "#{image_name}" --url #{node[:rightimage][:ec2_endpoint]} `
 
       ## parse out image id
       image_id_s3=`echo -n $image_out_s3 | awk '{ print $2 }'`
       echo "$image_id_s3" > /var/tmp/image_id_s3
+
+      rm -f $raw_image
       EOH
   end 
 end

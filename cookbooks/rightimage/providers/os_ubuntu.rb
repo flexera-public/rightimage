@@ -163,7 +163,7 @@ EOS
       if [ "#{platform_codename}" == "hardy" ] ; then
         image_temp=$image_name
       else
-        image_temp=`cat #{temp_build_dir}/xen.conf  | grep xvda1 | grep -v root  | cut -c 25- | cut -c -9`
+        image_temp=`cat #{temp_build_dir}/xen.conf  | grep xvda1 | grep -v root  | sed "s#\'tap:aio:#{temp_build_dir}/##" | cut -c -9`
       fi
 
 

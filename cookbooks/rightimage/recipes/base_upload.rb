@@ -6,18 +6,21 @@ class Chef::Resource::Bash
   include RightScale::RightImage::Helper
 end
 
-#directory(::File.dirname(loopback_file_compressed)) { recursive true }
-
-#directory temp_root do
-#  recursive true
-#  action :create
-#end
+# This will make the file smaller.
+bash "convert base image" do
+  cwd target_raw_root
+  flags "-ex"
+  code <<-EOH
+    qemu-img convert -f qcow2 -O qcow2 #{loopback_file} #{loopback_file}.new
+    mv #{loopback_file}.new #{loopback_file}
+  EOH
+end
 
 bash "compress partitioned base image" do
   cwd target_raw_root
   flags "-ex"
   not_if { ::File.exists?(loopback_file_compressed) && (::File.mtime(loopback_file_compressed) > ::File.mtime(loopback_file)) }
-  code "bzip2 --best --compress --force --keep #{loopback_file}"
+  code "tar cjf #{loopback_file_compressed} #{loopback_filename}"
 end
 
 

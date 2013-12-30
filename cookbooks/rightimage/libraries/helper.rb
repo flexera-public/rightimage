@@ -166,11 +166,11 @@ module RightScale
       end
 
       def loopback_file_compressed
-        loopback_file_base + ".bz2"
+        loopback_file_base + ".tbz"
       end	  
 	  
       def loopback_filename_compressed
-        loopback_filename + ".bz2"
+        loopback_filename + ".tbz"
       end
 	  
       def loopback_file_backup

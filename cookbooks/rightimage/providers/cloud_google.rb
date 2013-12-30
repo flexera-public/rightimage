@@ -95,13 +95,13 @@ EOH
     raise "Unsupported platform/version combination #{new_resource.platform} #{new_resource.platform_version}"
   end
 
-  cookbook_file "#{temp_root}/google.tgz" do
+  cookbook_file "#{target_raw_root}/google.tgz" do
     source "google.tgz"
     action :create
     backup false
   end
   bash "untar google helper and startup scripts" do
-    code "tar zxf #{temp_root}/google.tgz -C #{guest_root}/usr/share"
+    code "tar zxf #{target_raw_root}/google.tgz -C #{guest_root}/usr/share"
   end
 
   bash "configure for google compute" do

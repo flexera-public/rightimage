@@ -22,7 +22,7 @@ remote_file loopback_file_compressed do
   action :create_if_missing
 end
 
-execute "bzip2 --decompress #{loopback_file_compressed}" do
+execute "tar xjf #{loopback_file_compressed}" do
   cwd target_raw_root
   not_if { ::File.exists? loopback_file_base }
 end
