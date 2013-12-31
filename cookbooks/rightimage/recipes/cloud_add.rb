@@ -68,6 +68,7 @@ end
 
 
 rightimage_bootloader "grub" do
+  root guest_root
   hypervisor node[:rightimage][:hypervisor]
   platform node[:rightimage][:platform]
   platform_version node[:rightimage][:platform_version].to_f

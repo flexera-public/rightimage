@@ -5,6 +5,7 @@ module RightScale
         raise "ERROR: you must specify an image_name!" unless node[:rightimage][:image_name] =~ /./
         name = node[:rightimage][:image_name].dup
         name << "_#{generate_persisted_passwd}" if node[:rightimage][:debug] == "true" && node[:rightimage][:cloud] !~ /rackspace/
+        name << "_HVM" if hvm? and name !~ /_HVM/
         name << "_EBS" if node[:rightimage][:ec2][:image_type] =~ /ebs/i and name !~ /_EBS/
         name.gsub!("_","-") if node[:rightimage][:cloud] =~ /rackspace|google|azure/
         name.gsub!(".","-") if node[:rightimage][:cloud] =~ /google/
@@ -155,31 +156,61 @@ module RightScale
         `mount`.grep(/#{target_raw_root}/).any?
       end
 
-      def setup_ec2_tools_env
-        bash_snippet = <<-EOF
-          . /etc/profile
-          export PATH=$PATH:/usr/local/bin:/home/ec2/bin
-          export EC2_HOME=/home/ec2
-        EOF
-        return bash_snippet
+      def cloud_credentials(cloud_type = node[:rightimage][:cloud])
+        creds = 
+          case cloud_type
+          when "ec2"
+            {
+              'AWS_CALLING_FORMAT' => 'SUBDOMAIN',
+              'AWS_ACCESS_KEY_ID'  => node[:rightimage][:aws_access_key_id],
+              'AWS_SECRET_ACCESS_KEY'=> node[:rightimage][:aws_secret_access_key]
+            }
+          when "google"
+            {
+              'GOOGLE_KEY_LOCATION' => google_p12_path,
+              'GOOGLE_PROJECT' => node[:rightimage][:google][:project_id],
+              'GOOGLE_SERVICE_EMAIL' => node[:rightimage][:google][:client_email]
+            }
+          when /rackspace/i
+            {
+              'RACKSPACE_ACCOUNT' => node[:rightimage][:rackspace][:account],
+              'RACKSPACE_API_TOKEN' => node[:rightimage][:rackspace][:api_token]
+            }
+          else
+            raise "Cloud #{cloud_type} passed to cloud_credentials, which it doesn't know how to handle"
+          end
+        creds.merge(node[:rightimage][:script_env].to_hash)
       end
 
-      def cloud_credentials(cloud_type = node[:rightimage][:cloud])
-        case cloud_type
-        when "ec2"
-          return {'AWS_CALLING_FORMAT' => 'SUBDOMAIN',
-                  'AWS_ACCESS_KEY_ID'  => node[:rightimage][:aws_access_key_id],
-                  'AWS_SECRET_ACCESS_KEY'=> node[:rightimage][:aws_secret_access_key]}
-        when "google"
-          return {'GOOGLE_KEY_LOCATION' => google_p12_path,
-                  'GOOGLE_PROJECT' => node[:rightimage][:google][:project_id],
-                  'GOOGLE_SERVICE_EMAIL' => node[:rightimage][:google][:client_email]}
-        when /rackspace/i
-          return {'RACKSPACE_ACCOUNT' => node[:rightimage][:rackspace][:account],
-                  'RACKSPACE_API_TOKEN' => node[:rightimage][:rackspace][:api_token]}
-        else
-          raise "Cloud #{cloud_type} passed to cloud_credentials, which it doesn't know how to handle"
+
+      def ec2_expand_params(params)
+        mapped_params = params.keys.sort.map do |p|
+          if params[p] == true
+            "--#{p}"
+          elsif params[p].kind_of?(Array)
+            "--#{p} " + params[p].map { |val| "'#{val}'" }.join(" ")
+          else
+            "--#{p} '#{params[p]}'"
+          end
         end
+        mapped_params.join(" ")
+      end
+
+      def ec2_api_command(command, params = {})
+        # All of these api acommands
+        region = node[:rightimage][:region]
+        # TBD capture errors (i.e. RequestLimitExceeded)
+        full_command = "aws ec2 #{command} --output json --region '#{region}' #{ec2_expand_params(params)}"
+        Chef::Log::info("Running command #{full_command}")
+        cmd = shell_out!("#{full_command} 2>&1", :environment => cloud_credentials)
+        JSON.parse(cmd.stdout)
+      end
+
+      def ec2_ami_command(command, params = {})
+        prefix = "/home/ec2/bin/ec2-"
+        full_command = "#{prefix}#{command} #{ec2_expand_params(params)}"
+        cmd = shell_out!("#{full_command} 2>&1", :environment => cloud_credentials)
+        cmd.stdout
       end
 
       def google_p12_path
@@ -244,38 +275,29 @@ module RightScale
         end
       end
 
+      def hvm?
+        node[:rightimage][:virtualization] == "hvm"
+      end
+
       def gem_install_source
         "--source http://#{node[:rightimage][:mirror]}/rubygems/archive/#{mirror_freeze_date}/"
       end
 
 
-      def chroot_install
+      def chroot_install(root = guest_root)
         if node[:rightimage][:platform] == "ubuntu" 
-          "chroot #{guest_root} apt-get -y install"
+          "chroot #{root} apt-get -y install"
         else
-          "yum -c /tmp/yum.conf --installroot=#{guest_root} -y install"
+          "yum -c /tmp/yum.conf --installroot=#{root} -y install"
         end
       end
 
-      def chroot_remove
+      def chroot_remove(root = guest_root)
         if node[:rightimage][:platform] == "ubuntu"
-          "chroot #{guest_root} apt-get -y purge"
+          "chroot #{root} apt-get -y purge"
         else
-          "yum -c /tmp/yum.conf --installroot=#{guest_root} -y erase"
+          "yum -c /tmp/yum.conf --installroot=#{root} -y erase"
         end
-      end
-
-      def grub_root
-        if partitioned?
-          "(hd0,0)"
-        else
-          "(hd0)"
-        end
-      end
-
-      def partitioned?
-        # Don't partition EC2 images because it's not easy to rebundle them later without manual changes.
-        node[:rightimage][:build_mode] == "base" || (node[:rightimage][:build_mode] == "full" && node[:rightimage][:cloud] != "ec2")
       end
 
       # Mirror freeze date is used to name the snapshots that base images are stored to and restored from

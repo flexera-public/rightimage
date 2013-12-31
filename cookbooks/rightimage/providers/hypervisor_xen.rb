@@ -7,8 +7,7 @@ action :install_kernel do
  
   bash "install xen kernel" do
     flags "-ex"
-    # Use grub instead of grub-legacy-ec2 to fix issue w/ local changes prompt (w-6134)
-    ubuntu_kernel_packages = 'linux-image-virtual linux-headers-virtual'
+    not_if { hvm? }
     if new_resource.platform_version <= 10.04
       ubuntu_kernel_packages = 'linux-image-ec2 linux-headers-ec2 grub-legacy-ec2'
     end
