@@ -774,14 +774,14 @@
     "rightimage/region": {
       "calculated": false,
       "choice": [
-        "us-east",
-        "us-west",
+        "us-east-1",
+        "us-west-1",
         "us-west-2",
-        "eu-west",
-        "ap-southeast",
+        "eu-west-1",
+        "ap-southeast-1",
         "ap-southeast-2",
-        "ap-northeast",
-        "sa-east"
+        "ap-northeast-1",
+        "sa-east-1"
       ],
       "description": "The EC2 region in which the image will reside",
       "display_name": "EC2 Region",
@@ -868,6 +868,21 @@
         "rightimage::rebundle"
       ],
       "required": "optional",
+      "type": "string"
+    },
+    "rightimage/virtualization": {
+      "calculated": false,
+      "choice": [
+        "hvm",
+        "pvm"
+      ],
+      "default": "pvm",
+      "description": "Virtualization type (EC2 only).  Defaults to pvm.",
+      "display_name": "Virtualization type",
+      "recipes": [
+
+      ],
+      "required": "recommended",
       "type": "string"
     }
   },
