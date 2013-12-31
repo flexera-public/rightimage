@@ -155,10 +155,6 @@ module RightScale
         loopback_rootname + ".qcow2"
       end
 
-      def temp_root
-        "/mnt/ephemeral/rightimage-temp"
-      end
-
       def loopback_file_compressed
         loopback_file_base + ".tbz"
       end	  

@@ -15,10 +15,6 @@ action :configure do
     end
   end
 
-  directory temp_root do
-    recursive true
-  end
-
   # insert grub conf, and link menu.lst to grub.conf
   directory "#{guest_root}/boot/grub" do
     owner "root"
@@ -32,37 +28,6 @@ action :configure do
   template "#{guest_root}/boot/grub/menu.lst" do
     source "menu.lst.erb"
     backup false
-  end
-
-  bash "setup grub" do
-    flags "-ex"
-    code <<-EOH
-      guest_root="#{guest_root}"
-
-      case "#{new_resource.platform}" in
-        "ubuntu")
-          chroot $guest_root cp -p /usr/lib/grub/x86_64-pc/* /boot/grub
-          grub_command="/usr/sbin/grub"
-          ;;
-        "centos"|"rhel")
-          chroot $guest_root cp -p /usr/share/grub/x86_64-redhat/* /boot/grub
-          grub_command="/sbin/grub"
-          ;;
-      esac
-
-      echo "(hd0) #{node[:rightimage][:grub][:root_device]}" > $guest_root/boot/grub/device.map
-      echo "" >> $guest_root/boot/grub/device.map
-
-      cat > device.map <<EOF
-(hd0) #{loopback_file}
-EOF
-
-    ${grub_command} --batch --device-map=device.map <<EOF
-root (hd0,0)
-setup (hd0)
-quit
-EOF
-EOH
   end
 
   execute "install iscsi tools" do
