@@ -1,6 +1,8 @@
 def grub_kernel_options(cloud)
   options_line = "consoleblank=0"
-  if new_resource.hypervisor.to_s == "xen"
+  if hvm?
+    options_line << " console=ttyS0"
+  elsif new_resource.hypervisor.to_s == "xen"
     options_line << " console=hvc0"
 
     # Start device naming from xvda instead of xvde (w-4893)
@@ -29,12 +31,21 @@ def grub_package
   end
 end
 
-def grub_initrd
-  ::File.basename(Dir.glob("#{guest_root}/boot/initr*").sort_by { |f| ::File.mtime(f) }.last)
+def grub_root
+  if partitioned?
+    "(hd0,0)"
+  else
+    "(hd0)"
+  end
 end
 
-def grub_kernel
-  ::File.basename(Dir.glob("#{guest_root}/boot/vmlinuz*").sort_by { |f| ::File.mtime(f) }.last)
+def partitioned?
+  # Base images have cloud == none, so should always be true
+  if new_resource.cloud == "ec2" && !hvm?
+    false
+  else
+    true
+  end
 end
 
 def grub_root
@@ -45,20 +56,30 @@ def grub_root
   end
 end
 
+
+def grub_initrd
+  ::File.basename(Dir.glob("#{new_resource.root}/boot/initr*").sort_by { |f| ::File.mtime(f) }.last)
+end
+
+def grub_kernel
+  ::File.basename(Dir.glob("#{new_resource.root}/boot/vmlinuz*").sort_by { |f| ::File.mtime(f) }.last)
+end
+
 def install_grub_package
   if node[:rightimage][:platform] == "ubuntu"
     # Avoid grub install from asking questions. This is needed for grub -> grub2
     # update on host.
-    grub_install = "cat << ! | debconf-set-selections -v
-grub2   grub2/linux_cmdline                select   
-grub2   grub2/linux_cmdline_default        select   
-grub-pc grub-pc/install_devices_empty      select yes
-grub-pc grub-pc/install_devices            select   
-! && DEBIAN_FRONTEND=noninteractive apt-get -y install "
+    execute 'echo "grub2   grub2/linux_cmdline            select" | debconf-set-selections -v'
+    execute 'echo "grub2   grub2/linux_cmdline_default    select" | debconf-set-selections -v' 
+    execute 'echo "grub-pc grub-pc/install_devices_empty  select yes" | debconf-set-selections -v' 
+    execute 'echo "grub-pc grub-pc/install_devices        select" | debconf-set-selections -v' 
+    execute("apt-get -y install #{grub_package}") do
+      environment({"DEBIAN_FRONTEND"=>"noninteractive"})
+    end
   else
-    grub_install = "yum -y install "
+    grub_install = "yum -y install #{grub_package}"
   end
-  execute "#{grub_install} #{grub_package}"
+    
   execute "#{chroot_install} #{grub_package}"
 end
 
@@ -68,7 +89,7 @@ def install_grub_config
   timeout = 5
   timeout = 0 if ["ec2","eucalyptus","azure"].include?(cloud.to_s)
   # Specify if running in Xen domU or have grub detect automatically
-  indomu = (new_resource.hypervisor.to_s == "xen") ? "true" : "detect"
+  indomu = (new_resource.hypervisor.to_s == "xen" && !hvm?) ? "true" : "detect"
   if grub_package == "grub"
     grub_conf = "/boot/grub/menu.lst"
   else
@@ -78,7 +99,7 @@ def install_grub_config
   Chef::Log::info("Installing grub config to #{grub_conf} with cloud #{cloud}, kernel options: #{grub_kernel_options(cloud)}")
 
   # insert grub conf, and link menu.lst to grub_conf
-  directory "#{guest_root}/boot/grub" do
+  directory "#{new_resource.root}/boot/grub" do
     owner "root"
     group "root"
     mode "0750"
@@ -86,7 +107,7 @@ def install_grub_config
     recursive true
   end 
 
-  template "#{guest_root}#{grub_conf}" do
+  template "#{new_resource.root}#{grub_conf}" do
     source ::File::basename(grub_conf)+".erb"
     backup false
     variables(
@@ -106,11 +127,11 @@ def install_grub_config
   # then manually reads the menu.lst and uses its contents, so if have grub2 installed 
   # it sort of gets bypassed by pv-grub.  grub-legacy-ec2 is a shim that maintains 
   # the menu.lst in parallel - technically ec2 doesn't even need a bootloader installed
-  if cloud == "ec2" && grub_package == "grub2"
+  if cloud == "ec2" && grub_package == "grub2" && !hvm?
     Chef::Log::info("Installing legacy grub config to /boot/grub/menu.lst for ec2 cloud, kernel options: #{grub_kernel_options(cloud)}")
 
-    execute "#{chroot_install} grub-legacy-ec2"
-    template "#{guest_root}/boot/grub/menu.lst" do
+    execute "#{chroot_install(new_resource.root)} grub-legacy-ec2"
+    template "#{new_resource.root}/boot/grub/menu.lst" do
       source "menu.lst.erb"
       backup false
       variables(
@@ -128,24 +149,24 @@ def install_grub_config
     # with changes created by the package manager.  It keeps track of the config file
     # checksums and won't change the file if its been modified, so delete menu.lst
     # entry from the ucf registry to put it back under automatic control
-    execute "sed -i '/menu.lst/d' #{guest_root}/var/lib/ucf/registry"
+    execute "sed -i '/menu.lst/d' #{new_resource.root}/var/lib/ucf/registry"
   end
 
   if grub_package == "grub"
     # Grubby requires a symlink to /etc/grub.conf.
     execute "grub symlink" do
-      command "chroot #{guest_root} ln -s /boot/grub/menu.lst /etc/grub.conf"
-      creates "#{guest_root}/etc/grub.conf"
+      command "chroot #{new_resource.root} ln -s /boot/grub/menu.lst /etc/grub.conf"
+      creates "#{new_resource.root}/etc/grub.conf"
     end
 
     execute "grub symlink2" do
-      command "chroot #{guest_root} ln -s /boot/grub/menu.lst /boot/grub/grub.conf"
-      creates "#{guest_root}/boot/grub/grub.conf"
+      command "chroot #{new_resource.root} ln -s /boot/grub/menu.lst /boot/grub/grub.conf"
+      creates "#{new_resource.root}/boot/grub/grub.conf"
     end
 
     # Setup /etc/sysconfig/kernel to allow grub to auto-update grub.conf when updating kernel.
     if new_resource.platform =~ /centos|rhel|redhat/
-      template "#{guest_root}/etc/sysconfig/kernel" do
+      template "#{new_resource.root}/etc/sysconfig/kernel" do
         source "sysconfig-kernel.erb"
         backup false
         variables({
@@ -154,22 +175,15 @@ def install_grub_config
       end
     end
   else
-    execute "chroot #{guest_root} /usr/sbin/update-grub"
+    execute "chroot #{new_resource.root} /usr/sbin/update-grub"
 
     # This value is set to /dev/mapper/sdaX when run from the loopback, manually fix up
-    execute "sed -i 's/set root=.*/set root=(hd0,msdos1)/g' #{guest_root}/boot/grub/grub.cfg"
+    execute "sed -i 's/set root=.*/set root=(hd0,msdos1)/g' #{new_resource.root}/boot/grub/grub.cfg"
   end
 end
 
-action :install do
-
-  cloud = new_resource.cloud
-
-  install_grub_package
-  install_grub_config
-
-
-  root_device = 
+def install_grub_bootloader
+  instance_device = 
     case new_resource.hypervisor
     when "xen" then "/dev/xvda"
     when "kvm" then  "/dev/vda"
@@ -177,31 +191,43 @@ action :install do
     else raise "Unknown hypervisor, can't install bootloader"
     end
 
-  Chef::Log::info("Installing #{grub_package} bootloader to loopback file, with root dev #{root_device}")
+  Chef::Log::info("Installing #{grub_package} bootloader to #{new_resource.device} mounted at #{new_resource.root} with root volume set to #{instance_device}")
 
 
   if grub_package == "grub"
+    # So the device mapping stuff is slightly convoluted -- grub and grub2 expect
+    # different things passed in as the device for the loopback filesystem (loop0 for grub2
+    # mapped equiv at /dev/mapper/sda0 for grub) or they'll crap out with errors
+    # about being unable to find the partition.  
+    # For a real device (HVM case, mounted volume) it just works as expected 
+    if new_resource.device.to_s.empty?
+      local_device = "/dev/mapper/sda0"
+    else
+      local_device = new_resource.device
+    end
+    
+    package "grub"
+
     bash "setup grub" do
-      not_if { new_resource.hypervisor == "xen" }
       flags "-ex"
       code <<-EOH
-        guest_root="#{guest_root}"
+        guest_root="#{new_resource.root}"
         
         case "#{new_resource.platform}" in
           "ubuntu")
-            chroot $guest_root cp -p /usr/lib/grub/x86_64-pc/* /boot/grub
+            cp -p $guest_root/usr/lib/grub/x86_64-pc/* $guest_root/boot/grub
             grub_command="/usr/sbin/grub"
             ;;
           "centos"|"rhel")
-            chroot $guest_root cp -p /usr/share/grub/x86_64-redhat/* /boot/grub
+            cp -p $guest_root/usr/share/grub/x86_64-redhat/* $guest_root/boot/grub
             grub_command="/sbin/grub"
             ;;
         esac
 
-        echo "(hd0) #{root_device}" > $guest_root/boot/grub/device.map
+        echo "(hd0) #{instance_device}" > $guest_root/boot/grub/device.map
         echo "" >> $guest_root/boot/grub/device.map
 
-        echo "(hd0) /dev/mapper/sda0" > device.map
+        echo "(hd0) #{local_device}" > device.map 
 
         echo "root #{grub_root}" > /tmp/grubsetup
         echo "setup (hd0)" >> /tmp/grubsetup
@@ -210,13 +236,29 @@ action :install do
       EOH
     end
   else
+    if new_resource.device.to_s.empty?
+      local_device = "#{loopback_device}0"
+    else
+      local_device = new_resource.device
+    end
     bash "setup grub2" do
       flags "-ex"
       code <<-EOH
-        grub-install --boot-directory=#{guest_root}/boot/ --modules="ext2 part_msdos" #{loopback_device}0
+        grub-install --boot-directory=#{new_resource.root}/boot/ --modules="ext2 part_msdos" #{local_device}
       EOH
     end
   end
+end
+
+action :install do
+  install_grub_package
+  install_grub_config
+  install_grub_bootloader
+end
+
+action :install_bootloader  do
+  install_grub_config
+  install_grub_bootloader
 end
 
 

@@ -89,7 +89,7 @@ attribute "rightimage/cloud",
 attribute "rightimage/region",
   :display_name => "EC2 Region",
   :description => "The EC2 region in which the image will reside",
-  :choice => [ "us-east", "us-west", "us-west-2", "eu-west", "ap-southeast", "ap-southeast-2", "ap-northeast", "sa-east" ],
+  :choice => [ "us-east-1", "us-west-1", "us-west-2", "eu-west-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "sa-east-1" ],
   :required => true
   
 attribute "rightimage/rightlink_repo",
@@ -178,6 +178,13 @@ attribute "rightimage/datacenter",
   :display_name => "Datacenter ID",
   :description => "Datacenter/Zone ID.  Defaults to 1.  Use US/UK for Rackspace Legacy. Use DFW/ORD/LON/SYD for Rackspace Open Cloud.",
   :default => "1",
+  :required => "recommended"
+
+attribute "rightimage/virtualization",
+  :display_name => "Virtualization type",
+  :description => "Virtualization type (EC2 only).  Defaults to pvm.",
+  :choice => [ "hvm", "pvm" ],
+  :default => "pvm",
   :required => "recommended"
 
 attribute "rightimage/cloud_options",

@@ -67,13 +67,6 @@ git Rebundle::REBUNDLE_SOURCE_PATH do
   action :sync
 end
 
-bash "setup keyfiles" do
-  not_if { ::File.exists? "/tmp/AWS_X509_KEY.pem" }
-  code <<-EOH
-    echo "#{node[:rightimage][:aws_509_key]}" > /tmp/AWS_X509_KEY.pem
-    echo "#{node[:rightimage][:aws_509_cert]}" > /tmp/AWS_X509_CERT.pem
-  EOH
-end
 
 package "openssl" do
   only_if { node[:rightimage][:cloud] == "google" }
@@ -93,21 +86,19 @@ bash "setup google auth" do
   EOH
 end
 
-bash "check that image doesn't exist" do
+ruby_block "check that image doesn't exist" do 
   only_if { node[:rightimage][:cloud] == "ec2" }
-  flags "-e"
-  code <<-EOH
-    #{setup_ec2_tools_env}
-    set -x
-
-    images=`/home/ec2/bin/ec2-describe-images --private-key /tmp/AWS_X509_KEY.pem --cert /tmp/AWS_X509_CERT.pem -o self --url #{node[:rightimage][:ec2_endpoint]} --filter name=#{image_name}`
-    if [ -n "$images" ]; then
-      echo "Found existing image, aborting:"
-      echo $images
-      exit 1
-    fi 
-  EOH
+  block do
+    res = ec2_api_command("describe-images", {
+      "owner" => "self",
+      "filter" => "Name=name,Values=#{image_name}"
+    })
+    if res["Images"].length > 0
+      raise("Found existing image, aborting: #{res.inspect}")
+    end
+  end
 end
+
 
 bash "install bundler" do
   flags "-ex"
@@ -125,8 +116,8 @@ bash "launch the remote instance" do
   environment(cloud_credentials)
   cwd Rebundle::REBUNDLE_SOURCE_PATH
   region_opt = case node[:rightimage][:cloud]
-               when "ec2" then "#{node[:ec2][:placement][:availability_zone].chop}"
-               when "google" || /rackspace/i then "#{node[:rightimage][:datacenter]}"
+               when "ec2" then "#{node[:rightimage][:region]}"
+               when "google", /rackspace/i then "#{node[:rightimage][:datacenter]}"
                else ""
                end
 
@@ -160,6 +151,7 @@ end
 
 bash "upload code to the remote instance" do
   flags "-ex"
+  environment(cloud_credentials)
   cwd Rebundle::REBUNDLE_SOURCE_PATH
   freeze_date_opt = ""
   if mirror_freeze_date
@@ -202,15 +194,6 @@ bash "bundle instance" do
   EOH
 end
 #
-
-bash "remove keys" do
-  only_if { ::File.exists? "/tmp/AWS_X509_KEY.pem" }
-  code <<-EOH
-    #remove keys
-    rm -f /tmp/AWS_X509_KEY.pem
-    rm -f /tmp/AWS_X509_CERT.pem
-  EOH
-end 
 
 ruby_block "store image id" do
   block do
