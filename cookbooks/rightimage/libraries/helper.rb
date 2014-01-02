@@ -306,9 +306,9 @@ module RightScale
 
       def chroot_remove(root = guest_root)
         if node[:rightimage][:platform] == "ubuntu"
-          "chroot #{guest_root} apt-get -y purge"
+          "chroot #{root} apt-get -y purge"
         else
-          "yum -c /tmp/yum.conf --installroot=#{guest_root} -y erase"
+          "yum -c /tmp/yum.conf --installroot=#{root} -y erase"
         end
       end
 
