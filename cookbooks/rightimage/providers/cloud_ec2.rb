@@ -414,13 +414,13 @@ def upload_s3()
     "user" => node[:rightimage][:aws_account_number],
     "image" => loopback_nonpart,
     "prefix" => image_name,
-    "destination" => "#{temp_root}/bundled",
+    "destination" => "#{target_raw_root}/bundled",
     "arch" => new_resource.arch,
     "block-device-mapping" => "ami=sda,root=/dev/sda1,ephemeral0=sdb,swap=sda3"
   }
 
-  execute "rm -rf '#{temp_root}/bundled'"
-  execute "mkdir -p '#{temp_root}/bundled'"
+  execute "rm -rf '#{target_raw_root}/bundled'"
+  execute "mkdir -p '#{target_raw_root}/bundled'"
 
   execute "qemu-img convert -f qcow2 -O raw #{loopback_nonpart} #{raw_image}" do
     creates raw_image
@@ -431,7 +431,7 @@ def upload_s3()
       ec2_ami_command("bundle-image", bundle_image_options)
       ec2_ami_command("upload-bundle", {
         "bucket" => node[:rightimage][:image_upload_bucket], 
-        "manifest" => "#{temp_root}/bundled/#{image_name}.manifest.xml",
+        "manifest" => "#{target_raw_root}/bundled/#{image_name}.manifest.xml",
         "access-key" => node[:rightimage][:aws_access_key_id],
         "secret-key" => node[:rightimage][:aws_secret_access_key],
         "retry" => true,

@@ -7,7 +7,7 @@ action :install do
   # This allows builds for CentOS on Fedora and other Redhat Enterprise Linux clones.
   remote_file "/etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-#{node[:rightimage][:platform_version].to_i}" do
     source "http://mirror.rightscale.com/centos/#{node[:rightimage][:platform_version].to_i}/os/#{node[:rightimage][:arch]}/RPM-GPG-KEY-CentOS-#{node[:rightimage][:platform_version].to_i}"
-	action :create_if_missing
+    action :create_if_missing
   end
   
   cookbook_file "/etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL#{epel_key_name}" do
@@ -110,12 +110,12 @@ action :install do
   ## fix logrotate
   touch #{guest_root}/var/log/boot.log
 
-  #echo "Disabling TTYs"
-  #perl -p -i -e 's/(.*tty2)/#\1/' #{guest_root}/etc/inittab
-  #perl -p -i -e 's/(.*tty3)/#\1/' #{guest_root}/etc/inittab
-  #perl -p -i -e 's/(.*tty4)/#\1/' #{guest_root}/etc/inittab
-  #perl -p -i -e 's/(.*tty5)/#\1/' #{guest_root}/etc/inittab
-  #perl -p -i -e 's/(.*tty6)/#\1/' #{guest_root}/etc/inittab
+  echo "Disabling TTYs"
+  perl -p -i -e 's/(.*tty2)/#\1/' #{guest_root}/etc/inittab
+  perl -p -i -e 's/(.*tty3)/#\1/' #{guest_root}/etc/inittab
+  perl -p -i -e 's/(.*tty4)/#\1/' #{guest_root}/etc/inittab
+  perl -p -i -e 's/(.*tty5)/#\1/' #{guest_root}/etc/inittab
+  perl -p -i -e 's/(.*tty6)/#\1/' #{guest_root}/etc/inittab
 
   rm -f #{guest_root}/etc/yum.repos.d/CentOS-Media.repo
 

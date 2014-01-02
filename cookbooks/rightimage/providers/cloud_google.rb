@@ -15,21 +15,6 @@ action :configure do
     end
   end
 
-  # insert grub conf, and link menu.lst to grub.conf
-  directory "#{guest_root}/boot/grub" do
-    owner "root"
-    group "root"
-    mode "0750"
-    action :create
-    recursive true
-  end
-
-  # insert grub conf, and symlink
-  template "#{guest_root}/boot/grub/menu.lst" do
-    source "menu.lst.erb"
-    backup false
-  end
-
   execute "install iscsi tools" do
     only_if { node[:rightimage][:platform] =~ /redhat|rhel|centos/ }
     command "chroot #{guest_root} yum -y install iscsi-initiator-utils"
