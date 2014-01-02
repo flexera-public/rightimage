@@ -15,6 +15,7 @@ class Chef
 
         # Defaults
         @source = name  
+        @destination = nil
         @size_gb = 10
         @mount_point = "/mnt/image"
         @label = "ROOT"
@@ -26,6 +27,10 @@ class Chef
       # Define the attributes we set defaults for
       def source(arg=nil)
         set_or_return(:source, arg, :kind_of => String)
+      end
+
+      def destination(arg=nil)
+        set_or_return(:destination, arg, :kind_of => String)
       end
 
       def size_gb(arg=nil)

@@ -66,8 +66,9 @@ bash "replace old file" do
   code "mv #{loopback_file_base}.tmp #{loopback_file_base}"
 end
 
-loopback_fs "clone resized #{loopback_file_base}" do
+loopback_fs loopback_file_base do
   only_if { do_loopback_resize }
+  destination loopback_file_backup
   action :clone
 end
 

@@ -43,7 +43,7 @@ class Chef
 
       def create_loopback(source, size_gb, device_num)
         Chef::Log::info("Creating #{size_gb}GB volume at #{source}")
-        loop_device = "#{loopback_device}#{device_num}"
+        loop_device = "#{LoopbackFs.loopback_device}#{device_num}"
 
         shell_out! "qemu-img create -f qcow2 #{source} #{size_gb}G"
         create_qemu_nbd(source, device_num)
@@ -54,13 +54,13 @@ class Chef
       end
 
       def setup_loopback(source, device_num)
-        loop_device = "#{loopback_device}#{device_num}"
+        loop_device = "#{LoopbackFs.loopback_device}#{device_num}"
         Chef::Log::info("Creating loopback device at #{loop_device}")
         create_qemu_nbd(source_device_num)
       end
 
       def create_qemu_nbd(source, device_num)
-        loop_device = "#{loopback_device}#{device_num}"
+        loop_device = "#{LoopbackFs.loopback_device}#{device_num}"
         unless ::File.exists?("/dev/nbd0") 
           shell_out! "modprobe nbd max_part=16"
         end
@@ -69,7 +69,7 @@ class Chef
       end
 
       def setup_mapper(size_gb, device_num, partitioned)
-        loop_device = "#{loopback_device}#{device_num}"
+        loop_device = "#{LoopbackFs.loopback_device}#{device_num}"
 
         if partitioned
           # So this bit of indirection helps the grub2 install to work - grub2 
@@ -132,7 +132,7 @@ class Chef
 
         shell_out "umount -lf #{new_resource.mount_point}"
 
-        loop_device = "#{loopback_device}#{new_resource.device_number}"
+        loop_device = "#{LoopbackFs.loopback_device}#{new_resource.device_number}"
         fake_device = "/dev/mapper/sda#{new_resource.device_number}"
 
         if ::File.exists? fake_device
@@ -157,7 +157,9 @@ class Chef
       end
 
       def action_clone
-        shell_out!("qemu-img create -f qcow2 -o backing_file=#{loopback_file_base} #{loopback_file_backup}", :cwd => target_raw_root)
+        Chef::Log::info("Cloning by creating #{destination} backed by #{source}")
+        raise "No destination provided for clone action" if new_resource.destination.to_s.empty?
+        shell_out! "qemu-img create -f qcow2 -o backing_file=#{new_resource.source} #{new_resource.destination}"
       end
 
     end

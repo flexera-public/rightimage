@@ -136,10 +136,6 @@ module RightScale
         node[:rightimage][:build_dir]
       end
 
-      def loopback_device
-        "/dev/nbd"
-      end
-
       def loopback_file
         node[:rightimage][:build_mode] == "base" ? loopback_file_base : loopback_file_backup
       end

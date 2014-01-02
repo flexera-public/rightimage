@@ -237,7 +237,7 @@ def install_grub_bootloader
     end
   else
     if new_resource.device.to_s.empty?
-      local_device = "#{loopback_device}0"
+      local_device = "#{LoopbackFs.loopback_device}0"
     else
       local_device = new_resource.device
     end
