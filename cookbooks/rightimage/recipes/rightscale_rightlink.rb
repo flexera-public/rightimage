@@ -130,6 +130,7 @@ def install_rightlink()
   # Setup repos
   repo_url = repo_url_generator
   gpg_check = gpg_check_generator
+  rightlink_cloud = node[:rightimage][:cloud] == "vagrant" ? "none" : node[:rightimage][:cloud]
 
   # Since dependencies can be installed from the repo, need to freeze them here.
   rightimage_os node[:rightimage][:platform] do
@@ -142,8 +143,7 @@ def install_rightlink()
       variables({:enabled => true, :gpg_check => gpg_check, :repo_url => repo_url})
       backup false
     end
-    execute "chroot #{guest_root} yum -y install rightlink-cloud-#{node[:rightimage][:cloud]}"
-    execute "chroot #{guest_root} yum -y install rightlink rightlink-sandbox"
+    execute "chroot #{guest_root} yum -y install rightlink-cloud-#{rightlink_cloud}"
     template "#{guest_root}/etc/yum.repos.d/rightlink.repo" do
       source "rightlink.repo.erb"
       variables({:enabled => false, :gpg_check => gpg_check, :repo_url => repo_url})
@@ -176,8 +176,7 @@ def install_rightlink()
 
     # Force yes forces the package to be installed even if its unsigned.
     force_yes = gpg_check ? "" : "--force-yes"
-    execute "chroot #{guest_root} apt-get -y #{force_yes} install rightlink-cloud-#{node[:rightimage][:cloud]}"
-    execute "chroot #{guest_root} apt-get -y #{force_yes} install rightlink rightlink-sandbox"
+    execute "chroot #{guest_root} apt-get -y #{force_yes} install rightlink-cloud-#{rightlink_cloud}"
     template "#{guest_root}/etc/apt/sources.list.d/rightlink.list" do
       source "rightlink.list.erb"
       variables({

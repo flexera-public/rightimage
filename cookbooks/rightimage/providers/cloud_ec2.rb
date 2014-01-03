@@ -42,7 +42,10 @@ action :configure do
   execute "#{guest_root}/tmp/install_ec2_tools.sh" do
     environment(node[:rightimage][:script_env])
   end
-   
+  execute "chroot #{guest_root} /tmp/install_ec2_tools.sh" do
+    environment({'PLATFORM' => node[:rightimage][:platform]})
+  end
+
   bash "do_depmod" do 
     flags "-ex"
     only_if { node[:rightimage][:platform] == "centos" }
@@ -366,7 +369,8 @@ def upload_s3()
   # of images that are partitioned -- the tools don't recreate the grub config faithfully
   # and always assume we're using the non-partioned pvgrub
   guest_root_nonpart=guest_root+"2"
-  loopback_nonpart = "#{temp_root}/#{ri_lineage}_hd0.raw"
+  loopback_nonpart="#{target_raw_root}/#{ri_lineage}_hd0.qcow2"
+  raw_image="#{target_raw_root}/#{loopback_rootname}.raw"
   keyfile = "/tmp/AWS_X509_KEY.pem"
   certfile = "/tmp/AWS_X509_CERT.pem"
 
@@ -392,14 +396,17 @@ def upload_s3()
     action :create
   end
 
-  log "Rsyncing to non-partitioned filesystem"
-  execute("rsync -a #{guest_root}/ #{guest_root_nonpart}/")
+  bash "copy loopback fs" do
+    not_if { ::File.exists? raw_image }
+    flags "-e"
+    code "rsync -a #{guest_root}/ #{guest_root_nonpart}/"
+  end
 
   loopback_fs loopback_nonpart do
+    not_if { ::File.exists? raw_image }
     device_number 1
     action :unmount
   end
-
 
   bundle_image_options = {
     "privatekey" => keyfile,
@@ -407,20 +414,24 @@ def upload_s3()
     "user" => node[:rightimage][:aws_account_number],
     "image" => loopback_nonpart,
     "prefix" => image_name,
-    "destination" => "#{temp_root}/bundled",
+    "destination" => "#{target_raw_root}/bundled",
     "arch" => new_resource.arch,
     "block-device-mapping" => "ami=sda,root=/dev/sda1,ephemeral0=sdb,swap=sda3"
   }
 
-  execute "rm -rf '#{temp_root}/bundled'"
-  execute "mkdir -p '#{temp_root}/bundled'"
+  execute "rm -rf '#{target_raw_root}/bundled'"
+  execute "mkdir -p '#{target_raw_root}/bundled'"
+
+  execute "qemu-img convert -f qcow2 -O raw #{loopback_nonpart} #{raw_image}" do
+    creates raw_image
+  end
 
   ruby_block "Create and upload InstanceStore image bundle" do
     block do
       ec2_ami_command("bundle-image", bundle_image_options)
       ec2_ami_command("upload-bundle", {
         "bucket" => node[:rightimage][:image_upload_bucket], 
-        "manifest" => "#{temp_root}/bundled/#{image_name}.manifest.xml",
+        "manifest" => "#{target_raw_root}/bundled/#{image_name}.manifest.xml",
         "access-key" => node[:rightimage][:aws_access_key_id],
         "secret-key" => node[:rightimage][:aws_secret_access_key],
         "retry" => true,
@@ -448,6 +459,11 @@ def upload_s3()
         f.write(image_id)
       end
     end
+  end
+
+  file raw_image do 
+    action :delete
+    backup false
   end
 
   file certfile do 

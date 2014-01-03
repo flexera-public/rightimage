@@ -15,6 +15,7 @@ action :upload do
   Chef::Log.info("file to upload: #{file}")
 
   ruby "Upload image to s3" do
+    timeout 10800
     environment(
       'AWS_ACCESS_KEY_ID'=>user,
       'AWS_SECRET_ACCESS_KEY'=>password

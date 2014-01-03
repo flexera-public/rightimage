@@ -11,10 +11,11 @@ class Chef
         @resource_name = :loopback_fs          # Bind ourselves to the name with an underscore
         @provider = Chef::Provider::LoopbackFs # We need to tie to our provider
         @action = :create                     # Default Action Goes here
-        @allowed_actions = [ :create, :unmount, :mount, :nothing ]
+        @allowed_actions = [ :create, :unmount, :mount, :clone, :nothing ]
 
         # Defaults
         @source = name  
+        @destination = nil
         @size_gb = 10
         @mount_point = "/mnt/image"
         @label = "ROOT"
@@ -26,6 +27,10 @@ class Chef
       # Define the attributes we set defaults for
       def source(arg=nil)
         set_or_return(:source, arg, :kind_of => String)
+      end
+
+      def destination(arg=nil)
+        set_or_return(:destination, arg, :kind_of => String)
       end
 
       def size_gb(arg=nil)

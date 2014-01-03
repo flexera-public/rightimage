@@ -23,15 +23,10 @@ class Chef::Recipe
   include RightScale::RightImage::Helper
 end
 
-directory temp_root do
-  owner "root"
-  group "root"
-  recursive true
-end
-
 node[:rightimage][:host_packages].each { |p| package p.strip }
 
-include_recipe "rightimage::block_device_restore"
+include_recipe "rightimage::volume_create"
+include_recipe "rightimage::loopback_download"
 include_recipe "rightimage::loopback_resize"
 include_recipe "rightimage::loopback_mount"
 include_recipe "rightimage::clean"

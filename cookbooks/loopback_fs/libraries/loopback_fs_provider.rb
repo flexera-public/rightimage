@@ -43,28 +43,33 @@ class Chef
 
       def create_loopback(source, size_gb, device_num)
         Chef::Log::info("Creating #{size_gb}GB volume at #{source}")
-        loop_device = "/dev/loop#{device_num}"
+        loop_device = "#{LoopbackFs.loopback_device}#{device_num}"
 
-        size_mb = size_gb * 1024
+        shell_out! "qemu-img create -f qcow2 #{source} #{size_gb}G"
+        create_qemu_nbd(source, device_num)
 
-        shell_out! "dd if=/dev/zero of=#{source} bs=1M count=#{size_mb}", :timeout => 3600
-        Chef::Log::info("Creating loopback device at #{loop_device}")
-
-        shell_out! "losetup #{loop_device} #{source}"
         shell_out! "parted -s #{loop_device} mklabel msdos"
         shell_out! "parted -s #{loop_device} mkpart primary ext2 1024k 100% -a minimal"
         shell_out! "parted -s #{loop_device} set 1 boot on"
       end
 
       def setup_loopback(source, device_num)
-        loop_device = "/dev/loop#{device_num}"
+        loop_device = "#{LoopbackFs.loopback_device}#{device_num}"
         Chef::Log::info("Creating loopback device at #{loop_device}")
+        create_qemu_nbd(source_device_num)
+      end
 
-        shell_out! "losetup #{loop_device} #{source}"
+      def create_qemu_nbd(source, device_num)
+        loop_device = "#{LoopbackFs.loopback_device}#{device_num}"
+        unless ::File.exists?("/dev/nbd0") 
+          shell_out! "modprobe nbd max_part=16"
+        end
+        shell_out! "qemu-nbd -n -c #{loop_device} #{source}"
+        sleep 1
       end
 
       def setup_mapper(size_gb, device_num, partitioned)
-        loop_device = "/dev/loop#{device_num}"
+        loop_device = "#{LoopbackFs.loopback_device}#{device_num}"
 
         if partitioned
           # So this bit of indirection helps the grub2 install to work - grub2 
@@ -127,7 +132,7 @@ class Chef
 
         shell_out "umount -lf #{new_resource.mount_point}"
 
-        loop_device = "/dev/loop#{new_resource.device_number}"
+        loop_device = "#{LoopbackFs.loopback_device}#{new_resource.device_number}"
         fake_device = "/dev/mapper/sda#{new_resource.device_number}"
 
         if ::File.exists? fake_device
@@ -135,10 +140,7 @@ class Chef
           shell_out! "dmsetup remove #{fake_device}"
         end
 
-        all_devices = shell_out('losetup -a').stdout.split("\n")
-        if all_devices.any? { |dev| dev.include?(loop_device) }
-          shell_out! "losetup -d #{loop_device}"
-        end
+        shell_out! "qemu-nbd -d #{loop_device}"
       end
 
       def action_mount
@@ -152,6 +154,12 @@ class Chef
         loop_partition = setup_mapper(new_resource.size_gb, new_resource.device_number, new_resource.partitioned)
         mount_partition(loop_partition, new_resource.mount_point)
         bind_devices(new_resource.mount_point) if new_resource.bind_devices
+      end
+
+      def action_clone
+        Chef::Log::info("Cloning by creating #{destination} backed by #{source}")
+        raise "No destination provided for clone action" if new_resource.destination.to_s.empty?
+        shell_out! "qemu-img create -f qcow2 -o backing_file=#{new_resource.source} #{new_resource.destination}"
       end
 
     end

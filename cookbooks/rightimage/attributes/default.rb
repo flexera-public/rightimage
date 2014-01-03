@@ -5,7 +5,6 @@ end
 set_unless[:rightimage][:debug] = false
 set[:rightimage][:lang] = "en_US.UTF-8"
 set_unless[:rightimage][:root_size_gb] = "10"
-set[:rightimage][:build_dir] = "/mnt/vmbuilder"
 set[:rightimage][:guest_root] = "/mnt/image"
 set_unless[:rightimage][:hypervisor] = "xen"
 # Don't use cf-mirror because it causes hash sum mismatch errors on Ubuntu
@@ -50,25 +49,25 @@ when "virtualbox" then set[:rightimage][:image_type] = "box"
 else raise ArgumentError, "don't know what image format to use for #{node[:rightimage][:hypervisor]}!"
 end
 
-set[:rightimage][:host_packages] = []
+node.set[:rightimage][:host_packages] = []
 
 # set base os packages
 case rightimage[:platform]
 when "ubuntu"
-  rightimage[:host_packages] << " ca-certificates"
-  rightimage[:host_packages] << " openjdk-6-jre"
-  rightimage[:host_packages] << " openssl"
+  node.set[:rightimage][:host_packages] << " ca-certificates"
+  node.set[:rightimage][:host_packages] << " openjdk-6-jre"
+  node.set[:rightimage][:host_packages] << " openssl"
 
   if rightimage[:platform_version].to_f >= 10.10
-    rightimage[:host_packages] << " devscripts"
+    node.set[:rightimage][:host_packages] << " devscripts"
   end
 
   if rightimage[:platform_version].to_f == 12.04
-    rightimage[:host_packages] << " liburi-perl"
+    node.set[:rightimage][:host_packages] << " liburi-perl"
   end
 when "centos","rhel"
 
-  rightimage[:host_packages] << " swig"
+  node.set[:rightimage][:host_packages] << " swig"
 
   extra_el_packages =
     if el6?
@@ -82,7 +81,7 @@ when "centos","rhel"
     end
 
   extra_el_packages.split.each do |p|
-    rightimage[:host_packages] << " #{p}"
+    node.set[:rightimage][:host_packages] << " #{p}"
   end
 when "suse"
   rightimage[:host_packages] << " kiwi"
@@ -126,19 +125,8 @@ case rightimage[:cloud]
         end
     end
   else 
-    case rightimage[:hypervisor]
-    when "xen"
-      set[:rightimage][:root_mount][:dump] = "1" 
-      set[:rightimage][:root_mount][:fsck] = "1" 
-    when "kvm"
-      set[:rightimage][:root_mount][:dump] = "1" 
-      set[:rightimage][:root_mount][:fsck] = "1" 
-    when "esxi", "hyperv"
-      set[:rightimage][:root_mount][:dump] = "1" 
-      set[:rightimage][:root_mount][:fsck] = "1" 
-    else
-      raise "ERROR: unsupported hypervisor #{node[:rightimage][:hypervisor]} for cloudstack"
-    end
+    set[:rightimage][:root_mount][:dump] = "1"
+    set[:rightimage][:root_mount][:fsck] = "1"
 end
 
 # set rightscale stuff

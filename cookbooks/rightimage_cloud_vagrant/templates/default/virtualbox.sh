@@ -8,6 +8,13 @@
 # Installing the virtualbox guest additions
 VBOX_VERSION="4.2.12"
 file=/tmp/VBoxGuestAdditions.iso
+
+if [ `lsb_release -is` == "Ubuntu" ]; then
+  apt-get -y install curl
+else
+  yum -y install curl
+fi
+
 if [ ! -f $file ]; then
   curl -o $file --fail --silent --location http://download.virtualbox.org/virtualbox/$VBOX_VERSION/VBoxGuestAdditions_$VBOX_VERSION.iso
 fi

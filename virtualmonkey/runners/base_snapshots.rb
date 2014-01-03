@@ -69,7 +69,7 @@ module VirtualMonkey
 
       def base_builder_lookup_scripts
         scripts = [
-                   ['block_device_destroy', 'rightimage::block_device_destroy']
+                   ['volume_destroy', 'rightimage::volume_destroy']
                   ]
         st = match_st_by_server(s_one)
         load_script_table(st,scripts)

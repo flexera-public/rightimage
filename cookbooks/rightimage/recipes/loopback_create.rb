@@ -6,6 +6,9 @@ class Chef::Recipe
   include RightScale::RightImage::Helper
 end
 
+directory target_raw_root do
+  action :create
+end
 
 loopback_fs loopback_file do
   mount_point guest_root

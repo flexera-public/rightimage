@@ -15,67 +15,9 @@ action :configure do
     end
   end
 
-  bash "install guest packages" do
-    flags '-ex'
-    code <<-EOH
-      case "#{new_resource.platform}" in
-      "ubuntu")
-        chroot #{guest_root} apt-get -y purge grub-pc
-        chroot #{guest_root} apt-get -y install grub
-        ;;
-      "centos"|"rhel")
-        chroot #{guest_root} yum -y install grub iscsi-initiator-utils
-        ;;
-      esac
-    EOH
-  end
-
-  directory temp_root { recursive true }
-
-  # insert grub conf, and link menu.lst to grub.conf
-  directory "#{guest_root}/boot/grub" do
-    owner "root"
-    group "root"
-    mode "0750"
-    action :create
-    recursive true
-  end
-
-  # insert grub conf, and symlink
-  template "#{guest_root}/boot/grub/menu.lst" do
-    source "menu.lst.erb"
-    backup false
-  end
-
-  bash "setup grub" do
-    flags "-ex"
-    code <<-EOH
-      guest_root="#{guest_root}"
-
-      case "#{new_resource.platform}" in
-        "ubuntu")
-          chroot $guest_root cp -p /usr/lib/grub/x86_64-pc/* /boot/grub
-          grub_command="/usr/sbin/grub"
-          ;;
-        "centos"|"rhel")
-          chroot $guest_root cp -p /usr/share/grub/x86_64-redhat/* /boot/grub
-          grub_command="/sbin/grub"
-          ;;
-      esac
-
-      echo "(hd0) #{node[:rightimage][:grub][:root_device]}" > $guest_root/boot/grub/device.map
-      echo "" >> $guest_root/boot/grub/device.map
-
-      cat > device.map <<EOF
-(hd0) #{loopback_file}
-EOF
-
-    ${grub_command} --batch --device-map=device.map <<EOF
-root (hd0,0)
-setup (hd0)
-quit
-EOF
-EOH
+  execute "install iscsi tools" do
+    only_if { node[:rightimage][:platform] =~ /redhat|rhel|centos/ }
+    command "chroot #{guest_root} yum -y install iscsi-initiator-utils"
   end
 
   if (new_resource.platform =~ /centos|rhel/ && new_resource.platform_version.to_f >= 6) || new_resource.platform == "ubuntu"
@@ -107,13 +49,13 @@ EOH
     raise "Unsupported platform/version combination #{new_resource.platform} #{new_resource.platform_version}"
   end
 
-  cookbook_file "#{temp_root}/google.tgz" do
+  cookbook_file "#{target_raw_root}/google.tgz" do
     source "google.tgz"
     action :create
     backup false
   end
   bash "untar google helper and startup scripts" do
-    code "tar zxf #{temp_root}/google.tgz -C #{guest_root}/usr/share"
+    code "tar zxf #{target_raw_root}/google.tgz -C #{guest_root}/usr/share"
   end
 
   bash "configure for google compute" do
@@ -165,6 +107,11 @@ EOH
 end
 
 action :package do
+  loopback_raw="#{loopback_rootname}.raw"
+  execute "qemu-img convert -f qcow2 -O raw #{loopback_file} #{loopback_raw}" do
+    cwd target_raw_root
+  end
+
   file "#{target_raw_root}/disk.raw" do
     action :delete
     backup false
@@ -172,7 +119,7 @@ action :package do
   # Chef file resource doesn't do this correctly for some reason
   bash "hard link to disk.raw" do
     cwd target_raw_root
-    code "ln #{loopback_file} disk.raw"
+    code "ln #{loopback_raw} disk.raw"
   end
   bash "zipping raw file" do
     cwd target_raw_root

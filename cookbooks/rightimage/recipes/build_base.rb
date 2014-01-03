@@ -21,10 +21,8 @@ rightscale_marker :begin
 
 raise "ERROR: your build_mode input is set to #{node[:rightimage][:build_mode]}. Should be 'base'" unless node[:rightimage][:build_mode] == "base"
 
-include_recipe "rightimage::block_device_create"
 include_recipe "rightimage::loopback_create"
 include_recipe "rightimage::base_os"
 include_recipe "rightimage::loopback_unmount"
-include_recipe "rightimage::block_device_backup"
 include_recipe "rightimage::base_upload"
 rightscale_marker :end

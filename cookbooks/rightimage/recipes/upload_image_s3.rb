@@ -25,4 +25,5 @@ ros_upload full_image_path do
   remote_path image_s3_path
   action :upload
 end
+
 rightscale_marker :end

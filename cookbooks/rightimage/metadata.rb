@@ -8,7 +8,7 @@ depends "ros_upload"
 depends "rightimage_tester"
 depends "loopback_fs"
 depends "rightscale"
-depends "block_device"
+depends "rightscale_volume"
 
 depends "rightimage_cloud_vagrant"
 
@@ -29,18 +29,16 @@ recipe "rightimage::base_upload", "upload raw image to s3"
 recipe "rightimage::ec2_download_bundle","Downloads bundled image from EC2 S3."
 recipe "rightimage::image_tests", "run some basic tests on mounted image such as grepping for credentials"
 
-# Block device recipes
-recipe "rightimage::block_device_create", "creates, formats, and mounts a brand new EBS volume"
-recipe "rightimage::block_device_backup", "creates an EBS snapshot from attached EBS volume"
-recipe "rightimage::block_device_restore", "creates a new EBS volume by restoring from an EBS snapshot"
-recipe "rightimage::block_device_destroy", "unmounts, and deletes an attached EBS volume"
-
 # Loopback filesystem recipes
 recipe "rightimage::loopback_create", "creates and mounts loopback file system"
 recipe "rightimage::loopback_copy", "creates non-partitioned loopback fs image from a partitioned one"
+recipe "rightimage::loopback_download", "downloads base loopback image"
 recipe "rightimage::loopback_unmount", "unmounts loopback file system"
 recipe "rightimage::loopback_mount", "mounts loopback file system"
 recipe "rightimage::loopback_resize", "resizes loopback file system"
+
+recipe "rightimage::volume_create", "creates and attaches a volume"
+recipe "rightimage::volume_destroy", "detatches and deletes a volume"
 
 #
 # required
@@ -49,7 +47,7 @@ attribute "rightimage/root_size_gb",
   :display_name => "Root Size GB",
   :description => "Sets the size of the virtual image. Units are in GB.",
   :default => "10",
-  :recipes => [ "rightimage::default", "rightimage::build_base", "rightimage::build_image", "rightimage::loopback_copy", "rightimage::block_device_backup","rightimage::block_device_create",  "rightimage::block_device_restore", "rightimage::loopback_resize", "rightimage::loopback_mount", "rightimage::loopback_create", "rightimage::cloud_add", "rightimage::cloud_upload", "rightimage::cloud_package", "rightimage::rebundle" ]
+  :recipes => [ "rightimage::default", "rightimage::build_base", "rightimage::build_image", "rightimage::loopback_copy", "rightimage::loopback_resize", "rightimage::loopback_mount", "rightimage::loopback_create", "rightimage::cloud_add", "rightimage::cloud_upload", "rightimage::cloud_package", "rightimage::rebundle" ]
 
 attribute "rightimage/manual_mode",
   :display_name => "Manual Mode",
@@ -420,6 +418,18 @@ attribute "rightimage/google/service_key",
 
 attribute "rightimage/google/refresh_token",
   :display_name => "Google OAuth2 credentials refresh token",
-  :description => "Refresh token value for GCE. Pulled form gcutil conf",
+  :description => "Refresh token value for GCE. Pulled from gcutil conf",
   :required => "optional",
   :recipes => [ "rightimage::cloud_upload" ]
+
+attribute "rightimage/build_dir",
+  :display_name => "Build Directory",
+  :description => "Temporary directory to store build collateral",
+  :default => "/mnt/storage",
+  :required => "optional"
+
+attribute "rightimage/volume_size",
+  :display_name => "Volume Size",
+  :description => "If specified, creates a volume of specified size and mounts at rightimage/build_dir",
+  :required => "optional",
+  :recipes => [ "rightimage::volume_create" ]

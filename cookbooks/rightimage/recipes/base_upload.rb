@@ -6,13 +6,21 @@ class Chef::Resource::Bash
   include RightScale::RightImage::Helper
 end
 
-directory(::File.dirname(loopback_file_gz)) { recursive true }
+# This will make the file smaller.
+bash "convert base image" do
+  cwd target_raw_root
+  flags "-ex"
+  code <<-EOH
+    qemu-img convert -f qcow2 -O qcow2 #{loopback_file} #{loopback_file}.new
+    mv #{loopback_file}.new #{loopback_file}
+  EOH
+end
 
 bash "compress partitioned base image" do
-  cwd temp_root
+  cwd target_raw_root
   flags "-ex"
-  not_if { ::File.exists?(loopback_file_gz) && (::File.mtime(loopback_file_gz) > ::File.mtime(loopback_file)) }
-  code "gzip -c #{loopback_file} > #{loopback_file_gz}"
+  not_if { ::File.exists?(loopback_file_compressed) && (::File.mtime(loopback_file_compressed) > ::File.mtime(loopback_file)) }
+  code "tar cjf #{loopback_file_compressed} #{loopback_filename}"
 end
 
 
@@ -20,7 +28,7 @@ image_s3_path = guest_platform+"/"+guest_platform_version+"/"+guest_arch+"/"+mir
 image_upload_bucket = node[:rightimage][:base_image_bucket]
 
 # Upload partitioned image
-ros_upload loopback_file_gz do
+ros_upload loopback_file_compressed do
   provider "ros_upload_s3"
   user node[:rightimage][:aws_access_key_id]
   password node[:rightimage][:aws_secret_access_key]

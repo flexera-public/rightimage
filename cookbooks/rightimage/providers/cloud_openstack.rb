@@ -60,6 +60,7 @@ action :package do
 end
 
 action :upload do
+  # TODO: Probably need to add a dependency for gcc
   packages = case node[:platform]
              when "centos", "redhat" then
                %w(python-devel python-libs openssl-devel python-pip)

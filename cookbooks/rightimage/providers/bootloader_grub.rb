@@ -48,6 +48,14 @@ def partitioned?
   end
 end
 
+def grub_root
+  if partitioned?
+    "(hd0,0)"
+  else
+    "(hd0)"
+  end
+end
+
 
 def grub_initrd
   ::File.basename(Dir.glob("#{new_resource.root}/boot/initr*").sort_by { |f| ::File.mtime(f) }.last)
@@ -179,7 +187,7 @@ def install_grub_bootloader
     case new_resource.hypervisor
     when "xen" then "/dev/xvda"
     when "kvm" then  "/dev/vda"
-    when "esxi", "hyperv" then "/dev/sda"
+    when "esxi", "hyperv", "virtualbox" then "/dev/sda"
     else raise "Unknown hypervisor, can't install bootloader"
     end
 
@@ -229,7 +237,7 @@ def install_grub_bootloader
     end
   else
     if new_resource.device.to_s.empty?
-      local_device = "/dev/loop0"
+      local_device = "#{LoopbackFs.loopback_device}0"
     else
       local_device = new_resource.device
     end
