@@ -27,7 +27,6 @@ test "default" do
   short_arch = metadata[:os_arch] =~ /386|586|686/ ? 'i386' : 'x64'
   os_version = get_os_version(os,os_base_version,long_arch,mirror_freeze_date)
 
-
   # deprecated variables (needed for 12H1), delete later
   os_release = os == "ubuntu" ? get_ubuntu_release_name(os_version) : os_version
   s_one.set_input('rightimage/virtual_environment', "text:xen")
@@ -49,6 +48,10 @@ test "default" do
 
   s_one.launch
   wait_for_server_state(s_one, "operational")
+
+  # Required to be able to run a RightScript/recipe.
+  if s_one.cloud_id > 100; s_one.settings; end
+
   run_script_on_all('volume_destroy')
   s_one.stop
 

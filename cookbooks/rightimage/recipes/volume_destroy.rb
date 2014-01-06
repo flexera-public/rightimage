@@ -28,14 +28,15 @@ end
 
 include_recipe "rightimage::loopback_unmount" if mounted?(guest_root)
 
-mount target_raw_root do
-  device node['rightscale_volume']['volume']['device']
-  action :umount
-end
+unless node['rightimage']['volume_size'].nil?
+  mount target_raw_root do
+    device node['rightscale_volume']['volume']['device']
+    action :umount
+  end
 
-rightscale_volume "volume" do
-  only_if { node[:rightimage][:volume_size] }
-  action [ :detach, :delete ]
+  rightscale_volume "volume" do
+    action [ :detach, :delete ]
+  end
 end
 
 rightscale_marker :end

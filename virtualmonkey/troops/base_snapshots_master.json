@@ -1,6 +1,6 @@
 {
   "feature":"base_snapshots.rb",
-  "cloud_variables":"aws_us_oregon.json",
+  "cloud_variables":"cs_3.0.6_kvm.json",
   "common_inputs":"base_snapshots.json",
   "prefix":"RI_BASE_MASTER",
   "server_template_ids":[
