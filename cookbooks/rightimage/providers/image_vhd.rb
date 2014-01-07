@@ -19,6 +19,7 @@ action :package do
 
   vhd_util_deps.each { |p| package p }
 
+  # Pulled from: https://github.com/citrix-openstack/xenserver-utils/blob/984739db2198fbce23f61a90638b5b70c4bff5a0/blktap2.patch 
   cookbook_file "/tmp/vhd-util-patch" do 
     source "vhd-util-patch"
   end
@@ -28,10 +29,10 @@ action :package do
     flags "-ex"
     code <<-EOF
       rm -rf /mnt/vhd && mkdir /mnt/vhd && cd /mnt/vhd
-      # Mercurial repo generated with command 'hg clone --rev 21560 http://xenbits.xensource.com/xen-4.0-testing.hg'
-      wget -q #{node[:rightimage][:s3_base_url]}/files/vhd-util-rev21560.tar.gz 
-      tar zxf vhd-util-rev21560.tar.gz 
-      cd xen-4.0-testing.hg
+      # Pulled from: http://bits.xensource.com/oss-xen/release/4.2.0/xen-4.2.0.tar.gz
+      wget -q #{node[:rightimage][:s3_base_url]}/files/xen-4.2.0.tar.gz
+      tar zxf xen-4.2.0.tar.gz
+      cd xen-4.2.0
       patch --forward -p1 < /tmp/vhd-util-patch
       make install-tools
       cd tools/blktap2/
