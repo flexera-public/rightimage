@@ -56,7 +56,7 @@ class Chef
       def setup_loopback(source, device_num)
         loop_device = "#{::LoopbackFs.loopback_device}#{device_num}"
         Chef::Log::info("Creating loopback device at #{loop_device}")
-        create_qemu_nbd(source_device_num)
+        create_qemu_nbd(source, device_num)
       end
 
       def create_qemu_nbd(source, device_num)
@@ -157,7 +157,7 @@ class Chef
       end
 
       def action_clone
-        Chef::Log::info("Cloning by creating #{destination} backed by #{source}")
+        Chef::Log::info("Cloning by creating #{new_resource.destination} backed by #{new_resource.source}")
         raise "No destination provided for clone action" if new_resource.destination.to_s.empty?
         shell_out! "qemu-img create -f qcow2 -o backing_file=#{new_resource.source} #{new_resource.destination}"
       end
