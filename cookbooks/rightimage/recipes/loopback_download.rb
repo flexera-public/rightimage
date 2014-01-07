@@ -27,8 +27,9 @@ execute "tar xjf #{loopback_file_compressed}" do
   not_if { ::File.exists? loopback_file_base }
 end
 
-loopback_fs "clone #{loopback_file_base}" do
+loopback_fs loopback_file_base do
   not_if { ::File.exists?(loopback_file_backup) || do_loopback_resize }
+  destination loopback_file_backup
   action :clone
 end
 

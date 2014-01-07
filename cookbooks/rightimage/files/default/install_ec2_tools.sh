@@ -5,10 +5,10 @@
 # EC2 AMI Tools are Ruby based
 case "$PLATFORM" in
 ubuntu*)
-  apt-get -y install python-dev python-pip wget ruby curl
+  apt-get -y install python-dev python-pip wget ruby curl unzip
   ;;
 rhel*|redhat*|centos*)
-  yum -y install python-pip python-devel python-libs wget ruby curl
+  yum -y install python-pip python-devel python-libs wget ruby curl unzip
   ;;
 *)
   echo "ERROR: PLATFORM not set!"
