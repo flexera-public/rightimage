@@ -93,6 +93,7 @@ skip_dirs=(
 #{node[:rightimage_tester][:root]}/opt/rightscale/right_link/certs
 #{node[:rightimage_tester][:root]}/opt/rightscale/right_link/lib/instance/cook
 #{node[:rightimage_tester][:root]}/opt/rightscale/sandbox/man
+#{node[:rightimage_tester][:root]}/opt/rightscale/sandbox/ssl/man
 )
 
 # List of files to ignore.
