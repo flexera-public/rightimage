@@ -164,8 +164,8 @@ EOH
       set -e
 
       # Install Boto (for gsutil)
-      chroot $guest_root easy_install pip
-      chroot $guest_root source /etc/profile && pip install boto
+      chroot $guest_root easy_install pip==1.4.1
+      chroot $guest_root source /etc/profile && pip install boto==2.19.0
 
       gcutil=#{node[:rightimage][:google][:gcutil_name]}
       wget #{node[:rightimage][:google][:gcutil_base_url]}/$gcutil.tar.gz
@@ -214,8 +214,8 @@ action :upload do
     flags "-ex"
     environment(node[:rightimage][:script_env])
     code <<-EOF
-      easy_install pip
-      pip install boto
+      easy_install pip==1.4.1
+      pip install boto==2.19.0
     EOF
   end
 
