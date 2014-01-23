@@ -76,10 +76,11 @@ action :configure do
       "ubuntu")
         chroot $guest_root apt-get -y install acpid dhcp3-client
 
-        # Need to install backported kernel from 12.10
+        # Need to install backported kernel from 13.04
         # NOTE: this image should not be used in production!!
-        # See wookie page
-        chroot $guest_root apt-get -y install linux-generic-lts-quantal
+        # Precise kernel doesn't support SCSI_VIRTIO driver.
+        # Quantal kernel doesn't show attached volumes. (w-6223)
+        chroot $guest_root apt-get -y install linux-generic-lts-raring
 
         # Disable all ttys except for tty1 (console)
         for i in `ls $guest_root/etc/init/tty[2-9].conf`; do
