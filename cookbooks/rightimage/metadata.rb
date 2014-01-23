@@ -432,4 +432,4 @@ attribute "rightimage/volume_size",
   :display_name => "Volume Size",
   :description => "If specified, creates a volume of specified size and mounts at rightimage/build_dir",
   :required => "optional",
-  :recipes => [ "rightimage::volume_create" ]
+  :recipes => [ "rightimage::default", "rightimage::build_image", "rightimage::volume_create" ]

@@ -1,0 +1,6 @@
+grub2 grub2/linux_cmdline string
+grub2 grub2/linux_cmdline_default string
+grub-pc grub-pc/chainload_from_menu.lst boolean false
+grub-pc grub-pc/mixed_legacy_and_grub2 boolean true
+grub-pc grub-pc/install_devices string
+grub-pc grub-pc/install_devices_empty boolean true
