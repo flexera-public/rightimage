@@ -135,10 +135,11 @@ EOH
         chroot $guest_root apt-get -y install python-dev python-setuptools
         chroot $guest_root apt-get -y install acpid dhcp3-client
 
-        # Need to install backported kernel from 12.10
+        # Need to install backported kernel from 13.04
         # NOTE: this image should not be used in production!!
-        # See wookie page
-        chroot $guest_root apt-get -y install linux-generic-lts-quantal
+        # Precise kernel doesn't support SCSI_VIRTIO driver.
+        # Quantal kernel doesn't show attached volumes. (w-6223)
+        chroot $guest_root apt-get -y install linux-generic-lts-raring
 
         # Disable all ttys except for tty1 (console)
         for i in `ls $guest_root/etc/init/tty[2-9].conf`; do
@@ -163,8 +164,8 @@ EOH
       set -e
 
       # Install Boto (for gsutil)
-      chroot $guest_root easy_install pip
-      chroot $guest_root source /etc/profile && pip install boto
+      chroot $guest_root easy_install pip==1.4.1
+      chroot $guest_root source /etc/profile && pip install boto==2.19.0
 
       gcutil=#{node[:rightimage][:google][:gcutil_name]}
       wget #{node[:rightimage][:google][:gcutil_base_url]}/$gcutil.tar.gz
@@ -213,8 +214,8 @@ action :upload do
     flags "-ex"
     environment(node[:rightimage][:script_env])
     code <<-EOF
-      easy_install pip
-      pip install boto
+      easy_install pip==1.4.1
+      pip install boto==2.19.0
     EOF
   end
 
