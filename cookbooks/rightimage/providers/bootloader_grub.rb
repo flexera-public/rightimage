@@ -67,12 +67,22 @@ end
 
 def install_grub_package
   if node[:rightimage][:platform] == "ubuntu"
+    # Work around issue with grub installed on host and grub2 on image.
+    # grub-pc postinst resets grub-pc/mixed_legacy_and_grub2 and marks as
+    # critical input even if you set it beforehand (w-6232)
+    execute "touch /boot/grub/grub2-installed" do
+      creates "/boot/grub/grub2-installed"
+    end
+
     # Avoid grub install from asking questions. This is needed for grub -> grub2
     # update on host.
-    execute 'echo "grub2   grub2/linux_cmdline            select" | debconf-set-selections -v'
-    execute 'echo "grub2   grub2/linux_cmdline_default    select" | debconf-set-selections -v' 
-    execute 'echo "grub-pc grub-pc/install_devices_empty  select yes" | debconf-set-selections -v' 
-    execute 'echo "grub-pc grub-pc/install_devices        select" | debconf-set-selections -v' 
+    cookbook_file "/tmp/debconf-grub.txt" do
+      source "debconf-grub.txt"
+      backup false
+    end
+
+    execute 'debconf-set-selections -v /tmp/debconf-grub.txt'
+
     execute("apt-get -y install #{grub_package}") do
       environment({"DEBIAN_FRONTEND"=>"noninteractive"})
     end
