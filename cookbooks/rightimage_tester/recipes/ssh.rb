@@ -46,24 +46,4 @@ bash "Test ssh" do
   EOH
 end
 
-bash "Test ssh part 2" do
-  only_if { node[:cloud][:provider] == "ec2" }
-  flags "-ex"
-  code <<-EOH
-    # Make sure that the RS bash special sauce is in the ENV for non-interactive
-    # shells.  This is required for bundling images via the dashboard.
-    case "#{node[:platform]}" in
-      suse*)
-        #
-        # SLES Doesn't set EC2_HOME but the EC2 tools are installed
-        #
-        ssh -i /root/.ssh/id_rsa_tester localhost -C 'ec2-instance-id || exit 1'
-        ;;
-      *) 
-        ssh -i /root/.ssh/id_rsa_tester localhost -C 'if [[ -z "$EC2_HOME" ]]; then exit 1; fi'
-        ;;
-    esac
-  EOH
-end
-
 rightscale_marker :end

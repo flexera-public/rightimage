@@ -9,6 +9,13 @@ action :configure do
     end
   end
 
+  ruby_block "check cloud" do
+    only_if { node[:rightimage][:ec2][:image_type] =~ /EBS/i }
+    block do
+      raise "ERROR: you must be running in EC2 to create EBS images!" unless node[:ec2]
+    end
+  end
+
 
   #  - add get_ssh_key script
   template "#{guest_root}/etc/init.d/getsshkey" do 
@@ -209,10 +216,7 @@ def upload_ebs
       mount $device #{ebs_mount}
 
       ## mount EBS volume, rsync, and unmount ebs volume
-      rsync -a #{guest_root}/ #{ebs_mount}/ --exclude '/proc' --exclude '/sys' --exclude '/dev/'
-      ## recreate the /proc mountpoint
-      mkdir -p #{ebs_mount}/proc
-      mkdir -p #{ebs_mount}/dev
+      rsync -a #{guest_root}/ #{ebs_mount}/
     EOH
   end
 
@@ -409,7 +413,7 @@ def upload_s3()
     "privatekey" => keyfile,
     "cert" => certfile,
     "user" => node[:rightimage][:aws_account_number],
-    "image" => loopback_nonpart,
+    "image" => raw_image,
     "prefix" => image_name,
     "destination" => "#{target_raw_root}/bundled",
     "arch" => new_resource.arch,

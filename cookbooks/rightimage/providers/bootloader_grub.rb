@@ -48,13 +48,6 @@ def partitioned?
   end
 end
 
-def grub_root
-  if partitioned?
-    "(hd0,0)"
-  else
-    "(hd0)"
-  end
-end
 
 
 def grub_initrd
