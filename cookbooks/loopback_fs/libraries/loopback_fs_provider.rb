@@ -41,16 +41,18 @@ class Chef
         shell_out "umount -lf #{mount_point}/sys"
       end
 
-      def create_loopback(source, size_gb, device_num)
+      def create_loopback(source, size_gb, device_num, partitioned)
         Chef::Log::info("Creating #{size_gb}GB volume at #{source}")
         loop_device = "#{::LoopbackFs.loopback_device}#{device_num}"
 
         shell_out! "qemu-img create -f qcow2 #{source} #{size_gb}G"
         create_qemu_nbd(source, device_num)
 
-        shell_out! "parted -s #{loop_device} mklabel msdos"
-        shell_out! "parted -s #{loop_device} mkpart primary ext2 1024k 100% -a minimal"
-        shell_out! "parted -s #{loop_device} set 1 boot on"
+        if partitioned
+          shell_out! "parted -s #{loop_device} mklabel msdos"
+          shell_out! "parted -s #{loop_device} mkpart primary ext2 1024k 100% -a minimal"
+          shell_out! "parted -s #{loop_device} set 1 boot on"
+        end
       end
 
       def setup_loopback(source, device_num)
@@ -61,7 +63,7 @@ class Chef
 
       def create_qemu_nbd(source, device_num)
         loop_device = "#{::LoopbackFs.loopback_device}#{device_num}"
-        unless ::File.exists?("/dev/nbd0") 
+        unless ::File.exists?(loop_device)
           shell_out! "modprobe nbd max_part=16"
         end
         shell_out! "qemu-nbd -n -c #{loop_device} #{source}"
@@ -110,7 +112,7 @@ class Chef
       def action_create
 
         unless ::File.exists? new_resource.source
-          create_loopback(new_resource.source, new_resource.size_gb, new_resource.device_number)
+          create_loopback(new_resource.source, new_resource.size_gb, new_resource.device_number, new_resource.partitioned)
 
           loop_partition = setup_mapper(new_resource.size_gb, new_resource.device_number, new_resource.partitioned)
           format_partition(loop_partition, new_resource.label)
