@@ -301,16 +301,9 @@ def upload_ebs
       # EBS images don't support the maximum number of ephemeral devices
       # provided by the instance type unless you register them on the image or
       # when running the instance. (w-5974)
-      set +x
-      block_device_mapping="";
-      i=0;
-
-      # Register /dev/sdb -> ephemeral0 .. /dev/sdy -> ephemeral23 to support 24 ephemeral drives total.
-      for letter in {b..y}; do
-        block_device_mapping="$block_device_mapping --block-device-mapping \\"/dev/sd${letter}=ephemeral${i}\\" ";
-        ((i = i + 1))
-      done
-      set -x
+      # Unfortunately, the devices registered under the block device mapping
+      # are considered in use by EC2 but not on the instance. This causes a
+      # problem for the block device templates. (w-6247)
 
       image_out_ebs=`/home/ec2/bin/ec2-register \
         --private-key /tmp/AWS_X509_KEY.pem \
@@ -318,7 +311,7 @@ def upload_ebs
         --region $region \
         --url #{node[:rightimage][:ec2_endpoint]}\
         --architecture #{new_resource.arch} \
-        $block_device_mapping \
+        --block-device-mapping "/dev/sdb=ephemeral0" \
         --description "#{image_name}" \
         --name "#{image_name}" \
         --snapshot $snap_id \
