@@ -130,7 +130,15 @@ def install_rightlink()
   # Setup repos
   repo_url = repo_url_generator
   gpg_check = gpg_check_generator
-  rightlink_cloud = node[:rightimage][:cloud] == "vagrant" ? "none" : node[:rightimage][:cloud]
+  rightlink_cloud = 
+    case node[:rightimage][:cloud]
+    when "google"
+      "gce"
+    when "vagrant"
+      "none"
+    else
+      node[:rightimage][:cloud]
+    end
 
   # Since dependencies can be installed from the repo, need to freeze them here.
   rightimage_os node[:rightimage][:platform] do
