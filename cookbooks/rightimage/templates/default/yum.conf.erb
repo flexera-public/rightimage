@@ -17,15 +17,6 @@ plugins=1
 <% end -%>
 <% end -%>
 
-<% if @bootstrap -%>
-[ruby_custom]
-name=none
-baseurl=http://mirror.hep.wisc.edu/upstream/rbel/el5/x86_64
-failovermethod=priority
-gpgcheck=0
-enabled=0
-<% end -%>
-
 <% if node[:rightimage][:platform] == "centos" -%>
 [base]
 name = none
