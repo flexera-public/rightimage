@@ -224,6 +224,9 @@ EOS
     code "chroot #{guest_root} apt-key add /tmp/GPG-KEY-RightScale"
   end
 
+  # Apt-get update after key is added, needed to install packages from rightscale-software
+  execute "chroot #{guest_root} apt-get update > /dev/null"
+
 
   bash "Restore original ext4 in /etc/mke2fs.conf" do
     flags "-ex"
