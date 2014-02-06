@@ -337,10 +337,11 @@ def upload_ebs
       # EBS images don't support the maximum number of ephemeral devices
       # provided by the instance type unless you register them on the image or
       # when running the instance. (w-5974)
+      # Unfortunately, the devices registered under the block device mapping
+      # are considered in use by EC2 but not on the instance. This causes a
+      # problem for the block device templates. (w-6247)
       mappings = [{ "DeviceName" => register_options["root-device-name"], "Ebs" => { "SnapshotId" => node["rightimage"]["ebs_snapshot_id"] } }.to_json]
-      ("b".."y").each_with_index do |letter, i| 
-        mappings << { "DeviceName" => "/dev/sd#{letter}", "VirtualName" => "ephemeral#{i}" }.to_json
-      end
+      mappings << { "DeviceName" => "/dev/sdb", "VirtualName" => "ephemeral0" }.to_json
       register_options["block-device-mappings"] = mappings
 
       result = ec2_api_command("register-image", register_options)
