@@ -14,13 +14,13 @@ def repo_url_generator
   if repo_url_base =~ /^rightlink-(staging|production|nightly)$/
     repo_type = $1
     if repo_type == "nightly"
-      url = "http://rightlink-integration.s3.amazonaws.com/nightly/"
+      url = "http://rightlink-integration.test.rightscale.com/nightly/"
     else
-      url = "http://rightlink-#{repo_type}.s3.amazonaws.com/"
+      url = "http://rightlink-#{repo_type}.test.rightscale.com/"
     end
   elsif repo_url_base =~ /^adhoc-(.+)$/
     repo_name = $1
-    url = "http://rightlink-integration.s3.amazonaws.com/adhoc/#{repo_name}/"
+    url = "http://rightlink-integration.test.rightscale.com/adhoc/#{repo_name}/"
   else 
     raise "Unknown rightlink_repo passed in (#{repo_url_base})."
   end
