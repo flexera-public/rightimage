@@ -350,6 +350,13 @@ attribute "rightimage/openstack/password",
   :default => "",
   :recipes => [ "rightimage::cloud_upload" ]
 
+attribute "rightimage/openstack/tenant",
+  :display_name => "Openstack Tenant",
+  :description => "Tenant ID for Openstack project.",
+  :required => "optional",
+  :default => "",
+  :recipes => [ "rightimage::cloud_upload" ]
+
 # CloudStack
 attribute "rightimage/cloudstack/cdc_url",
   :display_name => "CloudStack API URL",
