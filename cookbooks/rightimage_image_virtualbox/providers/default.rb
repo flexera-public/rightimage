@@ -71,13 +71,19 @@ action :package do
     mode "0644"
   end
 
+  cookbook_file "#{target_raw_root}/metadata.json" do
+    cookbook 'rightimage_image_virtualbox'
+    source "metadata.json"
+    mode "0644"
+  end
+
   bash "Create create vmdk and create ovf/ova files" do
     cwd target_raw_root
     flags "-ex"
     code <<-EOH
       /tmp/ovftool/ovftool #{target_raw_root}/temp.ovf #{bundled_image}.ovf  > /dev/null 2>&1
       mv box box.vmdk
-      tar -cf #{image_name}.box #{bundled_image}.ovf #{bundled_image}-disk*.vmdk Vagrantfile
+      tar -cf #{image_name}.box #{bundled_image}.ovf #{bundled_image}-disk*.vmdk Vagrantfile metadata.json
     EOH
   end
 end
