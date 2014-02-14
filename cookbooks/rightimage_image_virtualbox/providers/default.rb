@@ -71,6 +71,12 @@ action :package do
     mode "0644"
   end
 
+  cookbook_file "#{target_raw_root}/metadata.json" do
+    cookbook 'rightimage_image_virtualbox'
+    source "metadata.json"
+    mode "0644"
+  end
+
   bash "Create create vmdk and create ovf/ova files" do
     cwd target_raw_root
     flags "-ex"
