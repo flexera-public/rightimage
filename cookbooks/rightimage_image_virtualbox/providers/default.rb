@@ -83,7 +83,7 @@ action :package do
     code <<-EOH
       /tmp/ovftool/ovftool #{target_raw_root}/temp.ovf #{bundled_image}.ovf  > /dev/null 2>&1
       mv box box.vmdk
-      tar -cf #{image_name}.box #{bundled_image}.ovf #{bundled_image}-disk*.vmdk Vagrantfile
+      tar -cf #{image_name}.box #{bundled_image}.ovf #{bundled_image}-disk*.vmdk Vagrantfile metadata.json
     EOH
   end
 end
