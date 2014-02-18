@@ -1,0 +1,7 @@
+source "https://rubygems.org"
+
+gem "image_builder",
+  :git => "git@github.com:rightscale/right_image_builder",
+  :branch =>' ivory_14_04_acu151992_port_to_ucp_master'
+gem "nokogiri", "<1.6"
+gem "mime-types", "<2.0"

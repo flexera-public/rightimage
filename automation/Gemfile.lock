@@ -1,0 +1,113 @@
+GIT
+  remote: git@github.com:rightscale/right_image_builder
+  revision: 8f7a45ff590ca579ea8051a4daedfd8128f5e4ff
+  branch:  ivory_14_04_acu151992_port_to_ucp_master
+  specs:
+    image_builder (0.1.0)
+      activesupport (~> 3.0)
+      amazon-ec2
+      eventmachine (= 1.0.0.2)
+      ffi (= 0.6.3)
+      highline (= 1.6.8)
+      jeweler
+      json (= 1.4.6)
+      mime-types (< 2.0)
+      rake
+      rest_connection
+      right_agent (~> 0.10)
+      right_api_client
+      right_aws
+      right_http_connection
+      right_popen (= 1.0.16)
+      right_rackspace (= 0.0.0.2)
+      rightimage_tools
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    activesupport (3.2.16)
+      i18n (~> 0.6, >= 0.6.4)
+      multi_json (~> 1.0)
+    amazon-ec2 (0.9.17)
+      xml-simple (>= 1.0.12)
+    builder (3.2.2)
+    eventmachine (1.0.0.2)
+    excon (0.31.0)
+    ffi (0.6.3)
+      rake (>= 0.8.7)
+    fog (1.20.0)
+      builder
+      excon (~> 0.31.0)
+      formatador (~> 0.2.0)
+      mime-types
+      multi_json (~> 1.0)
+      net-scp (~> 1.1)
+      net-ssh (>= 2.1.3)
+      nokogiri (>= 1.5.11)
+    formatador (0.2.4)
+    git (1.2.6)
+    highline (1.6.8)
+    i18n (0.6.9)
+    jeweler (1.8.4)
+      bundler (~> 1.0)
+      git (>= 1.2.5)
+      rake
+      rdoc
+    json (1.4.6)
+    mime-types (1.25.1)
+    msgpack (0.5.8)
+    multi_json (1.8.4)
+    net-scp (1.1.2)
+      net-ssh (>= 2.6.5)
+    net-ssh (2.8.0)
+    nokogiri (1.5.11)
+    rake (10.1.1)
+    rdoc (4.1.1)
+      json (~> 1.4)
+    rest-client (1.6.7)
+      mime-types (>= 1.16)
+    rest_connection (1.0.11)
+      activesupport (< 4.0.0)
+      highline
+      json
+      net-ssh
+      nokogiri (< 1.6.0)
+      rest-client
+    right_agent (0.17.2)
+      eventmachine (>= 0.12.10, < 2.0)
+      json (>= 1.4, <= 1.7.6)
+      msgpack (>= 0.4.4, < 0.6)
+      net-ssh (~> 2.0)
+      right_amqp (~> 0.7)
+      right_support (>= 2.4.1, < 3.0)
+    right_amqp (0.7.0)
+      eventmachine (>= 0.12.10, < 2.0)
+      right_support (>= 1.2, < 3.0)
+    right_api_client (1.5.15)
+      json
+      rest-client (~> 1.6)
+    right_aws (3.1.0)
+      right_http_connection (>= 1.2.5)
+    right_http_connection (1.4.0)
+    right_popen (1.0.16)
+      eventmachine (>= 0.12.10)
+    right_rackspace (0.0.0.2)
+    right_support (2.8.13)
+    rightimage_tools (0.6.1)
+      fog
+      json
+      rake
+      rest_connection
+      right_api_client
+      right_aws
+      trollop
+    trollop (2.0)
+    xml-simple (1.1.3)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  image_builder!
+  mime-types (< 2.0)
+  nokogiri (< 1.6)
