@@ -67,7 +67,7 @@ end
 
 
 action :upload do
-  is_ebs = new_resource.image_type =~ /ebs/i or new_resource.image_name =~ /_EBS/ or hvm?
+  is_ebs = new_resource.image_type =~ /ebs/i or new_resource.image_name =~ /_EBS/
 
   res = ec2_api_command("describe-images", {
     "owner" => "self",
@@ -363,16 +363,13 @@ end
 
 
 def upload_s3()
-  if hvm? 
-    raise "HVM not supported for instance store"
-  end
-
   # We rsync to a non-partitioned filesystem since ec2-ami-tools don't support bundling of 
   # of images that are partitioned -- the tools don't recreate the grub config faithfully
   # and always assume we're using the non-partioned pvgrub
   guest_root_nonpart=guest_root+"2"
   loopback_nonpart="#{target_raw_root}/#{ri_lineage}_hd0.qcow2"
   raw_image="#{target_raw_root}/#{loopback_rootname}.raw"
+  loopback_name = hvm? ? loopback_file : loopback_nonpart
   keyfile = "/tmp/AWS_X509_KEY.pem"
   certfile = "/tmp/AWS_X509_CERT.pem"
 
@@ -390,24 +387,26 @@ def upload_s3()
     action :create
   end
 
-  loopback_fs loopback_nonpart do
-    device_number 1
-    mount_point guest_root_nonpart
-    partitioned false
-    size_gb node[:rightimage][:root_size_gb].to_i
-    action :create
-  end
-
-  bash "copy loopback fs" do
-    not_if { ::File.exists? raw_image }
-    flags "-e"
-    code "rsync -a #{guest_root}/ #{guest_root_nonpart}/"
-  end
-
-  loopback_fs loopback_nonpart do
-    not_if { ::File.exists? raw_image }
-    device_number 1
-    action :unmount
+  unless hvm?
+    loopback_fs loopback_nonpart do
+      device_number 1
+      mount_point guest_root_nonpart
+      partitioned false
+      size_gb node[:rightimage][:root_size_gb].to_i
+      action :create
+    end
+  
+    bash "copy loopback fs" do
+      not_if { ::File.exists? raw_image }
+      flags "-e"
+      code "rsync -a #{guest_root}/ #{guest_root_nonpart}/"
+    end
+  
+    loopback_fs loopback_nonpart do
+      not_if { ::File.exists? raw_image }
+      device_number 1
+      action :unmount
+    end
   end
 
   bundle_image_options = {
@@ -420,11 +419,12 @@ def upload_s3()
     "arch" => new_resource.arch,
     "block-device-mapping" => "ami=sda,root=/dev/sda1,ephemeral0=sdb,swap=sda3"
   }
+  bundle_image_options["block-device-mapping"] = "ephemeral0=sdb,swap=sda3" if hvm?
 
   execute "rm -rf '#{target_raw_root}/bundled'"
   execute "mkdir -p '#{target_raw_root}/bundled'"
 
-  execute "qemu-img convert -f qcow2 -O raw #{loopback_nonpart} #{raw_image}" do
+  execute "qemu-img convert -f qcow2 -O raw #{loopback_name} #{raw_image}" do
     creates raw_image
   end
 
@@ -442,16 +442,19 @@ def upload_s3()
     end
   end
 
-
   register_options = {
     "image-location" => "#{node[:rightimage][:image_upload_bucket]}/#{image_name}.manifest.xml",
     "description" => image_name,
     "name" => image_name
   }
 
-
-  register_options["kernel"] = node[:rightimage][:aki_id] if node[:rightimage][:aki_id]
-  register_options["ramdisk"] = node[:rightimage][:ramdisk_id] if node[:rightimage][:ramdisk_id]
+  if hvm?
+    # HVM doesn't use pvgrub, so don't pass in the kernel options
+    register_options["virtualization-type"] = "hvm"
+  else
+    register_options["kernel"] = node[:rightimage][:aki_id] if node[:rightimage][:aki_id]
+    register_options["ramdisk"] = node[:rightimage][:ramdisk_id] if node[:rightimage][:ramdisk_id]        
+  end
 
   ruby_block "Register InstanceStore image" do 
     block do 
