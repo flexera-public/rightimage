@@ -90,7 +90,7 @@ def install_grub_config
   cloud = new_resource.cloud
 
   timeout = 5
-  timeout = 0 if ["ec2","eucalyptus","azure"].include?(cloud.to_s)
+  timeout = 0 if ["azure","ec2","eucalyptus","google"].include?(cloud.to_s)
   # Specify if running in Xen domU or have grub detect automatically
   indomu = (new_resource.hypervisor.to_s == "xen" && !hvm?) ? "true" : "detect"
   if grub_package == "grub"
