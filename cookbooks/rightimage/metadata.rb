@@ -83,7 +83,7 @@ attribute "rightimage/arch",
 attribute "rightimage/cloud",
   :display_name => "Target Cloud",
   :description => "The supported cloud for the virtual image. If unset, build a generic base image.",
-  :choice => [ "ec2", "cloudstack", "eucalyptus", "openstack", "rackspace", "rackspace-open-cloud", "azure", "google", "vagrant", "vscale" ],
+  :choice => [ "ec2", "cloudstack", "eucalyptus", "openstack", "rackspace", "rackspace-open-cloud", "azure", "google", "vagrant", "vsphere" ],
   :required => "recommended"
   
 attribute "rightimage/region",
