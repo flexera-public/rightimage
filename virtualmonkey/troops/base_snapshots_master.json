@@ -1,6 +1,6 @@
 {
   "feature":"base_snapshots.rb",
-  "cloud_variables":"cs_3.0.6_kvm.json",
+  "cloud_variables":"google.json",
   "common_inputs":"base_snapshots.json",
   "prefix":"RI_BASE_MASTER",
   "server_template_ids":[

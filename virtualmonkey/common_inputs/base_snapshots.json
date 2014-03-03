@@ -5,6 +5,7 @@
   "rightimage/region" : "text:us-west-2",
   "rightimage/root_size_gb" : "text:10",
   "rightimage/debug" : "text:false",
+  "rightimage/volume_size" : "text:50",
 
   "PRIVATE_SSH_KEY" : "cred:KB_GITHUB_SSHKEY",
   "AWS_ACCESS_KEY_ID" : "cred:AWS_ACCESS_KEY_ID",
