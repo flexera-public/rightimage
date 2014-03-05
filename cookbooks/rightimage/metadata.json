@@ -233,7 +233,7 @@
         "azure",
         "google",
         "vagrant",
-        "vscale"
+        "vsphere"
       ],
       "description": "The supported cloud for the virtual image. If unset, build a generic base image.",
       "display_name": "Target Cloud",
@@ -666,6 +666,20 @@
       "required": "optional",
       "type": "string"
     },
+    "rightimage/openstack/tenant": {
+      "calculated": false,
+      "choice": [
+
+      ],
+      "default": "",
+      "description": "Tenant ID for Openstack project.",
+      "display_name": "Openstack Tenant",
+      "recipes": [
+        "rightimage::cloud_upload"
+      ],
+      "required": "optional",
+      "type": "string"
+    },
     "rightimage/openstack/user": {
       "calculated": false,
       "choice": [
@@ -966,5 +980,5 @@
   },
   "suggestions": {
   },
-  "version": "1.0.0"
+  "version": "14.0.3"
 }

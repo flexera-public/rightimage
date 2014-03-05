@@ -33,6 +33,3 @@ cd /tmp
 wget -q ${BASE_URL}/files/azurecli-0.7.4.tar.gz
 cd /
 tar zxf /tmp/azurecli-0.7.4.tar.gz
-
-# Remove .swp files
-find /root/.npm /usr/lib/node* /usr/lib/node_modules -name *.swp -exec rm -rf {} \;

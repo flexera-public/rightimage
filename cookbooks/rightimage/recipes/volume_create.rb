@@ -44,7 +44,7 @@ ruby_block "format volume" do
   only_if { node[:rightimage][:volume_size] && !mounted? }
   block do
     volume_device = node['rightscale_volume']['volume']['device']
-    shell_out!("mkfs.ext4 #{volume_device}")
+    shell_out!("mkfs.ext4 -F #{volume_device}")
   end
 end
 

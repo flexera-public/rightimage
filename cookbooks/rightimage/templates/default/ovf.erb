@@ -72,7 +72,7 @@
         <rasd:Description>Ethernet adapter on "VM Network"</rasd:Description>
         <rasd:ElementName>Network adapter 1</rasd:ElementName>
         <rasd:InstanceID>8</rasd:InstanceID>
-        <rasd:ResourceSubType><% if node[:rightimage][:cloud] == "vscale" %>VMXNET3<% else -%>E1000<% end -%></rasd:ResourceSubType>
+        <rasd:ResourceSubType><% if node[:rightimage][:cloud] == "vsphere" %>VMXNET3<% else -%>E1000<% end -%></rasd:ResourceSubType>
         <rasd:ResourceType>10</rasd:ResourceType>
       </Item>
       <Item>

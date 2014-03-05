@@ -86,20 +86,6 @@ bash "setup google auth" do
   EOH
 end
 
-ruby_block "check that image doesn't exist" do 
-  only_if { node[:rightimage][:cloud] == "ec2" }
-  block do
-    res = ec2_api_command("describe-images", {
-      "owner" => "self",
-      "filter" => "Name=name,Values=#{image_name}"
-    })
-    if res["Images"].length > 0
-      raise("Found existing image, aborting: #{res.inspect}")
-    end
-  end
-end
-
-
 bash "install bundler" do
   flags "-ex"
   code "#{ruby_bin_dir}/gem install bundler --no-ri --no-rdoc --bindir #{ruby_bin_dir}"

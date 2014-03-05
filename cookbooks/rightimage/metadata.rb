@@ -1,7 +1,8 @@
 maintainer       "RightScale, Inc."
 maintainer_email "support@rightscale.com"
+name             "rightimage"
 description      "A cookbook for building RightImages"
-version          "1.0.0"
+version          "14.0.3"
 license          "Apache v2.0"
 
 depends "ros_upload"
@@ -83,7 +84,7 @@ attribute "rightimage/arch",
 attribute "rightimage/cloud",
   :display_name => "Target Cloud",
   :description => "The supported cloud for the virtual image. If unset, build a generic base image.",
-  :choice => [ "ec2", "cloudstack", "eucalyptus", "openstack", "rackspace", "rackspace-open-cloud", "azure", "google", "vagrant", "vscale" ],
+  :choice => [ "ec2", "cloudstack", "eucalyptus", "openstack", "rackspace", "rackspace-open-cloud", "azure", "google", "vagrant", "vsphere" ],
   :required => "recommended"
   
 attribute "rightimage/region",
@@ -298,6 +299,13 @@ attribute "rightimage/openstack/user",
 attribute "rightimage/openstack/password",
   :display_name => "Openstack Password",
   :description => "Password for user to access API of Openstack Cloud Controller.",
+  :required => "optional",
+  :default => "",
+  :recipes => [ "rightimage::cloud_upload" ]
+
+attribute "rightimage/openstack/tenant",
+  :display_name => "Openstack Tenant",
+  :description => "Tenant ID for Openstack project.",
   :required => "optional",
   :default => "",
   :recipes => [ "rightimage::cloud_upload" ]

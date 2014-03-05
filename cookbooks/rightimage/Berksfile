@@ -1,0 +1,21 @@
+def rightimage_cookbook(name, version = '>= 0.0.0', options = {})
+  cookbook(name, version, {
+    git: "git@github.com:rightscale/rightimage_private.git",
+    rel: "cookbooks/#{name}"
+   }.merge(options))
+end
+
+site :opscode
+
+metadata
+
+rightimage_cookbook "ros_upload"
+rightimage_cookbook "rightimage_tester"
+rightimage_cookbook "loopback_fs"
+rightimage_cookbook "rightimage_cloud_vagrant"
+rightimage_cookbook "rightimage_hypervisor_virtualbox"
+rightimage_cookbook "rightimage_image_virtualbox"
+rightimage_cookbook "sysbench"
+cookbook "mysql", "3.0.4"
+cookbook "rightscale", git: "https://github.com/rightscale/rightscale_cookbooks.git", ref: "90f6db611b23b443f64b47904ac43107fb980fe9", rel: "cookbooks/rightscale"
+cookbook "rightscale_volume", git: "https://github.com/rightscale-cookbooks/rightscale_volume.git", ref: "dde3ca26be24f53be56bd47a6f8a5792cd53fabd"
