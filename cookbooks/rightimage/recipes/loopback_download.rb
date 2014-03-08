@@ -14,8 +14,19 @@ directory target_raw_root do
   action :create
 end
 
+# First try to download from production bucket
 remote_file loopback_file_compressed do
   source "http://#{image_upload_bucket}.s3.amazonaws.com/#{image_s3_path}/#{loopback_filename_compressed}"
+  ignore_failure true
+  backup false
+  not_if { ::File.exists?(loopback_file_base) || ::File.exists?(loopback_file_compressed) }
+  
+  action :create_if_missing
+end
+
+# If not in production bucket, try dev bucket
+remote_file loopback_file_compressed do
+  source "http://#{image_upload_bucket}-dev.s3.amazonaws.com/#{image_s3_path}/#{loopback_filename_compressed}"
   backup false
   not_if { ::File.exists?(loopback_file_base) || ::File.exists?(loopback_file_compressed) }
   
