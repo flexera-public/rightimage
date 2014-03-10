@@ -6,6 +6,7 @@ version          "14.0.0"
 
 depends "ros_upload"
 depends "rightscale"
+depends "rightscale_volume"
 depends "sysbench"
 
 recipe "rightimage_tester::default", "Default recipe. Does nothing currently."
@@ -43,6 +44,8 @@ recipe "rightimage_tester::sftp", "Ensure can sftp into self."
 recipe "rightimage_tester::ssh", "Ensure can ssh into self."
 recipe "rightimage_tester::sshd_config", "Check sshd configuration."
 recipe "rightimage_tester::sudo", "Check sudo configuration."
+recipe "rightimage_tester::volume_attach", "Ensure a volume can be attached."
+
 recipe "rightimage_tester::xfs_crash", "Ensure instance does not crash when using XFS."
 
 attribute "rightimage_tester/aws_access_key_id",
