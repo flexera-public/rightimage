@@ -6,43 +6,43 @@
     "ros_upload": {
       "locked_version": "0.1.0",
       "git": "git@github.com:rightscale/rightimage_private.git",
-      "ref": "f3971d9fa373a87bdc23988a9a0e95a1061061d5",
+      "ref": "41be4948aef66103b9a3b3b733f5f806526d206e",
       "rel": "cookbooks/ros_upload"
     },
     "rightimage_tester": {
-      "locked_version": "14.0.0",
+      "locked_version": "14.0.1",
       "git": "git@github.com:rightscale/rightimage_private.git",
-      "ref": "f3971d9fa373a87bdc23988a9a0e95a1061061d5",
+      "ref": "41be4948aef66103b9a3b3b733f5f806526d206e",
       "rel": "cookbooks/rightimage_tester"
     },
     "loopback_fs": {
       "locked_version": "0.0.1",
       "git": "git@github.com:rightscale/rightimage_private.git",
-      "ref": "f3971d9fa373a87bdc23988a9a0e95a1061061d5",
+      "ref": "41be4948aef66103b9a3b3b733f5f806526d206e",
       "rel": "cookbooks/loopback_fs"
     },
     "rightimage_cloud_vagrant": {
       "locked_version": "1.0.0",
       "git": "git@github.com:rightscale/rightimage_private.git",
-      "ref": "f3971d9fa373a87bdc23988a9a0e95a1061061d5",
+      "ref": "41be4948aef66103b9a3b3b733f5f806526d206e",
       "rel": "cookbooks/rightimage_cloud_vagrant"
     },
     "rightimage_hypervisor_virtualbox": {
       "locked_version": "1.0.0",
       "git": "git@github.com:rightscale/rightimage_private.git",
-      "ref": "f3971d9fa373a87bdc23988a9a0e95a1061061d5",
+      "ref": "41be4948aef66103b9a3b3b733f5f806526d206e",
       "rel": "cookbooks/rightimage_hypervisor_virtualbox"
     },
     "rightimage_image_virtualbox": {
       "locked_version": "1.0.0",
       "git": "git@github.com:rightscale/rightimage_private.git",
-      "ref": "f3971d9fa373a87bdc23988a9a0e95a1061061d5",
+      "ref": "41be4948aef66103b9a3b3b733f5f806526d206e",
       "rel": "cookbooks/rightimage_image_virtualbox"
     },
     "sysbench": {
       "locked_version": "0.1.0",
       "git": "git@github.com:rightscale/rightimage_private.git",
-      "ref": "f3971d9fa373a87bdc23988a9a0e95a1061061d5",
+      "ref": "41be4948aef66103b9a3b3b733f5f806526d206e",
       "rel": "cookbooks/sysbench"
     },
     "mysql": {
