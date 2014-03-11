@@ -132,7 +132,7 @@ end
 # set rightscale stuff
 set_unless[:rightimage][:rightlink_version] = ""
 
-set_unless[:rightimage][:rightlink_repo] = "rightlink-staging"
+set_unless[:rightimage][:rightlink_repo] = "rightlink-beta"
 
 
 # http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=637234#40
