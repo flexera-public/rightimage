@@ -4,49 +4,22 @@
       "path": "."
     },
     "ros_upload": {
-      "locked_version": "0.1.0",
-      "git": "git@github.com:rightscale/rightimage_private.git",
-      "ref": "41be4948aef66103b9a3b3b733f5f806526d206e",
-      "rel": "cookbooks/ros_upload"
+      "path": "../ros_upload"
     },
     "rightimage_tester": {
-      "locked_version": "14.0.1",
-      "git": "git@github.com:rightscale/rightimage_private.git",
-      "ref": "41be4948aef66103b9a3b3b733f5f806526d206e",
-      "rel": "cookbooks/rightimage_tester"
+      "path": "../rightimage_tester"
     },
     "loopback_fs": {
-      "locked_version": "0.0.1",
-      "git": "git@github.com:rightscale/rightimage_private.git",
-      "ref": "41be4948aef66103b9a3b3b733f5f806526d206e",
-      "rel": "cookbooks/loopback_fs"
+      "path": "../loopback_fs"
     },
     "rightimage_cloud_vagrant": {
-      "locked_version": "1.0.0",
-      "git": "git@github.com:rightscale/rightimage_private.git",
-      "ref": "41be4948aef66103b9a3b3b733f5f806526d206e",
-      "rel": "cookbooks/rightimage_cloud_vagrant"
+      "path": "../rightimage_cloud_vagrant"
     },
     "rightimage_hypervisor_virtualbox": {
-      "locked_version": "1.0.0",
-      "git": "git@github.com:rightscale/rightimage_private.git",
-      "ref": "41be4948aef66103b9a3b3b733f5f806526d206e",
-      "rel": "cookbooks/rightimage_hypervisor_virtualbox"
+      "path": "../rightimage_hypervisor_virtualbox"
     },
     "rightimage_image_virtualbox": {
-      "locked_version": "1.0.0",
-      "git": "git@github.com:rightscale/rightimage_private.git",
-      "ref": "41be4948aef66103b9a3b3b733f5f806526d206e",
-      "rel": "cookbooks/rightimage_image_virtualbox"
-    },
-    "sysbench": {
-      "locked_version": "0.1.0",
-      "git": "git@github.com:rightscale/rightimage_private.git",
-      "ref": "41be4948aef66103b9a3b3b733f5f806526d206e",
-      "rel": "cookbooks/sysbench"
-    },
-    "mysql": {
-      "locked_version": "3.0.4"
+      "path": "../rightimage_image_virtualbox"
     },
     "rightscale": {
       "locked_version": "13.3.0",
@@ -55,15 +28,9 @@
       "rel": "cookbooks/rightscale"
     },
     "rightscale_volume": {
-      "locked_version": "1.0.0",
+      "locked_version": "1.0.1",
       "git": "https://github.com/rightscale-cookbooks/rightscale_volume.git",
-      "ref": "dde3ca26be24f53be56bd47a6f8a5792cd53fabd"
-    },
-    "openssl": {
-      "locked_version": "1.1.0"
-    },
-    "build-essential": {
-      "locked_version": "1.4.4"
+      "ref": "296043840ba56e73dd6b55008739c7481ccd23ce"
     }
   }
 }
