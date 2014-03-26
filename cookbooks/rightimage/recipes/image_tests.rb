@@ -20,10 +20,10 @@ class Chef::Recipe
   include RightScale::RightImage::Helper
 end
 
-node[:rightimage_tester][:root] = guest_root
-node[:rightimage_tester][:run_static_tests] = true
-node[:rightimage_tester][:aws_access_key_id] = node[:rightimage][:aws_access_key_id]
-node[:rightimage_tester][:aws_secret_access_key] = node[:rightimage][:aws_secret_access_key]
+node.set[:rightimage_tester][:root] = guest_root
+node.set[:rightimage_tester][:run_static_tests] = true
+node.set[:rightimage_tester][:aws_access_key_id] = node[:rightimage][:aws_access_key_id]
+node.set[:rightimage_tester][:aws_secret_access_key] = node[:rightimage][:aws_secret_access_key]
 
 include_recipe "rightimage_tester::gemrc"
 include_recipe "rightimage_tester::bad_files"

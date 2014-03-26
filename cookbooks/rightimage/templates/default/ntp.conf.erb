@@ -22,7 +22,6 @@ restrict -6 ::1
 # This entry is a hook to use a private ntp server.  Optionally provide host
 # "time" in your DNS server configuration, such as adding it to /etc/hosts for
 # dnsmasq.
-server time burst iburst
 server time.rightscale.com burst iburst
 server ec2-us-east.time.rightscale.com burst iburst
 server ec2-us-west.time.rightscale.com burst iburst
