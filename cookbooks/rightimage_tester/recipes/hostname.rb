@@ -32,6 +32,7 @@ ruby_block "Verify hostname set" do
 end
 
 ruby_block "Verify hostname is not localhost" do
+  not_if { node[:cloud][:provider] == "vsphere" }
   block do
     hostname = `hostname -f`.chomp
     if hostname.include? "localhost"

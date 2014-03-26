@@ -19,17 +19,21 @@
 
 rightscale_marker :begin
 
-rightscale_volume "volume" do
-  size node['cloud']['provider'] == "rackspace" ? 100:1
-  action :create
-end
+if node[:cloud][:provider] == "vsphere"
+  log "Skipping volume attach test on vSphere."
+else
+  rightscale_volume "volume" do
+    size node['cloud']['provider'] == "rackspace" ? 100:1
+    action :create
+  end
 
-rightscale_volume "volume" do
-  action :attach
-end
+  rightscale_volume "volume" do
+    action :attach
+  end
 
-rightscale_volume "volume" do
-  action [ :detach, :delete ]
+  rightscale_volume "volume" do
+    action [ :detach, :delete ]
+  end
 end
 
 rightscale_marker :end
