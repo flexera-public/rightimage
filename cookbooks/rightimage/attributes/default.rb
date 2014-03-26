@@ -20,6 +20,7 @@ set_unless[:rightimage][:base_image_bucket] = "rightscale-rightimage-base"
 set_unless[:rightimage][:platform] = guest_platform
 set_unless[:rightimage][:platform_version] = guest_platform_version
 set_unless[:rightimage][:arch] = guest_arch
+set_unless[:rightimage][:build_dir] = "/tmp"
 
 default[:rightimage][:s3_base_url] =  "http://rightscale-rightimage.s3.amazonaws.com"
 
