@@ -40,17 +40,18 @@ package "gcc"
 
 # Since we're using /usr/bin/gem below, we need to make sure it is installed
 # first, also before other include_recipes that are using /usr/bin/gem
-package "rubygems"
+package "rubygems" do
+  # Hack for rbenv. You may not need the package installed.
+  not_if "which gem"
+end
 
 # Dependency of fog, v2 requires Ruby 1.9.2+
 gem_package "mime-types" do
-  gem_binary "/usr/bin/gem"
   version "< 2.0"
   action :install
 end
 
 gem_package "fog" do
-  gem_binary "/usr/bin/gem"
   version "1.5.0"
   action :install
 end

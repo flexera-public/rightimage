@@ -2,7 +2,7 @@ maintainer       "RightScale, Inc."
 maintainer_email "support@rightscale.com"
 name             "rightimage"
 description      "A cookbook for building RightImages"
-version          "14.0.3"
+version          "14.0.7"
 license          "Apache v2.0"
 
 depends "ros_upload"
@@ -98,11 +98,11 @@ attribute "rightimage/rightlink_repo",
   :description => "Rightlink repository to use. For adhoc repos, supply the value 'adhoc-NAME', such as adhoc-pete.",
   :recipes => [ "rightimage::default", "rightimage::build_image", "rightimage::rightscale_rightlink", "rightimage::rebundle", "rightimage::rightscale_install"],
   :choice => [
-    "rightlink-staging",
+    "rightlink-beta",
     "rightlink-nightly",
     "rightlink-production"
     ],
-  :default => "rightlink-staging",
+  :default => "rightlink-beta",
   :required => "optional"
   
 attribute "rightimage/rightlink_version",

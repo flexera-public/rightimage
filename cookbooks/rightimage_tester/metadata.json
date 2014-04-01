@@ -103,6 +103,7 @@
   },
   "dependencies": {
     "rightscale": ">= 0.0.0",
+    "rightscale_volume": ">= 0.0.0",
     "ros_upload": ">= 0.0.0",
     "sysbench": ">= 0.0.0"
   },
@@ -154,6 +155,7 @@
     "rightimage_tester::ssh": "Ensure can ssh into self.",
     "rightimage_tester::sshd_config": "Check sshd configuration.",
     "rightimage_tester::sudo": "Check sudo configuration.",
+    "rightimage_tester::volume_attach": "Ensure a volume can be attached.",
     "rightimage_tester::xfs_crash": "Ensure instance does not crash when using XFS."
   },
   "recommendations": {
@@ -162,5 +164,5 @@
   },
   "suggestions": {
   },
-  "version": "14.0.0"
+  "version": "14.0.1"
 }

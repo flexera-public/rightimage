@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: rightimage_tester
-# Recipe:: hostname 
+# Recipe:: volume_attach 
 #
 # Copyright 2011, RightScale, Inc.
 #
@@ -19,28 +19,21 @@
 
 rightscale_marker :begin
 
-ruby_block "Verify hostname set" do
-  only_if { node[:cloud][:provider] == "ec2" }
-  block do
-    hostname = `hostname -f`.chomp
-    internal_hostname = node[:ec2][:local_hostname]
-    unless hostname == internal_hostname
-      Chef::Log.info "Hostname is not configured correctly!!! Exiting..."
-      exit 1
-    end
+if node[:cloud][:provider] == "vsphere"
+  log "Skipping volume attach test on vSphere."
+else
+  rightscale_volume "volume" do
+    size node['cloud']['provider'] == "rackspace" ? 100:1
+    action :create
+  end
+
+  rightscale_volume "volume" do
+    action :attach
+  end
+
+  rightscale_volume "volume" do
+    action [ :detach, :delete ]
   end
 end
-
-ruby_block "Verify hostname is not localhost" do
-  not_if { node[:cloud][:provider] == "vsphere" }
-  block do
-    hostname = `hostname -f`.chomp
-    if hostname.include? "localhost"
-      Chef::Log.info "Hostname is set to localhost."
-      exit 1
-    end
-  end
-end
-
 
 rightscale_marker :end

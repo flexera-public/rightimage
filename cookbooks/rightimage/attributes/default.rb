@@ -16,10 +16,11 @@ set[:rightimage][:root_mount][:label_dev] = "ROOT"
 set[:rightimage][:root_mount][:dev] = "LABEL=#{rightimage[:root_mount][:label_dev]}"
 set[:rightimage][:root_mount][:options] = "defaults"
 set_unless[:rightimage][:virtualization] = "pvm"
-set_unless[:rightimage][:base_image_bucket] = "rightscale-rightimage-base-dev"
+set_unless[:rightimage][:base_image_bucket] = "rightscale-rightimage-base"
 set_unless[:rightimage][:platform] = guest_platform
 set_unless[:rightimage][:platform_version] = guest_platform_version
 set_unless[:rightimage][:arch] = guest_arch
+set_unless[:rightimage][:build_dir] = "/tmp"
 
 default[:rightimage][:s3_base_url] =  "http://rightscale-rightimage.s3.amazonaws.com"
 
@@ -132,7 +133,7 @@ end
 # set rightscale stuff
 set_unless[:rightimage][:rightlink_version] = ""
 
-set_unless[:rightimage][:rightlink_repo] = "rightlink-staging"
+set_unless[:rightimage][:rightlink_repo] = "rightlink-beta"
 
 
 # http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=637234#40

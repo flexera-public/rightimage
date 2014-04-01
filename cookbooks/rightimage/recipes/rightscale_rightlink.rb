@@ -11,7 +11,7 @@ end
 
 def repo_url_generator
   repo_url_base = node[:rightimage][:rightlink_repo]
-  if repo_url_base =~ /^rightlink-(staging|production|nightly)$/
+  if repo_url_base =~ /^rightlink-(beta|production|nightly)$/
     repo_type = $1
     if repo_type == "nightly"
       url = "http://rightlink-integration.test.rightscale.com/nightly/"
@@ -35,7 +35,7 @@ def repo_url_generator
 end
 
 def gpg_check_generator
-  node[:rightimage][:rightlink_repo] =~ /staging|production/
+  node[:rightimage][:rightlink_repo] =~ /beta|production/
 end
 
 def install_rightlink_legacy
