@@ -1,23 +1,28 @@
 require 'rubygems'
+require 'time'
 require 'json'
 
 
 # The top of the repository checkout
 TOP_DIR    = File.expand_path(File.join(File.dirname(__FILE__), "."))
 MONKEY_DIR = TOP_DIR + "/virtualmonkey2"
-CB_DIR     = TOP_DIR + "/cookbooks"
+BASE_AUTOMATION_DIR = TOP_DIR + "/automation"
+COOKBOOKS_DIR     = TOP_DIR + "/cookbooks"
 
 def cmd(cmd)
   puts cmd
   STDOUT.sync = true
+  output = ""
   unless ENV['dryrun'].to_s =~ /./
     IO.popen cmd do |f|
       until f.eof?
+        output << f.gets
         puts f.gets
       end
     end
     raise "Command failed" unless $?.success?
   end
+  output
 end
 
 class Hash
@@ -36,11 +41,42 @@ end
 
 desc "Update metadata for all local repos with sorted keys"
 task :metadata do
-  cmd("knife cookbook metadata -o #{CB_DIR} --all")
-  Dir.glob(CB_DIR + "/*").each do |dir|
+  cmd("knife cookbook metadata -o #{COOKBOOKS_DIR} --all")
+  Dir.glob(COOKBOOKS_DIR + "/*").each do |dir|
     if ::File.exists?(dir + "/metadata.json")
       sort_metadata(dir + "/metadata.json")
     end
+  end
+end
+
+LINEAGES = {
+  "14" => {
+    :st_id => "263828001",
+    :repo_id => "241244004"
+  }
+}
+
+# Default image_tester template - right_image_tester master normally
+# override
+desc "Run RightImage base builders in EC2"
+task :base_build, [:image_version] do |t, args|
+  Dir.chdir BASE_AUTOMATION_DIR do
+    puts "cd #{BASE_AUTOMATION_DIR}"
+    current_sha = `git log --pretty=format:'%H' -n 1`.chomp[0..7]
+
+    image_version = args[:image_version]
+    raise "Image version must be in format vN.N, i.e. v14.0" unless image_version =~ /^v\d+\.\d+$/
+    lineage = image_version.sub("v","").split(".").first
+    unless ids = LINEAGES[lineage]
+      raise "Valid lineage not supplied, #{LINEAGES.keys.join(", ")} are supported"
+    end
+
+    cmd("bundle check || bundle install")
+    # Destroy on startup. Servers should be stopped at the end of a the run, though the deployment will
+    # linger for debugging purposes
+    output = cmd("bundle exec generate_ci_collateral base --build_id #{image_version}-#{current_sha} --lineage v#{lineage} --servertemplate_id #{ids[:st_id]}")
+    ci_collateral_file = /Writing base template to (.*)$/.match(output)[1]
+    cmd("bundle exec image_builder --restart #{ci_collateral_file} --yes")
   end
 end
 
