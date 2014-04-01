@@ -25,29 +25,6 @@ def cmd(cmd)
   output
 end
 
-class Hash
-  alias :oldkeys :keys
-  def keys
-    oldkeys.sort
-  end
-end
-
-def sort_metadata(file)
-  puts "Sorting #{file}"
-  data = ::JSON.load(::File.open(file, "r"))
-  File.open(file,"w") { |f| f.puts(JSON.pretty_generate(data)) }
-end
-
-
-desc "Update metadata for all local repos with sorted keys"
-task :metadata do
-  cmd("knife cookbook metadata -o #{COOKBOOKS_DIR} --all")
-  Dir.glob(COOKBOOKS_DIR + "/*").each do |dir|
-    if ::File.exists?(dir + "/metadata.json")
-      sort_metadata(dir + "/metadata.json")
-    end
-  end
-end
 
 LINEAGES = {
   "14" => {

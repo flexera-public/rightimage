@@ -1,0 +1,6 @@
+site :opscode
+
+metadata
+
+cookbook "rightscale", git: "https://github.com/rightscale/rightscale_cookbooks.git", ref: "90f6db611b23b443f64b47904ac43107fb980fe9", rel: "cookbooks/rightscale"
+cookbook "rightscale_volume", git: "https://github.com/rightscale-cookbooks/rightscale_volume.git", ref: "296043840ba56e73dd6b55008739c7481ccd23ce"
