@@ -1,7 +1,12 @@
 source "https://rubygems.org"
 
+gem "rightimage_tools",
+  :git => "git@github.com:rightscale/rightimage_tools",
+  :branch =>'master'
+
 gem "image_builder",
   :git => "git@github.com:rightscale/right_image_builder",
   :branch =>'ivory_14_07_acu159250_convert_base_builds'
+
 gem "nokogiri", "<1.6"
 gem "mime-types", "<2.0"
