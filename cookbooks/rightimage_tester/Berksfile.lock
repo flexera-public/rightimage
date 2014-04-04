@@ -1,25 +1,7 @@
 {
   "sources": {
-    "rightimage": {
-      "path": "."
-    },
-    "ros_upload": {
-      "path": "../ros_upload"
-    },
     "rightimage_tester": {
-      "path": "../rightimage_tester"
-    },
-    "loopback_fs": {
-      "path": "../loopback_fs"
-    },
-    "rightimage_cloud_vagrant": {
-      "path": "../rightimage_cloud_vagrant"
-    },
-    "rightimage_hypervisor_virtualbox": {
-      "path": "../rightimage_hypervisor_virtualbox"
-    },
-    "rightimage_image_virtualbox": {
-      "path": "../rightimage_image_virtualbox"
+      "path": "."
     },
     "rightscale": {
       "locked_version": "13.3.0",
