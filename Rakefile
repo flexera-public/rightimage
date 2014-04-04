@@ -33,6 +33,33 @@ LINEAGES = {
   }
 }
 
+desc "Upload rightimage cookbooks to s3"
+task :upload_cookbooks, [:image_version]  do |t, args|
+  rightimage_dir = "#{COOKBOOKS_DIR}/rightimage"
+  upload_url = ""
+  Dir.chdir rightimage_dir do
+    puts "cd #{rightimage_dir}"
+
+    image_version = args[:image_version]
+    raise "Image version must be in format vN.N, i.e. v14.0" unless image_version =~ /^v\d+\.\d+$/
+    lineage = image_version.sub("v","").split(".").first
+    unless ids = LINEAGES[lineage]
+      raise "Valid lineage not supplied, #{LINEAGES.keys.join(", ")} are supported"
+    end
+
+    cmd("bundle check || bundle install")
+    upload_config = File.expand_path("~/.rightscale_upload.json")
+    unless ::File.exists? upload_config
+      raise "No rightscale_upload config at #{upload_config}"
+    end
+    config = JSON.parse(File.read(upload_config))
+    puts "Uploading rightimage cookbooks to #{config['container']}"
+    output = cmd("bundle exec rightscale_upload berkshelf upload --force 2>&1")
+    upload_url = /Uploaded to: (.*)$/.match(output)[1]
+    puts "Uploaded to #{upload_url}"
+  end
+end
+
 # Default image_tester template - right_image_tester master normally
 # override
 desc "Run RightImage base builders in EC2"
