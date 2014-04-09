@@ -34,14 +34,9 @@ action :configure do
     EOH
   end
 
-  cookbook_file "/tmp/euca2ools-#{euca_tools_version}-centos-i386.tar.gz" do 
-    source "euca2ools-#{euca_tools_version}-centos-i386.tar.gz"
-    backup false
-  end
-
-  cookbook_file "/tmp/euca2ools-#{euca_tools_version}-centos-x86_64.tar.gz" do 
-    source "euca2ools-#{euca_tools_version}-centos-x86_64.tar.gz"
-    backup false
+  remote_file "/tmp/euca2ools-#{euca_tools_version}-centos-x86_64.tar.gz" do 
+    source "#{node[:rightimage][:s3_base_url]}/files/euca2ools-#{euca_tools_version}-centos-x86_64.tar.gz"
+    action :create_if_missing
   end
 
   bash "install euca tools for centos" do 
