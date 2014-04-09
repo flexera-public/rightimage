@@ -1,6 +1,6 @@
 GIT
   remote: git@github.com:rightscale/right_image_builder
-  revision: 49892487f5c1fd9b61a113e9c842adacb6ac7a82
+  revision: a1e7ff914088cd064066969d72c60212e6864359
   branch: ivory_14_07_acu159250_convert_base_builds
   specs:
     image_builder (0.1.0)
@@ -25,7 +25,7 @@ GIT
 
 GIT
   remote: git@github.com:rightscale/rightimage_tools
-  revision: bdc729d3ac4b3ee8933a7332f54761def282e9d3
+  revision: e0e202e0e9013c9c82b87b0a7b5c6fade3f8b484
   branch: ivory_14_07_acu159250_convert_base_builds
   specs:
     rightimage_tools (0.7.3)
@@ -119,7 +119,7 @@ GEM
     right_http_connection (1.4.0)
     right_popen (2.0.2)
     right_rackspace (0.0.0.2)
-    right_support (2.8.20)
+    right_support (2.8.22)
     trollop (2.0)
     xml-simple (1.1.3)
 
