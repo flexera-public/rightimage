@@ -25,10 +25,10 @@ GIT
 
 GIT
   remote: git@github.com:rightscale/rightimage_tools
-  revision: c1d690e445e12fc3a9520d8cde0011fb24578bf5
-  branch: master
+  revision: bdc729d3ac4b3ee8933a7332f54761def282e9d3
+  branch: ivory_14_07_acu159250_convert_base_builds
   specs:
-    rightimage_tools (0.7.0)
+    rightimage_tools (0.7.3)
       fog
       json
       memoize
@@ -93,7 +93,7 @@ GEM
       mime-types (>= 1.16)
       net-http-persistent
       netrc (~> 0.7.7)
-    rest_connection (1.0.11)
+    rest_connection (1.0.14)
       activesupport (< 4.0.0)
       highline
       json
