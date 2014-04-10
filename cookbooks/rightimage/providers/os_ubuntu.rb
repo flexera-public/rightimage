@@ -229,7 +229,6 @@ EOS
   # if they're updated before the gpg-key is added in
   execute "rm -f #{guest_root}/var/lib/apt/lists/*software*"
   execute "rm -f #{guest_root}/var/lib/apt/lists/partial/*software*"
-  execute "chroot #{guest_root} apt-get update > /dev/null"
 
   # Apt-get update after key is added, needed to install packages from rightscale-software
   execute "chroot #{guest_root} apt-get update > /dev/null"
