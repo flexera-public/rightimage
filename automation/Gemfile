@@ -1,4 +1,5 @@
 source "https://rubygems.org"
+source "http://s3.amazonaws.com/rightscale_rightlink_gems_dev"
 
 gem "rightimage_tools",
   :git => "git@github.com:rightscale/rightimage_tools",
