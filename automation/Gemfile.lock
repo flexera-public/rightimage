@@ -89,9 +89,8 @@ GEM
     rake (10.2.2)
     rdoc (4.1.1)
       json (~> 1.4)
-    rest-client (1.7.0.1)
+    rest-client (1.6.7)
       mime-types (>= 1.16)
-      net-http-persistent
       netrc (~> 0.7.7)
     rest_connection (1.0.14)
       activesupport (< 4.0.0)
