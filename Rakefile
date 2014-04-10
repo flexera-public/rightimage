@@ -83,6 +83,7 @@ def attach_cookbooks(image_version, source_url = nil)
       puts "Attaching cookbooks from Repository #{repo_id} to ServerTemplate #{st_id} with pre-existing source"
     end
 
+    cmd("bundle check || bundle install")
     cmd("bundle exec repo_refetch -s #{st_id} -r #{repo_id} #{src_url_arg}")
   end
 end
@@ -102,7 +103,7 @@ end
 
 # Default image_tester template - right_image_tester master normally
 # override
-desc "Run RightImage base builders in EC2"
+desc "Run RightImage base builders"
 task :base_build, [:image_version] do |t, args|
   upload_url = upload_cookbooks()
   attach_cookbooks(args[:image_version], upload_url)
@@ -126,10 +127,11 @@ task :base_build, [:image_version] do |t, args|
   end
 end
 
+def get_last_base_build
+  RightimageTools
+end
 
-# Default image_tester template - right_image_tester master normally
-# override
-desc "Run RightImage full builders in EC2"
+desc "Run RightImage CI full builders"
 task :full_build, [:image_version, :rightlink_version] do |t, args|
   upload_url = upload_cookbooks()
   attach_cookbooks(args[:image_version], upload_url)
@@ -143,12 +145,20 @@ task :full_build, [:image_version, :rightlink_version] do |t, args|
     lineage = image_version.sub("v","").split(".").first
     rightlink_version = args[:rightlink_version]
 
+    build_id, mirror_freeze_date = get_last_base_build
+
+    # To make each build unique, mark it with the latest commit timestamp
+    # Bump to current timestamp if change are unchecked in?
+    timestamp = `git log -1 --pretty=%ci`
+    time = Time.parse(timestamp).utc
+    build_version = "#{image_version}.#{time.strftime("%Y%m%d%H%M")}"
+
 
     cmd("bundle check || bundle install")
     # Destroy on startup. Servers should be stopped at the end of a the run, though the deployment will
     # linger for debugging purposes
-    output = cmd("bundle exec generate_ci_collateral full --rightlink_version #{rightlink_version} --build_id #{image_version}-#{current_sha} --servertemplate_id #{st_id}")
-    ci_collateral_file = /Writing base template to (.*)$/.match(output)[1]
+    output = cmd("bundle exec generate_ci_collateral full --rightlink_version #{rightlink_version} --build_id #{build_id} --mirror_freeze_date #{mirror_freeze_date} --image_version #{build_version} --servertemplate_id #{st_id}")
+    ci_collateral_file = /Writing full template to (.*)$/.match(output)[1]
     cmd("bundle exec image_builder --restart #{ci_collateral_file} --yes")
   end
 end
