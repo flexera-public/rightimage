@@ -4,7 +4,6 @@ require 'bundler/setup'
 require 'time'
 require 'json'
 
-require 'debugger'
 
 # The top of the repository checkout
 TOP_DIR    = File.expand_path(File.join(File.dirname(__FILE__), "."))
