@@ -70,7 +70,7 @@ def sts_for_version(image_version)
   [ids[:st_id], ids[:repo_id]]
 end
 
-def attach_cookbooks(image_version, source_url = nil)
+def attach_cookbooks(image_version, source_url)
   Dir.chdir RIGHTIMAGE_AUTOMATION_DIR do
     puts "cd #{RIGHTIMAGE_AUTOMATION_DIR}"
     st_id, repo_id = sts_for_version(image_version)
@@ -80,7 +80,7 @@ def attach_cookbooks(image_version, source_url = nil)
       src_url_arg = "-u #{source_url}"
       puts "Attaching cookbooks from Repository #{repo_id} to ServerTemplate #{st_id} with Source #{source_url}"
     else
-      puts "Attaching cookbooks from Repository #{repo_id} to ServerTemplate #{st_id} with pre-existing source"
+      raise "An S3 source tarball for the repository was not supplied. Running upload_cookbooks rake task should generate this for you."
     end
 
     cmd("bundle check || bundle install")
@@ -96,8 +96,8 @@ task :upload_cookbooks do |t, args|
 end
 
 desc "Attach cookbooks to ServerTemplate"
-task :attach_cookbooks, [:image_version]  do |t, args|
-  attach_cookbooks(args[:image_version])
+task :attach_cookbooks, [:image_version, :s3_url]  do |t, args|
+  attach_cookbooks(args[:image_version], args[:s3_url])
 end
 
 
