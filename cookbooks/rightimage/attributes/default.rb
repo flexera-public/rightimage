@@ -36,6 +36,7 @@ set_unless[:rightimage][:platform] = guest_platform
 set_unless[:rightimage][:platform_version] = guest_platform_version
 set_unless[:rightimage][:arch] = guest_arch
 set_unless[:rightimage][:bare_image] = "false"
+default[:rightimage][:s3_base_url] =  "http://rightscale-rightimage.s3.amazonaws.com"
 
 case node[:rightimage][:hypervisor]
 when "xen" then set[:rightimage][:image_type] = "vhd"

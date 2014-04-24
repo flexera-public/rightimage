@@ -168,15 +168,16 @@ EOH
       chroot $guest_root source /etc/profile && pip install boto==2.19.0
 
       gcutil=#{node[:rightimage][:google][:gcutil_name]}
-      wget #{node[:rightimage][:google][:gcutil_base_url]}/$gcutil.tar.gz
+      wget #{node[:rightimage][:s3_base_url]}/files/$gcutil.tar.gz
       tar zxvf $gcutil.tar.gz -C $guest_root/usr/local
       rm -rf $guest_root/usr/local/gcutil
       mv $guest_root/usr/local/$gcutil $guest_root/usr/local/gcutil
       echo 'export PATH=$PATH:/usr/local/gcutil' > $guest_root/etc/profile.d/gcutil.sh
 
       # Install GSUtil
-      wget http://commondatastorage.googleapis.com/pub/gsutil.tar.gz
-      tar zxvf gsutil.tar.gz -C $guest_root/usr/local
+      gsutil=#{node[:rightimage][:google][:gsutil_name]}
+      wget #{node[:rightimage][:s3_base_url]}/files/$gsutil.tar.gz
+      tar zxvf $gsutil.tar.gz -C $guest_root/usr/local
       echo 'export PATH=$PATH:/usr/local/gsutil' > $guest_root/etc/profile.d/gsutil.sh
     EOH
   end
@@ -223,23 +224,24 @@ action :upload do
     creates "/usr/local/gcutil/gcutil"
     code <<-EOF
       gcutil=#{node[:rightimage][:google][:gcutil_name]}
-      wget #{node[:rightimage][:google][:gcutil_base_url]}/$gcutil.tar.gz
+      wget #{node[:rightimage][:s3_base_url]}/files/$gcutil.tar.gz
       tar zxvf $gcutil.tar.gz -C /usr/local
       rm -rf /usr/local/gcutil
       mv /usr/local/$gcutil /usr/local/gcutil
       echo 'export PATH=$PATH:/usr/local/gcutil' > /etc/profile.d/gcutil.sh
       source /etc/profile.d/gcutil.sh
-EOF
+    EOF
   end
 
   bash "install gsutil" do
     creates "/usr/local/gsutil/gsutil"
     code <<-EOF
-  wget http://commondatastorage.googleapis.com/pub/gsutil.tar.gz
-  tar zxvf gsutil.tar.gz -C /usr/local
-  echo 'export PATH=$PATH:/usr/local/gsutil' > /etc/profile.d/gsutil.sh
-  source /etc/profile.d/gsutil.sh
-EOF
+      gsutil=#{node[:rightimage][:google][:gsutil_name]}
+      wget #{node[:rightimage][:s3_base_url]}/files/$gsutil.tar.gz
+      tar zxvf gsutil.tar.gz -C /usr/local
+      echo 'export PATH=$PATH:/usr/local/gsutil' > /etc/profile.d/gsutil.sh
+      source /etc/profile.d/gsutil.sh
+    EOF
   end
 
   # TBD, replace this block. We use the gsutil/gcutil tools to do this, but we
@@ -286,6 +288,7 @@ EOF
         "--project=#{node[:rightimage][:google][:project_id]}"
       Chef::Log.info("Running command: #{command}")
       `#{command}`
+      raise "Register failed" unless $?.success?
     end
   end
 

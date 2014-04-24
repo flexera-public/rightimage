@@ -1,0 +1,17 @@
+def rightimage_cookbook(name, version = '>= 0.0.0', options = {})
+  cookbook(name, version, {
+    path: "../#{name}"
+   }.merge(options))
+end
+
+site :opscode
+
+metadata
+
+rightimage_cookbook "rightimage_tester"
+rightimage_cookbook "loopback_fs"
+rightimage_cookbook "rightimage_cloud_vagrant"
+rightimage_cookbook "rightimage_hypervisor_virtualbox"
+rightimage_cookbook "rightimage_image_virtualbox"
+cookbook "rightscale", git: "https://github.com/rightscale/rightscale_cookbooks.git", ref: "90f6db611b23b443f64b47904ac43107fb980fe9", rel: "cookbooks/rightscale"
+cookbook "block_device", git: "https://github.com/rightscale/rightscale_cookbooks.git", ref: "90f6db611b23b443f64b47904ac43107fb980fe9", rel: "cookbooks/block_device"

@@ -1,0 +1,34 @@
+{
+  "sources": {
+    "rightimage": {
+      "path": "."
+    },
+    "rightimage_tester": {
+      "path": "../rightimage_tester"
+    },
+    "loopback_fs": {
+      "path": "../loopback_fs"
+    },
+    "rightimage_cloud_vagrant": {
+      "path": "../rightimage_cloud_vagrant"
+    },
+    "rightimage_hypervisor_virtualbox": {
+      "path": "../rightimage_hypervisor_virtualbox"
+    },
+    "rightimage_image_virtualbox": {
+      "path": "../rightimage_image_virtualbox"
+    },
+    "rightscale": {
+      "locked_version": "13.3.0",
+      "git": "https://github.com/rightscale/rightscale_cookbooks.git",
+      "ref": "90f6db611b23b443f64b47904ac43107fb980fe9",
+      "rel": "cookbooks/rightscale"
+    },
+    "block_device": {
+      "locked_version": "13.3.0",
+      "git": "https://github.com/rightscale/rightscale_cookbooks.git",
+      "ref": "90f6db611b23b443f64b47904ac43107fb980fe9",
+      "rel": "cookbooks/block_device"
+    }
+  }
+}
