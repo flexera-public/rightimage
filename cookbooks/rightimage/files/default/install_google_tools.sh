@@ -19,7 +19,7 @@ fi
 
 # Install gcutil
 cd /tmp
-gcutil=gcutil-1.11.0
+gcutil=gcutil-1.14.2
 wget -q $BASE_URL/files/${gcutil}.tar.gz
 tar zxf ${gcutil}.tar.gz -C /usr/local
 rm -rf /usr/local/gcutil
@@ -27,7 +27,7 @@ mv /usr/local/${gcutil} /usr/local/gcutil
 echo 'export PATH=$PATH:/usr/local/gcutil' > /etc/profile.d/gcutil.sh
 
 # Install GSUtil
-gsutil=gsutil-3.38
+gsutil=gsutil-3.42
 wget -q $BASE_URL/files/${gsutil}.tar.gz
 tar zxf ${gsutil}.tar.gz -C /usr/local
 echo 'export PATH=$PATH:/usr/local/gsutil' > /etc/profile.d/gsutil.sh
