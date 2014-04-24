@@ -1,9 +1,0 @@
-{
-  "feature":"rax_backup.rb",
-  "cloud_variables":"rackspace.json",
-  "common_inputs":"none.json",
-  "prefix":"RAX_CLOUDFILES_BACK",
-  "server_template_ids":[
-    "116369" /* Container backup*/
-  ]
-}

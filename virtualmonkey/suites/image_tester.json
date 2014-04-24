@@ -1,0 +1,6 @@
+{
+  "description": "Run image testers for a given servertemplate",
+  "server_templates": ["image_tester"],
+  "tests": ["image_tester.rb"],
+  "variables": { }
+}

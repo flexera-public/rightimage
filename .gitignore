@@ -4,3 +4,4 @@
 *.log
 *.swo
 *.db
+ci_base_*
