@@ -1,6 +1,7 @@
-maintainer       "YOUR_COMPANY_NAME"
-maintainer_email "YOUR_EMAIL"
-license          "All rights reserved"
+name             "loopback_fs"
+maintainer       "RightScale, Inc."
+maintainer_email "support@rightscale.com"
+license          "Apache v2.0"
 description      "Installs/Configures loopback_fs"
 long_description IO.read(File.join(File.dirname(__FILE__), 'README.md'))
 version          "0.0.1"

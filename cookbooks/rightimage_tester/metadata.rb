@@ -1,3 +1,4 @@
+name             "rightimage_tester"
 maintainer       "RightScale, Inc."
 maintainer_email "support@rightscale.com"
 description      "A cookbook for testing RightImages"
