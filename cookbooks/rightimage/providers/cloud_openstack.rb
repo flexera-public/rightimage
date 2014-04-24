@@ -116,33 +116,25 @@ action :upload do
   packages = case node[:platform]
              when "centos", "redhat" then
                if node[:platform_version].to_f >= 6.0
-                 %w(python-devel python-libs openssl-devel)
+                 %w(python-devel python-libs openssl-devel python-pip)
                else
                  %w(python26-devel python26-libs openssl-devel)
                end
              when "ubuntu" then
-               %w(python-dev libssl-dev)
+               %w(python-dev libssl-dev python-pip)
              end
 
   packages.each { |p| package p }
 
-  # Switched from easy_install to pip for most stuff, easy_install seems to be
-  # crapping out complaining about fetching from git urls while pip handles them fine
-  # Also pip handles all the dependencies better - PS
+  # Create bundle using pip bundle command on instance
+  remote_file "/tmp/glance.pybundle" do
+    source "#{node[:rightimage][:s3_base_url]}/files/glance-0.12.0.pybundle"
+    action :create_if_missing
+  end
+
   bash "install python modules" do
     flags "-ex"
-    cmd_append = ""
-    if node[:platform] =~ /centos|rhel/ && node[:platform_version].to_f < 6.0
-      cmd_append = "-2.6"
-    end
-    environment(node[:rightimage][:script_env])
-    code <<-EOH
-      # Install setuptools 0.8
-      wget http://rightscale-rightimage.s3.amazonaws.com/files/python/ez_setup.py -O - | python
-
-      easy_install#{cmd_append} pip
-      pip#{cmd_append} install -I python-glanceclient==0.9.0
-    EOH
+    code "pip install /tmp/glance.pybundle"
   end
 
   ruby_block "upload to cloud" do
