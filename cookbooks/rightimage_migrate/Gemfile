@@ -1,0 +1,4 @@
+source 'https://rubygems.org'
+
+gem 'berkshelf'
+gem 'rightscale_upload', :github => 'rightscale/rightscale_upload'
