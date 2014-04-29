@@ -10,7 +10,7 @@ action :package do
     EOH
   end
 
-  bundled_image = "#{image_name}.vmdk"
+  bundled_image = "#{image_name}"
   bash "convert raw image to VMDK flat file" do
     cwd target_raw_root
     flags "-ex"
@@ -57,7 +57,7 @@ action :package do
     flags "-ex"
     code <<-EOH
       /tmp/ovftool/ovftool #{target_raw_root}/temp.ovf #{target_raw_root}/#{bundled_image}.ovf  > /dev/null 2>&1
-      tar -cf #{bundled_image}.ova #{bundled_image}.ovf #{bundled_image}.mf #{image_name}.vmdk-disk*.vmdk
+      tar -cf #{bundled_image}.ova #{bundled_image}.ovf #{bundled_image}.mf #{image_name}*-disk*.vmdk
     EOH
   end
 end
