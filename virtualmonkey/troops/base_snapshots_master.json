@@ -1,9 +1,0 @@
-{
-  "feature":"base_snapshots.rb",
-  "cloud_variables":"google.json",
-  "common_inputs":"base_snapshots.json",
-  "prefix":"RI_BASE_MASTER",
-  "server_template_ids":[
-    "263828001" /* right_image_creator master*/
-  ]
-}

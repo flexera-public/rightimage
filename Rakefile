@@ -1,46 +1,164 @@
 require 'rubygems'
+require 'bundler/setup'
+
+require 'time'
 require 'json'
 
 
 # The top of the repository checkout
 TOP_DIR    = File.expand_path(File.join(File.dirname(__FILE__), "."))
 MONKEY_DIR = TOP_DIR + "/virtualmonkey2"
-CB_DIR     = TOP_DIR + "/cookbooks"
+RIGHTIMAGE_AUTOMATION_DIR = TOP_DIR + "/automation"
+COOKBOOKS_DIR     = TOP_DIR + "/cookbooks"
 
-def cmd(cmd)
+def cmd(cmd, echo = true)
   puts cmd
+  output = ""
   STDOUT.sync = true
   unless ENV['dryrun'].to_s =~ /./
-    IO.popen cmd do |f|
-      until f.eof?
-        puts f.gets
+    Bundler.with_clean_env do 
+      IO.popen cmd do |f|
+        f.sync = true
+        until f.eof?
+          line = f.gets
+          output << line
+          puts "+ #{line}" if echo
+        end
       end
     end
-    raise "Command failed" unless $?.success?
+      raise "Command failed" unless $?.success?
   end
+  output
 end
 
-class Hash
-  alias :oldkeys :keys
-  def keys
-    oldkeys.sort
-  end
-end
+def upload_cookbooks()
+  raise "Ruby version 1.9 or greater is required" unless RUBY_VERSION.to_s >= "1.9.0"
 
-def sort_metadata(file)
-  puts "Sorting #{file}"
-  data = ::JSON.load(::File.open(file, "r"))
-  File.open(file,"w") { |f| f.puts(JSON.pretty_generate(data)) }
-end
+  rightimage_dir = "#{COOKBOOKS_DIR}/rightimage"
+  upload_url = ""
+  Dir.chdir rightimage_dir do
+    puts "cd #{rightimage_dir}"
 
+    cmd("bundle check || bundle install")
 
-desc "Update metadata for all local repos with sorted keys"
-task :metadata do
-  cmd("knife cookbook metadata -o #{CB_DIR} --all")
-  Dir.glob(CB_DIR + "/*").each do |dir|
-    if ::File.exists?(dir + "/metadata.json")
-      sort_metadata(dir + "/metadata.json")
+    upload_config = File.expand_path("~/.rightscale_upload.json")
+    unless ::File.exists? upload_config
+      raise "No upload config found at #{upload_config}"
     end
+    config = JSON.parse(File.read(upload_config))
+    puts "Uploading rightimage cookbooks to #{config['container']}"
+    output = cmd("bundle exec rightscale_upload berkshelf upload --force 2>&1", echo=false)
+
+    upload_url = /Uploaded to: (.*)$/.match(output)[1]
+    return upload_url
+  end
+end
+
+def sts_for_version(image_version)
+  lineages = {
+    "14" => {
+      :st_id => "263828001",
+      :repo_id => "241244004"
+    }
+  }
+  raise "Image version must be in format vN.N, i.e. v14.0" unless image_version =~ /^v\d+\.\d+$/
+  lineage = image_version.sub("v","").split(".").first
+  unless ids = lineages[lineage]
+    raise "Valid lineage not supplied, #{lineages.keys.join(", ")} are supported"
+  end
+  [ids[:st_id], ids[:repo_id]]
+end
+
+def attach_cookbooks(image_version, source_url)
+  Dir.chdir RIGHTIMAGE_AUTOMATION_DIR do
+    puts "cd #{RIGHTIMAGE_AUTOMATION_DIR}"
+    st_id, repo_id = sts_for_version(image_version)
+
+    src_url_arg = ""
+    if source_url
+      src_url_arg = "-u #{source_url}"
+      puts "Attaching cookbooks from Repository #{repo_id} to ServerTemplate #{st_id} with Source #{source_url}"
+    else
+      raise "An S3 source tarball for the repository was not supplied. Running upload_cookbooks rake task should generate this for you."
+    end
+
+    cmd("bundle check || bundle install")
+    cmd("bundle exec repo_refetch -s #{st_id} -r #{repo_id} #{src_url_arg}")
+  end
+end
+
+
+desc "Upload rightimage cookbooks to s3"
+task :upload_cookbooks do |t, args|
+  upload_url = upload_cookbooks()
+  puts "Uploaded to #{upload_url}"
+end
+
+desc "Attach cookbooks to ServerTemplate"
+task :attach_cookbooks, [:image_version, :s3_url]  do |t, args|
+  attach_cookbooks(args[:image_version], args[:s3_url])
+end
+
+
+# Default image_tester template - right_image_tester master normally
+# override
+desc "Run RightImage base builders"
+task :base_build, [:image_version] do |t, args|
+  upload_url = upload_cookbooks()
+  attach_cookbooks(args[:image_version], upload_url)
+
+  Dir.chdir RIGHTIMAGE_AUTOMATION_DIR do
+    puts "cd #{RIGHTIMAGE_AUTOMATION_DIR}"
+    current_sha = `git log --pretty=format:'%H' -n 1`.chomp[0..7]
+
+    image_version = args[:image_version]
+    st_id, repo_id = sts_for_version(args[:image_version])
+    lineage = image_version.sub("v","").split(".").first
+
+
+    cmd("bundle check || bundle install")
+    # Destroy on startup. Servers should be stopped at the end of a the run, though the deployment will
+    # linger for debugging purposes
+    output = cmd("bundle exec generate_ci_collateral base  --build_id #{image_version}-#{current_sha} --lineage v#{lineage} --servertemplate_id #{st_id}", echo=false)
+    ci_collateral_file = /Writing base template to (.*)$/.match(output)[1]
+    ci_log_file = ci_collateral_file.sub(".yml",".log")
+    cmd("bundle exec image_builder --restart #{ci_collateral_file} --log-file #{ci_log_file} --yes")
+  end
+end
+
+def get_last_base_build
+  RightimageTools
+end
+
+desc "Run RightImage CI full builders"
+task :full_build, [:image_version, :rightlink_version] do |t, args|
+  upload_url = upload_cookbooks()
+  attach_cookbooks(args[:image_version], upload_url)
+
+  Dir.chdir RIGHTIMAGE_AUTOMATION_DIR do
+    puts "cd #{RIGHTIMAGE_AUTOMATION_DIR}"
+    current_sha = `git log --pretty=format:'%H' -n 1`.chomp[0..7]
+
+    image_version = args[:image_version]
+    st_id, repo_id = sts_for_version(args[:image_version])
+    lineage = image_version.sub("v","").split(".").first
+    rightlink_version = args[:rightlink_version]
+
+    build_id, mirror_freeze_date = get_last_base_build
+
+    # To make each build unique, mark it with the latest commit timestamp
+    # Bump to current timestamp if change are unchecked in?
+    timestamp = `git log -1 --pretty=%ci`
+    time = Time.parse(timestamp).utc
+    build_version = "#{image_version}.#{time.strftime("%Y%m%d%H%M")}"
+
+
+    cmd("bundle check || bundle install")
+    # Destroy on startup. Servers should be stopped at the end of a the run, though the deployment will
+    # linger for debugging purposes
+    output = cmd("bundle exec generate_ci_collateral full --rightlink_version #{rightlink_version} --build_id #{build_id} --mirror_freeze_date #{mirror_freeze_date} --image_version #{build_version} --servertemplate_id #{st_id}")
+    ci_collateral_file = /Writing full template to (.*)$/.match(output)[1]
+    cmd("bundle exec image_builder --restart #{ci_collateral_file} --yes")
   end
 end
 

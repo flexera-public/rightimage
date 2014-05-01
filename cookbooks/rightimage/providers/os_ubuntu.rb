@@ -224,6 +224,12 @@ EOS
     code "chroot #{guest_root} apt-key add /tmp/GPG-KEY-RightScale"
   end
 
+  # Hack: this cleans out cached copies of rightscale_software_ubuntu repo metadata
+  # The files are too new and won't be updated but can get into a bad/inconsistent state
+  # if they're updated before the gpg-key is added in
+  execute "rm -f #{guest_root}/var/lib/apt/lists/*software*"
+  execute "rm -f #{guest_root}/var/lib/apt/lists/partial/*software*"
+
   # Apt-get update after key is added, needed to install packages from rightscale-software
   execute "chroot #{guest_root} apt-get update > /dev/null"
 

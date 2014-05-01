@@ -46,7 +46,7 @@ module RightScale
             "qcow2.bz2"
           end
         when "esxi"
-          "vmdk.ova"
+          "ova"
         when "hyperv"
           "vhd"
         when "virtualbox"
