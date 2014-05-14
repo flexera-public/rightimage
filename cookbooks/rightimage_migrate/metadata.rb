@@ -2,7 +2,7 @@ name             "rightimage_migrate"
 maintainer       "RightScale, Inc."
 maintainer_email "support@rightscale.com"
 description      "A cookbook for migrating RightImages"
-version          "1.0.1"
+version          "14.0.0"
 license          "Apache v2.0"
 
 recipe "rightimage_migrate::default", "Migrate image"
