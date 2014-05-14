@@ -56,7 +56,6 @@ node.set[:rightimage][:host_packages] = []
 case rightimage[:platform]
 when "ubuntu"
   node.set[:rightimage][:host_packages] << " ca-certificates"
-  node.set[:rightimage][:host_packages] << " openjdk-6-jre"
   node.set[:rightimage][:host_packages] << " openssl"
 
   if rightimage[:platform_version].to_f >= 10.10
