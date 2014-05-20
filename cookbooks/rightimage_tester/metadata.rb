@@ -3,7 +3,7 @@ maintainer_email "support@rightscale.com"
 name             "rightimage_tester"
 description      "A cookbook for testing RightImages"
 license          "Apache v2.0"
-version          "13.0.0"
+version          "13.0.2"
 
 depends "rightscale"
 
@@ -42,6 +42,7 @@ recipe "rightimage_tester::ssh", "Ensure can ssh into self."
 recipe "rightimage_tester::sshd_config", "Check sshd configuration."
 recipe "rightimage_tester::sudo", "Check sudo configuration."
 recipe "rightimage_tester::xfs_crash", "Ensure instance does not crash when using XFS."
+recipe "rightimage_tester::volume_attach", "Ensure a volume can be attached."
 
 attribute "rightimage_tester/aws_access_key_id",
   :display_name => "AWS Access Key ID",

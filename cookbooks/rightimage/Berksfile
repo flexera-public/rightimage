@@ -13,5 +13,11 @@ rightimage_cookbook "loopback_fs"
 rightimage_cookbook "rightimage_cloud_vagrant"
 rightimage_cookbook "rightimage_hypervisor_virtualbox"
 rightimage_cookbook "rightimage_image_virtualbox"
-cookbook "rightscale", git: "https://github.com/rightscale/rightscale_cookbooks.git", ref: "90f6db611b23b443f64b47904ac43107fb980fe9", rel: "cookbooks/rightscale"
-cookbook "block_device", git: "https://github.com/rightscale/rightscale_cookbooks.git", ref: "90f6db611b23b443f64b47904ac43107fb980fe9", rel: "cookbooks/block_device"
+cookbook "rightscale", git: "https://github.com/rightscale/rightscale_cookbooks.git", ref: "38000baf516a40ddeab3a83e7660481cdc5599ad", rel: "cookbooks/rightscale"
+cookbook "block_device", git: "https://github.com/rightscale/rightscale_cookbooks.git", ref: "38000baf516a40ddeab3a83e7660481cdc5599ad", rel: "cookbooks/block_device"
+# Dependencies of block_device v13.4+
+cookbook "cloudmonitoring", git: "https://github.com/rightscale/rackspace_cookbooks.git", ref: "8b3c5b8678b462ba7980de6919f0c6a0ac9777a0", rel: "cloudmonitoring"
+cookbook "driveclient", git: "https://github.com/rightscale/rackspace_cookbooks.git", ref: "8b3c5b8678b462ba7980de6919f0c6a0ac9777a0", rel: "driveclient"
+# Lock version of external dependencies
+cookbook "apt", git: "https://github.com/rightscale/cookbooks.git", ref: "0e1e380b26b4b3c4464355dcdf6bf8b5a4c9b83c", rel: "apt"
+cookbook "yum", git: "https://github.com/rightscale/cookbooks.git", ref: "0e1e380b26b4b3c4464355dcdf6bf8b5a4c9b83c", rel: "yum"
