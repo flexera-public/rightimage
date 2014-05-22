@@ -26,6 +26,8 @@ end
 
 image_s3_path = guest_platform+"/"+guest_platform_version+"/"+guest_arch+"/"+mirror_freeze_date[0..3]+"/"
 image_upload_bucket = node[:rightimage][:base_image_bucket]
+# Initial upload should be to dev bucket. Move base images built for release to prod bucket.
+image_upload_bucket << "-dev" unless image_upload_bucket =~ /-dev/
 
 # Upload partitioned image
 ros_upload loopback_file_compressed do
