@@ -13,8 +13,11 @@ def repo_url_generator
   repo_url_base = node[:rightimage][:rightlink_repo]
   if repo_url_base =~ /^rightlink-(beta|production|nightly)$/
     repo_type = $1
-    if repo_type == "nightly"
+    case repo_type
+    when "nightly"
       url = "http://rightlink-integration.test.rightscale.com/nightly/"
+    when "production"
+      url = "http://mirror.rightscale.com/rightlink/"
     else
       url = "http://rightlink-#{repo_type}.test.rightscale.com/"
     end
