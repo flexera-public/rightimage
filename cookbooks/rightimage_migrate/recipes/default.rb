@@ -74,7 +74,9 @@ ruby_block "Migrate image" do
         image_type = /<rootDeviceType>(.*)<\/rootDeviceType>/.match(output)[1]
         kernel_id = /<kernelId>(.*)<\/kernelId>/.match(output)
         status = /<imageState>(.*)<\/imageState>/.match(output)[1]
-        
+        status_reason = /<stateReason>(.*)<\/stateReason>/.match(output)
+        error_message = /<message>(.*)<\/message>/.match(output)[1] if status_reason
+
         data = { "image_name" => image_name, "image_type" => image_type, "manifest" => manifest, "bucket" => bucket, "status" => status }
         data["kernel_id"] = kernel_id[1] if kernel_id
         data
@@ -126,14 +128,19 @@ ruby_block "Migrate image" do
       Chef::Log.warn("Image has already been migrated as #{image_check}, proceeding as normal")
       new_image_id = image_check
     else
-      Chef::Log.info("Checking for matching kernel in #{destination_region}")
-      # Get metadata for source image's aki
-      source_aki = get_ami_metadata(akid, sak, source_region, source_image['kernel_id'])
-      # aki name
-      source_aki_name = source_aki['image_name']
-      # Search all images in destination region for source aki name
-      destination_aki = get_ami_id(akid, sak, destination_region, source_aki_name, true)
-      raise "Could not find AKI #{source_aki_name} in #{destination_region}" unless destination_aki
+      if source_image['kernel_id']
+        Chef::Log.info("Checking for matching kernel in #{destination_region}")
+        # Get metadata for source image's aki
+        source_aki = get_ami_metadata(akid, sak, source_region, source_image['kernel_id'])
+        # aki name
+        source_aki_name = source_aki['image_name']
+        # Search all images in destination region for source aki name
+        destination_aki = get_ami_id(akid, sak, destination_region, source_aki_name, true)
+        raise "Could not find AKI #{source_aki_name} in #{destination_region}" unless destination_aki
+        kernel_flag = "--kernel \"#{destination_aki}\""
+      else
+        kernel_flag = ""
+      end
 
       Chef::Log.info("Migrating #{image_id} from #{source_region} to #{destination_region}")
       case source_image['image_type']
@@ -145,7 +152,7 @@ ruby_block "Migrate image" do
         raise "ec2-migrate-image failed" unless $?.success?
       
         Chef::Log.info("Registering image")
-        output = `. /etc/profile && ec2-register "#{destination_bucket}/#{source_image['manifest']}" --aws-access-key "#{akid}" --aws-secret-key "#{sak}" --name "#{source_image['image_name']}" --kernel "#{destination_aki}" --region "#{destination_region}"  2>&1`
+        output = `. /etc/profile && ec2-register "#{destination_bucket}/#{source_image['manifest']}" --aws-access-key "#{akid}" --aws-secret-key "#{sak}" --name "#{source_image['image_name']}" #{kernel_flag} --region "#{destination_region}"  2>&1`
       else
         raise "Root device type #{source_image['image_type']} not supported"
       end
@@ -174,9 +181,12 @@ ruby_block "Migrate image" do
             status = destination_image['status']
           end
 
-          if status == "available"
+          case status
+          when "available"
             Chef::Log.info("Image #{new_image_id} is available")
             break
+          when "failed"
+            raise "Image status is failed. Reason: #{destination_image['error_message']}"
           else
             $i += 1;
             Chef::Log.info("[#$i/#$retries] Image NOT ready! Status: #{status} Sleeping #$wait seconds...")
