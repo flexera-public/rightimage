@@ -76,8 +76,9 @@ ruby_block "Migrate image" do
         status = /<imageState>(.*)<\/imageState>/.match(output)[1]
         status_reason = /<stateReason>(.*)<\/stateReason>/.match(output)
         error_message = /<message>(.*)<\/message>/.match(output)[1] if status_reason
+        virt_type = /<virtualizationType>(.*)<\/virtualizationType>/.match(output)[1]
 
-        data = { "image_name" => image_name, "image_type" => image_type, "manifest" => manifest, "bucket" => bucket, "status" => status }
+        data = { "image_name" => image_name, "image_type" => image_type, "manifest" => manifest, "bucket" => bucket, "status" => status, "virt_type" => virt_type }
         data["kernel_id"] = kernel_id[1] if kernel_id
         data
       else
@@ -152,7 +153,7 @@ ruby_block "Migrate image" do
         raise "ec2-migrate-image failed" unless $?.success?
       
         Chef::Log.info("Registering image")
-        output = `. /etc/profile && ec2-register "#{destination_bucket}/#{source_image['manifest']}" --aws-access-key "#{akid}" --aws-secret-key "#{sak}" --name "#{source_image['image_name']}" #{kernel_flag} --region "#{destination_region}"  2>&1`
+        output = `. /etc/profile && ec2-register "#{destination_bucket}/#{source_image['manifest']}" --aws-access-key "#{akid}" --aws-secret-key "#{sak}" --name "#{source_image['image_name']}" #{kernel_flag} --region "#{destination_region}" --virtualization-type #{source_image['virt_type']} 2>&1`
       else
         raise "Root device type #{source_image['image_type']} not supported"
       end
