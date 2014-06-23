@@ -44,6 +44,15 @@ execute "rpm2cpio /tmp/grep/grep.rpm | cpio -id" do
   creates "/tmp/grep/bin/grep"
 end
 
+if node[:platform] == "ubuntu" && node[:platform_version].to_f == 14.04
+  remote_file "/tmp/grep.deb" do
+    source "http://mirror.rightscale.com/ubuntu_daily/2014/04/08/pool/main/g/grep/grep_2.10-1_amd64.deb"
+    action :create_if_missing
+  end
+
+  execute "dpkg -i /tmp/grep.deb"
+end
+
 bash "Check for special strings" do
   flags "-e"
   code <<-EOH
@@ -65,35 +74,35 @@ BEGIN CERTIFICATE|\
 
 # List of directories to ignore.
 skip_dirs=(
-#{node[:rightimage_tester][:root]}/dev
-#{node[:rightimage_tester][:root]}/etc/pki
-#{node[:rightimage_tester][:root]}/etc/ssh
-#{node[:rightimage_tester][:root]}/etc/ssl
-#{node[:rightimage_tester][:root]}/home/ec2
-#{node[:rightimage_tester][:root]}/lib
-#{node[:rightimage_tester][:root]}/lib64
-#{node[:rightimage_tester][:root]}/proc
-#{node[:rightimage_tester][:root]}/root/.npm
-#{node[:rightimage_tester][:root]}/sys
-#{node[:rightimage_tester][:root]}/usr/java
-#{node[:rightimage_tester][:root]}/usr/lib
-#{node[:rightimage_tester][:root]}/usr/lib64
-#{node[:rightimage_tester][:root]}/usr/local/lib
-#{node[:rightimage_tester][:root]}/usr/share/doc
-#{node[:rightimage_tester][:root]}/var/cache/rightscale
-#{node[:rightimage_tester][:root]}/var/lib/rightscale/right_link/certs
-#{node[:rightimage_tester][:root]}/var/lib/ureadahead
-#{node[:rightimage_tester][:root]}/usr/local/gsutil
-#{node[:rightimage_tester][:root]}/usr/local/gcutil
-#{node[:rightimage_tester][:root]}/usr/share
-#{node[:rightimage_tester][:root]}/var/lib/gems
-#{node[:rightimage_tester][:root]}/var/lib/ureadahead
-#{node[:rightimage_tester][:root]}/usr/local/lib/python2.7/dist-packages/boto
-#{node[:rightimage_tester][:root]}/opt/rightscale/sandbox/lib/ruby
-#{node[:rightimage_tester][:root]}/opt/rightscale/right_link/certs
-#{node[:rightimage_tester][:root]}/opt/rightscale/right_link/lib/instance/cook
-#{node[:rightimage_tester][:root]}/opt/rightscale/sandbox/man
-#{node[:rightimage_tester][:root]}/opt/rightscale/sandbox/ssl/man
+/dev
+/etc/pki
+/etc/ssh
+/etc/ssl
+/home/ec2
+/lib
+/lib64
+/proc
+/root/.npm
+/sys
+/usr/java
+/usr/lib
+/usr/lib64
+/usr/local/lib
+/usr/share/doc
+/var/cache/rightscale
+/var/lib/rightscale/right_link/certs
+/var/lib/ureadahead
+/usr/local/gsutil
+/usr/local/gcutil
+/usr/share
+/var/lib/gems
+/var/lib/ureadahead
+/usr/local/lib/python2.7/dist-packages/boto
+/opt/rightscale/sandbox/lib/ruby
+/opt/rightscale/right_link/certs
+/opt/rightscale/right_link/lib/instance/cook
+/opt/rightscale/sandbox/man
+/opt/rightscale/sandbox/ssl/man
 )
 
 # List of files to ignore.
@@ -103,15 +112,11 @@ skip_files=(
 # Ignore this script during the search
 skip_files=( "${skip_files[@]}" "$0" "$0.rb" )
 
-for (( i=0; i<${#skip_dirs[@]}; i++ ))
-do
- skip_dir="$skip_dir --exclude-dir=${skip_dirs[$i]}"
-done
+# Prepend --exclude-dir=
+skip_dirs=( "${skip_dirs[@]/#/--exclude-dir=#{node[:rightimage_tester][:root]}}" )
 
-for (( i=0; i<${#skip_files[@]}; i++ ))
-do
- skip_file="$skip_file --exclude=`basename ${skip_files[$i]}`"
-done
+# Prepend --exclude=
+skip_files=( "${skip_files[@]/#/--exclude=`basename ${skip_files[@]}`}" )
 
 echo "Going to search entire file system for $regexp, but \
 ${skip_dirs[@]} ${skip_files[@]}"
@@ -125,7 +130,7 @@ set +ex
 # --binary-files=without-match
 #   assumes that a binary file does not match so skips it.
 $grep_bin -E --ignore-case --files-with-matches --devices=skip \
-      --directories=recurse --no-messages $skip_dir $skip_file \
+      --directories=recurse --no-messages ${skip_dirs[@]} ${skip_files[@]} \
       --binary-files=without-match --regexp="$regexp" #{node[:rightimage_tester][:root]}/ > /tmp/badfiles
 [ "$?" == "127" ] && echo "grep didn't run" && exit 1
 
