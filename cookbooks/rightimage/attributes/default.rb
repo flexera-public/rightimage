@@ -62,7 +62,7 @@ when "ubuntu"
     node.set[:rightimage][:host_packages] << " devscripts"
   end
 
-  if rightimage[:platform_version].to_f == 12.04
+  if rightimage[:platform_version].to_f >= 12.04
     node.set[:rightimage][:host_packages] << " liburi-perl"
   end
 when "centos","rhel"
