@@ -39,11 +39,14 @@ ruby_block "Check for duplicate mounts" do
     # iterate through each line returned by the mount command and check to 
     # see if we have seen a device or mount point befeore. Exit if so
     mounts.each do |line| 
-      elements = line.split 
-      error_and_exit elements[0] if devices.include? elements[0]
-      error_and_exit elements[2] if mount_points.include? elements[2]
-      devices.push elements[0]
-      mount_points.push elements[2]
+      elements = line.split
+      # Ignore anything that doesn't start with a /
+      if elements[0] =~ /^\//
+        error_and_exit elements[0] if devices.include? elements[0]
+        error_and_exit elements[2] if mount_points.include? elements[2]
+        devices.push elements[0]
+        mount_points.push elements[2]
+      end
     end
   end
 end
