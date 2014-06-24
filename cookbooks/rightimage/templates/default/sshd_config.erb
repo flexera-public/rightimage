@@ -119,3 +119,7 @@ UseDNS no
 # override default of no subsystems
 Subsystem       sftp    <%= node[:rightimage][:sshd][:sftp_path] %>
 
+<% if sshd_UsePrivilegeSeparation? -%>
+UsePrivilegeSeparation sandbox
+<% end -%>
+

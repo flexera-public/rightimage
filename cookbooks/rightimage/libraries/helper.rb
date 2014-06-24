@@ -382,6 +382,11 @@ module RightScale
         end
       end
 
+      # Add "UsePrivilegeSeparation sandbox" for OpenSSH 6.1+ (w-6279)
+      def sshd_UsePrivilegeSeparation?
+        ((el? and node[:rightimage][:platform_version].to_f >= 7.0) || (node[:rightimage][:platform] == "ubuntu" && node[:rightimage][:platform_version].to_f >= 14.04)) ? true : false
+      end
+
     end
   end
 end
