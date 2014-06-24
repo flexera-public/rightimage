@@ -31,6 +31,23 @@ directory "#{guest_root}/etc/rightscale.d" do
   recursive true
 end
 
+bash "remove help message" do
+  only_if { ::File.directory? "#{guest_root}/etc/update-motd.d" }
+  code "rm #{guest_root}/etc/update-motd.d/10-help-text || true"
+end
+
+cookbook_file "#{guest_root}/etc/rightscale.d/motd" do 
+  only_if { ::File.directory? "#{guest_root}/etc/update-motd.d" }
+  source "motd"
+  backup false
+end
+
+cookbook_file "#{guest_root}/etc/motd" do 
+  not_if { ::File.directory? "#{guest_root}/etc/update-motd.d" }
+  source "motd"
+  backup false
+end
+
 # Put the freeze-date, build-date, and rightlink version in a hint file.
 ruby_block "create_hint_file" do
   block do

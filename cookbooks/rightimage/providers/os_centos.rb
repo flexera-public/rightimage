@@ -205,11 +205,6 @@ action :install do
     backup false
   end
 
-  cookbook_file "#{guest_root}/etc/motd" do 
-    source "motd" 
-    backup false
-  end
-
   cookbook_file "#{guest_root}/etc/profile.d/pkgconfig.sh" do 
     source "pkgconfig.sh" 
     mode "0755"
