@@ -1,9 +1,3 @@
-# Use vmbuilder to generate a base virtual image.  We will use the image generated here for other recipes to add
-# Cloud and Hypervisor specific details.
-#
-# When this is finished running, you should have a basic image ready in /mnt
-#
-
 require 'chef/log'
 require 'chef/mixin/shell_out'
 class Chef::Provider
@@ -11,35 +5,11 @@ class Chef::Provider
 end
 
 
-# Ubuntu packages may call triggers which autostart services after install.  
-# These services will open log files preventing the loopback filesystem from 
-# unmounting.  Do the same thing debootstrap does and stub out initctl and
-# such with dummy scripts temporarily
-def loopback_package_install(packages = nil)
-  init_scripts = ['/sbin/start-stop-daemon', '/sbin/initctl']
-  begin
-    init_scripts.each do |script|
-      shell_out!("chroot #{guest_root} dpkg-divert --add --rename --local #{script}")
-      ::File.open("#{guest_root}/#{script}","w") do |f|
-        f.puts('#!/bin/sh')
-        f.puts('echo')
-        f.puts("echo 'Warning: Fake #{script} called, doing nothing'")
-      end
-      shell_out!("chmod 755 #{guest_root}/#{script}")
-    end
-    if packages
-      package_list = Array(packages).join(" ")
-      Chef::Log.info("Installing #{package_list} into #{guest_root}")
-      shell_out!("chroot #{guest_root} apt-get install -y #{package_list}")
-    end
-    yield if block_given?
-  ensure
-    init_scripts.each do |script|
-      shell_out!("rm #{guest_root}/#{script}")
-      shell_out!("chroot #{guest_root} dpkg-divert --remove --rename #{script}")
-    end
-  end
-end
+# Use vmbuilder to generate a base virtual image.  We will use the image generated here for other recipes to add
+# Cloud and Hypervisor specific details.
+#
+# When this is finished running, you should have a basic image ready in /mnt
+#
 
 action :install do
   mirror_date = "#{mirror_freeze_date[0..3]}/#{mirror_freeze_date[4..5]}/#{mirror_freeze_date[6..7]}"
@@ -51,6 +21,7 @@ action :install do
 
   package "python-boto"
   package "python-vm-builder"
+
 
   # Overwrite the provided sources.list template or the kernel will be
   # installed from the upstream Ubuntu mirror. (w-6136)
@@ -83,6 +54,7 @@ action :install do
   end
 
   temp_build_dir = node[:rightimage][:build_dir] + "/vmbuilder"
+
   #create bootstrap command
   bootstrap_cmd = "/usr/bin/vmbuilder xen ubuntu -o \
       --suite=#{platform_codename} \
@@ -98,6 +70,9 @@ action :install do
   else
     bootstrap_cmd << " --arch amd64"
   end
+
+  # https://bugs.launchpad.net/ubuntu/+source/vm-builder/+bug/1037607
+  bootstrap_cmd << " --addpkg linux-image-generic" if node[:rightimage][:platform_version].to_f > 12.04
 
   Chef::Log.info "vmbuilder bootstrap command is: " + bootstrap_cmd
 
@@ -224,12 +199,6 @@ EOS
     code "chroot #{guest_root} apt-key add /tmp/GPG-KEY-RightScale"
   end
 
-  # Hack: this cleans out cached copies of rightscale_software_ubuntu repo metadata
-  # The files are too new and won't be updated but can get into a bad/inconsistent state
-  # if they're updated before the gpg-key is added in
-  execute "rm -f #{guest_root}/var/lib/apt/lists/*software*"
-  execute "rm -f #{guest_root}/var/lib/apt/lists/partial/*software*"
-
   # Apt-get update after key is added, needed to install packages from rightscale-software
   execute "chroot #{guest_root} apt-get update > /dev/null"
 
@@ -261,7 +230,7 @@ EOS
   # called sethostname.sh that does the same thing that you can place your enter
   # hooks.  You may have to manually install it though, so revisit the issue at 
   # that point (w-5618)
-  if new_resource.platform_version.to_f.between?(12.04,12.10); then
+  if new_resource.platform_version.to_f >= 12.04
     cookbook_file "#{guest_root}/etc/dhcp/dhclient-enter-hooks.d/hostname" do
       source "dhclient-hostname.sh"
       backup false

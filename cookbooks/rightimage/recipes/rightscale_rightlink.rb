@@ -187,7 +187,13 @@ def install_rightlink()
 
     # Force yes forces the package to be installed even if its unsigned.
     force_yes = gpg_check ? "" : "--force-yes"
-    execute "chroot #{guest_root} apt-get -y #{force_yes} install rightlink-cloud-#{rightlink_cloud}"
+
+    ruby_block "install rightlink" do
+      block do
+        loopback_package_install("rightlink-cloud-#{rightlink_cloud}",force_yes)
+      end
+    end
+
     template "#{guest_root}/etc/apt/sources.list.d/rightlink.list" do
       source "rightlink.list.erb"
       variables({
