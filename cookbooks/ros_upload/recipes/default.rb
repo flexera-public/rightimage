@@ -29,6 +29,6 @@ end
 
 gem_package "fog" do
   gem_binary "/usr/bin/gem"
-  version "1.5.0"
+  version "1.11.1"
   action :install
 end
