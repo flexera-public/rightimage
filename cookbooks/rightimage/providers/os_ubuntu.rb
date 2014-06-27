@@ -254,6 +254,14 @@ EOS
     EOH
   end
 
+  # Collectd 5 is not currently supported by the RightScale monitoring servers
+  # Pin to previous version from "precise" to avoid issues. These packages are
+  # available from http://mirror.rightscale.com/rightscale_software_ubuntu (w-6281)
+  cookbook_file "#{guest_root}/etc/apt/preferences.d/rightscale-collectd-pin-1001" do
+    source "pin_collectd"
+    backup false
+  end
+
   ruby_block "install guest packages" do 
     block do
       loopback_package_install node[:rightimage][:guest_packages]
