@@ -103,129 +103,44 @@ end
 action :upload do
   CDC_GEM_VER = "0.0.0"
   CDC_GEM = ::File.join(::File.dirname(__FILE__), "..", "files", "default", "right_cloud_api-#{CDC_GEM_VER}.gem")
-  SANDBOX_BIN = "/opt/rightscale/sandbox/bin/gem"
-
-  chef_gem "nokogiri" do
-    version "1.4.3.1"
-	  action :install
-  end
   
   chef_gem CDC_GEM do
     version CDC_GEM_VER
     action :install
   end
-  
-  chef_gem "right_http_connection"
+
+  tools_temp = "/tmp/rightimage_tools"
+  directory tools_temp
+
+  remote_file "#{tools_temp}/rightimage_tools.tgz" do
+    source "#{node[:rightimage][:s3_base_url]}/files/rightimage_tools_0.7.5.tar.gz"
+    action :create_if_missing
+  end
+
+  execute "tar zxf #{tools_temp}/rightimage_tools.tgz -C #{tools_temp}" do
+    creates "#{tools_temp}/bin"
+  end
 
   ruby_block "trigger download to test cloud" do
     block do
-      require "rubygems"
-      require "right_cloud_api"
-      require "cloud/cloud_stack/manager"
-      require "uri"
-
-      name = "#{new_resource.image_name}_#{new_resource.hypervisor.upcase}"
-      zoneId = node[:rightimage][:datacenter]
-      cloud_stack = RightScale::CloudApi::CloudStack::Manager::new(node[:rightimage][:cloudstack][:cdc_api_key], node[:rightimage][:cloudstack][:cdc_secret_key], node[:rightimage][:cloudstack][:cdc_url])
-
-      case new_resource.hypervisor
-      when "esxi"
-        format = "OVA"
-        hypervisor = "VMware"
-      when "kvm"
-        format = "QCOW2"
-        hypervisor = "KVM"
-      when "xen"
-        format = "VHD"
-        hypervisor = "XenServer"
-      end
-
-      def guess_os_type(cloud_stack, image_name)
-        # This function takes an image name as an input and attempts to pick the latest available
-        # OS type ID that matches
-        image_name_match = image_name.match(/RightImage_([^\_\)]+)_([^\_\)]+)/)
-        distro = image_name_match[1]
-        os_version_match = image_name_match[2].match(/(\d*[\.]?\d)*(.*)/)
-        arch = image_name =~ /x64/ ? "64-bit":"32-bit"
-
-        # Example image name: RightImage_Windows_2008R2_x64_sqlsvr2k8r2_v5.8.8.11
-        # CloudStack expects: Windows Server 2008 R2 (64-bit)
-        if distro =~ /Windows/i
-          distro << " Server"
-          os_version = os_version_match[1] + " " + os_version_match[2] if os_version_match[2]
-        else
-          # Example image name: RightImage_CentOS_6.4_x64_v13.4
-          # CloudStack expects: CentOS 6.4 (64-bit)
-          os_version = os_version_match[1]
-        end
-
-        what_to_match = distro + " " + os_version
-
-        types = cloud_stack.ListOsTypes['listostypesresponse']['ostype']
-        # Search only for distro and arch so we can do a fuzzy-match later
-        types = types.select { |os_type| os_type['description'] =~ /#{distro}.* \(#{arch}/}
-
-        types = types.select do |os_type|
-          # Pull out the arch so we can properly order the list
-          desc_no_arch = os_type['description'].sub(/ \(.*/, '')
-          what_to_match >= desc_no_arch
-        end
-        types = types.sort_by { |os_type| os_type['description'] }
-        types.last["id"]
-      end
-
-      cloud_stack = RightScale::CloudApi::CloudStack::Manager::new(node[:rightimage][:cloudstack][:cdc_api_key], node[:rightimage][:cloudstack][:cdc_secret_key], node[:rightimage][:cloudstack][:cdc_url])
-      res = cloud_stack.ListTemplates("templatefilter" => "self", "name" => name, "zoneid" => zoneId)
-      raise "Image already exists with the name: #{name}" if res["listtemplatesresponse"].any?
-
-      filename = "#{new_resource.image_name}.#{image_file_ext}"
-      local_file = "#{target_raw_root}/#{filename}"
-      md5sum = calc_md5sum(local_file)
-
-      # Try to auto-detect OS type ID
-      Chef::Log::info("Guessing OS type ID...")
-      osTypeId = guess_os_type(cloud_stack, name)
+      require "#{tools_temp}/lib/cloudstack_uploader"
 
       aws_url  = "rightscale-cloudstack-dev.s3.amazonaws.com"
       aws_path = new_resource.hypervisor+"/"+new_resource.platform+"/"+new_resource.platform_version.to_s
+      filename = "#{new_resource.image_name}.#{image_file_ext}"
       image_url = "http://#{aws_url}/#{aws_path}/#{filename}"
-      Chef::Log::info("Downloading from: #{image_url}...")
-     
-      Chef::Log.info("Registering image on cloud...")
-      res = cloud_stack.RegisterTemplate("displaytext" => name, "format" => format, "hypervisor" => hypervisor, "name" => name, "ostypeid" => osTypeId, "url" => image_url, "zoneid" => zoneId, "checksum" => md5sum, "isfeatured" => "true", "ispublic" => "true")
-      Chef::Log.info("Returned data: #{res.inspect}")
 
-      image_id = res["registertemplateresponse"]["template"][0]["id"]
+      options = {}
+      options[:endpoint] = node[:rightimage][:cloudstack][:cdc_url]
+      options[:name]     = "#{new_resource.image_name}_#{new_resource.hypervisor.upcase}"
+      options[:source]   = image_url
+      options[:zone_id]  = node[:rightimage][:datacenter]
 
-      $i=0
-      $retries=60
-      # Don't set less than 30 second polling period - It only updates every 30 seconds anyways.
-      $wait=30
+      ENV['CLOUDSTACK_API_KEY'] = node[:rightimage][:cloudstack][:cdc_api_key]
+      ENV['CLOUDSTACK_SECRET_KEY'] = node[:rightimage][:cloudstack][:cdc_secret_key]
 
-      until $i > $retries do
-        info = cloud_stack.ListTemplates("templatefilter" => "self", "id" => image_id)["listtemplatesresponse"]["template"][0]
-        ready = info["isready"].to_s
-        status = info["status"]
-
-        if ready == "true"
-          Chef::Log.info("Image ready")
-          break
-        else
-          $i += 1;
-          if status =~ /expected/
-            raise "Server returned error: #{status}"
-          else
-            Chef::Log.info("[#$i/#$retries] Image NOT ready! Status: #{status} Sleeping #$wait seconds...")
-            sleep $wait unless $i > $retries
-          end
-        end
-      end
-
-      raise "Upload failed! Status: #{status}" unless ready == "true"
-
-      # add to global id store for use by other recipes
-      id_list = RightImage::IdList.new(Chef::Log)
-      id_list.add(image_id)
+      uploader = RightImageTools::CloudstackUploader.new(options, Chef::Log)
+      uploader.register()
     end
   end
 end
