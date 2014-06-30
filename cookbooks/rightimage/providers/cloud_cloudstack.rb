@@ -113,7 +113,7 @@ action :upload do
   directory tools_temp
 
   remote_file "#{tools_temp}/rightimage_tools.tgz" do
-    source "https://s3.amazonaws.com/rightscale-rightimage/files/rightimage_tools_0.7.5.tar.gz"
+    source "#{node[:rightimage][:s3_base_url]}/files/rightimage_tools_0.7.5.tar.gz"
     action :create_if_missing
   end
 
