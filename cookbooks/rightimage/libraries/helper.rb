@@ -95,6 +95,7 @@ module RightScale
         when 10.04 then "lucid"
         when 10.10 then "maverick"
         when 12.04 then "precise"
+        when 14.04 then "trusty"
         else raise "Unknown Ubuntu version #{platform_version}"
         end
       end
@@ -349,6 +350,41 @@ module RightScale
           (str2_bits.size - str1_bits.size).times { str1_bits << 0 }
         end
         str1_bits <=> str2_bits
+      end
+
+      # Ubuntu packages may call triggers which autostart services after install.
+      # These services will open log files preventing the loopback filesystem from
+      # unmounting.  Do the same thing debootstrap does and stub out initctl and
+      # such with dummy scripts temporarily
+      def loopback_package_install(packages = nil, params = "")
+        init_scripts = ['/sbin/start-stop-daemon', '/sbin/initctl']
+        begin
+          init_scripts.each do |script|
+            shell_out!("chroot #{guest_root} dpkg-divert --add --rename --local #{script}")
+            ::File.open("#{guest_root}/#{script}","w") do |f|
+              f.puts('#!/bin/sh')
+              f.puts('echo')
+              f.puts("echo 'Warning: Fake #{script} called, doing nothing'")
+            end
+            shell_out!("chmod 755 #{guest_root}/#{script}")
+          end
+          if packages
+            package_list = Array(packages).join(" ")
+            Chef::Log.info("Installing #{package_list} into #{guest_root}")
+            shell_out!("chroot #{guest_root} apt-get install -y #{params} #{package_list}")
+          end
+          yield if block_given?
+        ensure
+          init_scripts.each do |script|
+            shell_out!("rm #{guest_root}/#{script}")
+            shell_out!("chroot #{guest_root} dpkg-divert --remove --rename #{script}")
+          end
+        end
+      end
+
+      # Add "UsePrivilegeSeparation sandbox" for OpenSSH 6.1+ (w-6279)
+      def sshd_UsePrivilegeSeparation?
+        ((el? and node[:rightimage][:platform_version].to_f >= 7.0) || (node[:rightimage][:platform] == "ubuntu" && node[:rightimage][:platform_version].to_f >= 14.04)) ? true : false
       end
 
     end

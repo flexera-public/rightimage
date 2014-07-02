@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: rightimage_tester
-# Recipe:: packages
+# Recipe:: collectd
 #
 # Copyright 2011, RightScale, Inc.
 #
@@ -19,14 +19,15 @@
 
 rightscale_marker :begin
 
-rightimage_tester "Verify packages install" do
-  cmd = value_for_platform(
-    "centos" => { "default" => 'yum install -y emacs' },
-    "redhat" => { "default" => 'yum install -y yum-plugin-changelog' },
-    "ubuntu" => { "default" => 'apt-get clean && apt-get update && apt-get install -y nmap' },
-    "default" => "echo \"OS #{node[:platform]} not supported.\" && exit 1"
-  )
-  command cmd
+cmd = value_for_platform(
+  /suse/i => { "default" => 'zypper search -i' },
+  "ubuntu" => { "default" => 'dpkg-query -W' },
+  "default" => 'rpm -qa'
+)
+
+rightimage_tester "Verify collectd4 installed" do
+  command "output=$(#{cmd} collectd); if [ ! -z $output ]; then echo $output | grep 4\.; fi"
   action :test
 end
+
 rightscale_marker :end

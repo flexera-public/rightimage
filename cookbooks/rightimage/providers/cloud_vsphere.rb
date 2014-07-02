@@ -24,12 +24,6 @@ action :configure do
     action :create
     recursive true
   end 
-
-  # Fix discovery of floppy device on CentOS
-  # https://bugzilla.redhat.com/show_bug.cgi?id=503308
-  execute "echo 'alias acpi:PNP0700: floppy' > #{guest_root}/etc/modprobe.d/floppy-pnp.conf" do
-    only_if { el6? }
-  end
 end
 
 action :package do

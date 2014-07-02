@@ -1,0 +1,12 @@
+# Collectd 5 is not currently supported by the RightScale monitoring servers
+# Pin to previous version from "precise" to avoid issues. These packages are
+# available from http://mirror.rightscale.com/rightscale_software_ubuntu
+
+Package: collectd
+Pin: version 4.10.1-2.1ubuntu7
+Pin-Priority: 1001
+
+Package: collectd-core
+Pin: version 4.10.1-2.1ubuntu7
+Pin-Priority: 1001
+

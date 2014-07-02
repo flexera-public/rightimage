@@ -108,9 +108,9 @@ bash "launch the remote instance" do
                end
 
   region_opt = "--region #{region_opt}" if region_opt =~ /./
-  resize_opt = node[:rightimage][:cloud] == "ec2" ? "--resize #{node[:rightimage][:root_size_gb]}" : ""
+  resize_opt = node[:rightimage][:cloud] == "ec2" && ((el? and node[:rightimage][:platform_version].to_f < 7.0) || !el?) ? "--resize #{node[:rightimage][:root_size_gb]}" : ""
   flavor_opt = case node[:rightimage][:cloud]
-               when "ec2" then "--flavor-id c1.medium"
+               when "ec2" then "--flavor-id m3.medium"
                when "google" then "--flavor-id n1-standard-1"
                else ""
                end
