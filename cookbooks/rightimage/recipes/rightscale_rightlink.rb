@@ -154,7 +154,7 @@ def install_rightlink()
       variables({:enabled => true, :gpg_check => gpg_check, :repo_url => repo_url})
       backup false
     end
-    execute "chroot #{guest_root} yum -y install rightlink-cloud-#{rightlink_cloud}"
+    execute "chroot #{guest_root} yum -y install rightlink#{node[:rightimage][:rightlink_version].to_i}-cloud-#{rightlink_cloud}"
     template "#{guest_root}/etc/yum.repos.d/rightlink.repo" do
       source "rightlink.repo.erb"
       variables({:enabled => false, :gpg_check => gpg_check, :repo_url => repo_url})
@@ -190,7 +190,7 @@ def install_rightlink()
 
     ruby_block "install rightlink" do
       block do
-        loopback_package_install("rightlink-cloud-#{rightlink_cloud}",force_yes)
+        loopback_package_install("rightlink#{node[:rightimage][:rightlink_version].to_i}-cloud-#{rightlink_cloud}",force_yes)
       end
     end
 
