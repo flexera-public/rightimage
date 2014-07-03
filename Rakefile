@@ -103,7 +103,7 @@ end
 # Default image_tester template - right_image_tester master normally
 # override
 desc "Run RightImage base builders"
-task :base_build, [:image_version] do |t, args|
+task :base_build, [:image_version, :mirror_freeze_date] do |t, args|
   upload_url = upload_cookbooks()
   attach_cookbooks(args[:image_version], upload_url)
 
@@ -119,7 +119,9 @@ task :base_build, [:image_version] do |t, args|
     cmd("bundle check || bundle install")
     # Destroy on startup. Servers should be stopped at the end of a the run, though the deployment will
     # linger for debugging purposes
-    output = cmd("bundle exec generate_ci_collateral base  --build_id #{image_version}-#{current_sha} --lineage v#{lineage} --servertemplate_id #{st_id}", echo=false)
+    command = "bundle exec generate_ci_collateral base  --build_id #{image_version}-#{current_sha} --lineage v#{lineage} --servertemplate_id #{st_id}"
+    command << " --mirror_freeze_date #{args[:mirror_freeze_date]}" if args[:mirror_freeze_date]
+    output = cmd(command, echo=false)
     ci_collateral_file = /Writing base template to (.*)$/.match(output)[1]
     ci_log_file = ci_collateral_file.sub(".yml",".log")
     cmd("bundle exec image_builder --restart #{ci_collateral_file} --log-file #{ci_log_file} --yes")
