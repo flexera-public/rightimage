@@ -26,7 +26,7 @@ cmd = value_for_platform(
 )
 
 rightimage_tester "Verify collectd4 installed" do
-  command "output=$(#{cmd} collectd); if [ ! -z $output ]; then echo $output | grep 4\.; fi"
+  command "output=$(#{cmd} collectd); if [ ! -z \"$output\" ]; then echo $output | grep -o [[:digit:]]\. | head -n 1 | grep -E ^4.; fi"
   action :test
 end
 
