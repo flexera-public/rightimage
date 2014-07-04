@@ -80,7 +80,9 @@ action :configure do
         # NOTE: this image should not be used in production!!
         # Precise kernel doesn't support SCSI_VIRTIO driver.
         # Quantal kernel doesn't show attached volumes. (w-6223)
-        chroot $guest_root apt-get -y install linux-generic-lts-raring
+        if [ "#{node[:rightimage][:platform_version]}" == "12.04" ]; then
+          chroot $guest_root apt-get -y install linux-generic-lts-raring
+        fi
 
         # Disable all ttys except for tty1 (console)
         for i in `ls $guest_root/etc/init/tty[2-9].conf`; do

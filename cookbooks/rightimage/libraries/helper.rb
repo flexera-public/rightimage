@@ -166,7 +166,7 @@ module RightScale
       end
 
       def mounted?(dir = target_raw_root)
-        `mount`.grep(/#{dir}/).any?
+        `mount`.lines.grep(/#{dir}/).any?
       end
 
       def cloud_credentials(cloud_type = node[:rightimage][:cloud])

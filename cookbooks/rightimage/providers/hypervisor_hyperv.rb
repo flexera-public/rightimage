@@ -9,7 +9,7 @@ action :install_kernel do
 
   # To work on the Azure platform, you need this package from at least 12/22/2012 (w-5336)
   execute "chroot #{guest_root} apt-get -y install linux-backports-modules-hv-precise-virtual" do
-    only_if { node[:rightimage][:platform] == "ubuntu" }
+    only_if { node[:rightimage][:platform] == "ubuntu" &&  node[:rightimage][:platform_version] == "12.04" }
   end
 end
 
@@ -39,7 +39,7 @@ action :install_tools do
       case "#{new_resource.platform}" in
       "ubuntu")
         # Install linux-tools and hv-kvp-daemon-init to support platform changes. (w-5338)
-        chroot $guest_root apt-get -y install linux-tools hv-kvp-daemon-init
+        chroot $guest_root apt-get -y install hv-kvp-daemon-init
 
         # Tell package manager to use the old config file.
         chroot $guest_root apt-get -y -o Dpkg::Options::="--force-confold" install walinuxagent
