@@ -101,6 +101,22 @@ action :package do
 end
 
 action :upload do
+  packages =
+    if platform_family?("debian")
+      %w(libxml2-dev rubygems ruby-dev zlib1g-dev)
+    else
+      %w(libxml2-devel rubygems ruby-devel)
+    end
+  packages << "gcc"
+  packages << "make"
+
+  packages.each do |pkg|
+    p = package pkg do
+      action :nothing
+    end
+    p.run_action(:install)
+  end
+
   CDC_GEM_VER = "0.0.0"
   CDC_GEM = ::File.join(::File.dirname(__FILE__), "..", "files", "default", "right_cloud_api-#{CDC_GEM_VER}.gem")
   
@@ -132,7 +148,9 @@ action :upload do
 
       options = {}
       options[:endpoint] = node[:rightimage][:cloudstack][:cdc_url]
+      options[:featured] = "true"
       options[:name]     = "#{new_resource.image_name}_#{new_resource.hypervisor.upcase}"
+      options[:public]   = "true"
       options[:source]   = image_url
       options[:zone_id]  = node[:rightimage][:datacenter]
 
