@@ -120,4 +120,8 @@ rightimage_os node[:rightimage][:platform] do
   action :repo_unfreeze
 end
 
+rightimage guest_root do
+  action :sanitize
+end
+
 rightscale_marker :end
