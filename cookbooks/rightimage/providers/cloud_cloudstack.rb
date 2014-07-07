@@ -103,7 +103,7 @@ end
 action :upload do
   packages =
     if platform_family?("debian")
-      %w(libxml2-dev rubygems ruby-dev zlib1g-dev)
+      %w(libxml2-dev rubygems1.9.1 ruby1.9.1-dev zlib1g-dev)
     else
       %w(libxml2-devel rubygems ruby-devel)
     end
