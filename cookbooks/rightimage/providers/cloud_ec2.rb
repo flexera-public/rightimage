@@ -110,9 +110,19 @@ action :upload do
   end
 end
 
+def availability_zone
+  if node[:ec2][:placement_availability_zone]
+    # Newer ohai (Chef 11) formatting
+    node[:ec2][:placement_availability_zone].dup
+  else
+    # Older ohai (Chef 10) formatting
+    node[:ece][:placement][:availability_zone].dup
+  end
+end
+
 def upload_ebs
 
-  this_region = node[:ec2][:placement][:availability_zone].chop
+  this_region = availability_zone.chop
   instance_id = node[:ec2][:instance_id]
 
   unless this_region == node[:rightimage][:region]
@@ -124,18 +134,18 @@ def upload_ebs
   if ::File.exists?("/var/tmp/ebs_volume_id")
     vol_id = ::File.read("/var/tmp/ebs_volume_id")
     Chef::Log.info("Using existing volume with id #{vol_id}")
-    node["rightimage"]["ebs_volume_id"] = vol_id
+    node.set["rightimage"]["ebs_volume_id"] = vol_id
   else
     ruby_block "Creating EBS volume" do
       block do 
         res = ec2_api_command("create-volume", {
           "size" => node[:rightimage][:root_size_gb],
-          "availability-zone" => node[:ec2][:placement][:availability_zone]
+          "availability-zone" => availability_zone
           })
         vol_id = res["VolumeId"]
         Chef::Log.info("Created volume with id #{vol_id}")
         ::File.open("/var/tmp/ebs_volume_id","w") { |f| f.write(vol_id) }
-        node["rightimage"]["ebs_volume_id"] = vol_id
+        node.set["rightimage"]["ebs_volume_id"] = vol_id
       end
     end
   end
@@ -275,7 +285,7 @@ def upload_ebs
 
       snap_id = res["SnapshotId"]
       ::File.open("/var/tmp/ebs_snapshot_id","w") { |f| f.write(snap_id) }
-      node["rightimage"]["ebs_snapshot_id"] = snap_id
+      node.set["rightimage"]["ebs_snapshot_id"] = snap_id
       sleep 60 # Snapshot will take at least this long
     end
   end
