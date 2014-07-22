@@ -9,7 +9,12 @@ set[:rightimage][:guest_root] = "/mnt/image"
 set_unless[:rightimage][:hypervisor] = "xen"
 # Don't use cf-mirror because it causes hash sum mismatch errors on Ubuntu
 # during an apt-get update using /latest. (w-6201)
-set[:rightimage][:mirror] = "mirror.rightscale.com"
+if el7?
+  # Temporary until mirror is set up
+  set[:rightimage][:mirror] = "mirror.centos.org"
+else
+  set[:rightimage][:mirror] = "mirror.rightscale.com"
+end
 set_unless[:rightimage][:rightscale_staging_mirror] = "false"
 set_unless[:rightimage][:cloud] = "ec2"
 set[:rightimage][:root_mount][:label_dev] = "ROOT"

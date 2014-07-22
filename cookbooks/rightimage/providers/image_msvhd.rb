@@ -5,10 +5,18 @@ action :package do
     action :install
   end
 
+  if el7?
+    # fedora 18 package throws errors about loading kernel mod on el7, doesn't
+    # matter though, we don't use that functionality
+    vbox_pkg = "VirtualBox-4.3-4.3.14_95030_fedora18-1.x86_64.rpm"
+  else el6?
+    vbox_pkg = "VirtualBox-4.1-4.1.18_78361_rhel6-1.x86_64.rpm"
+  end
+
   execute "virtualbox install" do
     only_if { node[:platform] == "centos" }
     not_if "rpm -qa VirtualBox*|grep VirtualBox"
-    command "yum -y install #{node[:rightimage][:s3_base_url]}/files/VirtualBox-4.1-4.1.18_78361_rhel6-1.x86_64.rpm"
+    command "yum -y install #{node[:rightimage][:s3_base_url]}/files/#{vbox_pkg}"
   end
 
   bash "package image" do

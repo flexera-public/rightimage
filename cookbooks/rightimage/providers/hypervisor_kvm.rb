@@ -22,7 +22,6 @@ action :install_kernel do
     "ubuntu" )
       echo '#!/bin/sh -e' > $guest_root/etc/rc.local
       echo "/sbin/modprobe acpiphp" >> $guest_root/etc/rc.local
-      echo "exit 0" >> $guest_root/etc/rc.local
       echo "acpiphp" >> /etc/modules
       ;;
     esac
