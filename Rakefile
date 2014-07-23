@@ -54,25 +54,27 @@ def upload_cookbooks()
   end
 end
 
-def sts_for_version(image_version)
+def sts_for_lineage(servertemplate_lineage)
   lineages = {
-    "14" => {
+    "v14" => {
       :st_id => "263828001",
       :repo_id => "241244004"
+    },
+    "v14.0.1" => {
+      :st_id => "340232004",
+      :repo_id => "241721004"
     }
   }
-  raise "Image version must be in format vN.N, i.e. v14.0" unless image_version =~ /^v\d+\.\d+$/
-  lineage = image_version.sub("v","").split(".").first
-  unless ids = lineages[lineage]
-    raise "Valid lineage not supplied, #{lineages.keys.join(", ")} are supported"
+  unless ids = lineages[servertemplate_lineage]
+    raise "The image version relates to the ServerTemplate lineage to use. Valid lineage was not supplied, #{lineages.keys.join(", ")} are supported"
   end
   [ids[:st_id], ids[:repo_id]]
 end
 
-def attach_cookbooks(image_version, source_url)
+def attach_cookbooks(servertemplate_lineage, source_url)
   Dir.chdir RIGHTIMAGE_AUTOMATION_DIR do
     puts "cd #{RIGHTIMAGE_AUTOMATION_DIR}"
-    st_id, repo_id = sts_for_version(image_version)
+    st_id, repo_id = sts_for_lineage(servertemplate_lineage)
 
     src_url_arg = ""
     if source_url
@@ -95,31 +97,31 @@ task :upload_cookbooks do |t, args|
 end
 
 desc "Attach cookbooks to ServerTemplate"
-task :attach_cookbooks, [:image_version, :s3_url]  do |t, args|
-  attach_cookbooks(args[:image_version], args[:s3_url])
+task :attach_cookbooks, [:servertemplate_lineage, :s3_url]  do |t, args|
+  attach_cookbooks(args[:servertemplate_lineage], args[:s3_url])
 end
 
 
 # Default image_tester template - right_image_tester master normally
 # override
 desc "Run RightImage base builders"
-task :base_build, [:image_version] do |t, args|
+task :base_build, [:servertemplate_lineage] do |t, args|
   upload_url = upload_cookbooks()
-  attach_cookbooks(args[:image_version], upload_url)
+  attach_cookbooks(args[:servertemplate_lineage], upload_url)
 
   Dir.chdir RIGHTIMAGE_AUTOMATION_DIR do
     puts "cd #{RIGHTIMAGE_AUTOMATION_DIR}"
     current_sha = `git log --pretty=format:'%H' -n 1`.chomp[0..7]
 
-    image_version = args[:image_version]
-    st_id, repo_id = sts_for_version(args[:image_version])
-    lineage = image_version.sub("v","").split(".").first
+    servertemplate_lineage = args[:servertemplate_lineage]
+    st_id, repo_id = sts_for_lineage(args[:servertemplate_lineage])
+    lineage = servertemplate_lineage.sub("v","").split(".").first
 
 
     cmd("bundle check || bundle install")
     # Destroy on startup. Servers should be stopped at the end of a the run, though the deployment will
     # linger for debugging purposes
-    output = cmd("bundle exec generate_ci_collateral base  --build_id #{image_version}-#{current_sha} --lineage v#{lineage} --servertemplate_id #{st_id}", echo=false)
+    output = cmd("bundle exec generate_ci_collateral base  --build_id #{servertemplate_lineage}-#{current_sha} --lineage v#{lineage} --servertemplate_id #{st_id}", echo=false)
     ci_collateral_file = /Writing base template to (.*)$/.match(output)[1]
     ci_log_file = ci_collateral_file.sub(".yml",".log")
     cmd("bundle exec image_builder --restart #{ci_collateral_file} --log-file #{ci_log_file} --yes")
@@ -131,17 +133,17 @@ def get_last_base_build
 end
 
 desc "Run RightImage CI full builders"
-task :full_build, [:image_version, :rightlink_version] do |t, args|
+task :full_build, [:servertemplate_lineage, :rightlink_version] do |t, args|
   upload_url = upload_cookbooks()
-  attach_cookbooks(args[:image_version], upload_url)
+  attach_cookbooks(args[:servertemplate_lineage], upload_url)
 
   Dir.chdir RIGHTIMAGE_AUTOMATION_DIR do
     puts "cd #{RIGHTIMAGE_AUTOMATION_DIR}"
     current_sha = `git log --pretty=format:'%H' -n 1`.chomp[0..7]
 
-    image_version = args[:image_version]
-    st_id, repo_id = sts_for_version(args[:image_version])
-    lineage = image_version.sub("v","").split(".").first
+    servertemplate_lineage = args[:servertemplate_lineage]
+    st_id, repo_id = sts_for_lineage(args[:servertemplate_lineage])
+    lineage = servertemplate_lineage.sub("v","").split(".").first
     rightlink_version = args[:rightlink_version]
 
     build_id, mirror_freeze_date = get_last_base_build
@@ -150,7 +152,7 @@ task :full_build, [:image_version, :rightlink_version] do |t, args|
     # Bump to current timestamp if change are unchecked in?
     timestamp = `git log -1 --pretty=%ci`
     time = Time.parse(timestamp).utc
-    build_version = "#{image_version}.#{time.strftime("%Y%m%d%H%M")}"
+    build_version = "#{servertemplate_lineage}.#{time.strftime("%Y%m%d%H%M")}"
 
 
     cmd("bundle check || bundle install")
