@@ -66,7 +66,7 @@ def sts_for_lineage(servertemplate_lineage)
     }
   }
   unless ids = lineages[servertemplate_lineage]
-    raise "The image version relates to the ServerTemplate lineage to use. Valid lineage was not supplied, #{lineages.keys.join(", ")} are supported"
+    raise "A valid servertemplate lineage was not supplied, must be one of: #{lineages.keys.join(", ")}"
   end
   [ids[:st_id], ids[:repo_id]]
 end
