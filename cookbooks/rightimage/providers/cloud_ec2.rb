@@ -116,7 +116,7 @@ def availability_zone
     node[:ec2][:placement_availability_zone].dup
   else
     # Older ohai (Chef 10) formatting
-    node[:ece][:placement][:availability_zone].dup
+    node[:ec2][:placement][:availability_zone].dup
   end
 end
 
