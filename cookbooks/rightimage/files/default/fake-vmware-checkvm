@@ -1,0 +1,6 @@
+#!/bin/bash
+
+# Vmware installer calls this before running. Fake it out running in loopback fs
+
+echo "VMware software version 6 (good)"
+exit 0

@@ -1,0 +1,16 @@
+#!/bin/bash
+
+# Vmware installer calls this to decide what kernel to build modules against. 
+# Fake it out by using the lib/modules dir instead of using proc, which is 
+# controlled by the host os
+
+if [ "$1" = "-r" ]; then
+  kernel_version=$(ls /boot/ | grep vmlinuz | sort -r | head -n 1 | sed s/vmlinuz-//)
+  if [ -z "$kernel_version"  ]; then
+    echo "Could not find kernel version !"
+    exit 1
+  fi
+  echo $kernel_version
+else
+  exec /bin/real-uname "$@"
+fi
