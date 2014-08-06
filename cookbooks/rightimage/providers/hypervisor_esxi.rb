@@ -30,40 +30,29 @@ action :install_kernel do
 end
 
 action :install_tools do
+  cookbook_file "#{guest_root}/tmp/install_vmware_tools.sh" do
+    backup false
+    mode "0755"
+    source "install_vmware_tools.sh"
+  end
+
+  cookbook_file "#{guest_root}/tmp/fake-uname" do
+    source "fake-uname"
+    mode "0777"
+    backup false
+  end
+
+  cookbook_file "#{guest_root}/tmp/fake-vmware-checkvm" do
+    source "fake-vmware-checkvm"
+    mode "0777"
+    backup false
+  end
+
   bash "install vmware tools" do
     flags "-ex"
-    code <<-EOH
-      guest_root=#{guest_root}
-      TMP_DIR=/tmp/vmware_tools
-
-  # TODO: THIS NEEDS TO BE CLEANED UP
-    case "#{new_resource.platform}" in 
-      "centos"|"rhel")
-        chroot $guest_root mkdir -p $TMP_DIR
-        chroot $guest_root curl --fail http://packages.vmware.com/tools/keys/VMWARE-PACKAGING-GPG-DSA-KEY.pub -o $TMP_DIR/dsa.pub
-        chroot $guest_root curl --fail http://packages.vmware.com/tools/keys/VMWARE-PACKAGING-GPG-RSA-KEY.pub -o $TMP_DIR/rsa.pub
-        chroot $guest_root rpm --import $TMP_DIR/dsa.pub
-        chroot $guest_root rpm --import $TMP_DIR/rsa.pub
-        cat > $guest_root/etc/yum.repos.d/vmware-tools.repo <<EOF
-[vmware-tools]
-name=VMware Tools
-baseurl=http://packages.vmware.com/tools/esx/5.0/rhel#{node[:rightimage][:platform_version].to_i}/x86_64
-enabled=1
-gpgcheck=1
-EOF
-     chroot $guest_root yum -y clean all
-     chroot $guest_root yum -y install vmware-tools-esx-nox vmware-tools-esx-kmods
-     rm -f $guest_root/etc/yum.repos.d/vmware-tools.repo
-      ;;
-
-    "ubuntu" )
-      # https://help.ubuntu.com/community/VMware/Tools#Installing VMware tools on an Ubuntu guest
-      chroot $guest_root apt-get install -y --no-install-recommends open-vm-dkms
-      chroot $guest_root apt-get install -y --no-install-recommends open-vm-tools
-      ;;
-
-   esac
-    EOH
+    environment(node[:rightimage][:script_env])
+    code "chroot #{guest_root} /tmp/install_vmware_tools.sh"
   end
+
 end
 

@@ -1,0 +1,48 @@
+#!/bin/bash -ex
+
+if [ -z "$BASE_URL" ]; then
+  echo "BASE_URL not set!"
+  exit 1
+fi
+
+if [ ! -e /bin/real-uname ]; then
+  mv /bin/uname /bin/real-uname
+  mv /tmp/fake-uname /bin/uname
+fi
+
+
+kernel_version=$(ls -t /lib/modules|awk '{ printf "%s ", $0 }'|cut -d ' ' -f1-1)
+if which apt-get; then
+  apt-get install -y dkms linux-headers-$kernel_version gcc make fuse-utils
+else
+  for pkg in dkms gcc make fuse fuse-libs kernel-headers; do
+    yum install -y $pkg
+  done
+fi
+
+cd /tmp
+if [ ! -e /tmp/vmware-tools-distrib ]; then 
+  curl --silent --fail $BASE_URL/files/VMwareTools-9.4.0-1280544.gz -o /tmp/vmware-tools-distrib.tar.gz
+  tar zxpf vmware-tools-distrib.tar.gz
+fi
+cd /tmp/vmware-tools-distrib
+
+# this part is kinda hacky -- vmware-install runs vmware-config-tools automatically
+# for us but it fails (without setting the return code properly) since vmware-checkvm
+# says we're not in a vm.  We just go and ahead and add a dummy checkvm command
+# 
+output=$(./vmware-install.pl --default 2>&1)
+
+# vmware-install always lays down
+mv /usr/lib/vmware-tools/sbin64/vmware-checkvm /bin/real-vmware-checkvm
+mv /tmp/fake-vmware-checkvm /usr/lib/vmware-tools/sbin64/vmware-checkvm
+
+/usr/bin/vmware-config-tools.pl --default --skip-stop-start
+
+# We depmod against the host kernel by default - force guest depmod. We also
+# throw lots of FATAL type errors in vmware-config-tools but that's ok, they're
+# not actually fatal
+depmod -a `uname -r`
+
+mv /bin/real-uname /bin/uname
+mv /bin/real-vmware-checkvm /usr/lib/vmware-tools/sbin64/vmware-checkvm
