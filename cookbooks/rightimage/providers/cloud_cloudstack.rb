@@ -10,13 +10,6 @@ action :configure do
     command "chroot #{guest_root} yum -y install iscsi-initiator-utils"
   end
 
-  Chef::Log::info "Add DHCP symlink for RightLink"
-  execute "chroot #{guest_root} ln -s /var/lib/dhcp /var/lib/dhcp3" do
-    only_if { ::File.exists?"#{guest_root}/var/lib/dhcp" }
-    creates "#{guest_root}/var/lib/dhcp3"
-  end
-
-
   bash "configure for cloudstack" do
     flags "-ex" 
     code <<-EOH
