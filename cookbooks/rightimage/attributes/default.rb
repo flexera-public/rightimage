@@ -3,6 +3,7 @@ class Chef::Node
 end
 
 set_unless[:rightimage][:debug] = false
+set_unless[:rightimage][:fixed_password] = "f1xedP@ss1"
 set[:rightimage][:lang] = "en_US.UTF-8"
 set_unless[:rightimage][:root_size_gb] = "10"
 set[:rightimage][:guest_root] = "/mnt/image"
