@@ -19,6 +19,7 @@ if platform_family?("rhel")
     remote_file "/tmp/qemu-common.rpm" do
       source "http://rightscale-rightimage.s3.amazonaws.com/packages/el6/qemu-common-0.12.3-8.el6.x86_64.rpm"
       not_if "which qemu-nbd"
+      backup false
       notifies :install, "package[install qemu common]", :immediately
     end
 
@@ -42,6 +43,7 @@ if platform_family?("rhel")
   remote_file "/tmp/kmod-nbd.rpm" do
     source node[:rightimage][:s3_base_url] + package_path
     not_if { ::File.exists?("/dev/nbd0") }
+    backup false
     notifies :install, "package[install kmod nbd]", :immediately
   end
 
