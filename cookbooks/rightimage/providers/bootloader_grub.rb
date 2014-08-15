@@ -6,13 +6,16 @@ def grub_kernel_options(cloud)
     options_line << " console=hvc0"
   end
 
-  if cloud.to_s == "azure"
+  case cloud.to_s
+  when "azure"
     # Ensure that all SCSI devices mounted in your kernel include an I/O timeout of 300 seconds or more. (w-5331)
     options_line << " rootdelay=300 console=ttyS0"
 
     if new_resource.platform == "centos"
       options_line <<  " numa=off"
     end
+  when "google"
+    options_line <<  " noquiet console=ttyS0,38400n8 loglevel=8"
   end
   options_line
 end
