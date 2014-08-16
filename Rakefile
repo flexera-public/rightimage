@@ -63,6 +63,10 @@ def sts_for_lineage(servertemplate_lineage)
     "v14.0.1" => {
       :st_id => "340232004",
       :repo_id => "241721004"
+    },
+    "peter" => {
+      :st_id => "316429001",
+      :repo_id => "222947001"
     }
   }
   unless ids = lineages[servertemplate_lineage]
@@ -105,11 +109,7 @@ end
 # Default image_tester template - right_image_tester master normally
 # override
 desc "Run RightImage base builders"
-<<<<<<< HEAD
-task :base_build, [:image_version, :mirror_freeze_date] do |t, args|
-=======
-task :base_build, [:servertemplate_lineage] do |t, args|
->>>>>>> v14.0.1
+task :base_build, [:servertemplate_lineage, :mirror_freeze_date] do |t, args|
   upload_url = upload_cookbooks()
   attach_cookbooks(args[:servertemplate_lineage], upload_url)
 
@@ -125,13 +125,9 @@ task :base_build, [:servertemplate_lineage] do |t, args|
     cmd("bundle check || bundle install")
     # Destroy on startup. Servers should be stopped at the end of a the run, though the deployment will
     # linger for debugging purposes
-<<<<<<< HEAD
-    command = "bundle exec generate_ci_collateral base  --build_id #{image_version}-#{current_sha} --lineage v#{lineage} --servertemplate_id #{st_id}"
+    command = "bundle exec generate_ci_collateral base  --build_id #{servertemplate_lineage}-#{current_sha} --lineage v#{lineage} --servertemplate_id #{st_id}"
     command << " --mirror_freeze_date #{args[:mirror_freeze_date]}" if args[:mirror_freeze_date]
     output = cmd(command, echo=false)
-=======
-    output = cmd("bundle exec generate_ci_collateral base  --build_id #{servertemplate_lineage}-#{current_sha} --lineage v#{lineage} --servertemplate_id #{st_id}", echo=false)
->>>>>>> v14.0.1
     ci_collateral_file = /Writing base template to (.*)$/.match(output)[1]
     ci_log_file = ci_collateral_file.sub(".yml",".log")
     cmd("bundle exec image_builder --restart #{ci_collateral_file} --log-file #{ci_log_file} --yes")
