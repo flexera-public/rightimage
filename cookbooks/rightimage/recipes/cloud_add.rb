@@ -42,6 +42,8 @@ rightimage_os node[:rightimage][:platform] do
   action :repo_freeze
 end
 
+execute "yum -c /tmp/yum.conf --installroot=#{guest_root} -y install openssh-clients"
+
 # BEGIN cloud specific additions
 rightimage_hypervisor node[:rightimage][:hypervisor] do
   platform          node[:rightimage][:platform]
@@ -65,7 +67,6 @@ rightimage_cloud node[:rightimage][:cloud] do
 
   action :configure
 end
-
 
 rightimage_bootloader "grub" do
   root guest_root

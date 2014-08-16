@@ -16,7 +16,7 @@ action :install_kernel do
       grep "acpiphp" $guest_root/etc/rc.local
       [ "$?" == "1" ] && echo "/sbin/modprobe acpiphp" >> $guest_root/etc/rc.local
       grep "acpiphp" $guest_root/etc/rc.modules
-      [ "$?" == "2" -o "$?" == "1" ] && echo 'modules acpiphp' > $guest_root/etc/rc.modules
+      [ "$?" == "2" -o "$?" == "1" ] && echo '/sbin/modprobe acpiphp' > $guest_root/etc/rc.modules
       chmod 755 $guest_root/etc/rc.modules
       ;;
     "ubuntu" )
@@ -39,9 +39,15 @@ action :install_kernel do
 
       kernel_version=$(ls -t $guest_root/lib/modules|awk '{ printf "%s ", $0 }'|cut -d ' ' -f1-1)
 
-      rm -f $guest_root/boot/initrd* $guest_root/initrd*
-      chroot $guest_root mkinitrd --with=ata_piix --with=virtio_ring --with=virtio_net --with=virtio_balloon --with=virtio --with=virtio_blk --with=ext3 --with=virtio_pci --with=dm_mirror --with=dm_snapshot --with=dm_zero -v initrd-$kernel_version $kernel_version
-      mv $guest_root/initrd-$kernel_version $guest_root/boot/.
+      if [ #{node[:rightimage][:platform_version].to_i} -le 6 ]; then
+        ramdisk="initrd-${kernel_version}"
+      else
+        ramdisk="initramfs-${kernel_version}.img"
+      fi
+
+      rm -f $guest_root/boot/initr* $guest_root/initr*
+      chroot $guest_root mkinitrd --with=ata_piix --with=virtio_ring --with=virtio_net --with=virtio_balloon --with=virtio --with=virtio_blk --with=virtio_scsi --with=ext3 --with=virtio_pci --with=dm_mirror --with=dm_snapshot --with=dm_zero -v $ramdisk $kernel_version
+      mv $guest_root/$ramdisk $guest_root/boot/.
       ;;
     "ubuntu" )
       ;;

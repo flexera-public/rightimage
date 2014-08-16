@@ -4,11 +4,6 @@ end
 
 action :configure do
 
-  node.override[:rightimage][:grub][:root_device] = "/dev/sda"
-  node.override[:rightimage][:grub][:kernel][:options] = "noquiet earlyprintk=ttyS0 loglevel=8"
-  node.override[:rightimage][:root_mount][:dump] = "1"
-  node.override[:rightimage][:root_mount][:fsck] = "1"
-
   ruby_block "check hypervisor" do
     block do
       raise "ERROR: you must set your hypervisor to kvm!" unless new_resource.hypervisor == "kvm"
@@ -23,13 +18,13 @@ action :configure do
   # See https://github.com/GoogleCloudPlatform/compute-image-packages for google startup
   # scripts for all the various platforms. Prepared the tarball with:
   #   git clone https://github.com/GoogleCloudPlatform/compute-image-packages
-  #   cd compute-image-packages/compute-image-packages
-  #   gtar --exclude etc/rc.local -zcvf ../google-startup-scripts-master-20140718.tar.gz etc lib usr
+  #   cd compute-image-packages/google-startup-scripts
+  #   tar --exclude etc/rc.local -zcvf ../google-startup-scripts-master-20140718.tar.gz etc lib usr
   if (new_resource.platform =~ /centos|rhel/ && new_resource.platform_version.to_f >= 5) || new_resource.platform == "ubuntu"
     # Add google init scripts. All system startup types (upstart, systemd, sysvinit)
     # get extracted, though they will only be used as needed. We still need to 
     remote_file "/tmp/google-startup-scripts.tar.gz" do
-      source "#{node[:rightimage][:s3_base_url]}/files/google-startup-scripts-master-20140718.tar.gz"
+      source "#{node[:rightimage][:s3_base_url]}/files/google-startup-scripts-master-20140731.tar.gz"
       action :create_if_missing
       backup false
     end
@@ -47,7 +42,7 @@ action :configure do
           echo "Installing sysvinit google startup scripts"
           exclusions="--exclude etc/init --exclude usr/lib/systemd"
         fi
-        tar $exclusions -C #{guest_root} -zxvf /tmp/google-startup-scripts.tar.gz
+        tar $exclusions -C #{guest_root}/ -zhxvf /tmp/google-startup-scripts.tar.gz
       EOF
     end
 
@@ -108,7 +103,7 @@ action :configure do
 
       set +e
       # Add metadata alias
-      grep -E 'metadata' /etc/hosts &> /dev/null
+      grep -E 'metadata' $guest_root/etc/hosts &> /dev/null
       if [ "$?" != "0" ]; then
         echo '169.254.169.254 metadata.google.internal metadata' >> $guest_root/etc/hosts
       fi

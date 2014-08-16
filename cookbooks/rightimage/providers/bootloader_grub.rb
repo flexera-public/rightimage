@@ -4,6 +4,9 @@ def grub_kernel_options(cloud)
     options_line << " console=ttyS0"
   elsif new_resource.hypervisor.to_s == "xen"
     options_line << " console=hvc0"
+  elsif (new_resource.platform == "ubuntu" && new_resource.platform_version.to_f >= 14.04) || (new_resource.platform =~ /centos|rhel/ && new_resource.platform_version.to_i >= 7)
+    # http://www.freedesktop.org/wiki/Software/systemd/PredictableNetworkInterfaceNames/
+    options_line << " net.ifnames=0"
   end
 
   case cloud.to_s
@@ -151,7 +154,9 @@ def install_grub_config
     # with changes created by the package manager.  It keeps track of the config file
     # checksums and won't change the file if its been modified, so delete menu.lst
     # entry from the ucf registry to put it back under automatic control
-    execute "sed -i '/menu.lst/d' #{new_resource.root}/var/lib/ucf/registry"
+    execute "sed -i '/menu.lst/d' #{new_resource.root}/var/lib/ucf/registry" do
+      only_if { el6? }
+    end
   end
 
   if grub_package == "grub"

@@ -45,7 +45,15 @@ class Chef
         Chef::Log::info("Creating #{size_gb}GB volume at #{source}")
         loop_device = "#{::LoopbackFs.loopback_device}#{device_num}"
 
-        shell_out! "qemu-img create -f qcow2 #{source} #{size_gb}G"
+        # Detect if compat option exists. https://lists.fedoraproject.org/pipermail/virt/2014-April/004041.html
+        cmd = shell_out!("qemu-img create -f qcow2 -o ? blah.qcow2 | grep 'compat'", {:returns => [0,1]})
+        if cmd.stderr.empty? && (cmd.stdout =~ /compat/)
+          compat="-o compat=0.10"
+        else
+          compat=""
+        end
+
+        shell_out! "qemu-img create -f qcow2 #{compat} #{source} #{size_gb}G"
         create_qemu_nbd(source, device_num)
 
         if partitioned
