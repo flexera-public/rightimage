@@ -96,7 +96,7 @@ attribute "rightimage/region",
 attribute "rightimage/rightlink_repo",
   :display_name => "RightLink Repository",
   :description => "Rightlink repository to use. For adhoc repos, supply the value 'adhoc-NAME', such as adhoc-pete.",
-  :recipes => [ "rightimage::default", "rightimage::build_image", "rightimage::rightscale_rightlink", "rightimage::rebundle", "rightimage::rightscale_install"],
+  :recipes => [ "rightimage::default", "rightimage::build_image", "rightimage::rightscale_rightlink", "rightimage::rebundle", "rightimage::rightscale_install", "rightimage::cloud_add"],
   :choice => [
     "rightlink-beta",
     "rightlink-nightly",
@@ -108,7 +108,7 @@ attribute "rightimage/rightlink_repo",
 attribute "rightimage/rightlink_version",
   :display_name => "RightLink Version",
   :description => "RightLink version to install.",
-  :recipes => [ "rightimage::default", "rightimage::build_image", "rightimage::rightscale_rightlink", "rightimage::rebundle", "rightimage::rightscale_install"],
+  :recipes => [ "rightimage::default", "rightimage::build_image", "rightimage::rightscale_rightlink", "rightimage::rebundle", "rightimage::rightscale_install", "rightimage::cloud_add"],
   :required => true
   
 attribute "rightimage/image_upload_bucket",
