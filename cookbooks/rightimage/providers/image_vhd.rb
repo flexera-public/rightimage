@@ -17,7 +17,11 @@ action :package do
       raise "ERROR: platform #{node[:platform]} not supported. Please feel free to add support ;) "
   end
 
-  vhd_util_deps.each { |p| package p }
+  if platform_family?("rhel")
+    vhd_util_deps.each { |p| yum_package p }
+  else
+    vhd_util_deps.each { |p| package p }
+  end
 
   # Pulled from: https://github.com/citrix-openstack/xenserver-utils/blob/984739db2198fbce23f61a90638b5b70c4bff5a0/blktap2.patch 
   cookbook_file "/tmp/vhd-util-patch" do 
