@@ -33,15 +33,12 @@ action :package do
 end
 
 action :upload do
-
-  raise "Upload not yet implemented."
-
   # add to global id store for use by other recipes
+  Chef::Log.info("Image #{new_resource.image_name} has been uploaded to S3. Image must be manually loaded into the cloud.")
   ruby_block "store id" do
     block do
-    
       id_list = RightImage::IdList.new(Chef::Log)
-      id_list.add(image_id)
+      id_list.add(new_resource.image_name)
     end
   end
 end
