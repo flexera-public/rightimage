@@ -8,8 +8,8 @@ action :package do
 
   case node[:platform]
     when "centos", /redhat/i
-      vhd_util_deps=%w{git ncurses-devel dev86 iasl SDL python-devel libgcrypt-devel uuid-devel openssl-devel glib2-devel yajl-devel texinfo}
-      vhd_util_deps << (el6? ? "libuuid-devel" : "e2fsprogs-devel")
+      vhd_util_deps=%w{git ncurses-devel dev86 iasl SDL python-devel libgcrypt-devel uuid-devel openssl-devel glib2-devel yajl-devel texinfo glibc-devel.i686}
+      vhd_util_deps << ((el? && el_ver >= 6.0) ? "libuuid-devel" : "e2fsprogs-devel")
     when "ubuntu"
       vhd_util_deps=%w{libncurses5-dev bin86 bcc iasl libsdl1.2-dev python-dev libgcrypt11-dev uuid-dev libssl-dev gettext libc6-dev libc6-dev-i386 libyajl-dev texinfo}
       vhd_util_deps << (node[:rightimage][:platform_version].to_f < 12.04 ? "libsdl1.2debian-all" : "libsdl1.2debian")
@@ -17,7 +17,11 @@ action :package do
       raise "ERROR: platform #{node[:platform]} not supported. Please feel free to add support ;) "
   end
 
-  vhd_util_deps.each { |p| package p }
+  if platform_family?("rhel")
+    vhd_util_deps.each { |p| yum_package p }
+  else
+    vhd_util_deps.each { |p| package p }
+  end
 
   # Pulled from: https://github.com/citrix-openstack/xenserver-utils/blob/984739db2198fbce23f61a90638b5b70c4bff5a0/blktap2.patch 
   cookbook_file "/tmp/vhd-util-patch" do 

@@ -18,6 +18,7 @@ ubuntu*)
   ;;
 rhel*|redhat*|centos*)
   # Replacepkgs ensures we don't error on rerun
+  # Note this package isntalls/works on on EL7 as well
   rpm -Uvh --replacepkgs ${BASE_URL}/packages/el6/nodejs-0.8.16-1.x86_64.rpm
   ;;
 *)

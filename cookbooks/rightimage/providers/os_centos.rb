@@ -5,8 +5,8 @@ action :install do
   end
 
   # This allows builds for CentOS on Fedora and other Redhat Enterprise Linux clones.
-  remote_file "/etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-#{node[:rightimage][:platform_version].to_i}" do
-    source "http://mirror.rightscale.com/centos/#{node[:rightimage][:platform_version].to_i}/os/#{node[:rightimage][:arch]}/RPM-GPG-KEY-CentOS-#{node[:rightimage][:platform_version].to_i}"
+  cookbook_file "/etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-#{node[:rightimage][:platform_version].to_i}" do
+    source "RPM-GPG-KEY-CentOS-#{node[:rightimage][:platform_version].to_i}"
     action :create_if_missing
   end
   
@@ -51,6 +51,18 @@ action :install do
     backup false
   end
 
+
+  # Collectd 5 is not currently supported by the RightScale monitoring servers
+  # Pin to previous version from "precise" to avoid issues. These packages are
+  # available from http://mirror.rightscale.com/rightscale_software_ubuntu (w-6281)
+  if el7?
+    package "yum-plugin-versionlock"
+    cookbook_file "/etc/yum/pluginconf.d/versionlock.list" do
+      source "pin_collectd"
+      backup false
+    end
+  end
+
   bash "bootstrap_centos" do 
     flags "-ex"
     code <<-EOF
@@ -69,10 +81,17 @@ action :install do
   yum -c /tmp/yum.conf  --installroot=#{guest_root} --disablerepo=rightscale-epel -y groupinstall Base 
 
   # Shadow file needs to be setup prior install additional packages
-  chroot #{guest_root} authconfig --enableshadow --useshadow --enablemd5 --updateall
+  if [ "#{el7?}" != "true" ]; then
+    # Not working EL7 - TBD figure out why or if we need this still
+    chroot #{guest_root} authconfig --enableshadow --useshadow --enablemd5 --updateall
+  fi
   yum -c /tmp/yum.conf -y clean all
   yum -c /tmp/yum.conf -y makecache
 
+  if [ "#{el7?}" = "true" ]; then
+    yum -c /tmp/yum.conf --installroot=#{guest_root} -y install yum-plugin-versionlock
+    cp /etc/yum/pluginconf.d/versionlock.list #{guest_root}/etc/yum/pluginconf.d/versionlock.list
+  fi
   # Install these one by one... yum install doesn't fail unless every package
   # fails, so grouping them on one lines hides errors
   for p in #{node[:rightimage][:guest_packages].join(" ")}; do
@@ -144,7 +163,9 @@ action :install do
   echo "install pata_acpi /bin/true" >> #{guest_root}/etc/modprobe.d/disable-pata_acpi.conf
     
   # disable IPV6
-  chroot #{guest_root} /sbin/chkconfig ip6tables off
+  if [ #{node[:rightimage][:platform_version].to_i} -lt 7 ]; then
+    chroot #{guest_root} /sbin/chkconfig ip6tables off
+  fi
 
   # Configure NTP - RightLink requires local time to be accurate (w-5025)
   # Enable ntpd on startup
@@ -236,9 +257,11 @@ action :repo_freeze do
 
   mirror_date = mirror_freeze_date[0..7] 
 
+  yum_conf_source = el7? ? "yum-el7-fixed.conf.erb" : "yum.conf.erb"
+
   ["/tmp/yum.conf", "#{repo_dir}/#{el_repo_file}"].each do |location|
     template location do
-      source "yum.conf.erb"
+      source yum_conf_source
       backup false
       variables({
         :bootstrap => true,
@@ -251,9 +274,10 @@ action :repo_freeze do
 end
 
 action :repo_unfreeze do
+  yum_conf_source = el7? ? "yum-el7-fixed.conf.erb" : "yum.conf.erb"
 
   template "#{guest_root}/etc/yum.repos.d/#{el_repo_file}" do
-    source "yum.conf.erb"
+    source yum_conf_source
     backup false
     variables({
       :bootstrap => false,

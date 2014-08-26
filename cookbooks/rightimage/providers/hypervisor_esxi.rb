@@ -14,12 +14,18 @@ action :install_kernel do
         "centos"|"rhel" )
           kernel_version=$(ls -t $guest_root/lib/modules|awk '{ printf "%s ", $0 }'|cut -d ' ' -f1-1)
     
-          rm -f $guest_root/boot/initrd* $guest_root/initrd*
+          if [ #{node[:rightimage][:platform_version].to_i} -le 6 ]; then
+            ramdisk="initrd-${kernel_version}"
+          else
+            ramdisk="initramfs-${kernel_version}.img"
+          fi
+    
+          rm -f $guest_root/boot/initr* $guest_root/initr*
 
           # Now rebuild ramdisk with xen drivers
           chroot $guest_root mkinitrd --with=mptbase --with=mptscsih --with=mptspi --with=scsi_transport_spi --with=ata_piix \
-             --with=ext3 -v initrd-$kernel_version $kernel_version
-          mv $guest_root/initrd-$kernel_version  $guest_root/boot/.
+             --with=ext3 -v $ramdisk $kernel_version
+          mv $guest_root/$ramdisk $guest_root/boot/.
         ;;
         "ubuntu" )
         ;;

@@ -19,48 +19,14 @@
 
 rightscale_marker :begin
 
-el = ((node[:platform] == "centos" || node[:platform] == "redhatenterpriseserver") && node[:platform_version].to_i < 6 )
-grep_bin = (el ? "/tmp/grep/bin/grep" : "grep")
-
 file "/tmp/badfiles" do
   backup false
   action :delete
 end
 
-directory "/tmp/grep" do
-  only_if { el }
-  action :create
-end 
-
-cookbook_file "/tmp/grep/grep.rpm" do
-  only_if { el }
-  source "grep-2.5.3-1.x86_64.rpm"
-  backup false
-end
-
-execute "rpm2cpio /tmp/grep/grep.rpm | cpio -id" do
-  only_if { el }
-  cwd "/tmp/grep"
-  creates "/tmp/grep/bin/grep"
-end
-
-if node[:platform] == "ubuntu" && node[:platform_version].to_f == 14.04
-  remote_file "/tmp/grep.deb" do
-    source "http://mirror.rightscale.com/ubuntu_daily/2014/04/08/pool/main/g/grep/grep_2.10-1_amd64.deb"
-    action :create_if_missing
-  end
-
-  execute "dpkg -i /tmp/grep.deb"
-end
-
 bash "Check for special strings" do
-  flags "-e"
+  flags "-ef"
   code <<-EOH
-# No -x as the script outputs what it's doing
-shopt -s nocasematch
-
-grep_bin=#{grep_bin}
-
 # NOTES: CentOS 5.x ships with grep 2.5.1 which doesn't support --exclude-dir (2.5.3+)
 # egrep doesn't return the matched files for some reason.. using grep -E instead...
 
@@ -110,13 +76,15 @@ skip_files=(
 )
 
 # Ignore this script during the search
-skip_files=( "${skip_files[@]}" "$0" "$0.rb" )
+skip_files=( "${skip_files[@]}" "$0" )
 
-# Prepend --exclude-dir=
-skip_dirs=( "${skip_dirs[@]/#/--exclude-dir=#{node[:rightimage_tester][:root]}}" )
+# Prepend exclusion
+skip_dirs=( "${skip_dirs[@]/#/-not -path #{node[:rightimage_tester][:root]}}" )
+# Append /*
+skip_dirs=( "${skip_dirs[@]/%//*}" )
 
-# Prepend --exclude=
-skip_files=( "${skip_files[@]/#/--exclude=`basename ${skip_files[@]}`}" )
+# Prepend exclusion
+skip_files=( "${skip_files[@]/#/-not -path }" )
 
 echo "Going to search entire file system for $regexp, but \
 ${skip_dirs[@]} ${skip_files[@]}"
@@ -129,9 +97,9 @@ set +ex
 #   skip means that devices, FIFOs and sockets are silently skipped.
 # --binary-files=without-match
 #   assumes that a binary file does not match so skips it.
-$grep_bin -E --ignore-case --files-with-matches --devices=skip \
-      --directories=recurse --no-messages ${skip_dirs[@]} ${skip_files[@]} \
-      --binary-files=without-match --regexp="$regexp" #{node[:rightimage_tester][:root]}/ > /tmp/badfiles
+find #{node[:rightimage_tester][:root]} -type f ${skip_dirs[@]} ${skip_files[@]} -exec grep -E --ignore-case --files-with-matches --devices=skip \
+      --directories=recurse --no-messages  \
+      --binary-files=without-match --regexp="$regexp" {} + > /tmp/badfiles
 [ "$?" == "127" ] && echo "grep didn't run" && exit 1
 
 if [ -s /tmp/badfiles ]; then

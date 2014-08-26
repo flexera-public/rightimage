@@ -1,0 +1,6 @@
+# Collectd 5 is not currently supported by the RightScale monitoring servers
+# Use ported version from CentOS 6 to avoid issues. These packages are
+# available from http://mirror.rightscale.com/rightscale_software/epel
+
+0:collectd-4.10.9-1.el7.*
+0:collectd-rrdtool-4.10.9-1.el7.*

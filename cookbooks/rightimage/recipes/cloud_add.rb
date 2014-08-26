@@ -67,7 +67,6 @@ rightimage_cloud node[:rightimage][:cloud] do
   action :configure
 end
 
-
 rightimage_bootloader "grub" do
   root guest_root
   hypervisor node[:rightimage][:hypervisor]
