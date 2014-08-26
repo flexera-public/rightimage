@@ -4,21 +4,28 @@ def grub_kernel_options(cloud)
     options_line << " console=ttyS0"
   elsif new_resource.hypervisor.to_s == "xen"
     options_line << " console=hvc0"
+  elsif (new_resource.platform == "ubuntu" && new_resource.platform_version.to_f >= 14.04) || (new_resource.platform =~ /centos|rhel/ && new_resource.platform_version.to_i >= 7)
+    # http://www.freedesktop.org/wiki/Software/systemd/PredictableNetworkInterfaceNames/
+    options_line << " net.ifnames=0 biosdevname=0"
   end
 
-  if cloud.to_s == "azure"
+  case cloud.to_s
+  when "azure"
     # Ensure that all SCSI devices mounted in your kernel include an I/O timeout of 300 seconds or more. (w-5331)
     options_line << " rootdelay=300 console=ttyS0"
 
     if new_resource.platform == "centos"
       options_line <<  " numa=off"
     end
+  when "google"
+    options_line <<  " noquiet console=ttyS0,38400n8 loglevel=8"
   end
   options_line
 end
 
 def grub_package
-  if new_resource.platform == "ubuntu"
+  if new_resource.platform == "ubuntu" || 
+    (new_resource.platform =~ /centos|rhel/ && new_resource.platform_version.to_i >= 7)
     "grub2"
   else
     "grub"
@@ -74,7 +81,7 @@ def install_grub_package
       environment({"DEBIAN_FRONTEND"=>"noninteractive"})
     end
   else
-    grub_install = "yum -y install #{grub_package}"
+    execute("yum -y install #{grub_package}")
   end
     
   execute "#{chroot_install} #{grub_package}"
@@ -124,10 +131,11 @@ def install_grub_config
   # then manually reads the menu.lst and uses its contents, so if have grub2 installed 
   # it sort of gets bypassed by pv-grub.  grub-legacy-ec2 is a shim that maintains 
   # the menu.lst in parallel - technically ec2 doesn't even need a bootloader installed
+  # grub-legacy-ec2 is an ubuntu package -- no equivalent for centos 7 (grub2 only) existsq
   if cloud == "ec2" && grub_package == "grub2" && !hvm?
     Chef::Log::info("Installing legacy grub config to /boot/grub/menu.lst for ec2 cloud, kernel options: #{grub_kernel_options(cloud)}")
 
-    execute "#{chroot_install(new_resource.root)} grub-legacy-ec2"
+    execute "#{chroot_install(new_resource.root)} grub-legacy-ec2" if new_resource.platform == "ubuntu"
     template "#{new_resource.root}/boot/grub/menu.lst" do
       source "menu.lst.erb"
       backup false
@@ -146,7 +154,9 @@ def install_grub_config
     # with changes created by the package manager.  It keeps track of the config file
     # checksums and won't change the file if its been modified, so delete menu.lst
     # entry from the ucf registry to put it back under automatic control
-    execute "sed -i '/menu.lst/d' #{new_resource.root}/var/lib/ucf/registry"
+    execute "sed -i '/menu.lst/d' #{new_resource.root}/var/lib/ucf/registry" do
+      only_if { el6? }
+    end
   end
 
   if grub_package == "grub"
@@ -167,15 +177,19 @@ def install_grub_config
         source "sysconfig-kernel.erb"
         backup false
         variables({
-          :kernel => (el6?) ? "kernel" : "kernel-xen"
+          :kernel => (new_resource.platform_version.to_f >= 6.0) ? "kernel" : "kernel-xen"
         })
       end
     end
   else
-    execute "chroot #{new_resource.root} /usr/sbin/update-grub"
+    if new_resource.platform == "ubuntu"
+      execute "chroot #{new_resource.root} /usr/sbin/update-grub"
 
-    # This value is set to /dev/mapper/sdaX when run from the loopback, manually fix up
-    execute "sed -i 's/set root=.*/set root=(hd0,msdos1)/g' #{new_resource.root}/boot/grub/grub.cfg"
+      # This value is set to /dev/mapper/sdaX when run from the loopback, manually fix up
+      execute "sed -i 's/set root=.*/set root=(hd0,msdos1)/g' #{new_resource.root}/boot/grub/grub.cfg"
+    else
+      execute "chroot #{new_resource.root} /usr/sbin/grub2-mkconfig -o /boot/grub2/grub.cfg"
+    end
   end
 end
 
@@ -238,12 +252,8 @@ def install_grub_bootloader
     else
       local_device = new_resource.device
     end
-    bash "setup grub2" do
-      flags "-ex"
-      code <<-EOH
-        grub-install --boot-directory=#{new_resource.root}/boot/ --modules="ext2 part_msdos" #{local_device}
-      EOH
-    end
+    grub_install = new_resource.platform == "ubuntu" ? "grub-install" : "grub2-install"
+    execute "#{grub_install} --boot-directory='#{new_resource.root}/boot/' --modules='ext2 part_msdos' '#{local_device}'"
   end
 end
 

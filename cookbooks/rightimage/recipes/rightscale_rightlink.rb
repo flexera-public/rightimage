@@ -6,6 +6,7 @@ end
 
 class Chef::Resource
   include RightScale::RightImage::Helper
+  include Chef::Mixin::ShellOut
 end
 
 

@@ -66,7 +66,6 @@ rightimage_cloud node[:rightimage][:cloud] do
   action :configure
 end
 
-
 rightimage_bootloader "grub" do
   root guest_root
   hypervisor node[:rightimage][:hypervisor]
@@ -78,10 +77,14 @@ end
 
 # END cloud specific additions
 
-rightimage_os node[:rightimage][:platform] do
-  action :repo_unfreeze
+include_recipe "rightimage::rightscale_install"
+
+# Clean up guest image
+rightimage guest_root do
+  action :sanitize
 end
 
+# Need to keep pre-run cron as close to the end as possible.
 bash "execute crontabs" do
   flags "-ex"
   code <<-EOF
@@ -112,5 +115,12 @@ CHROOT_SCRIPT
   EOF
 end
 
+rightimage_os node[:rightimage][:platform] do
+  action :repo_unfreeze
+end
+
+rightimage guest_root do
+  action :sanitize
+end
 
 rightscale_marker :end

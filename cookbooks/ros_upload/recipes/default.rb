@@ -11,7 +11,7 @@
 
 packages = 
   if platform_family?("debian")
-    %w(libxml2-dev libxslt1-dev rubygems ruby ruby-dev)
+    %w(libxml2-dev libxslt1-dev rubygems1.9.1 ruby1.9.1 ruby1.9.1-dev build-essential)
   else
     %w(libxml2-devel libxslt-devel rubygems ruby ruby-devel)
   end

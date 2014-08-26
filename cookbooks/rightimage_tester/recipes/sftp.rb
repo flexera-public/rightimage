@@ -35,7 +35,7 @@ bash "Verify SFTP" do
     # Test SFTP.
     set -e
     echo "blah" > /tmp/sftptest
-    scp -i /root/.ssh/id_rsa_tester /tmp/sftptest localhost:/tmp/sftptest2
+    scp -o StrictHostKeyChecking=no -i /root/.ssh/id_rsa_tester /tmp/sftptest localhost:/tmp/sftptest2
     set +e
 
     # Should have errored out if an issue, but double-check that file is there.

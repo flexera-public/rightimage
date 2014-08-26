@@ -10,13 +10,6 @@ action :configure do
     command "chroot #{guest_root} yum -y install iscsi-initiator-utils"
   end
 
-  Chef::Log::info "Add DHCP symlink for RightLink"
-  execute "chroot #{guest_root} ln -s /var/lib/dhcp /var/lib/dhcp3" do
-    only_if { ::File.exists?"#{guest_root}/var/lib/dhcp" }
-    creates "#{guest_root}/var/lib/dhcp3"
-  end
-
-
   bash "configure for cloudstack" do
     flags "-ex" 
     code <<-EOH
@@ -101,6 +94,22 @@ action :package do
 end
 
 action :upload do
+  packages =
+    if platform_family?("debian")
+      %w(libxml2-dev rubygems1.9.1 ruby1.9.1-dev zlib1g-dev)
+    else
+      %w(libxml2-devel rubygems ruby-devel)
+    end
+  packages << "gcc"
+  packages << "make"
+
+  packages.each do |pkg|
+    p = package pkg do
+      action :nothing
+    end
+    p.run_action(:install)
+  end
+
   CDC_GEM_VER = "0.0.0"
   CDC_GEM = ::File.join(::File.dirname(__FILE__), "..", "files", "default", "right_cloud_api-#{CDC_GEM_VER}.gem")
   
@@ -113,7 +122,7 @@ action :upload do
   directory tools_temp
 
   remote_file "#{tools_temp}/rightimage_tools.tgz" do
-    source "#{node[:rightimage][:s3_base_url]}/files/rightimage_tools_0.7.5.tar.gz"
+    source "#{node[:rightimage][:s3_base_url]}/files/rightimage_tools_0.7.6.tar.gz"
     action :create_if_missing
   end
 
@@ -132,7 +141,9 @@ action :upload do
 
       options = {}
       options[:endpoint] = node[:rightimage][:cloudstack][:cdc_url]
+      options[:featured] = "true"
       options[:name]     = "#{new_resource.image_name}_#{new_resource.hypervisor.upcase}"
+      options[:public]   = "true"
       options[:source]   = image_url
       options[:zone_id]  = node[:rightimage][:datacenter]
 

@@ -1,6 +1,6 @@
 
 action :package do
-  qemu_package = el6? ? "qemu-img" : "qemu"
+  qemu_package = (el? && el_ver >= 6.0) ? "qemu-img" : "qemu"
   package qemu_package
 
   bash "package image" do 

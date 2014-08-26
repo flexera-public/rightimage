@@ -166,7 +166,7 @@ module RightScale
       end
 
       def mounted?(dir = target_raw_root)
-        `mount`.grep(/#{dir}/).any?
+        `mount`.lines.grep(/#{dir}/).any?
       end
 
       def cloud_credentials(cloud_type = node[:rightimage][:cloud])
@@ -268,8 +268,16 @@ module RightScale
         centos? || rhel?
       end
 
+      def el_ver
+        node[:rightimage][:platform_version].to_f
+      end
+
       def el6?
-        (centos? || rhel?) and node[:platform_version].to_f >= 6.0
+        (centos? || rhel?) && el_ver.between?(6.0,6.99)
+      end
+
+      def el7?
+        (centos? || rhel?) && el_ver.between?(7.0,7.99)
       end
 
       def el_repo_file
@@ -281,8 +289,8 @@ module RightScale
       end
 
       def epel_key_name
-        if node[:rightimage][:platform_version].to_i >= 6.0
-          "-#{node[:rightimage][:platform_version][0].chr}"
+        if node[:rightimage][:platform_version].to_i >= 6
+          "-#{node[:rightimage][:platform_version].to_i}"
         else
           ""
         end

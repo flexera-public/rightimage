@@ -31,11 +31,6 @@ include_recipe "rightimage::loopback_resize"
 include_recipe "rightimage::loopback_mount"
 include_recipe "rightimage::clean"
 include_recipe "rightimage::cloud_add"
-include_recipe "rightimage::rightscale_install"
-# Clean up guest image
-rightimage guest_root do
-  action :sanitize
-end
 include_recipe "rightimage::image_tests"
 include_recipe "rightimage::loopback_unmount"
 include_recipe "rightimage::cloud_package"

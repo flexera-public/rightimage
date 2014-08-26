@@ -2,7 +2,7 @@ maintainer       "RightScale, Inc."
 maintainer_email "support@rightscale.com"
 name             "rightimage"
 description      "A cookbook for building RightImages"
-version          "14.0.14"
+version          "14.1.0"
 license          "Apache v2.0"
 
 depends "ros_upload"
@@ -72,7 +72,7 @@ attribute "rightimage/platform",
 attribute "rightimage/platform_version",
   :display_name => "Guest OS Version",
   :description => "The OS version to build into the virtual image.",
-  :choice => [ "6.3", "6.4", "6.5", "12.04", "14.04" ],
+  :choice => [ "6.3", "6.4", "6.5", "7.0", "12.04", "14.04" ],
   :required => "optional"
  
 attribute "rightimage/arch",
