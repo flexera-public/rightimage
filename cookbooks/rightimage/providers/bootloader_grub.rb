@@ -6,7 +6,7 @@ def grub_kernel_options(cloud)
     options_line << " console=hvc0"
   elsif (new_resource.platform == "ubuntu" && new_resource.platform_version.to_f >= 14.04) || (new_resource.platform =~ /centos|rhel/ && new_resource.platform_version.to_i >= 7)
     # http://www.freedesktop.org/wiki/Software/systemd/PredictableNetworkInterfaceNames/
-    options_line << " net.ifnames=0"
+    options_line << " net.ifnames=0 biosdevname=0"
   end
 
   case cloud.to_s
