@@ -24,7 +24,7 @@ action :configure do
     # Add google init scripts. All system startup types (upstart, systemd, sysvinit)
     # get extracted, though they will only be used as needed. We still need to 
     remote_file "/tmp/google-startup-scripts.tar.gz" do
-      source "#{node[:rightimage][:s3_base_url]}/files/google-startup-scripts-master-20140731.tar.gz"
+      source "#{node[:rightimage][:s3_base_url]}/files/google-startup-scripts-v1.1.6.tar.gz"
       action :create_if_missing
       backup false
     end
@@ -189,6 +189,7 @@ action :upload do
         "--project=#{node[:rightimage][:google][:project_id]}"
       Chef::Log.info("Running command: #{command}")
       `#{command}`
+      raise "Registration failed" unless $?.success?
     end
   end
 
