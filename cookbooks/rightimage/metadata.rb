@@ -96,7 +96,7 @@ attribute "rightimage/region",
 attribute "rightimage/rightlink_repo",
   :display_name => "RightLink Repository",
   :description => "Rightlink repository to use. For adhoc repos, supply the value 'adhoc-NAME', such as adhoc-pete.",
-  :recipes => [ "rightimage::default", "rightimage::build_image", "rightimage::rightscale_rightlink", "rightimage::rebundle", "rightimage::rightscale_install"],
+  :recipes => [ "rightimage::default", "rightimage::build_image", "rightimage::rightscale_rightlink", "rightimage::rebundle", "rightimage::rightscale_install", "rightimage::cloud_add"],
   :choice => [
     "rightlink-beta",
     "rightlink-nightly",
@@ -108,7 +108,7 @@ attribute "rightimage/rightlink_repo",
 attribute "rightimage/rightlink_version",
   :display_name => "RightLink Version",
   :description => "RightLink version to install.",
-  :recipes => [ "rightimage::default", "rightimage::build_image", "rightimage::rightscale_rightlink", "rightimage::rebundle", "rightimage::rightscale_install"],
+  :recipes => [ "rightimage::default", "rightimage::build_image", "rightimage::rightscale_rightlink", "rightimage::rebundle", "rightimage::rightscale_install", "rightimage::cloud_add"],
   :required => true
   
 attribute "rightimage/image_upload_bucket",
@@ -145,9 +145,15 @@ attribute "rightimage/rebundle_git_revision",
 
 attribute "rightimage/debug",
   :display_name => "Development Image?",
-  :description => "If set, a random root password will be set for debugging purposes. NOTE: you must include 'Dev' in the image name or the build with fail.",
-  :choice => [ "true", "false" ],
+  :description => "If true, a random root password will be set for debugging purposes. If 'fixed_password', will set root password to rightimage/fixed_password, default 'rightcale11'. NOTE: you must include 'Dev' in the image name or the build with fail.",
+  :choice => [ "true", "fixed_password", "false" ],
   :default => "false",
+  :required => "optional"
+
+attribute "rightimage/fixed_password",
+  :display_name => "Fixed root password",
+  :description => "Fixed password to use if rightimage/debug is set to 'fixed_password'",
+  :default => "f1xedP@ss1",
   :required => "optional"
 
 attribute "rightimage/mirror_freeze_date",

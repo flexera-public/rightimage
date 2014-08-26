@@ -36,7 +36,8 @@ template "#{guest_root}/etc/fstab" do
   backup false
 end
 
-include_recipe "rightimage::enable_debug" if node[:rightimage][:debug] == "true"
+include_recipe "rightimage::enable_debug" if ["true", "fixed_password"].include?(node[:rightimage][:debug])
+
 
 rightimage_os node[:rightimage][:platform] do
   action :repo_freeze

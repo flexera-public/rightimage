@@ -13,7 +13,12 @@ fi
 
 kernel_version=$(ls -t /lib/modules|awk '{ printf "%s ", $0 }'|cut -d ' ' -f1-1)
 if which apt-get; then
-  apt-get install -y dkms linux-headers-$kernel_version gcc make fuse-utils
+  apt-get install -y dkms linux-headers-$kernel_version gcc make
+  if apt-cache show fuse-utils; then 
+    apt-get install -y fuse-utils
+  else
+    apt-get install -y fuse
+  fi
 else
   for pkg in dkms gcc make fuse fuse-libs kernel-headers; do
     yum install -y $pkg
