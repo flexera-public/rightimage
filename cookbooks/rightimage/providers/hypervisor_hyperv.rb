@@ -45,7 +45,7 @@ action :install_tools do
         chroot $guest_root apt-get -y -o Dpkg::Options::="--force-confold" install walinuxagent
         ;;
       "centos"|"rhel")
-        chroot $guest_root yum -y install #{node[:rightimage][:s3_base_url]}/files/WALinuxAgent-2.0.5-1.noarch.rpm
+        chroot $guest_root yum -y install #{node[:rightimage][:s3_base_url]}/files/WALinuxAgent-2.0.8-1.noarch.rpm
         ;;
       esac
     EOH
