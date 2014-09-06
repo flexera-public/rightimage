@@ -1,6 +1,6 @@
 # Requirement of gem
 if [ `lsb_release -is` == "Ubuntu" ]; then
-  apt-get -y install rubygems ruby ruby-dev
+  apt-get -y install rubygems1.9.1 ruby1.9.1-dev
 else
   yum -y install rubygems ruby ruby-devel
 fi
