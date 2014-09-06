@@ -22,10 +22,10 @@ action :package do
     EOH
   end
 
-  cookbook_file "/tmp/ovftool.sh" do
-    cookbook 'rightimage' # Shared with image_vmdk
-    source "VMware-ovftool-2.0.1-260188-lin.x86_64.sh"
+  remote_file "/tmp/ovftool.sh" do
+    source "#{node[:rightimage][:s3_base_url]}/files/VMware-ovftool-2.0.1-260188-lin.x86_64.sh"
     mode "0744"
+    action :create_if_missing
   end
 
   bash "Install ovftools" do
