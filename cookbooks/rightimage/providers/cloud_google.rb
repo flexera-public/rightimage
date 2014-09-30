@@ -81,6 +81,13 @@ action :configure do
     raise "Unsupported platform/version combination #{new_resource.platform} #{new_resource.platform_version}"
   end
 
+  cookbook_file "#{guest_root}/etc/dhcp/dhclient.d/gce.sh" do
+    only_if { el7? }
+    source "gce-dhclient-hostname.sh"
+    mode "0700"
+    action :create
+    backup false
+  end
 
   bash "configure for google compute" do
     flags "-ex" 
