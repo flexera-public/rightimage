@@ -96,6 +96,11 @@ action :configure do
       "centos"|"rhel")
         # enable console access
         sed -i "s/ACTIVE_CONSOLES=.*/ACTIVE_CONSOLES=\\/dev\\/tty1/" $guest_root/etc/sysconfig/init
+
+        # CentOS 7 on Google requires NetworkManager (w-6307)
+        if [ "#{el7?}" == "true" ]; then
+          chroot $guest_root yum -y install NetworkManager
+        fi
         ;;
       "ubuntu")
         chroot $guest_root apt-get -y install acpid dhcp3-client
