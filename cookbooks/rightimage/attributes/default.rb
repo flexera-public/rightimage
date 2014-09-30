@@ -76,9 +76,9 @@ when "centos","rhel"
       " compat-expat1" +
       " openssl098e"
     else
-      " db4" +
-      " expat" +
-      " openssl"
+      " compat-db47" +
+      " expat-devel" +
+      " openssl098e"
     end
 
   extra_el_packages.split.each do |p|

@@ -28,8 +28,6 @@ if platform_family?("rhel")
       only_if { ::File.exists?("/tmp/qemu-common.rpm") }
       action :nothing
     end
-  elsif node[:platform_version].to_i == 7
-    package "qemu-common"
   end
 end
 

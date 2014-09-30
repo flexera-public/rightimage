@@ -29,6 +29,8 @@ class Chef::Resource::RubyBlock
   include Chef::Mixin::ShellOut
 end
 
+package "e2fsprogs"
+
 rightscale_volume "volume" do
   only_if { node[:rightimage][:volume_size] && !mounted? }
   size node[:rightimage][:volume_size].to_i
