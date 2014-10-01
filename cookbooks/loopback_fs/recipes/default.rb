@@ -6,8 +6,8 @@
 #
 
 packages = value_for_platform(
-  "ubuntu" => {"default" => %w(kpartx qemu-utils)},
-  "default" => %w(qemu-img)
+  "ubuntu" => {"default" => %w(e2fsprogs kpartx parted qemu-utils)},
+  "default" => %w(e2fsprogs parted qemu-img)
 )
 
 packages.each do |p| 
