@@ -1,5 +1,9 @@
 # CHANGES
 
+## 14.1.1
+
+* Add curl_ssl test 
+
 ## 14.1.0
 
 * collectd: Fix syntax error resulting in false positive
