@@ -14,7 +14,7 @@ def grub_kernel_options(cloud)
     # Ensure that all SCSI devices mounted in your kernel include an I/O timeout of 300 seconds or more. (w-5331)
     options_line << " rootdelay=300 console=ttyS0"
 
-    if new_resource.platform == "centos"
+    if new_resource.platform == "centos" && new_resource.platform_version.to_i == 6
       options_line <<  " numa=off"
     end
   when "google"
