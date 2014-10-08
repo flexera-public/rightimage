@@ -96,14 +96,14 @@ if rightimage[:bare_image] == "true"
   # set base os packages
   guest_packages =
   case rightimage[:platform]
-  when "ubuntu" then %w(acpid openssh-clients openssh-server language-selector-common ubuntu-standard)
+  when "ubuntu" then %w(acpid ca-certificates openssh-clients openssh-server language-selector-common ubuntu-standard)
   when "centos", "rhel" then %w(acpid openssh-server openssl dhclient)
   end
 else
   # set base os packages
   guest_packages =
   case rightimage[:platform]
-  when "ubuntu" then %w(rightimage-extras)
+  when "ubuntu" then %w(ca-certificates rightimage-extras)
   when "centos" then %w(rightimage-extras xfsprogs)
   when "rhel" then %w(rightimage-extras)
   end
