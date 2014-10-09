@@ -14,7 +14,7 @@ def grub_kernel_options(cloud)
     # Ensure that all SCSI devices mounted in your kernel include an I/O timeout of 300 seconds or more. (w-5331)
     options_line << " rootdelay=300 console=ttyS0"
 
-    if new_resource.platform == "centos"
+    if new_resource.platform == "centos" && new_resource.platform_version.to_i == 6
       options_line <<  " numa=off"
     end
   when "google"
@@ -170,17 +170,6 @@ def install_grub_config
       command "chroot #{new_resource.root} ln -s /boot/grub/menu.lst /boot/grub/grub.conf"
       creates "#{new_resource.root}/boot/grub/grub.conf"
     end
-
-    # Setup /etc/sysconfig/kernel to allow grub to auto-update grub.conf when updating kernel.
-    if new_resource.platform =~ /centos|rhel|redhat/
-      template "#{new_resource.root}/etc/sysconfig/kernel" do
-        source "sysconfig-kernel.erb"
-        backup false
-        variables({
-          :kernel => (new_resource.platform_version.to_f >= 6.0) ? "kernel" : "kernel-xen"
-        })
-      end
-    end
   else
     if new_resource.platform == "ubuntu"
       execute "chroot #{new_resource.root} /usr/sbin/update-grub"
@@ -191,6 +180,18 @@ def install_grub_config
       execute "chroot #{new_resource.root} /usr/sbin/grub2-mkconfig -o /boot/grub2/grub.cfg"
     end
   end
+
+  # Setup /etc/sysconfig/kernel to allow grub to auto-update grub.conf when updating kernel.
+  if new_resource.platform =~ /centos|rhel|redhat/
+    template "#{new_resource.root}/etc/sysconfig/kernel" do
+      source "sysconfig-kernel.erb"
+      backup false
+      variables({
+        :kernel => (new_resource.platform_version.to_f >= 7.0) ? "kernel-plus" : "kernel"
+      })
+    end
+  end
+
 end
 
 def install_grub_bootloader

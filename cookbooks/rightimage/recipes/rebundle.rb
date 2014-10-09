@@ -28,8 +28,8 @@ module Rebundle
 end
 
 packages = case node[:platform]
-           when "ubuntu" then %w(libxml2-dev libxslt1-dev)
-           when "centos", /redhat/ then %w(libxml2-devel libxslt-devel)
+           when "ubuntu" then %w(git libxml2-dev libxslt1-dev)
+           when "centos", /redhat/ then %w(git libxml2-devel libxslt-devel)
            end 
 
 packages.each { |p| package p }

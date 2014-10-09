@@ -114,9 +114,7 @@ action :install do
     chroot #{guest_root} /sbin/ldconfig -v
 
   else
-    set +e
-    chroot #{guest_root} rpm -e --nodeps yum-plugin-fastestmirror
-    set -e
+    sed -i "s/enabled=1/enabled=0/" #{guest_root}/etc/yum/pluginconf.d/fastestmirror.conf
 
     # Disable ttys
     sed -i "s/ACTIVE_CONSOLES=.*/ACTIVE_CONSOLES=/" #{guest_root}/etc/sysconfig/init

@@ -41,6 +41,9 @@ def upload_cookbooks()
 
     cmd("bundle check || bundle install")
 
+    # Required to update Git-ed references
+    cmd("bundle exec berks update")
+
     upload_config = File.expand_path("~/.rightscale_upload.json")
     unless ::File.exists? upload_config
       raise "No upload config found at #{upload_config}"

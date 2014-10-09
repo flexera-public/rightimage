@@ -6,7 +6,7 @@
 #  yum groupinstall "X Window System" -y
 #fi
 # Installing the virtualbox guest additions
-VBOX_VERSION="4.2.12"
+VBOX_VERSION="4.3.16"
 file=/tmp/VBoxGuestAdditions.iso
 
 if [ `lsb_release -is` == "Ubuntu" ]; then

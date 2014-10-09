@@ -76,9 +76,9 @@ when "centos","rhel"
       " compat-expat1" +
       " openssl098e"
     else
-      " db4" +
-      " expat" +
-      " openssl"
+      " compat-db47" +
+      " expat-devel" +
+      " openssl098e"
     end
 
   extra_el_packages.split.each do |p|
@@ -91,7 +91,7 @@ end
 # set base os packages
 guest_packages =
 case rightimage[:platform]
-when "ubuntu" then %w(acpid openssh-client openssh-server language-selector-common ntp ubuntu-standard rightimage-extras-base)
+when "ubuntu" then %w(acpid ca-certificates openssh-client openssh-server language-selector-common ntp ubuntu-standard rightimage-extras-base)
 when "centos", "rhel" then %w(acpid ntp openssh-clients openssh-server openssl psmisc dhclient rightimage-extras-base)
 end
 set[:rightimage][:guest_packages] = guest_packages

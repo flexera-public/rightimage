@@ -57,9 +57,9 @@ class Chef
         create_qemu_nbd(source, device_num)
 
         if partitioned
-          shell_out "parted -s #{loop_device} mklabel msdos"
-          shell_out "parted -s #{loop_device} mkpart primary ext2 1024k 100% -a minimal"
-          shell_out "parted -s #{loop_device} set 1 boot on"
+          shell_out! "parted -s #{loop_device} mklabel msdos"
+          shell_out! "parted -s #{loop_device} mkpart primary ext2 1024k 100% -a minimal"
+          shell_out! "parted -s #{loop_device} set 1 boot on"
         end
       end
 

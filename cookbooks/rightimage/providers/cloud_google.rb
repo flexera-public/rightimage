@@ -28,6 +28,12 @@ action :configure do
       action :create_if_missing
       backup false
     end
+    # Install Google Daemon (w-6306)
+    remote_file "/tmp/google-daemon.tar.gz" do
+      source "#{node[:rightimage][:s3_base_url]}/files/google-daemon-1.1.6.tar.gz"
+      action :create_if_missing
+      backup false
+    end
 
     bash "extract google startup scripts" do
       flags "-ex"
@@ -43,6 +49,7 @@ action :configure do
           exclusions="--exclude etc/init --exclude usr/lib/systemd"
         fi
         tar $exclusions -C #{guest_root}/ -zhxvf /tmp/google-startup-scripts.tar.gz
+        tar $exclusions -C #{guest_root}/ -zhxvf /tmp/google-daemon.tar.gz
       EOF
     end
 
@@ -56,10 +63,17 @@ action :configure do
         if [ -x #{guest_root}/bin/systemctl ]; then
           chroot #{guest_root} systemctl enable google-startup-scripts.service
           chroot #{guest_root} systemctl enable google.service
+          chroot #{guest_root} systemctl enable google-accounts-manager.service
+          chroot #{guest_root} systemctl enable google-address-manager.service
         elif [ -x #{guest_root}/sbin/initctl ]; then 
           grep -q 'google-rc-local-has-run' #{guest_root}/etc/rc.local && exit 0
           echo "initctl emit --no-wait google-rc-local-has-run" >> #{guest_root}/etc/rc.local
           chmod 755 #{guest_root}/etc/rc.local
+        else
+          chroot #{guest_root} chkconfig google on
+          chroot #{guest_root} chkconfig google-startup-scripts on
+          chroot #{guest_root} chkconfig google-accounts-manager on
+          chroot #{guest_root} chkconfig google-address-manager on
         fi
       EOF
     end
@@ -67,6 +81,13 @@ action :configure do
     raise "Unsupported platform/version combination #{new_resource.platform} #{new_resource.platform_version}"
   end
 
+  cookbook_file "#{guest_root}/etc/dhcp/dhclient.d/gce.sh" do
+    only_if { el7? }
+    source "gce-dhclient-hostname.sh"
+    mode "0700"
+    action :create
+    backup false
+  end
 
   bash "configure for google compute" do
     flags "-ex" 
@@ -82,6 +103,11 @@ action :configure do
       "centos"|"rhel")
         # enable console access
         sed -i "s/ACTIVE_CONSOLES=.*/ACTIVE_CONSOLES=\\/dev\\/tty1/" $guest_root/etc/sysconfig/init
+
+        # CentOS 7 on Google requires NetworkManager (w-6307)
+        if [ "#{el7?}" == "true" ]; then
+          chroot $guest_root yum -y install NetworkManager
+        fi
         ;;
       "ubuntu")
         chroot $guest_root apt-get -y install acpid dhcp3-client

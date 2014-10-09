@@ -11,6 +11,28 @@ action :install_kernel do
   execute "chroot #{guest_root} apt-get -y install linux-backports-modules-hv-precise-virtual" do
     only_if { node[:rightimage][:platform] == "ubuntu" &&  node[:rightimage][:platform_version] == "12.04" }
   end
+
+  cookbook_file "#{guest_root}/etc/dracut.conf.d/azure.conf" do
+    only_if { el7? }
+    source "dracut-azure.conf"
+    mode "0600"
+    action :create
+    backup false
+  end
+
+  bash "install hyperv ramdisk" do
+    only_if { el7? }
+    flags "-ex"
+    code <<-EOH
+      # Install to guest.
+      guest_root=#{guest_root}
+
+      kernel_version=$(ls -t $guest_root/lib/modules|awk '{ printf "%s ", $0 }'|cut -d ' ' -f1-1)
+
+      # Now rebuild ramdisk with hyper-v drivers
+      chroot $guest_root dracut --force --kver $kernel_version
+    EOH
+  end
 end
 
 action :install_tools do

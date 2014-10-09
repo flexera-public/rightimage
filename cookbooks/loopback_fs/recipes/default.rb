@@ -6,8 +6,8 @@
 #
 
 packages = value_for_platform(
-  "ubuntu" => {"default" => %w(kpartx qemu-utils)},
-  "default" => %w(qemu-img)
+  "ubuntu" => {"default" => %w(e2fsprogs kpartx parted qemu-utils)},
+  "default" => %w(e2fsprogs parted qemu-img)
 )
 
 packages.each do |p| 
@@ -28,8 +28,6 @@ if platform_family?("rhel")
       only_if { ::File.exists?("/tmp/qemu-common.rpm") }
       action :nothing
     end
-  elsif node[:platform_version].to_i == 7
-    package "qemu-common"
   end
 end
 
