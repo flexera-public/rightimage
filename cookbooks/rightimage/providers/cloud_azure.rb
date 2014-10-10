@@ -73,13 +73,6 @@ EOF
 EOH
   end
 
-  # Install Openlogic supplied kernel to support Azure (w-5335)
-  template "#{guest_root}/etc/yum.repos.d/Openlogic.repo" do
-     only_if { node[:rightimage][:platform] == "centos" }
-    source "openlogic.repo.erb"
-    backup false
-  end
-
   bash "configure for azure" do
     flags "-ex"
     code <<-EOH
@@ -94,10 +87,6 @@ EOH
         ;;
       "centos"|"rhel")
         sed -i "s/ACTIVE_CONSOLES=.*/ACTIVE_CONSOLES=\\/dev\\/tty1/" $guest_root/etc/sysconfig/init
-
-        # Install Openlogic supplied kernel to support Azure (w-5335)
-        # Need to be able to give Openlogic repo priority over base kernels.
-        chroot $guest_root yum -y install yum-plugin-priorities
         ;;
       esac
     EOH
