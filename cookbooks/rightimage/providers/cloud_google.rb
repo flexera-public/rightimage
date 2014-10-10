@@ -5,7 +5,7 @@ end
 action :configure do
 
   node.override[:rightimage][:grub][:root_device] = "/dev/sda"
-  node.override[:rightimage][:grub][:kernel][:options] = "noquiet earlyprintk=ttyS0 loglevel=8"
+  node.override[:rightimage][:grub][:kernel][:options] = "noquiet console=ttyS0,38400n8 loglevel=8"
   node.override[:rightimage][:root_mount][:dump] = "1"
   node.override[:rightimage][:root_mount][:fsck] = "1"
 
