@@ -176,24 +176,18 @@ EOH
         echo '169.254.169.254 metadata.google.internal metadata' >> $guest_root/etc/hosts
       fi
       set -e
-
-      # Install Boto (for gsutil)
-      chroot $guest_root easy_install pip==1.4.1
-      chroot $guest_root source /etc/profile && pip install boto==2.19.0
-
-      gcutil=#{node[:rightimage][:google][:gcutil_name]}
-      wget #{node[:rightimage][:s3_base_url]}/files/$gcutil.tar.gz
-      tar zxvf $gcutil.tar.gz -C $guest_root/usr/local
-      rm -rf $guest_root/usr/local/gcutil
-      mv $guest_root/usr/local/$gcutil $guest_root/usr/local/gcutil
-      echo 'export PATH=$PATH:/usr/local/gcutil' > $guest_root/etc/profile.d/gcutil.sh
-
-      # Install GSUtil
-      gsutil=#{node[:rightimage][:google][:gsutil_name]}
-      wget #{node[:rightimage][:s3_base_url]}/files/$gsutil.tar.gz
-      tar zxvf $gsutil.tar.gz -C $guest_root/usr/local
-      echo 'export PATH=$PATH:/usr/local/gsutil' > $guest_root/etc/profile.d/gsutil.sh
     EOH
+  end
+
+  cookbook_file "#{guest_root}/tmp/install_google_tools.sh" do
+    source "install_google_tools.sh"
+    mode "0755"
+    action :create
+    backup false
+  end
+
+  execute "chroot #{guest_root} /tmp/install_google_tools.sh" do
+    environment(node[:rightimage][:script_env])
   end
 end
 
@@ -224,38 +218,15 @@ action :upload do
     %w(python-dev python-setuptools).each {|p| package p}
   end
 
-  # requirement for gsutil
-  bash "install boto" do
-    flags "-ex"
+  cookbook_file "/tmp/install_google_tools.sh" do
+    source "install_google_tools.sh"
+    mode "0755"
+    action :create
+    backup false
+  end
+
+  execute "/tmp/install_google_tools.sh" do
     environment(node[:rightimage][:script_env])
-    code <<-EOF
-      easy_install pip==1.4.1
-      pip install boto==2.19.0
-    EOF
-  end
-
-  bash "install gcutil" do
-    creates "/usr/local/gcutil/gcutil"
-    code <<-EOF
-      gcutil=#{node[:rightimage][:google][:gcutil_name]}
-      wget #{node[:rightimage][:s3_base_url]}/files/$gcutil.tar.gz
-      tar zxvf $gcutil.tar.gz -C /usr/local
-      rm -rf /usr/local/gcutil
-      mv /usr/local/$gcutil /usr/local/gcutil
-      echo 'export PATH=$PATH:/usr/local/gcutil' > /etc/profile.d/gcutil.sh
-      source /etc/profile.d/gcutil.sh
-    EOF
-  end
-
-  bash "install gsutil" do
-    creates "/usr/local/gsutil/gsutil"
-    code <<-EOF
-      gsutil=#{node[:rightimage][:google][:gsutil_name]}
-      wget #{node[:rightimage][:s3_base_url]}/files/$gsutil.tar.gz
-      tar zxvf gsutil.tar.gz -C /usr/local
-      echo 'export PATH=$PATH:/usr/local/gsutil' > /etc/profile.d/gsutil.sh
-      source /etc/profile.d/gsutil.sh
-    EOF
   end
 
   # TBD, replace this block. We use the gsutil/gcutil tools to do this, but we
