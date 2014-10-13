@@ -255,11 +255,9 @@ action :repo_freeze do
 
   mirror_date = mirror_freeze_date[0..7] 
 
-  yum_conf_source = el7? ? "yum-el7-fixed.conf.erb" : "yum.conf.erb"
-
   ["/tmp/yum.conf", "#{repo_dir}/#{el_repo_file}"].each do |location|
     template location do
-      source yum_conf_source
+      source "yum.conf.erb"
       backup false
       variables({
         :bootstrap => true,
@@ -272,10 +270,8 @@ action :repo_freeze do
 end
 
 action :repo_unfreeze do
-  yum_conf_source = el7? ? "yum-el7-fixed.conf.erb" : "yum.conf.erb"
-
   template "#{guest_root}/etc/yum.repos.d/#{el_repo_file}" do
-    source yum_conf_source
+    source "yum.conf.erb"
     backup false
     variables({
       :bootstrap => false,
