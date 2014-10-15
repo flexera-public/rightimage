@@ -45,7 +45,8 @@ else
       # Times 1.15 since we need a little extra space to gzip them, take snapshots, etc
       new_volume_size = (node[:rightimage][:root_size_gb].to_f*1.15).ceil.to_s
       block_device ri_lineage do
-        cloud "ec2"
+        primary_cloud "ec2"
+        hypervisor "xen"
         mount_point target_raw_root
         vg_data_percentage "95"
         max_snapshots "1000"
