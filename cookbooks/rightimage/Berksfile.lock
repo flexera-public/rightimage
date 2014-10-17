@@ -20,14 +20,14 @@
     },
     "rightscale": {
       "locked_version": "13.5.6",
-      "git": "https://github.com/rightscale/rightscale_cookbooks.git",
-      "ref": "3105df25150265c46e7a66b56c89b89770b969ee",
+      "git": "https://github.com/kbockmanrs/rightscale_cookbooks.git",
+      "ref": "7ecd527ee0c5c8171afce839c67db3cae92f1e6e",
       "rel": "cookbooks/rightscale"
     },
     "block_device": {
       "locked_version": "13.5.1",
-      "git": "https://github.com/rightscale/rightscale_cookbooks.git",
-      "ref": "3105df25150265c46e7a66b56c89b89770b969ee",
+      "git": "https://github.com/kbockmanrs/rightscale_cookbooks.git",
+      "ref": "7ecd527ee0c5c8171afce839c67db3cae92f1e6e",
       "rel": "cookbooks/block_device"
     },
     "cloudmonitoring": {
