@@ -4,6 +4,12 @@ def grub_kernel_options(cloud)
     options_line << " console=ttyS0"
   elsif new_resource.hypervisor.to_s == "xen"
     options_line << " console=hvc0"
+
+    # Start device naming from xvda instead of xvde (w-4893)
+    # https://bugzilla.redhat.com/show_bug.cgi?id=729586
+    if new_resource.platform == "centos" && new_resource.platform_version.to_f.between?(6.3,6.99)
+      options_line << " xen_blkfront.sda_is_xvda=1"
+    end
   elsif (new_resource.platform == "ubuntu" && new_resource.platform_version.to_f >= 14.04) || (new_resource.platform =~ /centos|rhel/ && new_resource.platform_version.to_i >= 7)
     # http://www.freedesktop.org/wiki/Software/systemd/PredictableNetworkInterfaceNames/
     options_line << " net.ifnames=0 biosdevname=0"
