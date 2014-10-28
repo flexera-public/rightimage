@@ -1,5 +1,6 @@
 Changes
 -------
+ * 2014-10-27: bump to 14.1.3. More CentOS 7 fixes
  * 2014-10-13: bump to 14.1.2. Remove temporary yum.conf.erb for EPEL
  * 2014-07-15: bump to 14.1.0. Chef 11 compatibility fixes. Support for Ubuntu 14.04, CentOS 7. Updated Google startup scripts to v1.1.6. Pin collectd to v4.
  * 2014-08-15: bump to 14.0.15. enable simple fixed passwords for private clouds such as vSphere.
