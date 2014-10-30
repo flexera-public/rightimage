@@ -1,5 +1,9 @@
 # CHANGES
 
+## 14.1.2
+
+* Add yum-cron to banned packages test
+
 ## 14.1.1
 
 * Add curl_ssl test 
