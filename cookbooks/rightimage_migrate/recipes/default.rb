@@ -136,7 +136,7 @@ ruby_block "Migrate image" do
       when "ebs"
         output = `. /etc/profile && ec2-copy-image --aws-access-key "#{akid}" --aws-secret-key "#{sak}" --source-region "#{source_region}" --source-ami-id "#{image_id}" --region "#{destination_region}"  2>&1`
       when "instance-store"
-        output = `. /etc/profile && ec2-migrate-image --aws-access-key "#{akid}" --aws-secret-key "#{sak}" --owner-akid "#{akid}" --owner-sak "#{sak}" --bucket "#{source_image['bucket']}" --destination-bucket "#{destination_bucket}" --manifest "#{source_image['manifest']}" --acl "aws-exec-read" --region "#{destination_region}" --location "#{destination_region}" 2>&1`
+        output = `. /etc/profile && ec2-migrate-image --aws-access-key "#{akid}" --aws-secret-key "#{sak}" --owner-akid "#{akid}" --owner-sak "#{sak}" --bucket "#{source_image['bucket']}" --destination-bucket "#{destination_bucket}" --manifest "#{source_image['manifest']}" --acl "aws-exec-read" --region "#{destination_region}" --location "#{destination_region}" #{kernel_flag} 2>&1`
         Chef::Log.info(output)
         raise "ec2-migrate-image failed" unless $?.success?
       

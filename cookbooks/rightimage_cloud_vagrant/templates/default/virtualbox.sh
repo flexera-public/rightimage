@@ -20,7 +20,7 @@ if [ ! -f $file ]; then
 fi
 
 if [ ! -f /mnt/VBoxLinuxAdditions.run ]; then
-  [ ! -e /dev/loop1 ] && MAKEDEV loop1
+  [ ! -e /dev/loop1 ] && mknod -m 660 /dev/loop1 b 7 1
   mount -o loop /tmp/VBoxGuestAdditions.iso /mnt
 fi
 

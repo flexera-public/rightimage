@@ -24,7 +24,7 @@ rightimage_tester "Ensure no banned packages installed" do
     "ubuntu" => { "default" => 'dpkg --get-selections' },
     "default" => 'rpm -qa'
   )
-  command "output=$(#{cmd} sendmail mysql php*); [ -z \"$output\" ]"
+  command "output=$(#{cmd} sendmail mysql php* yum-cron); [ -z \"$output\" ]"
   action :test
 end
 
