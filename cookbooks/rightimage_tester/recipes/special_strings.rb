@@ -64,6 +64,7 @@ skip_dirs=(
 /var/lib/gems
 /var/lib/ureadahead
 /usr/local/lib/python2.7/dist-packages/boto
+/usr/local/share/gems
 /opt/rightscale/sandbox/lib/ruby
 /opt/rightscale/right_link/certs
 /opt/rightscale/right_link/lib/instance/cook

@@ -20,9 +20,14 @@ if which apt-get; then
     apt-get install -y fuse
   fi
 else
-  for pkg in dkms gcc make fuse fuse-libs kernel-headers; do
+  for pkg in dkms gcc make fuse fuse-libs; do
     yum install -y $pkg
   done
+  headers="kernel-headers"
+  # kernel-plus-headers conflicts with kernel-headers package, so install the right one
+  # Need to install after dkms since it installs kernel headers
+  rpm -qa "kernel-plus-headers" | grep "^kernel" && headers="kernel-plus-headers"
+  yum install -y $headers
 fi
 
 cd /tmp

@@ -18,7 +18,8 @@ action :configure do
         chroot #{guest_root} apt-get -y install linux-headers-virtual
         ;;
       "centos"|"rhel")
-        chroot #{guest_root} yum -y install iscsi-initiator-utils kernel-devel
+        kernel="#{el_ver >= 7.0 ? 'kernel-plus-devel' : 'kernel-devel'}"
+        chroot #{guest_root} yum -y install iscsi-initiator-utils $kernel
         ;;
       esac
     EOH

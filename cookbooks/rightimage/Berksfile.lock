@@ -28,9 +28,9 @@
       "rel": "cookbooks/rightscale"
     },
     "rightscale_volume": {
-      "locked_version": "1.2.2",
+      "locked_version": "1.2.4",
       "git": "https://github.com/rightscale-cookbooks/rightscale_volume.git",
-      "ref": "c7f27efe976ff9c9d56724c30ab1e0ad7f6626f4"
+      "ref": "a332d6ccd81903b17ef5e75f3cfba67dc5dd32fe"
     }
   }
 }
