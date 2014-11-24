@@ -17,6 +17,9 @@
 # limitations under the License.
 #
 
+key = "/tmp/AWS_X509_KEY.pem"
+cert = "/tmp/AWS_X509_CERT.pem"
+
 # ec2-api-tools are Java based
 bash "install openjdk" do
   flags "-ex"
@@ -47,6 +50,13 @@ bash "install_ec2_tools" do
     rm -r /tmp/ec2-a*
     echo 'export PATH=/home/ec2/bin:${PATH}' >> /etc/profile.d/ec2.sh
     echo 'export EC2_HOME=/home/ec2' >> /etc/profile.d/ec2.sh
+  EOH
+end
+
+bash "Store creds" do
+  code <<-EOH
+    echo "#{node[:rightimage_migrate][:aws_509_key]}" > #{key}
+    echo "#{node[:rightimage_migrate][:aws_509_cert]}" > #{cert}
   EOH
 end
 
@@ -109,6 +119,8 @@ ruby_block "Migrate image" do
     
     if source_image['image_type'] == "instance-store" 
       raise "Destination bucket must be specified for instance store based images" unless destination_bucket
+      raise "AWS x509 Certificate must be supplied for instance store based images" unless node[:rightimage_migrate][:aws_509_cert]
+      raise "AWS x509 Key must be supplied for instance store based images" unless node[:rightimage_migrate][:aws_509_key]
     end
 
     Chef::Log.info("Checking destination region for duplicate image")
@@ -136,7 +148,7 @@ ruby_block "Migrate image" do
       when "ebs"
         output = `. /etc/profile && ec2-copy-image --aws-access-key "#{akid}" --aws-secret-key "#{sak}" --source-region "#{source_region}" --source-ami-id "#{image_id}" --region "#{destination_region}"  2>&1`
       when "instance-store"
-        output = `. /etc/profile && ec2-migrate-image --aws-access-key "#{akid}" --aws-secret-key "#{sak}" --owner-akid "#{akid}" --owner-sak "#{sak}" --bucket "#{source_image['bucket']}" --destination-bucket "#{destination_bucket}" --manifest "#{source_image['manifest']}" --acl "aws-exec-read" --region "#{destination_region}" --location "#{destination_region}" #{kernel_flag} 2>&1`
+        output = `. /etc/profile && ec2-migrate-image --aws-access-key "#{akid}" --aws-secret-key "#{sak}" --private-key "#{key}" --cert "#{cert}" --owner-akid "#{akid}" --owner-sak "#{sak}" --bucket "#{source_image['bucket']}" --destination-bucket "#{destination_bucket}" --manifest "#{source_image['manifest']}" --acl "aws-exec-read" --region "#{destination_region}" --location "#{destination_region}" #{kernel_flag} 2>&1`
         Chef::Log.info(output)
         raise "ec2-migrate-image failed" unless $?.success?
       
