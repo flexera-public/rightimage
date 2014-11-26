@@ -19,6 +19,16 @@ attribute "rightimage_migrate/aws_secret_access_key",
   :description => "AWS Secret Access Key",
   :required => "required"
 
+attribute "rightimage_migrate/aws_509_cert",
+  :display_name => "AWS x509 Cert",
+  :description => "AWS x509 Cert, for instance store based images only",
+  :required => "recommended"
+
+attribute "rightimage_migrate/aws_509_key",
+  :display_name => "AWS x509 Key",
+  :description => "AWS x509 Key, for instance store based images only",
+  :required => "recommended"
+
 attribute "rightimage_migrate/destination_bucket",
   :display_name => "AWS S3 Destination Bucket",
   :description => "AWS S3 Destination Bucket, for instance store based images only",
