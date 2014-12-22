@@ -154,11 +154,12 @@ action :upload do
 
       openstack_user = node[:rightimage][:openstack][:user]
       openstack_password = node[:rightimage][:openstack][:password]
+      openstack_tenant = node[:rightimage][:openstack][:tenant]
       openstack_host = node[:rightimage][:openstack][:hostname].split(":")[0].sub(/http(s)?:\/\//,"")
       openstack_api_port = node[:rightimage][:openstack][:hostname].split(":")[1] || "5000"
 
       # Don't use location=file://path/to/file like you might think, thats the name of the location to store the file on the server that hosts the images, not this machine
-      auth_property = "--os-username '#{openstack_user}' --os-password '#{openstack_password}' --os-auth-url http://#{openstack_host}:#{openstack_api_port}/v2.0 --os-tenant-name #{openstack_user}"
+      auth_property = "--os-username '#{openstack_user}' --os-password '#{openstack_password}' --os-auth-url http://#{openstack_host}:#{openstack_api_port}/v2.0 --os-tenant-name #{openstack_tenant}"
       cmd = %Q(env PATH=$PATH:/usr/local/bin glance #{auth_property} image-create --name #{image_name} --is-public True --disk-format qcow2 --container-format bare --copy-from #{image_url})
       Chef::Log.info "Executing command: "
       Chef::Log.info cmd

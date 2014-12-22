@@ -15,6 +15,7 @@ recipe "rightimage_tester::banned_packages", "Ensure no banned packages installe
 recipe "rightimage_tester::bashrc", "Ensure bashrc is sourced."
 recipe "rightimage_tester::blank_passwords", "Ensure no blank passwords."
 recipe "rightimage_tester::crontab", "Check crontab configuration."
+recipe "rightimage_tester::curl_ssl", "Verify curl SSL."
 recipe "rightimage_tester::dependencies", "Ensure dependencies are installed."
 recipe "rightimage_tester::dupe_mounts", "Check for duplicate mounts."
 recipe "rightimage_tester::ephemeral", "Ensure ephemeral drive mounted."

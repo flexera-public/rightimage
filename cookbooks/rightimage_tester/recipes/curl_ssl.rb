@@ -1,8 +1,8 @@
 #
 # Cookbook Name:: rightimage_tester
-# Recipe:: packages
+# Recipe:: curl_ssl 
 #
-# Copyright 2011, RightScale, Inc.
+# Copyright 2014, RightScale, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,14 +19,9 @@
 
 rightscale_marker :begin
 
-rightimage_tester "Verify packages install" do
-  cmd = value_for_platform(
-    "centos" => { "default" => 'yum install -y emacs' },
-    "redhat" => { "default" => 'yum install -y yum-plugin-changelog' },
-    "ubuntu" => { "default" => 'apt-get clean && apt-get update && apt-get install -y nmap' },
-    "default" => "echo \"OS #{node[:platform]} not supported.\" && exit 1"
-  )
-  command cmd
+rightimage_tester "Verify curl SSL" do
+  command "curl --head --silent --output /dev/null https://www.google.com"
   action :test
 end
+
 rightscale_marker :end

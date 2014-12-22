@@ -5,7 +5,7 @@ end
 action :configure do
 
   node.override[:rightimage][:grub][:root_device] = "/dev/sda"
-  node.override[:rightimage][:grub][:kernel][:options] = "noquiet earlyprintk=ttyS0 loglevel=8"
+  node.override[:rightimage][:grub][:kernel][:options] = "noquiet console=ttyS0,38400n8 loglevel=8"
   node.override[:rightimage][:root_mount][:dump] = "1"
   node.override[:rightimage][:root_mount][:fsck] = "1"
 
@@ -78,42 +78,63 @@ EOF
 EOH
   end
 
+  # See https://github.com/GoogleCloudPlatform/compute-image-packages for google startup
+  # scripts for all the various platforms. Prepared the tarball with:
+  #   git clone https://github.com/GoogleCloudPlatform/compute-image-packages
+  #   cd compute-image-packages/google-startup-scripts
+  #   tar --exclude etc/rc.local -zcvf ../google-startup-scripts-master-20140718.tar.gz etc lib usr
   if (new_resource.platform =~ /centos|rhel/ && new_resource.platform_version.to_f >= 6) || new_resource.platform == "ubuntu"
-    # Add google init script for centos (6+ only) / ubuntu
-    cookbook_file "#{guest_root}/etc/init/google.conf" do
-      source "google.conf"
-      owner "root"
-      group "root"
-      mode "0755"
-      action :create
+    # Add google init scripts. All system startup types (upstart, systemd, sysvinit)
+    # get extracted, though they will only be used as needed. We still need to
+    remote_file "/tmp/google-startup-scripts.tar.gz" do
+      source "#{node[:rightimage][:s3_base_url]}/files/google-startup-scripts-v1.1.6.tar.gz"
+      action :create_if_missing
       backup false
     end
-    cookbook_file "#{guest_root}/etc/init/google_run_startup_scripts.conf" do
-      source "google_run_startup_scripts.conf"
-      owner "root"
-      group "root"
-      mode "0755"
-      action :create
-      backup false
+
+    bash "extract google startup scripts" do
+      flags "-ex"
+      code <<-EOF
+        if [ -x #{guest_root}/bin/systemctl ]; then
+          echo "Installing systemd google startup scripts"
+          exclusions="--exclude etc/init.d --exclude etc/init"
+        elif [ -x #{guest_root}/sbin/initctl ]; then
+          echo "Installing upstart google startup scripts"
+          exclusions="--exclude etc/init.d --exclude usr/lib/systemd"
+        else
+          echo "Installing sysvinit google startup scripts"
+          exclusions="--exclude etc/init --exclude usr/lib/systemd"
+        fi
+        tar $exclusions -C #{guest_root}/ -zhxvf /tmp/google-startup-scripts.tar.gz
+      EOF
     end
-    # implement support for disk path aliases (w-5221)
-    cookbook_file "#{guest_root}/lib/udev/rules.d/65-gce-disk-naming.rules" do
-      source "google_disk_naming_rules"
-      owner "root"
-      group "root"
-      backup false
+
+    # Add the needed upstart job emission to /etc/rc.local, conditional on upstart
+    # being present, but only if it's not already in the file. stolen from the .rpm
+    # postinstall scriptlet
+    # Note that this comes after and appends the /etc/rc.local written in KVM provider
+    bash "finish google startup scripts installation" do
+      flags "-ex"
+      code <<-EOF
+        if [ -x #{guest_root}/bin/systemctl ]; then
+          chroot #{guest_root} systemctl enable google-startup-scripts.service
+          chroot #{guest_root} systemctl enable google.service
+          chroot #{guest_root} systemctl enable google-accounts-manager.service
+          chroot #{guest_root} systemctl enable google-address-manager.service
+        elif [ -x #{guest_root}/sbin/initctl ]; then
+          grep -q 'google-rc-local-has-run' #{guest_root}/etc/rc.local && exit 0
+          echo "initctl emit --no-wait google-rc-local-has-run" >> #{guest_root}/etc/rc.local
+          chmod 755 #{guest_root}/etc/rc.local
+        else
+          chroot #{guest_root} chkconfig google on
+          chroot #{guest_root} chkconfig google-startup-scripts on
+          chroot #{guest_root} chkconfig google-accounts-manager on
+          chroot #{guest_root} chkconfig google-address-manager on
+        fi
+      EOF
     end
   else
     raise "Unsupported platform/version combination #{new_resource.platform} #{new_resource.platform_version}"
-  end
-
-  cookbook_file "#{temp_root}/google.tgz" do
-    source "google.tgz"
-    action :create
-    backup false
-  end
-  bash "untar google helper and startup scripts" do
-    code "tar zxvf #{temp_root}/google.tgz -C #{guest_root}/usr/share"
   end
 
   bash "configure for google compute" do
@@ -148,13 +169,6 @@ EOH
         ;;
       esac
 
-      # Emit signal to run google_run_startup_scripts
-      # Note that this comes after and replaces the /etc/rc.local written in KVM provider
-      # will not work centos 5
-      echo '#!/bin/bash' > $guest_root/etc/rc.local
-      echo 'initctl emit --no-wait google-rc-local-has-run' >> $guest_root/etc/rc.local
-      chmod 755 $guest_root/etc/rc.local
-
       set +e
       # Add metadata alias
       grep -E 'metadata' /etc/hosts &> /dev/null
@@ -162,24 +176,18 @@ EOH
         echo '169.254.169.254 metadata.google.internal metadata' >> $guest_root/etc/hosts
       fi
       set -e
-
-      # Install Boto (for gsutil)
-      chroot $guest_root easy_install pip==1.4.1
-      chroot $guest_root source /etc/profile && pip install boto==2.19.0
-
-      gcutil=#{node[:rightimage][:google][:gcutil_name]}
-      wget #{node[:rightimage][:s3_base_url]}/files/$gcutil.tar.gz
-      tar zxvf $gcutil.tar.gz -C $guest_root/usr/local
-      rm -rf $guest_root/usr/local/gcutil
-      mv $guest_root/usr/local/$gcutil $guest_root/usr/local/gcutil
-      echo 'export PATH=$PATH:/usr/local/gcutil' > $guest_root/etc/profile.d/gcutil.sh
-
-      # Install GSUtil
-      gsutil=#{node[:rightimage][:google][:gsutil_name]}
-      wget #{node[:rightimage][:s3_base_url]}/files/$gsutil.tar.gz
-      tar zxvf $gsutil.tar.gz -C $guest_root/usr/local
-      echo 'export PATH=$PATH:/usr/local/gsutil' > $guest_root/etc/profile.d/gsutil.sh
     EOH
+  end
+
+  cookbook_file "#{guest_root}/tmp/install_google_tools.sh" do
+    source "install_google_tools.sh"
+    mode "0755"
+    action :create
+    backup false
+  end
+
+  execute "chroot #{guest_root} /tmp/install_google_tools.sh" do
+    environment(node[:rightimage][:script_env])
   end
 end
 
@@ -210,38 +218,15 @@ action :upload do
     %w(python-dev python-setuptools).each {|p| package p}
   end
 
-  # requirement for gsutil
-  bash "install boto" do
-    flags "-ex"
+  cookbook_file "/tmp/install_google_tools.sh" do
+    source "install_google_tools.sh"
+    mode "0755"
+    action :create
+    backup false
+  end
+
+  execute "/tmp/install_google_tools.sh" do
     environment(node[:rightimage][:script_env])
-    code <<-EOF
-      easy_install pip==1.4.1
-      pip install boto==2.19.0
-    EOF
-  end
-
-  bash "install gcutil" do
-    creates "/usr/local/gcutil/gcutil"
-    code <<-EOF
-      gcutil=#{node[:rightimage][:google][:gcutil_name]}
-      wget #{node[:rightimage][:s3_base_url]}/files/$gcutil.tar.gz
-      tar zxvf $gcutil.tar.gz -C /usr/local
-      rm -rf /usr/local/gcutil
-      mv /usr/local/$gcutil /usr/local/gcutil
-      echo 'export PATH=$PATH:/usr/local/gcutil' > /etc/profile.d/gcutil.sh
-      source /etc/profile.d/gcutil.sh
-    EOF
-  end
-
-  bash "install gsutil" do
-    creates "/usr/local/gsutil/gsutil"
-    code <<-EOF
-      gsutil=#{node[:rightimage][:google][:gsutil_name]}
-      wget #{node[:rightimage][:s3_base_url]}/files/$gsutil.tar.gz
-      tar zxvf gsutil.tar.gz -C /usr/local
-      echo 'export PATH=$PATH:/usr/local/gsutil' > /etc/profile.d/gsutil.sh
-      source /etc/profile.d/gsutil.sh
-    EOF
   end
 
   # TBD, replace this block. We use the gsutil/gcutil tools to do this, but we
