@@ -74,7 +74,8 @@ def restore_ebs_snapshot
   # than that it'll error out with an exception.
   new_volume_size = 12 if new_volume_size < 12
   block_device ri_lineage do
-    cloud "ec2"
+    primary_cloud "ec2"
+    hypervisor "xen"
     lineage ri_lineage
     mount_point target_raw_root
     vg_data_percentage "95"

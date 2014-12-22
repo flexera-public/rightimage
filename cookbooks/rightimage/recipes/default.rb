@@ -40,6 +40,13 @@ packages.each do |p|
   package p
 end
 
+# Install prereq so you don't auto-resolve to mime-types 2.0, which is ruby 1.9 only
+gem_package "mime-types" do
+  gem_binary "/usr/bin/gem"
+  version "1.18.0"
+  action :install
+end
+
 gem_package "fog" do
   gem_binary "/usr/bin/gem"
   version "1.5.0"

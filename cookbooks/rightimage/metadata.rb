@@ -87,7 +87,7 @@ attribute "rightimage/platform",
 attribute "rightimage/platform_version",
   :display_name => "Guest OS Version",
   :description => "The OS version to build into the virtual image.",
-  :choice => [ "5.4", "5.6", "5.8", "6.2", "6.3", "6.4", "10.04", "10.10", "12.04" ],
+  :choice => [ "5.4", "5.6", "5.8", "6.2", "6.3", "6.4", "6.5", "10.04", "10.10", "12.04" ],
   :required => "optional"
  
 attribute "rightimage/arch",
@@ -346,6 +346,13 @@ attribute "rightimage/openstack/user",
 attribute "rightimage/openstack/password",
   :display_name => "Openstack Password",
   :description => "Password for user to access API of Openstack Cloud Controller.",
+  :required => "optional",
+  :default => "",
+  :recipes => [ "rightimage::cloud_upload" ]
+
+attribute "rightimage/openstack/tenant",
+  :display_name => "Openstack Tenant",
+  :description => "Tenant ID for Openstack project.",
   :required => "optional",
   :default => "",
   :recipes => [ "rightimage::cloud_upload" ]
