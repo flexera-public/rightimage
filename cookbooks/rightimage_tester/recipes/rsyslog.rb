@@ -20,7 +20,7 @@
 rightscale_marker :begin
 
 rightimage_tester "Verify rsyslog config" do
-  command "count=$(grep '$IncludeConfig /etc/rsyslog.d/\*.conf' /etc/rsyslog.conf |wc -l); [ $count -le 0] "
+  command "count=$(grep -e \"^\\$IncludeConfig /etc/rsyslog.d/\\*.conf\" /etc/rsyslog.conf | wc -l); echo $count; [ $count -le 1 ]"
   action :test
 end
 
