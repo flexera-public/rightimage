@@ -3,7 +3,7 @@ maintainer_email "support@rightscale.com"
 name             "rightimage_tester"
 description      "A cookbook for testing RightImages"
 license          "Apache v2.0"
-version          "13.5.4"
+version          "13.5.5"
 
 depends "rightscale"
 
@@ -35,6 +35,7 @@ recipe "rightimage_tester::rackconnect", "Check for Rackspace Rackconnect automa
 recipe "rightimage_tester::reboot", "Ensure instance reboots."
 recipe "rightimage_tester::resolvconf", "Verify resolvconf tail empty."
 recipe "rightimage_tester::rightlink_core", "Ensure no RightLink core files."
+recipe "rightimage_tester::rsyslog", "Verify rsyslog config."
 recipe "rightimage_tester::rubygems", "Check rubygems installation."
 recipe "rightimage_tester::selinux", "Ensure SELinux is disabled."
 recipe "rightimage_tester::special_strings","Check for special strings."
