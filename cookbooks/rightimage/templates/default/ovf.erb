@@ -19,7 +19,7 @@
     <OperatingSystemSection ovf:id="100" ovf:version="5" vmw:osType="<%= @ovf_ostype %>">
       <Info>The kind of installed guest operating system</Info>
     </OperatingSystemSection>
-    <VirtualHardwareSection>
+    <VirtualHardwareSection ovf:transport="com.vmware.guestInfo">
       <Info>Virtual hardware requirements</Info>
       <System>
         <vssd:ElementName>Virtual Hardware Family</vssd:ElementName>

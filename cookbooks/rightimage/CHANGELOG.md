@@ -1,5 +1,6 @@
 Changes
 -------
+ * 2014-12-04: bump to 14.1.4. Enable guestinfo on VMware
  * 2014-10-27: bump to 14.1.3. More CentOS 7 fixes
  * 2014-10-13: bump to 14.1.2. Remove temporary yum.conf.erb for EPEL
  * 2014-07-15: bump to 14.1.0. Chef 11 compatibility fixes. Support for Ubuntu 14.04, CentOS 7. Updated Google startup scripts to v1.1.6. Pin collectd to v4.
