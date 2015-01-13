@@ -129,7 +129,7 @@ task :base_build, [:servertemplate_lineage, :mirror_freeze_date] do |t, args|
     # Destroy on startup. Servers should be stopped at the end of a the run, though the deployment will
     # linger for debugging purposes
     command = "bundle exec generate_ci_collateral base  --build_id #{servertemplate_lineage}-#{current_sha} --lineage v#{lineage} --servertemplate_id #{st_id}"
-    command << " --mirror_freeze_date #{args[:mirror_freeze_date]}" if args[:mirror_freeze_date]
+    command << " --mirror_freeze_date #{args[:mirror_freeze_date]}" unless args[:mirror_freeze_date].empty?
     output = cmd(command, echo=false)
     ci_collateral_file = /Writing base template to (.*)$/.match(output)[1]
     ci_log_file = ci_collateral_file.sub(".yml",".log")
