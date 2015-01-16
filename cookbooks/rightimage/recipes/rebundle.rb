@@ -118,7 +118,7 @@ bash "launch the remote instance" do
   zone = node[:rightimage][:datacenter].to_s.empty? ? "US" : node[:rightimage][:datacenter]
 
   if node[:rightimage][:cloud] == "google" || node[:rightimage][:cloud] =~ /rackspace/i
-    name_opt = "--hostname ri-rebundle-#{node[:rightimage][:platform]}"
+    name_opt = "--hostname ri-rebundle-#{node[:rightimage][:platform]}-#{node[:rightimage][:platform_version].gsub(".","-")}"
   else
     name_opt = ""
   end
