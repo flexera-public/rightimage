@@ -1,5 +1,6 @@
 Changes
 -------
+ * 2015-01-16: bump to 14.2.0. rebundle: Pass platform_version to hostname on Google and Rackspace
  * 2014-12-04: bump to 14.1.4. Enable guestinfo on VMware
  * 2014-10-27: bump to 14.1.3. More CentOS 7 fixes
  * 2014-10-13: bump to 14.1.2. Remove temporary yum.conf.erb for EPEL
