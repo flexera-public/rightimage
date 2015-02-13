@@ -2,7 +2,7 @@ maintainer       "RightScale, Inc."
 maintainer_email "support@rightscale.com"
 name             "rightimage"
 description      "A cookbook for building RightImages"
-version          "14.2.0"
+version          "14.2.1"
 license          "Apache v2.0"
 
 depends "ros_upload"
