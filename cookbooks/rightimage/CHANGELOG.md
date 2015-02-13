@@ -1,5 +1,6 @@
 Changes
 -------
+ * 2015-02-12: bump to 14.2.1. Reinstall VMware tools on boot when the kernel is updated
  * 2015-01-16: bump to 14.2.0. rebundle: Pass platform_version to hostname on Google and Rackspace
  * 2014-12-04: bump to 14.1.4. Enable guestinfo on VMware
  * 2014-10-27: bump to 14.1.3. More CentOS 7 fixes

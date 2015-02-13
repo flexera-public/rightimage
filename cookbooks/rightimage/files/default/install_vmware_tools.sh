@@ -49,6 +49,14 @@ mv /tmp/fake-vmware-checkvm /usr/lib/vmware-tools/sbin64/vmware-checkvm
 
 /usr/bin/vmware-config-tools.pl --default --skip-stop-start
 
+# Reinstall VMware tools on boot when the kernel is updated (IV-773)
+# Sed this after running config, or it doesn't save the setting
+#
+# Known limitation: user needs to update/install kernel headers so the VMware
+#  modules can be rebuilt. CentOS: kernel-devel, Ubuntu: linux-headers
+sed -i "s/answer AUTO_KMODS_ENABLED_ANSWER no/answer AUTO_KMODS_ENABLED_ANSWER yes/" /etc/vmware-tools/locations
+sed -i "s/answer AUTO_KMODS_ENABLED no/answer AUTO_KMODS_ENABLED yes/" /etc/vmware-tools/locations
+
 # We depmod against the host kernel by default - force guest depmod. We also
 # throw lots of FATAL type errors in vmware-config-tools but that's ok, they're
 # not actually fatal
