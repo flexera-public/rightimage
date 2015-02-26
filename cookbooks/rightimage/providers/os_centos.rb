@@ -72,6 +72,20 @@ action :install do
   mkdir -p #{guest_root}/var/log
   touch #{guest_root}/var/log/yum.log
 
+  # /var/run on EL7 is a symlink to /run on tmpfs (IV-1043)
+  if [ "#{el7?}" == "true" ]; then
+    mkdir -p #{guest_root}/run
+
+    set +e
+    mount | grep "#{guest_root}/run"
+    ret=$?
+    set -e
+    if [ "$ret" == "1" ]; then
+      mount -t tmpfs none #{guest_root}/run
+    fi
+
+    ln -sf ../run #{guest_root}/var/run
+  fi
 
   ## bootstrap base OS.  
   # We have to disable the rightscale-epel in the base install due to a subtle bug with
