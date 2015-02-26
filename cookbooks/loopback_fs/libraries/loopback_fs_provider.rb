@@ -38,6 +38,7 @@ class Chef
         shell_out "umount -lf #{mount_point}/dev/pts"
         shell_out "umount -lf #{mount_point}/dev"
         shell_out "umount -lf #{mount_point}/proc"
+        shell_out "umount -lf #{mount_point}/run"
         shell_out "umount -lf #{mount_point}/sys"
       end
 
