@@ -148,6 +148,18 @@ def upload_ebs
         node.set["rightimage"]["ebs_volume_id"] = vol_id
       end
     end
+
+    ruby_block "Wait for volume to create" do
+      block do
+        Timeout::timeout(15*20) do
+          while true
+            status = ec2_api_command("describe-volumes", {"volume-ids" => node["rightimage"]["ebs_volume_id"]})
+            break if status["Volumes"][0]["State"] == "available"
+            sleep 20
+          end
+        end
+      end
+    end
   end
 
 
