@@ -177,6 +177,10 @@ def install_grub_config
       creates "#{new_resource.root}/boot/grub/grub.conf"
     end
   else
+    # IV-1232: On Ubuntu this will add extra entries with the loopback device.
+    # Disable while running update-grub
+    execute "chroot #{new_resource.root} chmod ugo-x /etc/grub.d/30_os-prober"
+
     if new_resource.platform == "ubuntu"
       execute "chroot #{new_resource.root} /usr/sbin/update-grub"
 
@@ -185,6 +189,9 @@ def install_grub_config
     else
       execute "chroot #{new_resource.root} /usr/sbin/grub2-mkconfig -o /boot/grub2/grub.cfg"
     end
+
+    # IV-1232
+    execute "chroot #{new_resource.root} chmod ugo+x /etc/grub.d/30_os-prober"
   end
 
   # Setup /etc/sysconfig/kernel to allow grub to auto-update grub.conf when updating kernel.
