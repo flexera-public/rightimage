@@ -1,13 +1,19 @@
+<% unless node[:rightimage][:platform] =~ /centos|rhel/ -%>
 # If you change this file, run 'update-grub' afterwards to update
 # /boot/grub/grub.cfg.
 # For full documentation of the options in this file, see:
 #   info -f grub -n 'Simple configuration'
 
+<% end -%>
 GRUB_DEFAULT=0
-GRUB_HIDDEN_TIMEOUT=0
-GRUB_HIDDEN_TIMEOUT_QUIET=true
+#GRUB_HIDDEN_TIMEOUT=0
+#GRUB_HIDDEN_TIMEOUT_QUIET=true
 GRUB_TIMEOUT=<%= @timeout %>
+<% if node[:rightimage][:platform] =~ /centos|rhel/ -%>
+GRUB_DISTRIBUTOR="$(sed 's, release .*$,,g' /etc/system-release)"
+<% else -%>
 GRUB_DISTRIBUTOR=`lsb_release -i -s 2> /dev/null || echo Debian`
+<% end -%>
 GRUB_CMDLINE_LINUX_DEFAULT="<%=@grub_kernel_options%>"
 GRUB_CMDLINE_LINUX=""
 
