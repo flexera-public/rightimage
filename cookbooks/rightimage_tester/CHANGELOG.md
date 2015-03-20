@@ -1,5 +1,9 @@
 # CHANGES
 
+## 14.2.1
+
+* ldconfig: Grep for errors when running ldconfig
+
 ## 14.1.2
 
 * Add yum-cron to banned packages test
