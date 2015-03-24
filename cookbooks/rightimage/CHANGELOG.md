@@ -1,6 +1,9 @@
 Changes
 -------
- * 2015-02-25: bump to 14.2.2. Make /var/run a symlink to /run on CentOS 7. Add wait for volume create/detach to complete on EBS upload. Fix grub timeout on Ubuntu.
+ * 2015-02-25: bump to 14.2.2. Make /var/run a symlink to /run on CentOS 7.
+               Add wait for volume create/detach to complete on EBS upload.
+               Fix grub timeout on Ubuntu.
+               rebundle: Run resize script.
  * 2015-02-12: bump to 14.2.1. Reinstall VMware tools on boot when the kernel is updated
  * 2015-01-16: bump to 14.2.0. rebundle: Pass platform_version to hostname on Google and Rackspace
  * 2014-12-04: bump to 14.1.4. Enable guestinfo on VMware

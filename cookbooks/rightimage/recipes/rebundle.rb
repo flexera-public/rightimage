@@ -150,6 +150,14 @@ bash "upload code to the remote instance" do
   EOH
 end
 
+bash "resize the remote instance" do
+  flags "-ex"
+  cwd Rebundle::REBUNDLE_SOURCE_PATH
+  code <<-EOH
+  #{ruby_bin_dir}/ruby bin/resize
+  EOH
+end
+
 bash "configure the remote instance" do
   flags "-ex"
   cwd Rebundle::REBUNDLE_SOURCE_PATH
