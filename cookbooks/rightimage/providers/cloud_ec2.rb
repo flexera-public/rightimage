@@ -329,10 +329,7 @@ def upload_ebs
       Timeout::timeout(60*20) do
         while true
           status = ec2_api_command("describe-volumes", {"volume-ids" => node["rightimage"]["ebs_volume_id"]})
-Chef::Log.info("STATUS: #{status}")
           break if status["Volumes"][0]["State"] == "available"
-#         attachments = status["Volumes"][0]["Attachments"]
-#          break if attachments.any? { |a| a["InstanceId"] == instance_id && a["State"] == "available" }
           sleep 20
         end
       end
