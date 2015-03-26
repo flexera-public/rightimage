@@ -320,9 +320,19 @@ def upload_ebs
 
   ruby_block "Detach volume" do
     block do 
-      ec2_api_command("detach-volume", { "volume-id" => node["rightimage"]["ebs_volume_id"], "instance-id" => instance_id, "force" => true })
-      # TBD: Should get rid of the force parameter and wait for detachment here. 
-      sleep 20
+      ec2_api_command("detach-volume", { "volume-id" => node["rightimage"]["ebs_volume_id"], "instance-id" => instance_id })
+    end
+  end
+
+  ruby_block "Wait for volume to detach" do
+    block do
+      Timeout::timeout(60*20) do
+        while true
+          status = ec2_api_command("describe-volumes", {"volume-ids" => node["rightimage"]["ebs_volume_id"]})
+          break if status["Volumes"][0]["State"] == "available"
+          sleep 20
+        end
+      end
     end
   end
 

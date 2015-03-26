@@ -3,7 +3,7 @@ maintainer       "RightScale, Inc."
 maintainer_email "support@rightscale.com"
 description      "A cookbook for testing RightImages"
 license          "Apache v2.0"
-version          "14.1.2"
+version          "14.2.1"
 
 depends "rightscale"
 depends "rightscale_volume"

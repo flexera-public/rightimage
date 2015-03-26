@@ -19,9 +19,29 @@
 
 rightscale_marker :begin
 
-rightimage_tester "Verify ldconfig runs" do
-  command "ldconfig"
-  action :test
+bash "Verify ldconfig runs" do
+  flags "-e"
+  code <<-EOH
+    ldconfig=$(ldconfig 2>&1)
+    res=$?
+
+    # ldconfig will still exit 0 in the case of I/O errors loading libraries (IV-1382)
+    if [ "$res" == "0" ]; then
+      set +e
+      echo "$ldconfig" | grep "error"
+      res2=$?
+      set -e
+
+      if [ "$res2" == "0" ]; then
+        exit 1
+      else
+        exit 0
+      fi
+    else
+      # This shouldn't get called if -e flag is on.
+      exit $res
+    fi
+  EOH
 end
 
 rightscale_marker :end
