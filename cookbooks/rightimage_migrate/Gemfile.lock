@@ -79,7 +79,7 @@ GEM
     coderay (1.1.0)
     diff-lcs (1.2.5)
     erubis (2.7.0)
-    excon (0.33.0)
+    excon (0.71.0)
     faraday (0.8.9)
       multipart-post (~> 1.2.0)
     ffi (1.9.3)
